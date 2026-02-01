@@ -24,11 +24,13 @@ CORE OBJECTIVES
    - All transactions visible on-chain
    - Real-time reserve tracking
    - Public loan request/approval history
+   - Explainable AI decisions with clear reasoning
 
 2. DECENTRALIZATION
    - No centralized database
    - Smart contract-based logic
    - Self-executing transactions
+   - Distributed ML inference (optional federated learning)
 
 3. ACCESSIBILITY
    - Cross-platform compatibility (PC, Mobile, Tablet)
@@ -40,7 +42,21 @@ CORE OBJECTIVES
    - Architecture ready for mainnet deployment
    - Modular design for feature expansion
 
-SYSTEM ARCHITECTURE
+5. INTELLIGENT SECURITY (NEW)
+   - AI-powered fraud detection
+   - Real-time anomaly monitoring
+   - Attack pattern recognition
+   - Automated risk assessment
+   - Explainable ML decisions
+
+6. RESEARCH CONTRIBUTION (NEW)
+   - Novel integration of AI/ML in DeFi lending
+   - Demonstrable security improvements
+   - Quantifiable performance metrics
+   - Publishable academic research
+   - Open-source reference implementation
+
+SYSTEM ARCHITECTURE (WITH AI/ML INTEGRATION)
 ================================================================================
 
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -50,6 +66,20 @@ SYSTEM ARCHITECTURE
 │  - Responsive Design             │  - Native Feel                   │
 │  - Material Design 3             │  - QR Scanner Integration        │
 │  - Wallet Integration            │  - WalletConnect                 │
+│  - Risk Dashboard                │  - XAI Visualizations            │
+│  - Real-time Alerts              │  - ML Recommendations            │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    AI/ML BACKEND SERVICE (Python)                   │
+├─────────────────────────────────────────────────────────────────────┤
+│  • Anomaly Detection (Isolation Forest + Autoencoder)               │
+│  • Fraud Detection (Random Forest)                                  │
+│  • Explainable AI (SHAP + LIME)                                     │
+│  • RL Policy (DQN for lending optimization)                         │
+│  • Attack Detection (LSTM for pattern recognition)                  │
+│  • Real-time Monitoring & Alerting                                  │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
                                    ▼
@@ -59,6 +89,7 @@ SYSTEM ARCHITECTURE
 │  • Ethers.js / Web3.js          │  • WalletConnect SDK             │
 │  • MetaMask Integration         │  • QR Code Generator/Scanner     │
 │  • Contract ABI Interface       │  • Transaction Encoder           │
+│  • ML API Connector             │  • Blockchain Event Listener     │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
                                    ▼
@@ -73,6 +104,16 @@ SYSTEM ARCHITECTURE
 │  └───────────────────────────────────────────────────────────┘    │
 │                                                                      │
 │  Deployment Network: Polygon Mumbai / Sepolia Testnet               │
+└─────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    DATA & ANALYTICS LAYER                           │
+├─────────────────────────────────────────────────────────────────────┤
+│  • PostgreSQL (Features & History)                                  │
+│  • Redis (Caching & Real-time Alerts)                               │
+│  • Time-series Analytics                                            │
+│  • Model Training Pipeline                                          │
 └─────────────────────────────────────────────────────────────────────┘
 
 FEATURE SPECIFICATION
@@ -130,10 +171,15 @@ ADMIN FEATURES (Restricted Access)
    - Reserve health indicators
    - Pending requests queue
    - Approval history
+   - AI/ML Risk Analytics Dashboard
+   - Real-time Security Alerts
 
 2. LOAN MANAGEMENT
    - View all pending loan requests
-   - Review loan details
+   - Review loan details with AI risk scores
+   - Fraud probability indicators
+   - RL-based approval recommendations
+   - XAI explanations for flagged loans
    - Approve/Reject loans
    - Release funds to borrowers
    - Track loan lifecycle
@@ -143,6 +189,56 @@ ADMIN FEATURES (Restricted Access)
    - Monitor reserve utilization
    - Set loan limits (future)
    - Emergency pause functionality (future)
+
+AI/ML SECURITY FEATURES (Integrated Throughout)
+--------------------------------------------------------------------------------
+
+1. WALLET BEHAVIOR ANOMALY DETECTION
+   - Real-time transaction pattern analysis
+   - Anomaly score calculation (Isolation Forest + Autoencoder)
+   - Alert generation for suspicious behavior
+   - Historical pattern visualization
+   - Risk level classification (Low/Medium/High)
+
+2. FRAUD & LOAN ABUSE DETECTION
+   - AI-powered loan request screening
+   - Multi-account detection via graph analysis
+   - Collusion pattern identification
+   - Purpose text analysis (NLP)
+   - Fraud probability scoring (Random Forest)
+   - Automated reason generation
+
+3. EXPLAINABLE AI (XAI)
+   - SHAP explanations for AI decisions
+   - Feature importance visualization
+   - Plain-text decision reasoning
+   - Waterfall plots showing contribution factors
+   - "What-if" counterfactual analysis
+   - Transparency for admins and users
+
+4. REINFORCEMENT LEARNING LENDING POLICY
+   - AI-optimized loan approval suggestions
+   - Dynamic policy based on reserve state
+   - Expected reward predictions
+   - Human-in-the-loop validation
+   - Confidence scores for recommendations
+   - Performance tracking vs baseline
+
+5. SMART CONTRACT ATTACK DETECTION
+   - LSTM-based pattern recognition
+   - Reentrancy attack detection
+   - Front-running identification
+   - Flash loan abuse monitoring
+   - Abnormal call sequence alerts
+   - Gas manipulation detection
+
+6. REAL-TIME SECURITY MONITORING
+   - Continuous blockchain event listening
+   - Automated threat assessment
+   - Alert dashboard with severity levels
+   - Historical attack pattern database
+   - Integration with all AI/ML models
+   - Notification system for critical events
 
 CROSS-PLATFORM FEATURES
 --------------------------------------------------------------------------------
@@ -406,11 +502,29 @@ FRONTEND (WEB)
 • State Management: React Context API + Zustand
 • Blockchain Interaction: Ethers.js v6
 • Wallet Connection: RainbowKit / WalletConnect
-• QR Code: qrcode.react, react-qr-reader
+• QR Code: qrcode.react
 • Routing: React Router v6
 • Forms: React Hook Form + Zod validation
 • HTTP Client: Axios
+• Visualization: Recharts, Plotly.js (for ML dashboards)
 • Build Tool: Vite
+
+AI/ML BACKEND (NEW)
+--------------------------------------------------------------------------------
+• Framework: FastAPI (Python)
+• ML Libraries:
+  - scikit-learn (Anomaly Detection, Fraud Detection)
+  - PyTorch (Deep Learning, LSTM)
+  - Stable-Baselines3 (Reinforcement Learning)
+  - SHAP, LIME (Explainable AI)
+• Data Processing: pandas, numpy
+• Database: PostgreSQL (feature storage)
+• Caching: Redis (real-time alerts)
+• Task Queue: Celery (async ML inference)
+• Blockchain Integration: web3.py
+• Visualization: Matplotlib, Seaborn, Plotly
+• Containerization: Docker + Docker Compose
+• Model Serving: Joblib (serialization)
 
 FRONTEND (MOBILE)
 --------------------------------------------------------------------------------
@@ -418,13 +532,15 @@ FRONTEND (MOBILE)
 • Alternative: PWA with native capabilities
 • UI Library: React Native Paper (Material Design)
 • Navigation: React Navigation
-• QR Scanner: react-native-camera / expo-camera
+• QR Scanner: expo-camera
 • Wallet: WalletConnect Mobile SDK
 • Storage: AsyncStorage
 
 DEPLOYMENT & HOSTING
 --------------------------------------------------------------------------------
-• Web Hosting: Vercel / Netlify
+• Web Hosting: Vercel / Netlify (Frontend)
+• ML Backend: Docker on cloud (DigitalOcean, AWS, or local)
+• Database: PostgreSQL (managed or Docker)
 • CDN: Cloudflare
 • Domain: Custom domain with SSL
 • IPFS: (Optional) Decentralized hosting
@@ -435,9 +551,11 @@ DEVELOPMENT TOOLS
 • Version Control: Git + GitHub
 • Code Editor: VS Code
 • Node Version: 18.x LTS
-• Package Manager: npm / yarn
-• Linting: ESLint + Prettier
-• Type Checking: TypeScript
+• Python Version: 3.10+
+• Package Manager: npm / yarn (JS), pip (Python)
+• Linting: ESLint + Prettier (JS), Black + Flake8 (Python)
+• Type Checking: TypeScript (JS), mypy (Python)
+• Notebooks: Jupyter (for ML experimentation)
 
 DEMO SCENARIO
 ================================================================================
@@ -830,7 +948,140 @@ demo-ready application that showcases your understanding of:
 The result will be a portfolio-worthy project that demonstrates real-world 
 application of decentralized technology for social good.
 
-NEXT STEPS: See IMPLEMENTATION_GUIDE.txt for detailed build instructions.
+AI/ML RESEARCH COMPONENT
+================================================================================
+
+RESEARCH OBJECTIVES
+--------------------------------------------------------------------------------
+1. Demonstrate AI/ML can improve security in decentralized lending
+2. Quantify fraud detection improvements vs rule-based systems
+3. Prove explainable AI enables transparent automated decisions
+4. Show RL can optimize lending policies for better outcomes
+5. Publish findings as academic research
+
+NOVELTY & CONTRIBUTIONS
+--------------------------------------------------------------------------------
+• First integrated AI/ML security framework for DeFi lending on testnet
+• Explainable AI for blockchain decision transparency
+• RL-based adaptive lending policy optimization
+• Multi-layered cybersecurity (wallet + contract + loan levels)
+• Open-source reference implementation
+
+EVALUATION METRICS
+--------------------------------------------------------------------------------
+Anomaly Detection:
+- ROC-AUC Score
+- Precision, Recall, F1-Score
+- False Positive Rate
+- Detection Latency (<500ms target)
+
+Fraud Detection:
+- Classification Accuracy
+- Confusion Matrix Analysis
+- Cost-Benefit Analysis (funds saved)
+- Comparison with baseline (rule-based)
+
+RL Policy:
+- Cumulative Reward over Episodes
+- Default Rate (target: <15% vs 25% baseline)
+- Approval Rate (accessibility metric)
+- Reserve Stability (variance)
+
+Attack Detection:
+- Detection Rate per Attack Type (>90% target)
+- Time to Detection
+- False Alarm Rate (<5% target)
+
+XAI Quality:
+- User Comprehension (survey-based)
+- Explanation Fidelity
+- Trust Metrics
+
+EXPECTED OUTCOMES
+--------------------------------------------------------------------------------
+✓ Functional prototype with all 6 AI/ML features
+✓ Performance benchmarks demonstrating improvements
+✓ Research paper (6-8 pages) for academic submission
+✓ Technical documentation (15-20 pages)
+✓ Presentation slides (20-25 slides)
+✓ Demo video (5-7 minutes)
+✓ Open-source codebase with documentation
+
+ACADEMIC DELIVERABLES
+--------------------------------------------------------------------------------
+1. Research Paper Structure:
+   - Abstract (150-200 words)
+   - Introduction (problem, motivation, objectives)
+   - Related Work (DeFi, AI in blockchain, XAI)
+   - Methodology (architecture, algorithms, implementation)
+   - Experimental Setup (datasets, parameters)
+   - Results & Discussion (metrics, visualizations, analysis)
+   - Conclusion & Future Work
+
+2. Demonstration Scenarios:
+   - Normal loan approval flow
+   - Fraud detection with XAI explanation
+   - Anomaly alert generation
+   - RL recommendation showcase
+   - Attack detection simulation
+
+3. Comparison Baselines:
+   - Manual review (current practice)
+   - Rule-based fraud detection
+   - Random loan approval policy
+   - No security monitoring
+
+TIMELINE (INTEGRATED WITH PROTOTYPE)
+--------------------------------------------------------------------------------
+Weeks 1-2:   Blockchain Prototype (Days 1-10)
+Weeks 3-4:   ML Infrastructure & Data (Days 11-12)
+Weeks 5-6:   Core ML Models (Days 13-16)
+Weeks 7-8:   XAI & Integration (Days 17-21)
+Weeks 9-10:  Evaluation & Documentation (Days 22-25)
+Weeks 11-12: Research Paper & Presentation Prep
+
+FUTURE RESEARCH DIRECTIONS
+--------------------------------------------------------------------------------
+• Federated learning for privacy-preserving collaborative fraud detection
+• Advanced NLP for deeper loan purpose analysis
+• Graph Neural Networks for sophisticated collusion detection
+• Adversarial robustness of ML models
+• Cross-chain fraud detection patterns
+• Mainnet deployment considerations and challenges
+
+NEXT STEPS
+================================================================================
+
+Phase 1 (Already Complete):
+✓ Review AI_ML_RESEARCH_PLAN.txt for detailed theory
+✓ See IMPLEMENTATION_GUIDE.txt for Days 1-14 step-by-step
+✓ Check AI_ML_IMPLEMENTATION_STEPS.txt for Days 15-25
+
+Phase 2 (To Implement):
+1. Set up ML backend environment (Day 11)
+2. Generate synthetic datasets (Day 11)
+3. Train anomaly + fraud detectors (Days 12-13)
+4. Integrate XAI (Day 14)
+5. Build RL environment & agent (Days 15-16)
+6. Complete attack detection (Day 18)
+7. Integrate with frontend (Days 19-21)
+8. Evaluate & document (Days 22-25)
+
+Phase 3 (Demonstration):
+1. Prepare demo scenarios from DEMO_STATUS.md
+2. Practice demo flow (5-7 minutes)
+3. Prepare Q&A responses
+4. Create backup plans (recorded video, screenshots)
+5. Deploy and test end-to-end
+
+DOCUMENTATION FILES
+--------------------------------------------------------------------------------
+📄 PROJECT_PLAN.txt - Overall project plan (this file)
+📄 IMPLEMENTATION_GUIDE.txt - Days 1-14 detailed steps
+📄 AI_ML_RESEARCH_PLAN.txt - AI/ML theory and approach
+📄 AI_ML_IMPLEMENTATION_STEPS.txt - Days 15-25 quick reference
+📄 DEMO_STATUS.md - Current status and demo preparation
+📄 README.md - Quick start and setup guide
 
 ================================================================================
 END OF PROJECT PLAN

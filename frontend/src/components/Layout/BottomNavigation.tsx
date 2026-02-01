@@ -9,6 +9,7 @@ import {
   RequestQuote,
   AdminPanelSettings,
   QrCode2,
+  Security,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -16,7 +17,7 @@ const navItems = [
   { label: "Dashboard", value: "/", icon: <Dashboard /> },
   { label: "Deposit", value: "/deposit", icon: <Add /> },
   { label: "Loan", value: "/loan", icon: <RequestQuote /> },
-  { label: "QR", value: "/qr", icon: <QrCode2 /> },
+  { label: "Risk AI", value: "/risk", icon: <Security /> },
   { label: "Admin", value: "/admin", icon: <AdminPanelSettings /> },
 ];
 

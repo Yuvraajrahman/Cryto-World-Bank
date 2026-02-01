@@ -2849,5 +2849,967 @@ and future expansion.
 Good luck with your demonstration!
 
 ================================================================================
+PART 2: AI/ML CYBERSECURITY INTEGRATION (DAYS 11-25)
+================================================================================
+
+This section adds intelligent security and risk analysis on top of the existing
+blockchain prototype. By the end, you'll have ML-powered fraud detection,
+anomaly detection, explainable AI, and RL-based lending policy.
+
+PREREQUISITES
+--------------------------------------------------------------------------------
+✓ Completed Days 1-10 (working blockchain prototype)
+✓ Python 3.10+ installed
+✓ Basic ML knowledge (sklearn, PyTorch basics)
+✓ 8GB+ RAM (16GB recommended for training)
+
+NEW TECH STACK
+--------------------------------------------------------------------------------
+Backend: Python + FastAPI
+ML: scikit-learn, PyTorch, SHAP, LIME
+Data: pandas, numpy, PostgreSQL
+RL: Stable-Baselines3, Gym
+Visualization: Plotly, Matplotlib
+
+================================================================================
+DAY 11: AI/ML BACKEND SETUP & DATA PIPELINE
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 11.1: Create AI/ML Backend Structure
+-------------------------------------------
+□ Create ml-backend directory structure
+  ```bash
+  mkdir -p ml-backend/{app,models,data,notebooks,tests}
+  mkdir -p ml-backend/app/{api,ml,services,utils}
+  mkdir -p ml-backend/data/{synthetic,real,processed}
+  mkdir -p ml-backend/models/{trained,configs}
+  ```
+
+□ Initialize Python project
+  ```bash
+  cd ml-backend
+  python -m venv venv
+  source venv/bin/activate  # Windows: venv\Scripts\activate
+  ```
+
+□ Create requirements.txt
+  ```
+  fastapi==0.109.0
+  uvicorn[standard]==0.27.0
+  pydantic==2.5.0
+  scikit-learn==1.4.0
+  pandas==2.2.0
+  numpy==1.26.0
+  torch==2.2.0
+  shap==0.44.0
+  lime==0.2.0.1
+  stable-baselines3==2.2.0
+  gymnasium==0.29.0
+  psycopg2-binary==2.9.9
+  sqlalchemy==2.0.25
+  redis==5.0.1
+  celery==5.3.6
+  web3==6.15.0
+  python-dotenv==1.0.0
+  plotly==5.18.0
+  matplotlib==3.8.2
+  seaborn==0.13.0
+  pytest==7.4.4
+  httpx==0.26.0
+  ```
+
+□ Install dependencies
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+STEP 11.2: Set Up FastAPI Backend
+-----------------------------------
+□ Create ml-backend/app/main.py
+  ```python
+  from fastapi import FastAPI
+  from fastapi.middleware.cors import CORSMiddleware
+  
+  app = FastAPI(
+      title="Crypto World Bank AI/ML API",
+      description="ML-powered security and risk analysis",
+      version="1.0.0"
+  )
+  
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=["http://localhost:5173"],
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+  
+  @app.get("/")
+  def root():
+      return {"status": "AI/ML Backend Running", "version": "1.0.0"}
+  
+  @app.get("/health")
+  def health():
+      return {"status": "healthy"}
+  ```
+
+□ Test backend
+  ```bash
+  uvicorn app.main:app --reload --port 8000
+  ```
+  Visit http://localhost:8000/docs for API docs
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 11.3: Create Synthetic Data Generator
+--------------------------------------------
+□ Create ml-backend/app/utils/data_generator.py
+  ```python
+  import numpy as np
+  import pandas as pd
+  from datetime import datetime, timedelta
+  
+  class WalletDataGenerator:
+      def __init__(self, n_wallets=1000, n_days=30):
+          self.n_wallets = n_wallets
+          self.n_days = n_days
+      
+      def generate_normal_wallets(self, n=800):
+          """Generate normal wallet behavior"""
+          data = []
+          for i in range(n):
+              wallet_id = f"0x{np.random.randint(0, 16**40):040x}"
+              
+              # Normal patterns
+              txs_per_day = np.random.poisson(5)
+              avg_amount = np.random.lognormal(0, 1)
+              tx_times = np.random.normal(12, 3, size=txs_per_day)
+              
+              for day in range(self.n_days):
+                  for _ in range(txs_per_day):
+                      data.append({
+                          'wallet': wallet_id,
+                          'timestamp': datetime.now() - timedelta(days=day),
+                          'amount': abs(np.random.normal(avg_amount, 0.2)),
+                          'tx_type': np.random.choice(['deposit', 'withdraw'], p=[0.6, 0.4]),
+                          'gas_price': np.random.uniform(20, 50),
+                          'is_anomaly': 0
+                      })
+          return pd.DataFrame(data)
+      
+      def generate_anomalous_wallets(self, n=200):
+          """Generate anomalous wallet behavior"""
+          data = []
+          for i in range(n):
+              wallet_id = f"0x{np.random.randint(0, 16**40):040x}"
+              
+              # Anomalous patterns
+              if i % 3 == 0:  # High frequency
+                  txs_per_day = np.random.poisson(50)
+              elif i % 3 == 1:  # Large amounts
+                  txs_per_day = 5
+              else:  # Odd hours
+                  txs_per_day = 10
+              
+              for day in range(self.n_days):
+                  for _ in range(txs_per_day):
+                      if i % 3 == 1:
+                          amount = np.random.uniform(100, 1000)
+                      else:
+                          amount = np.random.lognormal(0, 1)
+                      
+                      hour = np.random.choice([2, 3, 4]) if i % 3 == 2 else np.random.randint(0, 24)
+                      
+                      data.append({
+                          'wallet': wallet_id,
+                          'timestamp': datetime.now() - timedelta(days=day, hours=hour),
+                          'amount': amount,
+                          'tx_type': np.random.choice(['deposit', 'withdraw']),
+                          'gas_price': np.random.uniform(50, 200) if i % 3 == 0 else np.random.uniform(20, 50),
+                          'is_anomaly': 1
+                      })
+          return pd.DataFrame(data)
+      
+      def generate_dataset(self):
+          """Generate complete dataset"""
+          normal = self.generate_normal_wallets()
+          anomalous = self.generate_anomalous_wallets()
+          df = pd.concat([normal, anomalous], ignore_index=True)
+          df = df.sample(frac=1).reset_index(drop=True)
+          return df
+  ```
+
+□ Create ml-backend/app/utils/loan_data_generator.py
+  ```python
+  import numpy as np
+  import pandas as pd
+  
+  class LoanDataGenerator:
+      PURPOSES_NORMAL = [
+          "Education expenses",
+          "Medical treatment",
+          "Business expansion",
+          "Home renovation",
+          "Emergency funds"
+      ]
+      
+      PURPOSES_FRAUD = [
+          "urgent need fast",
+          "investment opportunity guaranteed returns",
+          "quick cash needed",
+          "temporary loan will repay soon",
+          "test purpose"
+      ]
+      
+      def generate_normal_loans(self, n=700):
+          data = []
+          for i in range(n):
+              wallet_age = np.random.uniform(30, 365)
+              wallet_balance = np.random.lognormal(1, 1)
+              loan_amount = np.random.uniform(0.1, wallet_balance * 0.8)
+              
+              data.append({
+                  'wallet': f"0x{np.random.randint(0, 16**40):040x}",
+                  'amount': loan_amount,
+                  'purpose': np.random.choice(self.PURPOSES_NORMAL),
+                  'wallet_age_days': wallet_age,
+                  'wallet_balance': wallet_balance,
+                  'previous_loans': np.random.poisson(1),
+                  'avg_tx_amount': np.random.lognormal(0, 0.5),
+                  'tx_count': np.random.poisson(20),
+                  'is_fraud': 0
+              })
+          return pd.DataFrame(data)
+      
+      def generate_fraudulent_loans(self, n=300):
+          data = []
+          for i in range(n):
+              wallet_age = np.random.uniform(1, 30)
+              wallet_balance = np.random.uniform(0, 0.1)
+              loan_amount = np.random.uniform(5, 100)
+              
+              data.append({
+                  'wallet': f"0x{np.random.randint(0, 16**40):040x}",
+                  'amount': loan_amount,
+                  'purpose': np.random.choice(self.PURPOSES_FRAUD),
+                  'wallet_age_days': wallet_age,
+                  'wallet_balance': wallet_balance,
+                  'previous_loans': np.random.poisson(5),
+                  'avg_tx_amount': np.random.uniform(0, 0.01),
+                  'tx_count': np.random.poisson(2),
+                  'is_fraud': 1
+              })
+          return pd.DataFrame(data)
+      
+      def generate_dataset(self):
+          normal = self.generate_normal_loans()
+          fraud = self.generate_fraudulent_loans()
+          df = pd.concat([normal, fraud], ignore_index=True)
+          df = df.sample(frac=1).reset_index(drop=True)
+          return df
+  ```
+
+□ Generate and save datasets
+  ```python
+  # ml-backend/scripts/generate_data.py
+  from app.utils.data_generator import WalletDataGenerator
+  from app.utils.loan_data_generator import LoanDataGenerator
+  
+  wallet_gen = WalletDataGenerator()
+  wallet_data = wallet_gen.generate_dataset()
+  wallet_data.to_csv('data/synthetic/wallet_transactions.csv', index=False)
+  
+  loan_gen = LoanDataGenerator()
+  loan_data = loan_gen.generate_dataset()
+  loan_data.to_csv('data/synthetic/loan_requests.csv', index=False)
+  
+  print(f"Generated {len(wallet_data)} wallet transactions")
+  print(f"Generated {len(loan_data)} loan requests")
+  ```
+
+STEP 11.4: Set Up Database Connection
+---------------------------------------
+□ Create ml-backend/app/database.py
+  ```python
+  from sqlalchemy import create_engine
+  from sqlalchemy.ext.declarative import declarative_base
+  from sqlalchemy.orm import sessionmaker
+  import os
+  
+  DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost/cryptobank_ml")
+  
+  engine = create_engine(DATABASE_URL)
+  SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+  Base = declarative_base()
+  
+  def get_db():
+      db = SessionLocal()
+      try:
+          yield db
+      finally:
+          db.close()
+  ```
+
+DELIVERABLES FOR DAY 11
+--------------------------------------------------------------------------------
+✓ FastAPI backend running
+✓ Synthetic wallet transaction dataset
+✓ Synthetic loan request dataset
+✓ Database connection configured
+✓ Data generation scripts
+
+================================================================================
+DAY 12: ANOMALY DETECTION MODEL
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 12.1: Feature Engineering for Wallets
+--------------------------------------------
+□ Create ml-backend/app/ml/feature_engineering.py
+  ```python
+  import pandas as pd
+  import numpy as np
+  
+  class WalletFeatureExtractor:
+      def extract_features(self, df):
+          """Extract features from wallet transactions"""
+          features = df.groupby('wallet').agg({
+              'amount': ['mean', 'std', 'max', 'min'],
+              'timestamp': 'count',
+              'gas_price': ['mean', 'max'],
+          }).reset_index()
+          
+          features.columns = ['wallet', 'avg_amount', 'std_amount', 
+                             'max_amount', 'min_amount', 'tx_count',
+                             'avg_gas', 'max_gas']
+          
+          # Time-based features
+          df['hour'] = pd.to_datetime(df['timestamp']).dt.hour
+          hour_dist = df.groupby('wallet')['hour'].apply(lambda x: x.value_counts().std())
+          features['hour_variance'] = features['wallet'].map(hour_dist)
+          
+          # Deposit/withdrawal ratio
+          type_ratio = df.groupby('wallet')['tx_type'].apply(
+              lambda x: (x == 'deposit').sum() / len(x)
+          )
+          features['deposit_ratio'] = features['wallet'].map(type_ratio)
+          
+          return features
+  ```
+
+STEP 12.2: Train Isolation Forest
+-----------------------------------
+□ Create ml-backend/app/ml/anomaly_detector.py
+  ```python
+  from sklearn.ensemble import IsolationForest
+  from sklearn.preprocessing import StandardScaler
+  import joblib
+  import numpy as np
+  
+  class AnomalyDetector:
+      def __init__(self):
+          self.scaler = StandardScaler()
+          self.model = IsolationForest(
+              contamination=0.2,
+              random_state=42,
+              n_estimators=100
+          )
+      
+      def train(self, X, y=None):
+          """Train anomaly detector"""
+          X_scaled = self.scaler.fit_transform(X)
+          self.model.fit(X_scaled)
+          return self
+      
+      def predict(self, X):
+          """Predict anomalies"""
+          X_scaled = self.scaler.transform(X)
+          predictions = self.model.predict(X_scaled)
+          scores = self.model.score_samples(X_scaled)
+          
+          # Convert: -1 (anomaly) -> 1, 1 (normal) -> 0
+          predictions = (predictions == -1).astype(int)
+          
+          # Normalize scores to 0-1
+          anomaly_scores = 1 - (scores - scores.min()) / (scores.max() - scores.min())
+          
+          return predictions, anomaly_scores
+      
+      def save(self, path='models/trained/anomaly_detector.pkl'):
+          joblib.dump({'model': self.model, 'scaler': self.scaler}, path)
+      
+      def load(self, path='models/trained/anomaly_detector.pkl'):
+          data = joblib.load(path)
+          self.model = data['model']
+          self.scaler = data['scaler']
+          return self
+  ```
+
+□ Create training script ml-backend/scripts/train_anomaly_detector.py
+  ```python
+  import pandas as pd
+  from app.ml.feature_engineering import WalletFeatureExtractor
+  from app.ml.anomaly_detector import AnomalyDetector
+  from sklearn.metrics import classification_report, roc_auc_score
+  
+  # Load data
+  df = pd.read_csv('data/synthetic/wallet_transactions.csv')
+  
+  # Extract features
+  extractor = WalletFeatureExtractor()
+  features = extractor.extract_features(df)
+  
+  # Get labels (if available)
+  labels = df.groupby('wallet')['is_anomaly'].max()
+  features['label'] = features['wallet'].map(labels)
+  
+  # Train
+  X = features.drop(['wallet', 'label'], axis=1).fillna(0)
+  y = features['label']
+  
+  detector = AnomalyDetector()
+  detector.train(X)
+  
+  # Evaluate
+  y_pred, scores = detector.predict(X)
+  print(classification_report(y, y_pred))
+  print(f"ROC-AUC: {roc_auc_score(y, scores):.3f}")
+  
+  # Save
+  detector.save()
+  print("Model saved to models/trained/anomaly_detector.pkl")
+  ```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 12.3: Create Anomaly Detection API
+-----------------------------------------
+□ Create ml-backend/app/api/anomaly.py
+  ```python
+  from fastapi import APIRouter, HTTPException
+  from pydantic import BaseModel
+  from typing import List
+  from app.ml.anomaly_detector import AnomalyDetector
+  from app.ml.feature_engineering import WalletFeatureExtractor
+  import pandas as pd
+  
+  router = APIRouter(prefix="/api/anomaly", tags=["Anomaly Detection"])
+  
+  # Load model at startup
+  detector = AnomalyDetector()
+  try:
+      detector.load()
+  except:
+      print("Warning: Anomaly model not loaded")
+  
+  class WalletTransaction(BaseModel):
+      wallet: str
+      amount: float
+      timestamp: str
+      tx_type: str
+      gas_price: float
+  
+  class AnomalyCheckResponse(BaseModel):
+      wallet: str
+      is_anomalous: bool
+      anomaly_score: float
+      risk_level: str
+      contributing_features: dict
+  
+  @router.post("/check-wallet", response_model=AnomalyCheckResponse)
+  async def check_wallet_anomaly(transactions: List[WalletTransaction]):
+      """Check if wallet behavior is anomalous"""
+      if not transactions:
+          raise HTTPException(400, "No transactions provided")
+      
+      # Convert to DataFrame
+      df = pd.DataFrame([t.dict() for t in transactions])
+      
+      # Extract features
+      extractor = WalletFeatureExtractor()
+      features = extractor.extract_features(df)
+      
+      # Predict
+      X = features.drop(['wallet'], axis=1).fillna(0)
+      predictions, scores = detector.predict(X)
+      
+      wallet = transactions[0].wallet
+      is_anomalous = bool(predictions[0])
+      score = float(scores[0])
+      
+      # Determine risk level
+      if score > 0.8:
+          risk_level = "HIGH"
+      elif score > 0.5:
+          risk_level = "MEDIUM"
+      else:
+          risk_level = "LOW"
+      
+      # Contributing features (simplified)
+      feature_names = X.columns.tolist()
+      feature_values = X.iloc[0].to_dict()
+      
+      return AnomalyCheckResponse(
+          wallet=wallet,
+          is_anomalous=is_anomalous,
+          anomaly_score=score,
+          risk_level=risk_level,
+          contributing_features=feature_values
+      )
+  ```
+
+□ Register router in ml-backend/app/main.py
+  ```python
+  from app.api import anomaly
+  
+  app.include_router(anomaly.router)
+  ```
+
+STEP 12.4: Test Anomaly Detection API
+---------------------------------------
+□ Test with curl or Postman
+  ```bash
+  curl -X POST http://localhost:8000/api/anomaly/check-wallet \
+    -H "Content-Type: application/json" \
+    -d '[{
+      "wallet": "0x1234...",
+      "amount": 100,
+      "timestamp": "2024-01-01T12:00:00",
+      "tx_type": "deposit",
+      "gas_price": 150
+    }]'
+  ```
+
+DELIVERABLES FOR DAY 12
+--------------------------------------------------------------------------------
+✓ Wallet feature extraction
+✓ Trained Isolation Forest model
+✓ Anomaly detection API endpoint
+✓ Model evaluation metrics
+
+================================================================================
+DAY 13: FRAUD & LOAN ABUSE DETECTION
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 13.1: Train Fraud Detection Model
+----------------------------------------
+□ Create ml-backend/app/ml/fraud_detector.py
+  ```python
+  from sklearn.ensemble import RandomForestClassifier
+  from sklearn.preprocessing import StandardScaler
+  from sklearn.model_selection import train_test_split
+  from sklearn.metrics import classification_report, confusion_matrix
+  import joblib
+  import numpy as np
+  
+  class FraudDetector:
+      def __init__(self):
+          self.scaler = StandardScaler()
+          self.model = RandomForestClassifier(
+              n_estimators=100,
+              max_depth=10,
+              random_state=42,
+              class_weight='balanced'
+          )
+      
+      def train(self, X, y):
+          """Train fraud detection model"""
+          X_train, X_test, y_train, y_test = train_test_split(
+              X, y, test_size=0.2, random_state=42, stratify=y
+          )
+          
+          X_train_scaled = self.scaler.fit_transform(X_train)
+          X_test_scaled = self.scaler.transform(X_test)
+          
+          self.model.fit(X_train_scaled, y_train)
+          
+          # Evaluate
+          y_pred = self.model.predict(X_test_scaled)
+          print(classification_report(y_test, y_pred))
+          print("Confusion Matrix:")
+          print(confusion_matrix(y_test, y_pred))
+          
+          return self
+      
+      def predict(self, X):
+          """Predict fraud probability"""
+          X_scaled = self.scaler.transform(X)
+          probabilities = self.model.predict_proba(X_scaled)[:, 1]
+          predictions = (probabilities > 0.5).astype(int)
+          return predictions, probabilities
+      
+      def get_feature_importance(self):
+          """Get feature importance scores"""
+          return dict(zip(
+              range(len(self.model.feature_importances_)),
+              self.model.feature_importances_
+          ))
+      
+      def save(self, path='models/trained/fraud_detector.pkl'):
+          joblib.dump({'model': self.model, 'scaler': self.scaler}, path)
+      
+      def load(self, path='models/trained/fraud_detector.pkl'):
+          data = joblib.load(path)
+          self.model = data['model']
+          self.scaler = data['scaler']
+          return self
+  ```
+
+□ Train fraud detector ml-backend/scripts/train_fraud_detector.py
+  ```python
+  import pandas as pd
+  from app.ml.fraud_detector import FraudDetector
+  
+  # Load data
+  df = pd.read_csv('data/synthetic/loan_requests.csv')
+  
+  # Prepare features
+  X = df.drop(['wallet', 'purpose', 'is_fraud'], axis=1)
+  y = df['is_fraud']
+  
+  # Train
+  detector = FraudDetector()
+  detector.train(X, y)
+  
+  # Save
+  detector.save()
+  print("Fraud detector saved")
+  ```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 13.2: Create Fraud Detection API
+---------------------------------------
+□ Create ml-backend/app/api/fraud.py
+  ```python
+  from fastapi import APIRouter
+  from pydantic import BaseModel
+  from app.ml.fraud_detector import FraudDetector
+  import pandas as pd
+  
+  router = APIRouter(prefix="/api/fraud", tags=["Fraud Detection"])
+  
+  detector = FraudDetector()
+  try:
+      detector.load()
+  except:
+      print("Warning: Fraud model not loaded")
+  
+  class LoanRequest(BaseModel):
+      wallet: str
+      amount: float
+      purpose: str
+      wallet_age_days: float
+      wallet_balance: float
+      previous_loans: int
+      avg_tx_amount: float
+      tx_count: int
+  
+  class FraudCheckResponse(BaseModel):
+      wallet: str
+      is_fraudulent: bool
+      fraud_score: float
+      risk_category: str
+      reasons: list
+  
+  @router.post("/check-loan", response_model=FraudCheckResponse)
+  async def check_loan_fraud(loan: LoanRequest):
+      """Check if loan request is fraudulent"""
+      # Prepare features
+      X = pd.DataFrame([{
+          'amount': loan.amount,
+          'wallet_age_days': loan.wallet_age_days,
+          'wallet_balance': loan.wallet_balance,
+          'previous_loans': loan.previous_loans,
+          'avg_tx_amount': loan.avg_tx_amount,
+          'tx_count': loan.tx_count,
+      }])
+      
+      # Predict
+      predictions, probabilities = detector.predict(X)
+      
+      is_fraud = bool(predictions[0])
+      score = float(probabilities[0])
+      
+      # Risk category
+      if score > 0.8:
+          risk = "HIGH"
+      elif score > 0.5:
+          risk = "MEDIUM"
+      else:
+          risk = "LOW"
+      
+      # Generate reasons
+      reasons = []
+      if loan.wallet_age_days < 7:
+          reasons.append("Very new wallet (< 7 days)")
+      if loan.amount > loan.wallet_balance * 10:
+          reasons.append("Loan amount much larger than balance")
+      if loan.previous_loans > 5:
+          reasons.append("Multiple previous loans")
+      if loan.tx_count < 5:
+          reasons.append("Very low transaction history")
+      
+      return FraudCheckResponse(
+          wallet=loan.wallet,
+          is_fraudulent=is_fraud,
+          fraud_score=score,
+          risk_category=risk,
+          reasons=reasons
+      )
+  ```
+
+□ Register in main.py
+  ```python
+  from app.api import fraud
+  app.include_router(fraud.router)
+  ```
+
+DELIVERABLES FOR DAY 13
+--------------------------------------------------------------------------------
+✓ Random Forest fraud detector trained
+✓ Fraud detection API
+✓ Risk categorization logic
+✓ Automated reason generation
+
+================================================================================
+DAY 14: EXPLAINABLE AI (XAI) INTEGRATION
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 14.1: Integrate SHAP
+---------------------------
+□ Create ml-backend/app/ml/explainer.py
+  ```python
+  import shap
+  import matplotlib.pyplot as plt
+  import base64
+  from io import BytesIO
+  
+  class ModelExplainer:
+      def __init__(self, model, feature_names):
+          self.model = model
+          self.feature_names = feature_names
+          self.explainer = shap.TreeExplainer(model)
+      
+      def explain_prediction(self, X):
+          """Generate SHAP explanation for prediction"""
+          shap_values = self.explainer.shap_values(X)
+          
+          if isinstance(shap_values, list):
+              shap_values = shap_values[1]
+          
+          # Top features
+          feature_importance = {}
+          for i, name in enumerate(self.feature_names):
+              feature_importance[name] = {
+                  'value': float(X[i]),
+                  'impact': float(shap_values[0][i])
+              }
+          
+          # Sort by absolute impact
+          sorted_features = sorted(
+              feature_importance.items(),
+              key=lambda x: abs(x[1]['impact']),
+              reverse=True
+          )
+          
+          return {
+              'top_features': sorted_features[:5],
+              'all_features': feature_importance
+          }
+      
+      def generate_waterfall_plot(self, X):
+          """Generate SHAP waterfall plot"""
+          shap_values = self.explainer.shap_values(X)
+          
+          if isinstance(shap_values, list):
+              shap_values = shap_values[1]
+          
+          fig, ax = plt.subplots(figsize=(10, 6))
+          shap.waterfall_plot(
+              shap.Explanation(
+                  values=shap_values[0],
+                  base_values=self.explainer.expected_value[1] if isinstance(
+                      self.explainer.expected_value, list
+                  ) else self.explainer.expected_value,
+                  data=X[0],
+                  feature_names=self.feature_names
+              ),
+              show=False
+          )
+          
+          # Convert to base64
+          buffer = BytesIO()
+          plt.savefig(buffer, format='png', bbox_inches='tight')
+          buffer.seek(0)
+          img_str = base64.b64encode(buffer.read()).decode()
+          plt.close()
+          
+          return img_str
+  ```
+
+STEP 14.2: Create XAI API Endpoints
+-------------------------------------
+□ Create ml-backend/app/api/explainability.py
+  ```python
+  from fastapi import APIRouter
+  from pydantic import BaseModel
+  from typing import Dict, List
+  from app.ml.fraud_detector import FraudDetector
+  from app.ml.explainer import ModelExplainer
+  import pandas as pd
+  
+  router = APIRouter(prefix="/api/explain", tags=["Explainability"])
+  
+  detector = FraudDetector()
+  detector.load()
+  
+  feature_names = ['amount', 'wallet_age_days', 'wallet_balance', 
+                   'previous_loans', 'avg_tx_amount', 'tx_count']
+  explainer = ModelExplainer(detector.model, feature_names)
+  
+  class ExplanationRequest(BaseModel):
+      amount: float
+      wallet_age_days: float
+      wallet_balance: float
+      previous_loans: int
+      avg_tx_amount: float
+      tx_count: int
+  
+  class ExplanationResponse(BaseModel):
+      top_features: List[tuple]
+      explanation_text: str
+      visualization: str
+  
+  @router.post("/fraud-decision", response_model=ExplanationResponse)
+  async def explain_fraud_decision(request: ExplanationRequest):
+      """Explain why a loan was flagged as fraud"""
+      X = [[
+          request.amount,
+          request.wallet_age_days,
+          request.wallet_balance,
+          request.previous_loans,
+          request.avg_tx_amount,
+          request.tx_count
+      ]]
+      
+      # Get explanation
+      explanation = explainer.explain_prediction(X)
+      
+      # Generate text
+      top_feat = explanation['top_features'][0]
+      reason = f"Flagged primarily due to {top_feat[0]} "
+      reason += f"(value: {top_feat[1]['value']:.2f}, impact: {top_feat[1]['impact']:.3f})"
+      
+      # Generate visualization
+      viz = explainer.generate_waterfall_plot(X)
+      
+      return ExplanationResponse(
+          top_features=explanation['top_features'],
+          explanation_text=reason,
+          visualization=viz
+      )
+  ```
+
+□ Register in main.py
+  ```python
+  from app.api import explainability
+  app.include_router(explainability.router)
+  ```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 14.3: Integrate XAI into Frontend
+----------------------------------------
+□ Create frontend/src/components/XAI/ExplanationCard.tsx
+  ```typescript
+  import { Card, CardContent, Typography, Box, Chip } from "@mui/material";
+  
+  interface Feature {
+    name: string;
+    value: number;
+    impact: number;
+  }
+  
+  interface ExplanationCardProps {
+    topFeatures: Feature[];
+    explanationText: string;
+    visualizationBase64?: string;
+  }
+  
+  export function ExplanationCard({
+    topFeatures,
+    explanationText,
+    visualizationBase64,
+  }: ExplanationCardProps) {
+    return (
+      <Card elevation={2} sx={{ mt: 2 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Decision Explanation
+          </Typography>
+          
+          <Typography variant="body2" color="text.secondary" paragraph>
+            {explanationText}
+          </Typography>
+          
+          <Typography variant="subtitle2" gutterBottom>
+            Top Contributing Factors:
+          </Typography>
+          
+          {topFeatures.map((feat, idx) => (
+            <Box key={idx} sx={{ mb: 1 }}>
+              <Chip
+                label={feat.name}
+                size="small"
+                color={feat.impact > 0 ? "error" : "success"}
+                sx={{ mr: 1 }}
+              />
+              <Typography variant="caption" component="span">
+                Value: {feat.value.toFixed(2)} | Impact: {feat.impact.toFixed(3)}
+              </Typography>
+            </Box>
+          ))}
+          
+          {visualizationBase64 && (
+            <Box sx={{ mt: 2 }}>
+              <img
+                src={`data:image/png;base64,${visualizationBase64}`}
+                alt="SHAP Explanation"
+                style={{ width: "100%", maxWidth: 600 }}
+              />
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+  ```
+
+DELIVERABLES FOR DAY 14
+--------------------------------------------------------------------------------
+✓ SHAP integration for fraud detector
+✓ XAI API endpoints
+✓ Frontend explanation component
+✓ Visual explanations (waterfall plots)
+
+[Continuing in next response due to length...]
+
+================================================================================
 END OF IMPLEMENTATION GUIDE
 ================================================================================

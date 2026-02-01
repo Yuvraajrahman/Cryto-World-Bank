@@ -1,0 +1,374 @@
+================================================================================
+AI/ML IMPLEMENTATION QUICK REFERENCE
+Days 15-25: Remaining Features & Integration
+================================================================================
+
+This document provides condensed implementation steps for the remaining AI/ML
+features. Refer to AI_ML_RESEARCH_PLAN.txt for detailed theory and approach.
+
+DAY 15: REINFORCEMENT LEARNING ENVIRONMENT
+================================================================================
+
+□ Install: stable-baselines3, gymnasium
+□ Create ml-backend/app/ml/lending_env.py (Gym environment)
+  - State: reserve, pending_loans, default_rate
+  - Actions: approve, reject, adjust_amount
+  - Reward: +10 (repaid), -20 (default), +5 (reserve up)
+□ Create synthetic borrower profiles (various risk levels)
+□ Test environment: run random agent for 1000 steps
+
+DAY 16: RL AGENT TRAINING
+================================================================================
+
+□ Create ml-backend/scripts/train_rl_agent.py
+□ Use DQN algorithm from stable-baselines3
+□ Train for 50,000 timesteps
+□ Save model: models/trained/rl_lending_policy.zip
+□ Plot: cumulative reward, default rate, approval rate
+□ Evaluate: compare RL vs random vs always-approve baseline
+
+DAY 17: RL API & INTEGRATION
+================================================================================
+
+□ Create ml-backend/app/api/rl_policy.py
+  - Endpoint: /api/rl/recommend-action
+  - Input: loan_request + current_state
+  - Output: action, confidence, expected_reward
+□ Test with Postman/curl
+□ Add "RL Suggestion" card to Admin panel frontend
+□ Show: "RL suggests: APPROVE (confidence: 85%)"
+
+DAY 18: SMART CONTRACT ATTACK DETECTION
+================================================================================
+
+□ Create attack pattern dataset (synthetic):
+  - Reentrancy sequences
+  - Front-running patterns
+  - Flash loan attacks
+□ Build LSTM model for sequence classification
+□ Train on attack vs normal sequences
+□ Create API: /api/security/check-transaction
+□ Add real-time monitoring service (listens to blockchain events)
+
+DAY 19: BLOCKCHAIN EVENT LISTENER
+================================================================================
+
+□ Create ml-backend/app/services/blockchain_monitor.py
+  - Use web3.py to listen to contract events
+  - Parse ReserveDeposited, LoanRequested, LoanApproved
+  - Store in PostgreSQL for analysis
+□ Run anomaly detection on each new transaction
+□ Send alerts to Redis queue if anomaly detected
+□ Create /api/alerts/recent endpoint
+
+DAY 20: FRONTEND RISK DASHBOARD
+================================================================================
+
+□ Create frontend/src/pages/RiskDashboard.tsx
+  - Chart: Anomaly score timeline
+  - Chart: Fraud detection rate
+  - Chart: RL performance metrics
+  - Table: Recent alerts
+□ Use Recharts or Plotly for visualizations
+□ Add "Risk Dashboard" to navigation
+□ Fetch data from ML backend APIs
+
+DAY 21: INTEGRATION TESTING
+================================================================================
+
+□ Test end-to-end flow:
+  1. User deposits → Anomaly check → Dashboard updates
+  2. User requests loan → Fraud check → XAI explanation
+  3. Admin sees RL recommendation → Approves
+  4. Monitor logs attack pattern check
+□ Fix integration bugs
+□ Test cross-platform (desktop + mobile)
+
+DAY 22: MODEL EVALUATION & METRICS
+================================================================================
+
+□ Run comprehensive evaluation:
+  - Anomaly detection: ROC-AUC, Precision, Recall
+  - Fraud detection: Confusion matrix, F1-score
+  - RL: Cumulative reward, default rate, reserve stability
+  - Attack detection: Detection rate per attack type
+□ Generate evaluation report (PDF)
+□ Create comparison charts (ML vs baseline)
+
+DAY 23: DOCUMENTATION & RESEARCH PAPER
+================================================================================
+
+□ Write research paper (6-8 pages):
+  - Abstract
+  - Introduction (problem, motivation)
+  - Related Work
+  - Methodology (architecture, algorithms)
+  - Implementation
+  - Results & Evaluation
+  - Conclusion & Future Work
+□ Create presentation slides (20-25 slides)
+□ Prepare demo script
+
+DAY 24: DEPLOYMENT & DEMO PREPARATION
+================================================================================
+
+□ Dockerize ML backend:
+  - Create Dockerfile
+  - Docker Compose with PostgreSQL, Redis
+□ Deploy frontend + ML backend (local or cloud)
+□ Prepare demo scenarios:
+  - Normal loan → Approved
+  - Fraudulent loan → Flagged + Explanation
+  - Anomalous wallet → Alert
+  - Attack simulation → Detected
+□ Test demo flow 3+ times
+
+DAY 25: FINAL POLISH & BACKUP
+================================================================================
+
+□ Code cleanup and comments
+□ Update README.md with ML setup instructions
+□ Create DEMO_GUIDE.md with step-by-step demo
+□ Backup all trained models
+□ Create demo video (5-7 minutes)
+□ Prepare for Q&A:
+  - Why ML for this problem?
+  - How does XAI work?
+  - What are limitations?
+  - Future improvements?
+
+OPTIONAL ADVANCED FEATURES (If Time Permits)
+================================================================================
+
+□ Federated Learning Setup
+  - 5 simulated nodes (Docker containers)
+  - FedAvg algorithm
+  - Compare federated vs centralized
+
+□ NLP for Loan Purpose Analysis
+  - Sentiment analysis on purpose text
+  - Keyword extraction
+  - Suspicious phrase detection
+
+□ Graph Neural Network for Multi-Account Detection
+  - Build wallet interaction graph
+  - GNN for node classification
+  - Detect collusion clusters
+
+QUICK SETUP COMMANDS
+================================================================================
+
+# ML Backend Setup
+cd ml-backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Generate Data
+python scripts/generate_data.py
+
+# Train Models
+python scripts/train_anomaly_detector.py
+python scripts/train_fraud_detector.py
+python scripts/train_rl_agent.py
+
+# Run Backend
+uvicorn app.main:app --reload --port 8000
+
+# Test APIs
+curl http://localhost:8000/docs
+
+API ENDPOINTS SUMMARY
+================================================================================
+
+Anomaly Detection:
+  POST /api/anomaly/check-wallet
+  Body: [{ wallet, amount, timestamp, tx_type, gas_price }]
+  Response: { is_anomalous, anomaly_score, risk_level }
+
+Fraud Detection:
+  POST /api/fraud/check-loan
+  Body: { wallet, amount, purpose, wallet_age_days, ... }
+  Response: { is_fraudulent, fraud_score, risk_category, reasons }
+
+Explainability:
+  POST /api/explain/fraud-decision
+  Body: { amount, wallet_age_days, ... }
+  Response: { top_features, explanation_text, visualization }
+
+RL Policy:
+  POST /api/rl/recommend-action
+  Body: { loan_request, current_state }
+  Response: { action, confidence, expected_reward }
+
+Attack Detection:
+  POST /api/security/check-transaction
+  Body: { tx_hash, call_sequence, gas_prices }
+  Response: { is_attack, attack_type, probability }
+
+Alerts:
+  GET /api/alerts/recent?limit=10
+  Response: [{ timestamp, type, severity, message }]
+
+FOLDER STRUCTURE
+================================================================================
+
+ml-backend/
+├── app/
+│   ├── main.py
+│   ├── database.py
+│   ├── api/
+│   │   ├── anomaly.py
+│   │   ├── fraud.py
+│   │   ├── explainability.py
+│   │   ├── rl_policy.py
+│   │   └── security.py
+│   ├── ml/
+│   │   ├── anomaly_detector.py
+│   │   ├── fraud_detector.py
+│   │   ├── explainer.py
+│   │   ├── lending_env.py
+│   │   ├── rl_agent.py
+│   │   └── feature_engineering.py
+│   ├── services/
+│   │   ├── blockchain_monitor.py
+│   │   └── alert_service.py
+│   └── utils/
+│       ├── data_generator.py
+│       └── loan_data_generator.py
+├── models/
+│   ├── trained/
+│   │   ├── anomaly_detector.pkl
+│   │   ├── fraud_detector.pkl
+│   │   └── rl_lending_policy.zip
+│   └── configs/
+├── data/
+│   ├── synthetic/
+│   │   ├── wallet_transactions.csv
+│   │   └── loan_requests.csv
+│   ├── real/
+│   └── processed/
+├── scripts/
+│   ├── generate_data.py
+│   ├── train_anomaly_detector.py
+│   ├── train_fraud_detector.py
+│   └── train_rl_agent.py
+├── notebooks/
+│   ├── exploratory_analysis.ipynb
+│   ├── model_evaluation.ipynb
+│   └── visualization.ipynb
+├── tests/
+│   ├── test_api.py
+│   └── test_models.py
+├── requirements.txt
+├── Dockerfile
+└── docker-compose.yml
+
+DEBUGGING TIPS
+================================================================================
+
+Issue: "Module not found"
+→ Activate venv: source venv/bin/activate
+
+Issue: "Model file not found"
+→ Train models first: python scripts/train_*.py
+
+Issue: "CUDA out of memory"
+→ Use CPU: device='cpu' in PyTorch
+
+Issue: "Frontend can't connect to ML backend"
+→ Check CORS settings in FastAPI
+→ Verify ML backend is running on port 8000
+
+Issue: "Low model accuracy"
+→ Generate more synthetic data
+→ Tune hyperparameters
+→ Check feature engineering
+
+Issue: "RL agent not learning"
+→ Increase training timesteps
+→ Adjust reward function
+→ Check environment is working
+
+PERFORMANCE BENCHMARKS (Expected)
+================================================================================
+
+Anomaly Detection:
+- ROC-AUC: >0.85
+- Inference time: <100ms
+- False positive rate: <10%
+
+Fraud Detection:
+- F1-Score: >0.80
+- Precision: >0.75
+- Recall: >0.80
+
+RL Policy:
+- Approval rate: 60-70%
+- Default rate: <15% (vs 25% baseline)
+- Reserve stability: Variance <20%
+
+Attack Detection:
+- Detection rate: >90% for known attacks
+- False alarms: <5%
+- Time to detection: <500ms
+
+DEMO SCRIPT FOR FACULTY
+================================================================================
+
+[5 MINUTES TOTAL]
+
+1. Introduction (30s)
+   "This prototype integrates AI/ML for fraud detection, anomaly detection,
+   and explainable automated decision-making in blockchain lending."
+
+2. Normal Flow (1min)
+   - Connect wallet → Deposit → Dashboard updates
+   - Request loan (normal profile) → Low fraud score → Approved
+
+3. Fraud Detection (1.5min)
+   - Submit suspicious loan (new wallet, large amount)
+   - Show fraud score: 0.87 (HIGH RISK)
+   - Click "Explain" → Show XAI card with top features
+   - "Flagged due to: wallet age <7 days, loan > 10x balance"
+
+4. Anomaly Detection (1min)
+   - Show wallet with unusual pattern (50 txs in 1 hour)
+   - Anomaly score: 0.92
+   - Alert on Risk Dashboard
+
+5. RL Policy (1min)
+   - Admin panel → Pending loan
+   - RL suggests: REJECT (confidence 78%, expected reward: -5)
+   - Explain: "High default risk, low reserve balance"
+
+6. Conclusion (30s)
+   - Show metrics: 85% fraud detection rate, 90% ROC-AUC
+   - "Demonstrates AI can enhance blockchain security and transparency"
+
+Q&A PREPARATION
+================================================================================
+
+Q: Why use ML instead of rule-based systems?
+A: ML adapts to new patterns, rules are brittle and easy to bypass.
+
+Q: How do you prevent adversarial attacks on ML models?
+A: Ensemble methods, adversarial training, human-in-the-loop validation.
+
+Q: What about privacy with ML models?
+A: Only aggregated features used, no raw user data stored. Can extend to
+   federated learning for distributed privacy.
+
+Q: How scalable is this approach?
+A: Current: 1000+ loans/day. Can scale horizontally with model serving
+   (TorchServe) and caching (Redis).
+
+Q: What's the biggest limitation?
+A: Data quality. Synthetic data for demo. Real deployment needs historical
+   transaction data for better training.
+
+Q: How do you keep models updated?
+A: Scheduled retraining (weekly/monthly), online learning, A/B testing.
+
+END OF AI/ML IMPLEMENTATION STEPS
+================================================================================

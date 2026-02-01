@@ -1,0 +1,32 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  background-color: #FFFBFE;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Touch-friendly minimum sizes (Material 48dp) */
+button, [role="button"], .MuiButton-root {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* No hover-only interactions for mobile */
+@media (hover: none) {
+  .MuiButton-root:active {
+    opacity: 0.9;
+  }
+}

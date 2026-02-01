@@ -1,0 +1,2853 @@
+================================================================================
+IMPLEMENTATION GUIDE
+Decentralized Crypto Reserve & Lending Bank
+Step-by-Step Build Instructions
+================================================================================
+
+This guide provides detailed, actionable steps to build the complete prototype
+from scratch. Follow each step in order for best results.
+
+TABLE OF CONTENTS
+================================================================================
+DAY 1:  Environment Setup & Planning
+DAY 2:  Smart Contract Development (Part 1)
+DAY 3:  Smart Contract Development (Part 2) & Testing
+DAY 4:  Smart Contract Deployment & Verification
+DAY 5:  Frontend Setup & Wallet Integration
+DAY 6:  Dashboard & Reserve Features
+DAY 7:  Loan Request & Management Features
+DAY 8:  Admin Panel & QR Code Integration
+DAY 9:  Mobile Optimization & Cross-Platform Testing
+DAY 10: Polish, Documentation & Deployment
+
+================================================================================
+DAY 1: ENVIRONMENT SETUP & PLANNING
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 1.1: Install Required Software
+------------------------------------
+□ Install Node.js 18.x LTS
+  - Download from: https://nodejs.org/
+  - Verify: node --version (should show v18.x.x)
+  - Verify: npm --version
+
+□ Install Git
+  - Download from: https://git-scm.com/
+  - Verify: git --version
+
+□ Install VS Code
+  - Download from: https://code.visualstudio.com/
+  - Install extensions:
+    * Solidity (Juan Blanco)
+    * ESLint
+    * Prettier
+    * TypeScript
+    * Material Icon Theme
+
+□ Install MetaMask
+  - Browser extension from: https://metamask.io/
+  - Create two accounts:
+    1. Admin Account (save address)
+    2. User Account (save address)
+  - NEVER share private keys or seed phrases
+
+STEP 1.2: Set Up Development Wallets
+-------------------------------------
+□ Configure MetaMask for Polygon Mumbai Testnet
+  Network Name: Mumbai Testnet
+  RPC URL: https://rpc-mumbai.maticvigil.com/
+  Chain ID: 80001
+  Currency Symbol: MATIC
+  Block Explorer: https://mumbai.polygonscan.com/
+
+□ Get Test MATIC
+  - Visit: https://faucet.polygon.technology/
+  - Request MATIC for both accounts
+  - Verify receipt in MetaMask
+
+□ Alternative: Sepolia Testnet Setup
+  Network Name: Sepolia
+  RPC URL: https://sepolia.infura.io/v3/YOUR_KEY
+  Chain ID: 11155111
+  Currency Symbol: ETH
+  Block Explorer: https://sepolia.etherscan.io/
+
+□ Get Test ETH (Sepolia)
+  - Visit: https://sepoliafaucet.com/
+  - Request ETH for both accounts
+
+STEP 1.3: Create Project Structure
+-----------------------------------
+□ Create project directory
+  ```
+  mkdir crypto-world-bank
+  cd crypto-world-bank
+  ```
+
+□ Initialize Git repository
+  ```
+  git init
+  ```
+
+□ Create directory structure
+  ```
+  mkdir -p contracts
+  mkdir -p scripts
+  mkdir -p test
+  mkdir -p frontend
+  mkdir -p docs
+  mkdir -p artifacts
+  ```
+
+STEP 1.4: Initialize Smart Contract Project
+--------------------------------------------
+□ Install Hardhat
+  ```
+  npm init -y
+  npm install --save-dev hardhat
+  npx hardhat
+  ```
+  - Select: "Create a TypeScript project"
+  - Accept all defaults
+
+□ Install dependencies
+  ```
+  npm install --save-dev @nomicfoundation/hardhat-toolbox
+  npm install @openzeppelin/contracts
+  npm install dotenv
+  ```
+
+□ Create .env file
+  ```
+  touch .env
+  ```
+  
+  Add to .env:
+  ```
+  PRIVATE_KEY=your_admin_private_key_here
+  MUMBAI_RPC_URL=https://rpc-mumbai.maticvigil.com/
+  POLYGONSCAN_API_KEY=your_polygonscan_api_key
+  ```
+
+□ Update .gitignore
+  ```
+  node_modules/
+  .env
+  artifacts/
+  cache/
+  coverage/
+  dist/
+  .DS_Store
+  ```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 1.5: Create Architecture Diagrams
+---------------------------------------
+□ Draw System Architecture
+  Components to include:
+  - User Interface Layer
+  - Wallet Integration Layer
+  - Blockchain Layer
+  - Smart Contract Components
+  - Data Flow
+
+□ Draw Smart Contract Architecture
+  Include:
+  - State variables
+  - Functions
+  - Events
+  - Modifiers
+  - Access control
+
+□ Draw User Flow Diagrams
+  Create flows for:
+  - Wallet connection
+  - Deposit process
+  - Loan request process
+  - Loan approval process
+  - QR code usage
+
+Tools: Draw.io, Lucidchart, or Excalidraw
+
+STEP 1.6: Create Feature Checklist
+-----------------------------------
+□ Create FEATURES.md file
+  List all features from PROJECT_PLAN.txt
+  Add checkboxes for tracking completion
+
+□ Create TIMELINE.md
+  Map features to days
+  Include buffer time
+  Set daily goals
+
+STEP 1.7: Set Up Frontend Project (Initial)
+--------------------------------------------
+□ Create React app with Vite
+  ```
+  cd frontend
+  npm create vite@latest . -- --template react-ts
+  npm install
+  ```
+
+□ Install core dependencies
+  ```
+  npm install ethers@6
+  npm install @mui/material @emotion/react @emotion/styled
+  npm install @mui/icons-material
+  npm install react-router-dom
+  npm install @rainbow-me/rainbowkit wagmi viem
+  npm install qrcode.react react-qr-reader
+  npm install zustand
+  npm install react-hook-form zod @hookform/resolvers
+  ```
+
+DELIVERABLES FOR DAY 1
+--------------------------------------------------------------------------------
+✓ Development environment fully configured
+✓ MetaMask wallets created and funded
+✓ Project structure initialized
+✓ Hardhat configured
+✓ Architecture diagrams completed
+✓ Feature checklist created
+✓ Frontend project initialized
+
+================================================================================
+DAY 2: SMART CONTRACT DEVELOPMENT (PART 1)
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 2.1: Create Smart Contract Skeleton
+-----------------------------------------
+□ Create contracts/WorldBankReserve.sol
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+/**
+ * @title WorldBankReserve
+ * @dev Decentralized reserve and lending system
+ */
+contract WorldBankReserve is ReentrancyGuard, Ownable {
+    
+    // State variables
+    uint256 public totalReserve;
+    uint256 public loanCounter;
+    
+    // Loan status enum
+    enum LoanStatus {
+        Pending,
+        Approved,
+        Rejected,
+        Paid
+    }
+    
+    // Loan structure
+    struct Loan {
+        uint256 id;
+        address borrower;
+        uint256 amount;
+        string purpose;
+        LoanStatus status;
+        uint256 requestedAt;
+        uint256 approvedAt;
+    }
+    
+    // Mappings
+    mapping(uint256 => Loan) public loans;
+    mapping(address => uint256[]) public userLoans;
+    mapping(address => uint256) public userDeposits;
+    
+    // Events
+    event ReserveDeposited(
+        address indexed depositor,
+        uint256 amount,
+        uint256 timestamp
+    );
+    
+    event LoanRequested(
+        uint256 indexed loanId,
+        address indexed borrower,
+        uint256 amount,
+        string purpose
+    );
+    
+    event LoanApproved(
+        uint256 indexed loanId,
+        address indexed borrower,
+        uint256 amount
+    );
+    
+    event LoanRejected(
+        uint256 indexed loanId,
+        address indexed borrower
+    );
+    
+    // Constructor
+    constructor() Ownable(msg.sender) {
+        loanCounter = 0;
+    }
+    
+    // Functions will be added next
+}
+```
+
+STEP 2.2: Implement Deposit Function
+-------------------------------------
+□ Add deposit function to contract
+
+```solidity
+/**
+ * @dev Deposit funds to the reserve
+ */
+function depositToReserve() external payable nonReentrant {
+    require(msg.value > 0, "Deposit amount must be greater than 0");
+    
+    totalReserve += msg.value;
+    userDeposits[msg.sender] += msg.value;
+    
+    emit ReserveDeposited(msg.sender, msg.value, block.timestamp);
+}
+
+/**
+ * @dev Get total reserve balance
+ */
+function getTotalReserve() external view returns (uint256) {
+    return totalReserve;
+}
+
+/**
+ * @dev Get user's total deposits
+ */
+function getUserDeposits(address user) external view returns (uint256) {
+    return userDeposits[user];
+}
+```
+
+STEP 2.3: Implement Loan Request Function
+------------------------------------------
+□ Add loan request function
+
+```solidity
+/**
+ * @dev Request a loan from the reserve
+ * @param amount The amount to borrow
+ * @param purpose The purpose of the loan
+ */
+function requestLoan(
+    uint256 amount,
+    string memory purpose
+) external nonReentrant {
+    require(amount > 0, "Loan amount must be greater than 0");
+    require(bytes(purpose).length > 0, "Purpose cannot be empty");
+    require(amount <= totalReserve, "Insufficient reserve balance");
+    
+    loanCounter++;
+    
+    loans[loanCounter] = Loan({
+        id: loanCounter,
+        borrower: msg.sender,
+        amount: amount,
+        purpose: purpose,
+        status: LoanStatus.Pending,
+        requestedAt: block.timestamp,
+        approvedAt: 0
+    });
+    
+    userLoans[msg.sender].push(loanCounter);
+    
+    emit LoanRequested(loanCounter, msg.sender, amount, purpose);
+}
+
+/**
+ * @dev Get loan details
+ */
+function getLoan(uint256 loanId) external view returns (Loan memory) {
+    require(loanId > 0 && loanId <= loanCounter, "Invalid loan ID");
+    return loans[loanId];
+}
+
+/**
+ * @dev Get all loan IDs for a user
+ */
+function getUserLoans(address user) external view returns (uint256[] memory) {
+    return userLoans[user];
+}
+```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 2.4: Implement Admin Approval Functions
+---------------------------------------------
+□ Add approval and rejection functions
+
+```solidity
+/**
+ * @dev Approve a loan and transfer funds (admin only)
+ * @param loanId The ID of the loan to approve
+ */
+function approveLoan(uint256 loanId) external onlyOwner nonReentrant {
+    require(loanId > 0 && loanId <= loanCounter, "Invalid loan ID");
+    Loan storage loan = loans[loanId];
+    
+    require(loan.status == LoanStatus.Pending, "Loan is not pending");
+    require(loan.amount <= address(this).balance, "Insufficient contract balance");
+    
+    loan.status = LoanStatus.Approved;
+    loan.approvedAt = block.timestamp;
+    
+    totalReserve -= loan.amount;
+    
+    // Transfer funds to borrower
+    (bool success, ) = payable(loan.borrower).call{value: loan.amount}("");
+    require(success, "Transfer failed");
+    
+    emit LoanApproved(loanId, loan.borrower, loan.amount);
+}
+
+/**
+ * @dev Reject a loan (admin only)
+ * @param loanId The ID of the loan to reject
+ */
+function rejectLoan(uint256 loanId) external onlyOwner {
+    require(loanId > 0 && loanId <= loanCounter, "Invalid loan ID");
+    Loan storage loan = loans[loanId];
+    
+    require(loan.status == LoanStatus.Pending, "Loan is not pending");
+    
+    loan.status = LoanStatus.Rejected;
+    
+    emit LoanRejected(loanId, loan.borrower);
+}
+```
+
+STEP 2.5: Add Helper Functions
+-------------------------------
+□ Add utility functions for admin
+
+```solidity
+/**
+ * @dev Get all pending loans (admin only)
+ */
+function getPendingLoans() external view onlyOwner returns (Loan[] memory) {
+    uint256 pendingCount = 0;
+    
+    // Count pending loans
+    for (uint256 i = 1; i <= loanCounter; i++) {
+        if (loans[i].status == LoanStatus.Pending) {
+            pendingCount++;
+        }
+    }
+    
+    // Create array of pending loans
+    Loan[] memory pendingLoans = new Loan[](pendingCount);
+    uint256 index = 0;
+    
+    for (uint256 i = 1; i <= loanCounter; i++) {
+        if (loans[i].status == LoanStatus.Pending) {
+            pendingLoans[index] = loans[i];
+            index++;
+        }
+    }
+    
+    return pendingLoans;
+}
+
+/**
+ * @dev Get contract statistics
+ */
+function getStats() external view returns (
+    uint256 _totalReserve,
+    uint256 _totalLoans,
+    uint256 _pendingLoans,
+    uint256 _approvedLoans
+) {
+    _totalReserve = totalReserve;
+    _totalLoans = loanCounter;
+    
+    uint256 pending = 0;
+    uint256 approved = 0;
+    
+    for (uint256 i = 1; i <= loanCounter; i++) {
+        if (loans[i].status == LoanStatus.Pending) pending++;
+        if (loans[i].status == LoanStatus.Approved) approved++;
+    }
+    
+    _pendingLoans = pending;
+    _approvedLoans = approved;
+}
+```
+
+STEP 2.6: Add Emergency Functions
+----------------------------------
+□ Add pause and emergency withdraw
+
+```solidity
+bool public paused;
+
+modifier whenNotPaused() {
+    require(!paused, "Contract is paused");
+    _;
+}
+
+/**
+ * @dev Pause contract operations (admin only)
+ */
+function pause() external onlyOwner {
+    paused = true;
+}
+
+/**
+ * @dev Unpause contract operations (admin only)
+ */
+function unpause() external onlyOwner {
+    paused = false;
+}
+
+/**
+ * @dev Emergency withdraw (admin only)
+ */
+function emergencyWithdraw() external onlyOwner {
+    uint256 balance = address(this).balance;
+    (bool success, ) = payable(owner()).call{value: balance}("");
+    require(success, "Emergency withdraw failed");
+}
+```
+
+DELIVERABLES FOR DAY 2
+--------------------------------------------------------------------------------
+✓ Complete WorldBankReserve.sol contract
+✓ All core functions implemented
+✓ Events defined
+✓ Admin controls in place
+✓ Emergency functions added
+
+================================================================================
+DAY 3: SMART CONTRACT TESTING & REFINEMENT
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 3.1: Write Unit Tests
+---------------------------
+□ Create test/WorldBankReserve.test.ts
+
+```typescript
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { WorldBankReserve } from "../typechain-types";
+import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
+
+describe("WorldBankReserve", function () {
+  let worldBank: WorldBankReserve;
+  let admin: SignerWithAddress;
+  let user1: SignerWithAddress;
+  let user2: SignerWithAddress;
+
+  beforeEach(async function () {
+    [admin, user1, user2] = await ethers.getSigners();
+    
+    const WorldBankReserve = await ethers.getContractFactory("WorldBankReserve");
+    worldBank = await WorldBankReserve.deploy();
+    await worldBank.waitForDeployment();
+  });
+
+  describe("Deployment", function () {
+    it("Should set the right owner", async function () {
+      expect(await worldBank.owner()).to.equal(admin.address);
+    });
+
+    it("Should initialize with zero reserve", async function () {
+      expect(await worldBank.getTotalReserve()).to.equal(0);
+    });
+  });
+
+  describe("Deposits", function () {
+    it("Should accept deposits", async function () {
+      const depositAmount = ethers.parseEther("1.0");
+      
+      await expect(worldBank.connect(user1).depositToReserve({ value: depositAmount }))
+        .to.emit(worldBank, "ReserveDeposited")
+        .withArgs(user1.address, depositAmount, anyValue);
+      
+      expect(await worldBank.getTotalReserve()).to.equal(depositAmount);
+    });
+
+    it("Should track user deposits", async function () {
+      const depositAmount = ethers.parseEther("2.0");
+      
+      await worldBank.connect(user1).depositToReserve({ value: depositAmount });
+      
+      expect(await worldBank.getUserDeposits(user1.address)).to.equal(depositAmount);
+    });
+
+    it("Should reject zero deposits", async function () {
+      await expect(
+        worldBank.connect(user1).depositToReserve({ value: 0 })
+      ).to.be.revertedWith("Deposit amount must be greater than 0");
+    });
+  });
+
+  describe("Loan Requests", function () {
+    beforeEach(async function () {
+      // Deposit funds to reserve
+      await worldBank.connect(admin).depositToReserve({ 
+        value: ethers.parseEther("10.0") 
+      });
+    });
+
+    it("Should allow users to request loans", async function () {
+      const loanAmount = ethers.parseEther("1.0");
+      const purpose = "Education expenses";
+      
+      await expect(worldBank.connect(user1).requestLoan(loanAmount, purpose))
+        .to.emit(worldBank, "LoanRequested")
+        .withArgs(1, user1.address, loanAmount, purpose);
+    });
+
+    it("Should reject loan requests exceeding reserve", async function () {
+      const loanAmount = ethers.parseEther("20.0");
+      
+      await expect(
+        worldBank.connect(user1).requestLoan(loanAmount, "Too much")
+      ).to.be.revertedWith("Insufficient reserve balance");
+    });
+
+    it("Should reject empty purpose", async function () {
+      const loanAmount = ethers.parseEther("1.0");
+      
+      await expect(
+        worldBank.connect(user1).requestLoan(loanAmount, "")
+      ).to.be.revertedWith("Purpose cannot be empty");
+    });
+  });
+
+  describe("Loan Approval", function () {
+    beforeEach(async function () {
+      await worldBank.connect(admin).depositToReserve({ 
+        value: ethers.parseEther("10.0") 
+      });
+      await worldBank.connect(user1).requestLoan(
+        ethers.parseEther("2.0"),
+        "Business loan"
+      );
+    });
+
+    it("Should allow admin to approve loans", async function () {
+      await expect(worldBank.connect(admin).approveLoan(1))
+        .to.emit(worldBank, "LoanApproved")
+        .withArgs(1, user1.address, ethers.parseEther("2.0"));
+    });
+
+    it("Should transfer funds on approval", async function () {
+      const balanceBefore = await ethers.provider.getBalance(user1.address);
+      
+      await worldBank.connect(admin).approveLoan(1);
+      
+      const balanceAfter = await ethers.provider.getBalance(user1.address);
+      expect(balanceAfter - balanceBefore).to.equal(ethers.parseEther("2.0"));
+    });
+
+    it("Should not allow non-admin to approve", async function () {
+      await expect(
+        worldBank.connect(user2).approveLoan(1)
+      ).to.be.revertedWithCustomError(worldBank, "OwnableUnauthorizedAccount");
+    });
+  });
+
+  describe("Statistics", function () {
+    it("Should return correct statistics", async function () {
+      await worldBank.connect(admin).depositToReserve({ 
+        value: ethers.parseEther("5.0") 
+      });
+      await worldBank.connect(user1).requestLoan(
+        ethers.parseEther("1.0"),
+        "Test"
+      );
+      
+      const stats = await worldBank.getStats();
+      expect(stats._totalReserve).to.equal(ethers.parseEther("5.0"));
+      expect(stats._totalLoans).to.equal(1);
+      expect(stats._pendingLoans).to.equal(1);
+    });
+  });
+});
+```
+
+STEP 3.2: Run Tests
+--------------------
+□ Execute test suite
+  ```
+  npx hardhat test
+  ```
+
+□ Check coverage
+  ```
+  npm install --save-dev solidity-coverage
+  npx hardhat coverage
+  ```
+
+□ Fix any failing tests
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 3.3: Gas Optimization
+---------------------------
+□ Analyze gas usage
+  ```
+  npx hardhat test --gas-reporter
+  ```
+
+□ Optimize expensive operations:
+  - Use uint256 instead of smaller uints
+  - Pack struct variables
+  - Use events instead of storage where possible
+  - Minimize storage reads/writes
+
+STEP 3.4: Security Review
+--------------------------
+□ Review checklist:
+  - ✓ Reentrancy protection (ReentrancyGuard)
+  - ✓ Access control (Ownable)
+  - ✓ Input validation
+  - ✓ Safe math (Solidity 0.8+)
+  - ✓ External calls at end of functions
+  - ✓ Check-Effects-Interactions pattern
+
+□ Run Slither (optional but recommended)
+  ```
+  pip install slither-analyzer
+  slither contracts/WorldBankReserve.sol
+  ```
+
+STEP 3.5: Documentation
+------------------------
+□ Add NatSpec comments to all functions
+□ Create contracts/README.md explaining:
+  - Contract purpose
+  - Function descriptions
+  - Usage examples
+  - Security considerations
+
+DELIVERABLES FOR DAY 3
+--------------------------------------------------------------------------------
+✓ Comprehensive test suite
+✓ All tests passing
+✓ Gas optimizations completed
+✓ Security review conducted
+✓ Contract documented
+
+================================================================================
+DAY 4: SMART CONTRACT DEPLOYMENT & VERIFICATION
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 4.1: Configure Hardhat for Deployment
+-------------------------------------------
+□ Update hardhat.config.ts
+
+```typescript
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "dotenv/config";
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+  networks: {
+    mumbai: {
+      url: process.env.MUMBAI_RPC_URL || "",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 80001,
+    },
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL || "",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 11155111,
+    },
+  },
+  etherscan: {
+    apiKey: {
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY || "",
+      sepolia: process.env.ETHERSCAN_API_KEY || "",
+    },
+  },
+};
+
+export default config;
+```
+
+STEP 4.2: Create Deployment Script
+-----------------------------------
+□ Create scripts/deploy.ts
+
+```typescript
+import { ethers } from "hardhat";
+
+async function main() {
+  console.log("Deploying WorldBankReserve...");
+
+  const [deployer] = await ethers.getSigners();
+  console.log("Deploying with account:", deployer.address);
+  
+  const balance = await ethers.provider.getBalance(deployer.address);
+  console.log("Account balance:", ethers.formatEther(balance), "ETH");
+
+  const WorldBankReserve = await ethers.getContractFactory("WorldBankReserve");
+  const worldBank = await WorldBankReserve.deploy();
+
+  await worldBank.waitForDeployment();
+  const address = await worldBank.getAddress();
+
+  console.log("WorldBankReserve deployed to:", address);
+  console.log("Admin (owner):", deployer.address);
+  
+  // Save deployment info
+  const fs = require("fs");
+  const deploymentInfo = {
+    contractAddress: address,
+    adminAddress: deployer.address,
+    network: (await ethers.provider.getNetwork()).name,
+    chainId: (await ethers.provider.getNetwork()).chainId.toString(),
+    deployedAt: new Date().toISOString(),
+  };
+  
+  fs.writeFileSync(
+    "deployment-info.json",
+    JSON.stringify(deploymentInfo, null, 2)
+  );
+  
+  console.log("\nDeployment info saved to deployment-info.json");
+  console.log("\nWait for a minute before verifying...");
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+```
+
+STEP 4.3: Deploy to Testnet
+----------------------------
+□ Deploy to Mumbai
+  ```
+  npx hardhat run scripts/deploy.ts --network mumbai
+  ```
+
+□ Save contract address (from output)
+
+□ Verify deployment on block explorer
+  - Visit: https://mumbai.polygonscan.com/
+  - Search for your contract address
+  - Confirm transaction was successful
+
+STEP 4.4: Verify Contract on Etherscan
+---------------------------------------
+□ Verify contract
+  ```
+  npx hardhat verify --network mumbai YOUR_CONTRACT_ADDRESS
+  ```
+
+□ Check verification status on block explorer
+
+□ Test reading contract data through explorer
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 4.5: Create Contract Interaction Scripts
+----------------------------------------------
+□ Create scripts/interact.ts
+
+```typescript
+import { ethers } from "hardhat";
+import deploymentInfo from "../deployment-info.json";
+
+async function main() {
+  const contractAddress = deploymentInfo.contractAddress;
+  
+  const WorldBankReserve = await ethers.getContractFactory("WorldBankReserve");
+  const worldBank = WorldBankReserve.attach(contractAddress);
+
+  // Get stats
+  console.log("Fetching contract statistics...");
+  const stats = await worldBank.getStats();
+  console.log("Total Reserve:", ethers.formatEther(stats._totalReserve), "MATIC");
+  console.log("Total Loans:", stats._totalLoans.toString());
+  console.log("Pending Loans:", stats._pendingLoans.toString());
+  console.log("Approved Loans:", stats._approvedLoans.toString());
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+```
+
+□ Test interaction script
+  ```
+  npx hardhat run scripts/interact.ts --network mumbai
+  ```
+
+STEP 4.6: Generate Contract ABI
+--------------------------------
+□ Extract ABI from artifacts
+  ```
+  const fs = require('fs');
+  const artifact = require('./artifacts/contracts/WorldBankReserve.sol/WorldBankReserve.json');
+  fs.writeFileSync(
+    './frontend/src/contracts/WorldBankReserve.json',
+    JSON.stringify(artifact.abi, null, 2)
+  );
+  ```
+
+□ Create frontend/src/contracts/ directory
+□ Copy ABI and contract address for frontend use
+
+STEP 4.7: Test Deployed Contract
+---------------------------------
+□ Manual testing checklist:
+  - ✓ Connect to contract via MetaMask
+  - ✓ Test deposit function
+  - ✓ Test loan request
+  - ✓ Test admin approval (from admin account)
+  - ✓ Verify all transactions on block explorer
+  - ✓ Check event emissions
+
+□ Document test transactions:
+  - Save transaction hashes
+  - Take screenshots
+  - Record for demonstration
+
+DELIVERABLES FOR DAY 4
+--------------------------------------------------------------------------------
+✓ Contract deployed to testnet
+✓ Contract verified on block explorer
+✓ ABI exported for frontend
+✓ Interaction scripts created
+✓ Deployment documented
+✓ Manual testing completed
+
+================================================================================
+DAY 5: FRONTEND SETUP & WALLET INTEGRATION
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 5.1: Configure Material-UI Theme
+--------------------------------------
+□ Create frontend/src/theme/theme.ts
+
+```typescript
+import { createTheme } from '@mui/material/styles';
+
+export const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#6750A4',
+      light: '#EADDFF',
+      dark: '#21005D',
+      contrastText: '#FFFFFF',
+    },
+    secondary: {
+      main: '#625B71',
+      light: '#E8DEF8',
+      dark: '#1D192B',
+      contrastText: '#FFFFFF',
+    },
+    tertiary: {
+      main: '#7D5260',
+      light: '#FFD8E4',
+      dark: '#31111D',
+      contrastText: '#FFFFFF',
+    },
+    error: {
+      main: '#B3261E',
+      light: '#F9DEDC',
+      dark: '#410E0B',
+      contrastText: '#FFFFFF',
+    },
+    background: {
+      default: '#FFFBFE',
+      paper: '#FFFBFE',
+    },
+    surface: {
+      main: '#FEF7FF',
+    },
+  },
+  typography: {
+    fontFamily: 'Roboto, sans-serif',
+    displayLarge: {
+      fontSize: '57px',
+      lineHeight: '64px',
+      fontWeight: 400,
+    },
+    headlineLarge: {
+      fontSize: '32px',
+      lineHeight: '40px',
+      fontWeight: 400,
+    },
+    titleLarge: {
+      fontSize: '22px',
+      lineHeight: '28px',
+      fontWeight: 400,
+    },
+    bodyLarge: {
+      fontSize: '16px',
+      lineHeight: '24px',
+      fontWeight: 400,
+    },
+    labelLarge: {
+      fontSize: '14px',
+      lineHeight: '20px',
+      fontWeight: 500,
+    },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+  shadows: [
+    'none',
+    '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px rgba(0, 0, 0, 0.15)',
+    '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px rgba(0, 0, 0, 0.15)',
+    // ... add more as needed
+  ],
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: '20px',
+          padding: '10px 24px',
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: '12px',
+        },
+      },
+    },
+  },
+});
+```
+
+STEP 5.2: Set Up RainbowKit & Wagmi
+------------------------------------
+□ Create frontend/src/config/wagmi.ts
+
+```typescript
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { polygon, polygonMumbai, sepolia } from 'wagmi/chains';
+
+export const config = getDefaultConfig({
+  appName: 'Crypto World Bank',
+  projectId: 'YOUR_WALLETCONNECT_PROJECT_ID', // Get from https://cloud.walletconnect.com
+  chains: [polygonMumbai, sepolia, polygon],
+  ssr: false,
+});
+```
+
+□ Update frontend/src/main.tsx
+
+```typescript
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { theme } from './theme/theme';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { config } from './config/wagmi';
+import '@rainbow-me/rainbowkit/styles.css';
+
+const queryClient = new QueryClient();
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider>
+            <App />
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ThemeProvider>
+  </React.StrictMode>
+);
+```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 5.3: Create Layout Components
+-----------------------------------
+□ Create frontend/src/components/Layout/AppBar.tsx
+
+```typescript
+import React from 'react';
+import {
+  AppBar as MuiAppBar,
+  Toolbar,
+  Typography,
+  Box,
+  IconButton,
+} from '@mui/material';
+import { AccountBalanceWallet } from '@mui/icons-material';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+
+export const AppBar: React.FC = () => {
+  return (
+    <MuiAppBar position="sticky" elevation={0}>
+      <Toolbar>
+        <IconButton edge="start" color="inherit" sx={{ mr: 2 }}>
+          <AccountBalanceWallet />
+        </IconButton>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          Crypto World Bank
+        </Typography>
+        <ConnectButton />
+      </Toolbar>
+    </MuiAppBar>
+  );
+};
+```
+
+□ Create frontend/src/components/Layout/BottomNavigation.tsx
+
+```typescript
+import React from 'react';
+import {
+  BottomNavigation as MuiBottomNavigation,
+  BottomNavigationAction,
+  Paper,
+} from '@mui/material';
+import {
+  Dashboard,
+  Add,
+  RequestQuote,
+  AdminPanelSettings,
+} from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+export const BottomNavigation: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  return (
+    <Paper
+      sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}
+      elevation={3}
+    >
+      <MuiBottomNavigation
+        value={location.pathname}
+        onChange={(_, newValue) => navigate(newValue)}
+      >
+        <BottomNavigationAction
+          label="Dashboard"
+          value="/"
+          icon={<Dashboard />}
+        />
+        <BottomNavigationAction
+          label="Deposit"
+          value="/deposit"
+          icon={<Add />}
+        />
+        <BottomNavigationAction
+          label="Loan"
+          value="/loan"
+          icon={<RequestQuote />}
+        />
+        <BottomNavigationAction
+          label="Admin"
+          value="/admin"
+          icon={<AdminPanelSettings />}
+        />
+      </MuiBottomNavigation>
+    </Paper>
+  );
+};
+```
+
+STEP 5.4: Set Up Routing
+-------------------------
+□ Create frontend/src/App.tsx
+
+```typescript
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Box } from '@mui/material';
+import { AppBar } from './components/Layout/AppBar';
+import { BottomNavigation } from './components/Layout/BottomNavigation';
+import { Dashboard } from './pages/Dashboard';
+import { Deposit } from './pages/Deposit';
+import { Loan } from './pages/Loan';
+import { Admin } from './pages/Admin';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <AppBar />
+        <Box component="main" sx={{ flexGrow: 1, p: 3, pb: 10 }}>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/deposit" element={<Deposit />} />
+            <Route path="/loan" element={<Loan />} />
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
+        </Box>
+        <BottomNavigation />
+      </Box>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+STEP 5.5: Create Contract Hook
+-------------------------------
+□ Create frontend/src/hooks/useContract.ts
+
+```typescript
+import { usePublicClient, useWalletClient } from 'wagmi';
+import { getContract } from 'viem';
+import WorldBankReserveABI from '../contracts/WorldBankReserve.json';
+
+const CONTRACT_ADDRESS = 'YOUR_DEPLOYED_CONTRACT_ADDRESS';
+
+export function useWorldBankContract() {
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
+
+  const contract = getContract({
+    address: CONTRACT_ADDRESS as `0x${string}`,
+    abi: WorldBankReserveABI,
+    client: { public: publicClient, wallet: walletClient },
+  });
+
+  return contract;
+}
+```
+
+STEP 5.6: Create Placeholder Pages
+-----------------------------------
+□ Create frontend/src/pages/Dashboard.tsx
+
+```typescript
+import React from 'react';
+import { Typography, Container } from '@mui/material';
+
+export const Dashboard: React.FC = () => {
+  return (
+    <Container maxWidth="lg">
+      <Typography variant="h4">Dashboard</Typography>
+      <Typography>Dashboard content coming on Day 6</Typography>
+    </Container>
+  );
+};
+```
+
+□ Create similar placeholder files for:
+  - frontend/src/pages/Deposit.tsx
+  - frontend/src/pages/Loan.tsx
+  - frontend/src/pages/Admin.tsx
+
+DELIVERABLES FOR DAY 5
+--------------------------------------------------------------------------------
+✓ Material-UI theme configured (Android 16 style)
+✓ RainbowKit wallet integration working
+✓ App layout with navigation
+✓ Routing set up
+✓ Contract hook created
+✓ Placeholder pages created
+
+================================================================================
+DAY 6: DASHBOARD & RESERVE FEATURES
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 6.1: Create Dashboard Statistics Component
+------------------------------------------------
+□ Create frontend/src/components/Dashboard/StatsCard.tsx
+
+```typescript
+import React from 'react';
+import { Card, CardContent, Typography, Box } from '@mui/material';
+
+interface StatsCardProps {
+  title: string;
+  value: string;
+  icon: React.ReactNode;
+  subtitle?: string;
+}
+
+export const StatsCard: React.FC<StatsCardProps> = ({
+  title,
+  value,
+  icon,
+  subtitle,
+}) => {
+  return (
+    <Card elevation={1}>
+      <CardContent>
+        <Box display="flex" alignItems="center" mb={2}>
+          <Box mr={2} color="primary.main">
+            {icon}
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {title}
+          </Typography>
+        </Box>
+        <Typography variant="h4" component="div" gutterBottom>
+          {value}
+        </Typography>
+        {subtitle && (
+          <Typography variant="caption" color="text.secondary">
+            {subtitle}
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+```
+
+STEP 6.2: Implement Dashboard Page
+-----------------------------------
+□ Update frontend/src/pages/Dashboard.tsx
+
+```typescript
+import React, { useEffect, useState } from 'react';
+import {
+  Container,
+  Grid,
+  Typography,
+  Card,
+  CardContent,
+  Box,
+  CircularProgress,
+} from '@mui/material';
+import {
+  AccountBalance,
+  RequestQuote,
+  CheckCircle,
+  PendingActions,
+} from '@mui/icons-material';
+import { StatsCard } from '../components/Dashboard/StatsCard';
+import { useWorldBankContract } from '../hooks/useContract';
+import { formatEther } from 'viem';
+
+export const Dashboard: React.FC = () => {
+  const contract = useWorldBankContract();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalReserve: '0',
+    totalLoans: '0',
+    pendingLoans: '0',
+    approvedLoans: '0',
+  });
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const result = await contract.read.getStats();
+      setStats({
+        totalReserve: formatEther(result[0]),
+        totalLoans: result[1].toString(),
+        pendingLoans: result[2].toString(),
+        approvedLoans: result[3].toString(),
+      });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Container maxWidth="lg">
+      <Typography variant="h4" gutterBottom>
+        Reserve Dashboard
+      </Typography>
+      <Typography variant="body1" color="text.secondary" paragraph>
+        Transparent, on-chain global reserve system
+      </Typography>
+
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatsCard
+            title="Total Reserve"
+            value={`${parseFloat(stats.totalReserve).toFixed(4)} MATIC`}
+            icon={<AccountBalance fontSize="large" />}
+            subtitle="Available for lending"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatsCard
+            title="Total Loans"
+            value={stats.totalLoans}
+            icon={<RequestQuote fontSize="large" />}
+            subtitle="All time"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatsCard
+            title="Pending"
+            value={stats.pendingLoans}
+            icon={<PendingActions fontSize="large" />}
+            subtitle="Awaiting approval"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatsCard
+            title="Approved"
+            value={stats.approvedLoans}
+            icon={<CheckCircle fontSize="large" />}
+            subtitle="Funds released"
+          />
+        </Grid>
+      </Grid>
+
+      <Card sx={{ mt: 4 }} elevation={1}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            About This System
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            This decentralized reserve operates entirely on the blockchain,
+            ensuring complete transparency. All deposits, loan requests, and
+            approvals are recorded on-chain and publicly verifiable. Anyone
+            can contribute to the reserve, and all loan decisions are made
+            through smart contract execution.
+          </Typography>
+        </CardContent>
+      </Card>
+    </Container>
+  );
+};
+```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 6.3: Implement Deposit Page
+---------------------------------
+□ Update frontend/src/pages/Deposit.tsx
+
+```typescript
+import React, { useState } from 'react';
+import {
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+import { Add } from '@mui/icons-material';
+import { useWorldBankContract } from '../hooks/useContract';
+import { useAccount } from 'wagmi';
+import { parseEther } from 'viem';
+
+export const Deposit: React.FC = () => {
+  const contract = useWorldBankContract();
+  const { isConnected } = useAccount();
+  const [amount, setAmount] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleDeposit = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      setError('Please enter a valid amount');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      const tx = await contract.write.depositToReserve({
+        value: parseEther(amount),
+      });
+      
+      await tx.wait();
+      setSuccess(true);
+      setAmount('');
+      
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err: any) {
+      setError(err.message || 'Transaction failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isConnected) {
+    return (
+      <Container maxWidth="sm">
+        <Alert severity="warning">
+          Please connect your wallet to deposit funds
+        </Alert>
+      </Container>
+    );
+  }
+
+  return (
+    <Container maxWidth="sm">
+      <Typography variant="h4" gutterBottom>
+        Deposit to Reserve
+      </Typography>
+      <Typography variant="body1" color="text.secondary" paragraph>
+        Contribute to the global reserve fund
+      </Typography>
+
+      <Card elevation={1} sx={{ mt: 3 }}>
+        <CardContent>
+          <TextField
+            fullWidth
+            label="Amount (MATIC)"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            inputProps={{ min: 0, step: 0.01 }}
+            sx={{ mb: 3 }}
+            disabled={loading}
+          />
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              Deposit successful! Transaction confirmed.
+            </Alert>
+          )}
+
+          <Button
+            fullWidth
+            variant="contained"
+            size="large"
+            startIcon={loading ? <CircularProgress size={20} /> : <Add />}
+            onClick={handleDeposit}
+            disabled={loading || !amount}
+          >
+            {loading ? 'Processing...' : 'Deposit'}
+          </Button>
+
+          <Box mt={2}>
+            <Typography variant="caption" color="text.secondary">
+              Your deposit will be added to the global reserve and used for
+              approved loans. All transactions are recorded on-chain.
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    </Container>
+  );
+};
+```
+
+STEP 6.4: Test Deposit Flow
+----------------------------
+□ Testing checklist:
+  - ✓ Connect wallet
+  - ✓ Navigate to Deposit page
+  - ✓ Enter amount
+  - ✓ Submit deposit
+  - ✓ Confirm transaction in MetaMask
+  - ✓ Verify success message
+  - ✓ Check dashboard updates
+  - ✓ Verify transaction on block explorer
+
+□ Fix any issues encountered
+
+DELIVERABLES FOR DAY 6
+--------------------------------------------------------------------------------
+✓ Dashboard with live statistics
+✓ Statistics cards component
+✓ Deposit page fully functional
+✓ Transaction handling implemented
+✓ Error handling in place
+✓ Success notifications working
+
+================================================================================
+DAY 7: LOAN REQUEST & MANAGEMENT FEATURES
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 7.1: Create Loan Request Form
+-----------------------------------
+□ Update frontend/src/pages/Loan.tsx
+
+```typescript
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Alert,
+  CircularProgress,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
+} from '@mui/material';
+import { RequestQuote } from '@mui/icons-material';
+import { useWorldBankContract } from '../hooks/useContract';
+import { useAccount } from 'wagmi';
+import { parseEther, formatEther } from 'viem';
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div hidden={value !== index} {...other}>
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+export const Loan: React.FC = () => {
+  const contract = useWorldBankContract();
+  const { address, isConnected } = useAccount();
+  const [tabValue, setTabValue] = useState(0);
+  const [amount, setAmount] = useState('');
+  const [purpose, setPurpose] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const [userLoans, setUserLoans] = useState<any[]>([]);
+  const [loadingLoans, setLoadingLoans] = useState(true);
+
+  useEffect(() => {
+    if (isConnected && address) {
+      loadUserLoans();
+    }
+  }, [isConnected, address]);
+
+  const loadUserLoans = async () => {
+    try {
+      const loanIds = await contract.read.getUserLoans([address]);
+      const loans = await Promise.all(
+        loanIds.map((id: bigint) => contract.read.getLoan([id]))
+      );
+      setUserLoans(loans);
+    } catch (error) {
+      console.error('Error loading loans:', error);
+    } finally {
+      setLoadingLoans(false);
+    }
+  };
+
+  const handleRequest = async () => {
+    if (!amount || parseFloat(amount) <= 0) {
+      setError('Please enter a valid amount');
+      return;
+    }
+    if (!purpose.trim()) {
+      setError('Please enter the loan purpose');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccess(false);
+
+    try {
+      const tx = await contract.write.requestLoan([
+        parseEther(amount),
+        purpose,
+      ]);
+      
+      await tx.wait();
+      setSuccess(true);
+      setAmount('');
+      setPurpose('');
+      
+      await loadUserLoans();
+      setTimeout(() => setSuccess(false), 5000);
+    } catch (err: any) {
+      setError(err.message || 'Transaction failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: number) => {
+    switch (status) {
+      case 0: return 'warning';
+      case 1: return 'success';
+      case 2: return 'error';
+      case 3: return 'info';
+      default: return 'default';
+    }
+  };
+
+  const getStatusLabel = (status: number) => {
+    const labels = ['Pending', 'Approved', 'Rejected', 'Paid'];
+    return labels[status] || 'Unknown';
+  };
+
+  if (!isConnected) {
+    return (
+      <Container maxWidth="md">
+        <Alert severity="warning">
+          Please connect your wallet to request loans
+        </Alert>
+      </Container>
+    );
+  }
+
+  return (
+    <Container maxWidth="md">
+      <Typography variant="h4" gutterBottom>
+        Loan Management
+      </Typography>
+
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
+          <Tab label="Request Loan" />
+          <Tab label="My Loans" />
+        </Tabs>
+      </Box>
+
+      <TabPanel value={tabValue} index={0}>
+        <Card elevation={1}>
+          <CardContent>
+            <TextField
+              fullWidth
+              label="Loan Amount (MATIC)"
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              inputProps={{ min: 0, step: 0.01 }}
+              sx={{ mb: 3 }}
+              disabled={loading}
+            />
+
+            <TextField
+              fullWidth
+              label="Purpose"
+              multiline
+              rows={4}
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              placeholder="Describe why you need this loan..."
+              sx={{ mb: 3 }}
+              disabled={loading}
+            />
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                Loan request submitted successfully!
+              </Alert>
+            )}
+
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              startIcon={
+                loading ? <CircularProgress size={20} /> : <RequestQuote />
+              }
+              onClick={handleRequest}
+              disabled={loading || !amount || !purpose}
+            >
+              {loading ? 'Submitting...' : 'Request Loan'}
+            </Button>
+
+            <Box mt={2}>
+              <Typography variant="caption" color="text.secondary">
+                Your request will be reviewed by the admin. Approved loans
+                will be transferred to your wallet automatically.
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={1}>
+        {loadingLoans ? (
+          <Box display="flex" justifyContent="center" p={4}>
+            <CircularProgress />
+          </Box>
+        ) : userLoans.length === 0 ? (
+          <Alert severity="info">
+            You haven't requested any loans yet.
+          </Alert>
+        ) : (
+          <List>
+            {userLoans.map((loan: any, index: number) => (
+              <Card key={index} sx={{ mb: 2 }} elevation={1}>
+                <ListItem>
+                  <ListItemText
+                    primary={
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography variant="h6">
+                          {formatEther(loan.amount)} MATIC
+                        </Typography>
+                        <Chip
+                          label={getStatusLabel(loan.status)}
+                          color={getStatusColor(loan.status)}
+                          size="small"
+                        />
+                      </Box>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="body2" color="text.secondary">
+                          {loan.purpose}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Requested: {new Date(Number(loan.requestedAt) * 1000).toLocaleString()}
+                        </Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+              </Card>
+            ))}
+          </List>
+        )}
+      </TabPanel>
+    </Container>
+  );
+};
+```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 7.2: Test Loan Request Flow
+---------------------------------
+□ Testing checklist:
+  - ✓ Connect wallet (non-admin)
+  - ✓ Navigate to Loan page
+  - ✓ Fill out loan request form
+  - ✓ Submit request
+  - ✓ Verify success message
+  - ✓ Check "My Loans" tab
+  - ✓ Verify loan appears with "Pending" status
+
+STEP 7.3: Add Transaction History Component
+--------------------------------------------
+□ Create frontend/src/components/TransactionHistory.tsx
+
+```typescript
+import React, { useEffect, useState } from 'react';
+import {
+  Card,
+  CardContent,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Chip,
+  Box,
+} from '@mui/material';
+import { useWorldBankContract } from '../hooks/useContract';
+import { formatEther } from 'viem';
+
+export const TransactionHistory: React.FC = () => {
+  const contract = useWorldBankContract();
+  const [events, setEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  const loadEvents = async () => {
+    try {
+      // Listen to past events
+      const depositEvents = await contract.getPastEvents('ReserveDeposited', {
+        fromBlock: 0,
+        toBlock: 'latest',
+      });
+      
+      const loanEvents = await contract.getPastEvents('LoanRequested', {
+        fromBlock: 0,
+        toBlock: 'latest',
+      });
+
+      // Combine and sort by timestamp
+      const allEvents = [...depositEvents, ...loanEvents].sort(
+        (a, b) => b.blockNumber - a.blockNumber
+      );
+      
+      setEvents(allEvents.slice(0, 10)); // Show latest 10
+    } catch (error) {
+      console.error('Error loading events:', error);
+    }
+  };
+
+  return (
+    <Card elevation={1}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Recent Activity
+        </Typography>
+        <List>
+          {events.map((event, index) => (
+            <ListItem key={index}>
+              <ListItemText
+                primary={event.event}
+                secondary={
+                  <Box>
+                    <Typography variant="body2">
+                      {formatEther(event.returnValues.amount)} MATIC
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Block: {event.blockNumber}
+                    </Typography>
+                  </Box>
+                }
+              />
+              <Chip
+                label={event.event === 'ReserveDeposited' ? 'Deposit' : 'Loan'}
+                size="small"
+              />
+            </ListItem>
+          ))}
+        </List>
+      </CardContent>
+    </Card>
+  );
+};
+```
+
+DELIVERABLES FOR DAY 7
+--------------------------------------------------------------------------------
+✓ Loan request form completed
+✓ User loan dashboard
+✓ Loan status tracking
+✓ Transaction history component
+✓ All user-facing features functional
+
+================================================================================
+DAY 8: ADMIN PANEL & QR CODE INTEGRATION
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 8.1: Implement Admin Panel
+--------------------------------
+□ Update frontend/src/pages/Admin.tsx
+
+```typescript
+import React, { useEffect, useState } from 'react';
+import {
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Box,
+  Alert,
+  CircularProgress,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
+import { CheckCircle, Cancel } from '@mui/icons-material';
+import { useWorldBankContract } from '../hooks/useContract';
+import { useAccount } from 'wagmi';
+import { formatEther } from 'viem';
+
+export const Admin: React.FC = () => {
+  const contract = useWorldBankContract();
+  const { address } = useAccount();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [pendingLoans, setPendingLoans] = useState<any[]>([]);
+  const [selectedLoan, setSelectedLoan] = useState<any>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+
+  useEffect(() => {
+    checkAdmin();
+  }, [address]);
+
+  const checkAdmin = async () => {
+    try {
+      const owner = await contract.read.owner();
+      setIsAdmin(owner.toLowerCase() === address?.toLowerCase());
+      if (owner.toLowerCase() === address?.toLowerCase()) {
+        await loadPendingLoans();
+      }
+    } catch (error) {
+      console.error('Error checking admin:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadPendingLoans = async () => {
+    try {
+      const loans = await contract.read.getPendingLoans();
+      setPendingLoans(loans);
+    } catch (error) {
+      console.error('Error loading pending loans:', error);
+    }
+  };
+
+  const handleApprove = async (loanId: bigint) => {
+    setActionLoading(true);
+    try {
+      const tx = await contract.write.approveLoan([loanId]);
+      await tx.wait();
+      await loadPendingLoans();
+      setSelectedLoan(null);
+    } catch (error) {
+      console.error('Error approving loan:', error);
+      alert('Failed to approve loan');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReject = async (loanId: bigint) => {
+    setActionLoading(true);
+    try {
+      const tx = await contract.write.rejectLoan([loanId]);
+      await tx.wait();
+      await loadPendingLoans();
+      setSelectedLoan(null);
+    } catch (error) {
+      console.error('Error rejecting loan:', error);
+      alert('Failed to reject loan');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <Container maxWidth="sm">
+        <Alert severity="error">
+          Access Denied: Admin privileges required
+        </Alert>
+      </Container>
+    );
+  }
+
+  return (
+    <Container maxWidth="md">
+      <Typography variant="h4" gutterBottom>
+        Admin Panel
+      </Typography>
+      <Typography variant="body1" color="text.secondary" paragraph>
+        Review and manage pending loan requests
+      </Typography>
+
+      {pendingLoans.length === 0 ? (
+        <Alert severity="info">No pending loan requests</Alert>
+      ) : (
+        <List>
+          {pendingLoans.map((loan: any, index: number) => (
+            <Card key={index} sx={{ mb: 2 }} elevation={1}>
+              <ListItem>
+                <ListItemText
+                  primary={
+                    <Box>
+                      <Typography variant="h6">
+                        {formatEther(loan.amount)} MATIC
+                      </Typography>
+                      <Chip label="Pending Review" color="warning" size="small" />
+                    </Box>
+                  }
+                  secondary={
+                    <>
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        <strong>Purpose:</strong> {loan.purpose}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Borrower: {loan.borrower}
+                      </Typography>
+                      <br />
+                      <Typography variant="caption" color="text.secondary">
+                        Requested: {new Date(Number(loan.requestedAt) * 1000).toLocaleString()}
+                      </Typography>
+                    </>
+                  }
+                />
+              </ListItem>
+              <Box sx={{ p: 2, display: 'flex', gap: 2 }}>
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<CheckCircle />}
+                  onClick={() => setSelectedLoan({ ...loan, action: 'approve' })}
+                  fullWidth
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Cancel />}
+                  onClick={() => setSelectedLoan({ ...loan, action: 'reject' })}
+                  fullWidth
+                >
+                  Reject
+                </Button>
+              </Box>
+            </Card>
+          ))}
+        </List>
+      )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={!!selectedLoan} onClose={() => setSelectedLoan(null)}>
+        <DialogTitle>
+          Confirm {selectedLoan?.action === 'approve' ? 'Approval' : 'Rejection'}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to {selectedLoan?.action} this loan request for{' '}
+            {selectedLoan && formatEther(selectedLoan.amount)} MATIC?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSelectedLoan(null)}>Cancel</Button>
+          <Button
+            onClick={() =>
+              selectedLoan?.action === 'approve'
+                ? handleApprove(selectedLoan.id)
+                : handleReject(selectedLoan.id)
+            }
+            color={selectedLoan?.action === 'approve' ? 'success' : 'error'}
+            disabled={actionLoading}
+          >
+            {actionLoading ? <CircularProgress size={20} /> : 'Confirm'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
+  );
+};
+```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 8.2: Implement QR Code Generation
+---------------------------------------
+□ Create frontend/src/components/QR/QRGenerator.tsx
+
+```typescript
+import React from 'react';
+import QRCode from 'qrcode.react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  IconButton,
+} from '@mui/material';
+import { Download, Share } from '@mui/icons-material';
+
+interface QRGeneratorProps {
+  value: string;
+  title: string;
+  subtitle?: string;
+}
+
+export const QRGenerator: React.FC<QRGeneratorProps> = ({
+  value,
+  title,
+  subtitle,
+}) => {
+  const downloadQR = () => {
+    const canvas = document.getElementById('qr-canvas') as HTMLCanvasElement;
+    const pngUrl = canvas
+      .toDataURL('image/png')
+      .replace('image/png', 'image/octet-stream');
+    const downloadLink = document.createElement('a');
+    downloadLink.href = pngUrl;
+    downloadLink.download = `${title.replace(/\s+/g, '-')}.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
+  const shareQR = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: subtitle,
+          url: value,
+        });
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    }
+  };
+
+  return (
+    <Card elevation={1}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          {title}
+        </Typography>
+        {subtitle && (
+          <Typography variant="body2" color="text.secondary" paragraph>
+            {subtitle}
+          </Typography>
+        )}
+
+        <Box display="flex" justifyContent="center" my={3}>
+          <QRCode
+            id="qr-canvas"
+            value={value}
+            size={256}
+            level="H"
+            includeMargin
+          />
+        </Box>
+
+        <Typography
+          variant="caption"
+          sx={{
+            display: 'block',
+            wordBreak: 'break-all',
+            bgcolor: 'grey.100',
+            p: 1,
+            borderRadius: 1,
+            mb: 2,
+          }}
+        >
+          {value}
+        </Typography>
+
+        <Box display="flex" gap={2}>
+          <Button
+            variant="outlined"
+            startIcon={<Download />}
+            onClick={downloadQR}
+            fullWidth
+          >
+            Download
+          </Button>
+          {navigator.share && (
+            <Button
+              variant="outlined"
+              startIcon={<Share />}
+              onClick={shareQR}
+              fullWidth
+            >
+              Share
+            </Button>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+```
+
+STEP 8.3: Implement QR Code Scanner
+------------------------------------
+□ Create frontend/src/components/QR/QRScanner.tsx
+
+```typescript
+import React, { useState } from 'react';
+import { QrReader } from 'react-qr-reader';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Box,
+  Alert,
+} from '@mui/material';
+
+interface QRScannerProps {
+  open: boolean;
+  onClose: () => void;
+  onScan: (data: string) => void;
+}
+
+export const QRScanner: React.FC<QRScannerProps> = ({
+  open,
+  onClose,
+  onScan,
+}) => {
+  const [error, setError] = useState('');
+
+  const handleScan = (result: any) => {
+    if (result) {
+      onScan(result.text);
+      onClose();
+    }
+  };
+
+  const handleError = (error: any) => {
+    console.error(error);
+    setError('Failed to access camera. Please check permissions.');
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Scan QR Code</DialogTitle>
+      <DialogContent>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        
+        <Box sx={{ width: '100%', aspectRatio: '1' }}>
+          <QrReader
+            onResult={handleScan}
+            constraints={{ facingMode: 'environment' }}
+            containerStyle={{ width: '100%' }}
+          />
+        </Box>
+
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+          Position the QR code within the frame to scan
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+```
+
+STEP 8.4: Add QR Features to Dashboard
+---------------------------------------
+□ Update Dashboard to include wallet QR code display
+□ Add QR scanner button for quick transactions
+□ Test QR generation and scanning
+
+DELIVERABLES FOR DAY 8
+--------------------------------------------------------------------------------
+✓ Admin panel fully functional
+✓ Loan approval/rejection working
+✓ QR code generation implemented
+✓ QR code scanner implemented
+✓ Admin access control enforced
+
+================================================================================
+DAY 9: MOBILE OPTIMIZATION & CROSS-PLATFORM TESTING
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 9.1: Add Progressive Web App (PWA) Support
+------------------------------------------------
+□ Create frontend/public/manifest.json
+
+```json
+{
+  "name": "Crypto World Bank",
+  "short_name": "WorldBank",
+  "description": "Decentralized Reserve and Lending Platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFBFE",
+  "theme_color": "#6750A4",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+```
+
+□ Update frontend/index.html
+  Add to <head>:
+  ```html
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#6750A4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  ```
+
+□ Create app icons (192x192 and 512x512)
+
+STEP 9.2: Optimize for Mobile Devices
+--------------------------------------
+□ Add responsive breakpoints to theme
+□ Test touch interactions
+□ Increase button sizes for mobile (min 48x48dp)
+□ Optimize form inputs for mobile keyboards
+□ Add haptic feedback for important actions
+
+STEP 9.3: Test WalletConnect on Mobile
+---------------------------------------
+□ Install MetaMask mobile app
+□ Test WalletConnect connection flow
+□ Verify all transactions work on mobile
+□ Test QR scanner on mobile
+□ Check camera permissions
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 9.4: Cross-Platform Testing Matrix
+----------------------------------------
+□ Test on devices:
+
+Desktop Browsers:
+  ✓ Chrome (Windows/Mac)
+  ✓ Firefox (Windows/Mac)
+  ✓ Safari (Mac)
+  ✓ Edge (Windows)
+
+Mobile Browsers:
+  ✓ Chrome (Android)
+  ✓ Safari (iOS)
+  ✓ Samsung Internet (Android)
+  ✓ Firefox (Android)
+
+Wallet Apps:
+  ✓ MetaMask (Extension)
+  ✓ MetaMask (Mobile)
+  ✓ Trust Wallet (Mobile)
+  ✓ Rainbow Wallet (Mobile)
+
+□ Document any issues found
+
+STEP 9.5: Performance Optimization
+-----------------------------------
+□ Run Lighthouse audit
+  Target scores:
+  - Performance: >90
+  - Accessibility: >95
+  - Best Practices: >95
+  - SEO: >90
+
+□ Optimize images
+□ Enable code splitting
+□ Add lazy loading
+□ Minimize bundle size
+
+STEP 9.6: Accessibility Testing
+--------------------------------
+□ Test keyboard navigation
+□ Test screen reader compatibility
+□ Verify color contrast ratios
+□ Add ARIA labels where needed
+□ Test with browser accessibility tools
+
+DELIVERABLES FOR DAY 9
+--------------------------------------------------------------------------------
+✓ PWA support enabled
+✓ Mobile optimization completed
+✓ Cross-platform testing done
+✓ Performance optimized
+✓ Accessibility verified
+✓ All devices tested
+
+================================================================================
+DAY 10: POLISH, DOCUMENTATION & DEPLOYMENT
+================================================================================
+
+MORNING SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 10.1: Final UI Polish
+---------------------------
+□ Review all pages for consistency
+□ Fix any visual bugs
+□ Improve loading states
+□ Add empty state illustrations
+□ Polish animations and transitions
+□ Add tooltips where helpful
+
+STEP 10.2: Error Handling Improvements
+---------------------------------------
+□ Add comprehensive error messages
+□ Implement error boundaries
+□ Add retry logic for failed transactions
+□ Improve network error handling
+□ Add offline detection
+
+STEP 10.3: Create User Documentation
+-------------------------------------
+□ Create frontend/public/user-guide.pdf
+
+Content:
+  1. Getting Started
+     - Installing MetaMask
+     - Getting test tokens
+     - Connecting wallet
+  
+  2. Making a Deposit
+     - Step-by-step guide
+     - Screenshots
+  
+  3. Requesting a Loan
+     - How to request
+     - What to expect
+  
+  4. Using QR Codes
+     - Generating QR codes
+     - Scanning QR codes
+  
+  5. Troubleshooting
+     - Common issues
+     - Solutions
+
+□ Create README.md in root directory
+
+```markdown
+# Crypto World Bank
+
+A decentralized reserve and lending platform built on blockchain technology.
+
+## Features
+
+- 🏦 Decentralized Reserve System
+- 💰 Transparent Loan Management
+- 📱 Cross-Platform Support
+- 🔍 QR Code Integration
+- 🎨 Material Design 3 UI
+- 🔐 Secure Smart Contracts
+
+## Tech Stack
+
+**Blockchain:**
+- Solidity ^0.8.20
+- Hardhat
+- OpenZeppelin
+- Polygon Mumbai Testnet
+
+**Frontend:**
+- React 18 + TypeScript
+- Material-UI v5
+- Ethers.js v6
+- RainbowKit
+- Vite
+
+## Getting Started
+
+[Installation and setup instructions]
+
+## Demo
+
+Live Demo: [Your Vercel URL]
+Contract: [Polygonscan URL]
+
+## License
+
+MIT
+```
+
+AFTERNOON SESSION (3-4 HOURS)
+--------------------------------------------------------------------------------
+
+STEP 10.4: Deploy to Production
+--------------------------------
+□ Deploy frontend to Vercel
+
+```bash
+cd frontend
+npm run build
+vercel --prod
+```
+
+□ Configure custom domain (optional)
+□ Set up environment variables on Vercel
+□ Test production deployment
+
+STEP 10.5: Create Demo Video
+-----------------------------
+□ Record demo following the 7-minute flow:
+  1. Introduction (30s)
+  2. Admin deposits to reserve (1min)
+  3. Dashboard overview (1min)
+  4. User requests loan on mobile (2min)
+  5. Admin approves loan (1.5min)
+  6. QR code demonstration (1min)
+
+□ Edit video with:
+  - Clear audio narration
+  - On-screen annotations
+  - Smooth transitions
+  - Transaction confirmations visible
+
+□ Export in 1080p
+□ Upload to YouTube (unlisted)
+
+STEP 10.6: Prepare Presentation
+--------------------------------
+□ Create PowerPoint/PDF (15-20 slides)
+
+Slide Outline:
+  1. Title Slide
+  2. Problem Statement
+  3. Proposed Solution
+  4. System Architecture
+  5. Smart Contract Design
+  6. Technology Stack
+  7. Key Features
+  8. Live Demo (video or live)
+  9. Security Considerations
+  10. Testing Results
+  11. Performance Metrics
+  12. Cross-Platform Compatibility
+  13. Challenges Overcome
+  14. Future Enhancements
+  15. Conclusions
+  16. Q&A
+
+□ Prepare speaker notes
+□ Practice presentation (aim for 15 minutes)
+
+STEP 10.7: Final Testing Checklist
+-----------------------------------
+□ Complete end-to-end test:
+  ✓ Connect wallet
+  ✓ Deposit funds
+  ✓ Dashboard updates
+  ✓ Request loan
+  ✓ Admin approves
+  ✓ Funds transferred
+  ✓ QR codes work
+  ✓ Mobile responsive
+  ✓ All links work
+  ✓ Error handling works
+
+□ Backup test wallets with funds
+□ Prepare demo script
+
+STEP 10.8: Create Project Report
+---------------------------------
+□ Write comprehensive report (40-60 pages)
+
+Report Structure:
+  1. Abstract
+  2. Introduction
+  3. Literature Review
+  4. System Analysis
+  5. System Design
+  6. Implementation
+  7. Testing
+  8. Results
+  9. Conclusion
+  10. References
+  11. Appendices
+
+DELIVERABLES FOR DAY 10
+--------------------------------------------------------------------------------
+✓ UI polished and bug-free
+✓ User documentation created
+✓ README.md completed
+✓ Frontend deployed to production
+✓ Demo video recorded
+✓ Presentation prepared
+✓ Project report written
+✓ Final testing completed
+
+================================================================================
+POST-DEPLOYMENT CHECKLIST
+================================================================================
+
+SUBMISSION PACKAGE
+--------------------------------------------------------------------------------
+□ GitHub repository link
+□ Live demo URL
+□ Smart contract address
+□ Block explorer link (verified contract)
+□ Demo video link
+□ Presentation slides (PDF)
+□ Project report (PDF)
+□ User guide (PDF)
+□ Admin credentials (for faculty testing)
+□ Test user credentials
+□ Test MATIC for faculty testing
+
+FACULTY DEMO PREPARATION
+--------------------------------------------------------------------------------
+□ Test all features 24 hours before demo
+□ Ensure wallets are funded
+□ Have backup video ready
+□ Print handouts (optional)
+□ Prepare for common questions
+□ Have block explorer open
+□ Have backup internet connection
+
+CONTINGENCY PLANS
+--------------------------------------------------------------------------------
+□ If live demo fails: Play pre-recorded video
+□ If network congested: Use cached data / screenshots
+□ If MetaMask issues: Have second browser ready
+□ If QR scanner fails: Use manual address input
+
+================================================================================
+ADDITIONAL RESOURCES
+================================================================================
+
+HELPFUL LINKS
+--------------------------------------------------------------------------------
+• Polygon Mumbai Faucet: https://faucet.polygon.technology/
+• Sepolia Faucet: https://sepoliafaucet.com/
+• WalletConnect Cloud: https://cloud.walletconnect.com/
+• Material Design 3: https://m3.material.io/
+• Ethers.js Docs: https://docs.ethers.org/v6/
+• Hardhat Docs: https://hardhat.org/docs
+• OpenZeppelin: https://docs.openzeppelin.com/
+
+TROUBLESHOOTING COMMON ISSUES
+--------------------------------------------------------------------------------
+
+Issue: "Insufficient funds for gas"
+Solution: Get more test tokens from faucet
+
+Issue: "User rejected transaction"
+Solution: Inform user to approve in MetaMask
+
+Issue: "Network mismatch"
+Solution: Prompt user to switch networks
+
+Issue: "Contract not found"
+Solution: Verify contract address and network
+
+Issue: "Camera permission denied"
+Solution: Guide user to enable in browser settings
+
+BEST PRACTICES FOLLOWED
+--------------------------------------------------------------------------------
+✓ Clean, commented code
+✓ Consistent naming conventions
+✓ Modular component structure
+✓ Proper error handling
+✓ Security best practices
+✓ Responsive design
+✓ Accessibility compliance
+✓ Performance optimization
+✓ Comprehensive testing
+✓ Clear documentation
+
+================================================================================
+CONGRATULATIONS!
+================================================================================
+
+You now have a complete, polished, demo-ready prototype that demonstrates:
+
+✓ Blockchain fundamentals
+✓ Smart contract development
+✓ Full-stack web development
+✓ Cross-platform compatibility
+✓ Modern UI/UX design
+✓ QR code integration
+✓ Security implementation
+✓ Professional documentation
+
+This project showcases your ability to build real-world decentralized 
+applications and is suitable for academic presentations, portfolio inclusion,
+and future expansion.
+
+Good luck with your demonstration!
+
+================================================================================
+END OF IMPLEMENTATION GUIDE
+================================================================================

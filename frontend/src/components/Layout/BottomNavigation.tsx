@@ -7,23 +7,33 @@ import {
   Dashboard,
   Add,
   RequestQuote,
-  AdminPanelSettings,
+  AccountBalance,
   QrCode2,
   Security,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useRole } from "../../hooks/useRole";
 
-const navItems = [
+const baseNavItems = [
   { label: "Dashboard", value: "/", icon: <Dashboard /> },
   { label: "Deposit", value: "/deposit", icon: <Add /> },
   { label: "Loan", value: "/loan", icon: <RequestQuote /> },
+  { label: "QR", value: "/qr", icon: <QrCode2 /> },
+];
+
+const bankOnlyNavItems = [
   { label: "Risk AI", value: "/risk", icon: <Security /> },
-  { label: "Admin", value: "/admin", icon: <AdminPanelSettings /> },
+  { label: "Bank", value: "/admin", icon: <AccountBalance /> },
 ];
 
 export function BottomNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isBankOrAdmin } = useRole();
+  const navItems = [
+    ...baseNavItems,
+    ...(isBankOrAdmin ? bankOnlyNavItems : [{ label: "Bank", value: "/admin", icon: <AccountBalance /> }]),
+  ];
   const value = navItems.find((item) => item.value === location.pathname)?.value ?? "/";
 
   return (

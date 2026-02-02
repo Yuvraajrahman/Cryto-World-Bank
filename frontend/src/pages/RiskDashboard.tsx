@@ -16,6 +16,7 @@ import {
   TableRow,
   Paper,
   Chip,
+  Alert,
 } from "@mui/material";
 import {
   Security,
@@ -23,6 +24,7 @@ import {
   SmartToy,
   Speed,
 } from "@mui/icons-material";
+import { useRole } from "../hooks/useRole";
 import { RiskScoreCard } from "../components/ML/RiskScoreCard";
 import { AnomalyAlert } from "../components/ML/AnomalyAlert";
 
@@ -72,7 +74,21 @@ function TabPanel({ children, value, index }: { children: React.ReactNode; value
 }
 
 export function RiskDashboard() {
+  const { isBankOrAdmin } = useRole();
   const [tabValue, setTabValue] = useState(0);
+
+  if (!isBankOrAdmin) {
+    return (
+      <Container maxWidth="sm">
+        <Typography variant="h4" gutterBottom fontWeight={500}>
+          Risk & Security Dashboard
+        </Typography>
+        <Alert severity="warning">
+          Bank only. Risk detection and security features are visible to the bank, not to users.
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg">

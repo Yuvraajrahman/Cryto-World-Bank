@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import { CheckCircle, Cancel, AccountBalance, People, PendingActions } from "@mui/icons-material";
 import { useWorldBankContract } from "../hooks/useContract";
+import { useDemoMode } from "../context/DemoModeContext";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { RLRecommendation } from "../components/ML/RLRecommendation";
@@ -65,6 +66,7 @@ const MOCK_PENDING_LOANS: DemoLoan[] = [
 
 export function Admin() {
   const contract = useWorldBankContract();
+  const { demoRole, setDemoRole } = useDemoMode();
   const { address } = useAccount();
   const [isAdmin, setIsAdmin] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
@@ -151,9 +153,10 @@ export function Admin() {
     setDemoAction(null);
   };
 
-  const showPanel = isAdmin || demoMode;
+  const showDemoContent = demoMode || demoRole === "bank";
+  const showPanel = isAdmin || demoMode || demoRole === "bank";
 
-  if (loading && !demoMode) {
+  if (loading && !showDemoContent) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
         <CircularProgress />
@@ -165,17 +168,17 @@ export function Admin() {
     return (
       <Container maxWidth="sm">
         <Typography variant="h4" gutterBottom fontWeight={500}>
-          Admin Panel
+          Bank
         </Typography>
         <Alert severity="info" sx={{ mb: 2 }}>
-          Connect as contract owner to manage real loans, or use Demo Admin to try the flow.
+          Use <strong>Demo Bank</strong> or <strong>Demo User</strong> in the top bar to switch roles. Or connect as the bank (contract owner) to manage real loans.
         </Alert>
         <Card elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom fontWeight={500}>
-            Demo Admin
+            Bank (Demo)
           </Typography>
           <Typography variant="body2" color="text.secondary" paragraph>
-            Use the demo to see the admin panel with a 1M ETH bank reserve, user loans, and approve/reject pending requests.
+            The bank holds a 1M ETH reserve. Users request loans and make deposits. Click <strong>Demo Bank</strong> in the top bar to view the bank panel.
           </Typography>
           <Button
             fullWidth
@@ -184,7 +187,7 @@ export function Admin() {
             onClick={() => setDemoMode(true)}
             startIcon={<AccountBalance />}
           >
-            Enter as Demo Admin
+            Enter as Bank (Demo)
           </Button>
         </Card>
       </Container>
@@ -196,23 +199,30 @@ export function Admin() {
       <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2} mb={3}>
         <Box>
           <Typography variant="h4" gutterBottom fontWeight={500}>
-            Admin Panel
+            Bank
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {demoMode ? "Demo mode — manage loans and view reserve" : "Review and manage pending loan requests"}
+            {showDemoContent ? "Demo — 1M ETH reserve, manage loans and risk" : "1M ETH reserve. Review loan requests and approve/reject."}
           </Typography>
         </Box>
-        {demoMode && (
+        {showDemoContent && (
           <Box display="flex" alignItems="center" gap={2}>
-            <Chip label="Demo Admin" color="primary" sx={{ fontWeight: 600 }} />
-            <Button variant="outlined" size="small" onClick={() => setDemoMode(false)}>
+            <Chip label="Bank (Demo)" color="primary" sx={{ fontWeight: 600 }} />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                setDemoMode(false);
+                setDemoRole(null);
+              }}
+            >
               Exit Demo
             </Button>
           </Box>
         )}
       </Box>
 
-      {demoMode && (
+      {showDemoContent && (
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={4}>
             <Card elevation={2} sx={{ p: 2, height: "100%" }}>
@@ -250,7 +260,7 @@ export function Admin() {
         </Grid>
       )}
 
-      {demoMode && (
+      {showDemoContent && (
         <Card elevation={2} sx={{ mb: 4 }}>
           <Box sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom fontWeight={500}>
@@ -288,7 +298,7 @@ export function Admin() {
         <PendingActions /> Pending loan requests
       </Typography>
 
-      {demoMode ? (
+      {showDemoContent ? (
         demoPendingLoans.length === 0 ? (
           <Alert severity="info">No pending loan requests in demo.</Alert>
         ) : (

@@ -4,14 +4,18 @@ import {
   Typography,
   IconButton,
   Box,
+  Button,
 } from "@mui/material";
-import { AccountBalanceWallet } from "@mui/icons-material";
+import { AccountBalanceWallet, AccountBalance, Person } from "@mui/icons-material";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useDemoMode } from "../../context/DemoModeContext";
 
 export function AppBar() {
+  const { demoRole, setDemoRole } = useDemoMode();
+
   return (
     <MuiAppBar position="sticky" elevation={0}>
-      <Toolbar sx={{ minHeight: { xs: 56, sm: 64 } }}>
+      <Toolbar sx={{ minHeight: { xs: 56, sm: 64 }, flexWrap: "wrap" }}>
         <IconButton
           edge="start"
           color="inherit"
@@ -31,7 +35,27 @@ export function AppBar() {
         >
           Crypto Reserve Bank
         </Typography>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+          <Button
+            size="small"
+            variant={demoRole === "bank" ? "contained" : "outlined"}
+            color="inherit"
+            startIcon={<AccountBalance />}
+            onClick={() => setDemoRole(demoRole === "bank" ? null : "bank")}
+            sx={{ borderColor: "rgba(255,255,255,0.5)" }}
+          >
+            Demo Bank
+          </Button>
+          <Button
+            size="small"
+            variant={demoRole === "user" ? "contained" : "outlined"}
+            color="inherit"
+            startIcon={<Person />}
+            onClick={() => setDemoRole(demoRole === "user" ? null : "user")}
+            sx={{ borderColor: "rgba(255,255,255,0.5)" }}
+          >
+            Demo User
+          </Button>
           <ConnectButton />
         </Box>
       </Toolbar>

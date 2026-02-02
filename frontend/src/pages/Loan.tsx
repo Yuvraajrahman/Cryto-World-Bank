@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { RequestQuote, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { useWorldBankContract } from "../hooks/useContract";
+import { useRole } from "../hooks/useRole";
 import { useAccount } from "wagmi";
 import { parseEther, formatEther } from "viem";
 import { RiskScoreCard } from "../components/ML/RiskScoreCard";
@@ -45,6 +46,7 @@ const STATUS_COLORS = ["warning", "success", "error", "info"] as const;
 
 export function Loan() {
   const contract = useWorldBankContract();
+  const { isBankOrAdmin } = useRole();
   const { address, isConnected } = useAccount();
   const [tabValue, setTabValue] = useState(0);
   const [amount, setAmount] = useState("");
@@ -108,8 +110,8 @@ export function Loan() {
       return;
     }
 
-    analyzeFraudRisk();
-    
+    if (isBankOrAdmin) analyzeFraudRisk();
+
     setLoading(true);
     setError("");
     setSuccess(false);
@@ -193,43 +195,47 @@ export function Loan() {
               </Alert>
             )}
 
-            <Button
-              fullWidth
-              variant="outlined"
-              size="large"
-              onClick={analyzeFraudRisk}
-              disabled={!amount || !purpose}
-              sx={{ mb: 2 }}
-            >
-              Analyze Risk with AI
-            </Button>
+            {isBankOrAdmin && (
+              <>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  size="large"
+                  onClick={analyzeFraudRisk}
+                  disabled={!amount || !purpose}
+                  sx={{ mb: 2 }}
+                >
+                  Analyze Risk with AI
+                </Button>
 
-            <Collapse in={showRiskAnalysis}>
-              <Box sx={{ mb: 2 }}>
-                <RiskScoreCard
-                  score={fraudScore}
-                  type="fraud"
-                  label="AI Fraud Detection Score"
-                />
-                <XAIExplanation
-                  decision={fraudScore > 0.7 ? "reject" : fraudScore > 0.4 ? "flag" : "approve"}
-                  confidence={0.85}
-                  features={[
-                    { name: "Loan Amount", value: `${amount} MATIC`, impact: parseFloat(amount) > 10 ? 0.25 : -0.15 },
-                    { name: "Purpose Length", value: `${purpose.length} chars`, impact: purpose.length < 20 ? 0.18 : -0.12 },
-                    { name: "Wallet Age", value: "45 days", impact: -0.08 },
-                    { name: "Previous Loans", value: "2", impact: -0.05 },
-                  ]}
-                  reasoning={
-                    fraudScore > 0.7
-                      ? "High fraud probability detected. Large loan amount and short purpose description indicate potential risk."
-                      : fraudScore > 0.4
-                      ? "Moderate risk detected. Loan request shows some suspicious patterns but may be legitimate."
-                      : "Low fraud probability. Loan request appears normal based on historical patterns."
-                  }
-                />
-              </Box>
-            </Collapse>
+                <Collapse in={showRiskAnalysis}>
+                  <Box sx={{ mb: 2 }}>
+                    <RiskScoreCard
+                      score={fraudScore}
+                      type="fraud"
+                      label="AI Fraud Detection Score"
+                    />
+                    <XAIExplanation
+                      decision={fraudScore > 0.7 ? "reject" : fraudScore > 0.4 ? "flag" : "approve"}
+                      confidence={0.85}
+                      features={[
+                        { name: "Loan Amount", value: `${amount} MATIC`, impact: parseFloat(amount) > 10 ? 0.25 : -0.15 },
+                        { name: "Purpose Length", value: `${purpose.length} chars`, impact: purpose.length < 20 ? 0.18 : -0.12 },
+                        { name: "Wallet Age", value: "45 days", impact: -0.08 },
+                        { name: "Previous Loans", value: "2", impact: -0.05 },
+                      ]}
+                      reasoning={
+                        fraudScore > 0.7
+                          ? "High fraud probability detected. Large loan amount and short purpose description indicate potential risk."
+                          : fraudScore > 0.4
+                          ? "Moderate risk detected. Loan request shows some suspicious patterns but may be legitimate."
+                          : "Low fraud probability. Loan request appears normal based on historical patterns."
+                      }
+                    />
+                  </Box>
+                </Collapse>
+              </>
+            )}
 
             <Button
               fullWidth
@@ -250,8 +256,8 @@ export function Loan() {
 
             <Box mt={2}>
               <Typography variant="caption" color="text.secondary">
-                Your request will be analyzed by AI and reviewed by admin. Approved
-                loans will be transferred automatically.
+                Your request will be reviewed by the bank. Approved loans will be
+                transferred to your wallet automatically.
               </Typography>
             </Box>
           </CardContent>

@@ -16,13 +16,22 @@ import {
   DialogContent,
   DialogActions,
   Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from "@mui/material";
-import { CheckCircle, Cancel } from "@mui/icons-material";
+import { CheckCircle, Cancel, AccountBalance, People, PendingActions } from "@mui/icons-material";
 import { useWorldBankContract } from "../hooks/useContract";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { RLRecommendation } from "../components/ML/RLRecommendation";
 import { XAIExplanation } from "../components/ML/XAIExplanation";
+
+const DEMO_TOTAL_RESERVE_ETH = 1_000_000;
 
 type LoanItem = {
   id: bigint;
@@ -34,15 +43,44 @@ type LoanItem = {
   approvedAt: bigint;
 };
 
+type DemoLoan = {
+  id: number;
+  borrower: string;
+  amountEth: number;
+  purpose: string;
+  requestedAt: number;
+  status: "pending" | "approved" | "rejected";
+};
+
+const MOCK_APPROVED_LOANS: DemoLoan[] = [
+  { id: 1, borrower: "0x742d...5f0b", amountEth: 2.5, purpose: "Business expansion", requestedAt: Date.now() / 1000 - 86400 * 7, status: "approved" },
+  { id: 2, borrower: "0x8a3c...1d2e", amountEth: 1.2, purpose: "Education", requestedAt: Date.now() / 1000 - 86400 * 3, status: "approved" },
+  { id: 3, borrower: "0xb91f...9c4a", amountEth: 5, purpose: "Medical emergency", requestedAt: Date.now() / 1000 - 86400, status: "approved" },
+];
+
+const MOCK_PENDING_LOANS: DemoLoan[] = [
+  { id: 4, borrower: "0xc4e2...7f3d", amountEth: 3, purpose: "Home repair", requestedAt: Date.now() / 1000 - 3600, status: "pending" },
+  { id: 5, borrower: "0xd5f1...2a8b", amountEth: 0.8, purpose: "Short-term working capital", requestedAt: Date.now() / 1000 - 7200, status: "pending" },
+];
+
 export function Admin() {
   const contract = useWorldBankContract();
   const { address } = useAccount();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pendingLoans, setPendingLoans] = useState<LoanItem[]>([]);
   const [selectedLoan, setSelectedLoan] = useState<LoanItem & { action: "approve" | "reject" } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [showMLAnalysis, setShowMLAnalysis] = useState<{ [key: string]: boolean }>({});
+
+  const [demoApprovedLoans, setDemoApprovedLoans] = useState<DemoLoan[]>(MOCK_APPROVED_LOANS);
+  const [demoPendingLoans, setDemoPendingLoans] = useState<DemoLoan[]>(MOCK_PENDING_LOANS);
+  const [demoSelected, setDemoSelected] = useState<DemoLoan | null>(null);
+  const [demoAction, setDemoAction] = useState<"approve" | "reject" | null>(null);
+
+  const demoReserveLeft = DEMO_TOTAL_RESERVE_ETH - demoApprovedLoans.reduce((s, l) => s + l.amountEth, 0);
+  const demoTotalDisbursed = demoApprovedLoans.reduce((s, l) => s + l.amountEth, 0);
 
   useEffect(() => {
     checkAdmin();
@@ -57,7 +95,7 @@ export function Admin() {
         await loadPendingLoans();
       }
     } catch (err) {
-      console.error("Error checking admin:", err);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -66,9 +104,7 @@ export function Admin() {
   const loadPendingLoans = async () => {
     try {
       const loans = await contract.read.getPendingLoans();
-      setPendingLoans(
-        loans.map((l: LoanItem) => l)
-      );
+      setPendingLoans(loans.map((l: LoanItem) => l));
     } catch (err) {
       console.error("Error loading pending loans:", err);
     }
@@ -102,42 +138,206 @@ export function Admin() {
     }
   };
 
-  if (loading) {
+  const handleDemoApprove = (loan: DemoLoan) => {
+    setDemoPendingLoans((prev) => prev.filter((l) => l.id !== loan.id));
+    setDemoApprovedLoans((prev) => [...prev, { ...loan, status: "approved" as const }]);
+    setDemoSelected(null);
+    setDemoAction(null);
+  };
+
+  const handleDemoReject = (loan: DemoLoan) => {
+    setDemoPendingLoans((prev) => prev.filter((l) => l.id !== loan.id));
+    setDemoSelected(null);
+    setDemoAction(null);
+  };
+
+  const showPanel = isAdmin || demoMode;
+
+  if (loading && !demoMode) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="60vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
         <CircularProgress />
       </Box>
     );
   }
 
-  if (!isAdmin) {
+  if (!showPanel) {
     return (
       <Container maxWidth="sm">
         <Typography variant="h4" gutterBottom fontWeight={500}>
           Admin Panel
         </Typography>
-        <Alert severity="error">
-          Access denied. Admin privileges required.
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Connect as contract owner to manage real loans, or use Demo Admin to try the flow.
         </Alert>
+        <Card elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom fontWeight={500}>
+            Demo Admin
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Use the demo to see the admin panel with a 1M ETH bank reserve, user loans, and approve/reject pending requests.
+          </Typography>
+          <Button
+            fullWidth
+            variant="contained"
+            size="large"
+            onClick={() => setDemoMode(true)}
+            startIcon={<AccountBalance />}
+          >
+            Enter as Demo Admin
+          </Button>
+        </Card>
       </Container>
     );
   }
 
   return (
     <Container maxWidth="md">
-      <Typography variant="h4" gutterBottom fontWeight={500}>
-        Admin Panel
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Review and manage pending loan requests
+      <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2} mb={3}>
+        <Box>
+          <Typography variant="h4" gutterBottom fontWeight={500}>
+            Admin Panel
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {demoMode ? "Demo mode — manage loans and view reserve" : "Review and manage pending loan requests"}
+          </Typography>
+        </Box>
+        {demoMode && (
+          <Box display="flex" alignItems="center" gap={2}>
+            <Chip label="Demo Admin" color="primary" sx={{ fontWeight: 600 }} />
+            <Button variant="outlined" size="small" onClick={() => setDemoMode(false)}>
+              Exit Demo
+            </Button>
+          </Box>
+        )}
+      </Box>
+
+      {demoMode && (
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={4}>
+            <Card elevation={2} sx={{ p: 2, height: "100%" }}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <AccountBalance color="primary" />
+                <Typography variant="subtitle2" color="text.secondary">Bank Total Reserve</Typography>
+              </Box>
+              <Typography variant="h4" fontWeight={700}>
+                {DEMO_TOTAL_RESERVE_ETH.toLocaleString()} ETH
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Card elevation={2} sx={{ p: 2, height: "100%", borderLeft: 4, borderColor: "success.main" }}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <AccountBalance color="success" />
+                <Typography variant="subtitle2" color="text.secondary">Reserve Left</Typography>
+              </Box>
+              <Typography variant="h4" fontWeight={700} color="success.main">
+                {demoReserveLeft.toLocaleString()} ETH
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Card elevation={2} sx={{ p: 2, height: "100%" }}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <People color="primary" />
+                <Typography variant="subtitle2" color="text.secondary">Total Disbursed</Typography>
+              </Box>
+              <Typography variant="h4" fontWeight={700}>
+                {demoTotalDisbursed.toFixed(1)} ETH
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
+
+      {demoMode && (
+        <Card elevation={2} sx={{ mb: 4 }}>
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h6" gutterBottom fontWeight={500}>
+              Who took how much (approved loans)
+            </Typography>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell><strong>User (Borrower)</strong></TableCell>
+                    <TableCell align="right"><strong>Amount (ETH)</strong></TableCell>
+                    <TableCell><strong>Purpose</strong></TableCell>
+                    <TableCell align="center"><strong>Status</strong></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {demoApprovedLoans.map((loan) => (
+                    <TableRow key={loan.id}>
+                      <TableCell>{loan.borrower}</TableCell>
+                      <TableCell align="right">{loan.amountEth.toFixed(2)}</TableCell>
+                      <TableCell>{loan.purpose}</TableCell>
+                      <TableCell align="center">
+                        <Chip label="Approved" color="success" size="small" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </Card>
+      )}
+
+      <Typography variant="h6" gutterBottom fontWeight={500} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <PendingActions /> Pending loan requests
       </Typography>
 
-      {pendingLoans.length === 0 ? (
+      {demoMode ? (
+        demoPendingLoans.length === 0 ? (
+          <Alert severity="info">No pending loan requests in demo.</Alert>
+        ) : (
+          <List disablePadding>
+            {demoPendingLoans.map((loan) => (
+              <Card key={loan.id} sx={{ mb: 3 }} elevation={2}>
+                <ListItem>
+                  <ListItemText
+                    primary={
+                      <Box>
+                        <Typography variant="h6">{loan.amountEth} ETH</Typography>
+                        <Box display="flex" gap={1} mt={1} flexWrap="wrap">
+                          <Chip label="Pending" color="warning" size="small" />
+                        </Box>
+                      </Box>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="body2" sx={{ mt: 1 }}><strong>Purpose:</strong> {loan.purpose}</Typography>
+                        <Typography variant="caption" color="text.secondary">Borrower: {loan.borrower}</Typography>
+                      </>
+                    }
+                  />
+                </ListItem>
+                <Box sx={{ p: 2 }} display="flex" gap={2}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    startIcon={<CheckCircle />}
+                    onClick={() => { setDemoSelected(loan); setDemoAction("approve"); }}
+                    fullWidth
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<Cancel />}
+                    onClick={() => { setDemoSelected(loan); setDemoAction("reject"); }}
+                    fullWidth
+                  >
+                    Reject
+                  </Button>
+                </Box>
+              </Card>
+            ))}
+          </List>
+        )
+      ) : pendingLoans.length === 0 ? (
         <Alert severity="info">No pending loan requests</Alert>
       ) : (
         <List disablePadding>
@@ -300,6 +500,36 @@ export function Admin() {
             ) : (
               "Confirm"
             )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={!!demoSelected && !!demoAction}
+        onClose={() => { setDemoSelected(null); setDemoAction(null); }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          Confirm {demoAction === "approve" ? "Approval" : "Rejection"}
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to {demoAction} this demo loan request for{" "}
+            {demoSelected?.amountEth} ETH?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => { setDemoSelected(null); setDemoAction(null); }}>Cancel</Button>
+          <Button
+            onClick={() => {
+              if (demoSelected && demoAction === "approve") handleDemoApprove(demoSelected);
+              if (demoSelected && demoAction === "reject") handleDemoReject(demoSelected);
+            }}
+            color={demoAction === "approve" ? "success" : "error"}
+            variant="contained"
+          >
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>

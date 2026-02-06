@@ -10,6 +10,7 @@ import {
   Alert,
   Button,
   Chip,
+  LinearProgress,
 } from "@mui/material";
 import {
   AccountBalance,
@@ -18,6 +19,7 @@ import {
   PendingActions,
   Security,
   Shield,
+  Person,
 } from "@mui/icons-material";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
@@ -73,6 +75,7 @@ export function Dashboard() {
     totalLoans: "0",
     pendingLoans: "0",
     approvedLoans: "0",
+    userDeposits: "0",
   });
 
   useEffect(() => {
@@ -81,7 +84,7 @@ export function Dashboard() {
       return;
     }
     loadStats();
-  }, [isConnected]);
+  }, [isConnected, address]);
 
   const loadStats = async () => {
     if (CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
@@ -91,12 +94,22 @@ export function Dashboard() {
     }
     try {
       setError("");
-      const result = await contract.read.getStats();
+      const statsResult = await contract.read.getStats();
+      let userDeposits = "0";
+      if (address) {
+        try {
+          const dep = await contract.read.getUserDeposits([address]);
+          userDeposits = formatEther(dep);
+        } catch {
+          userDeposits = "0";
+        }
+      }
       setStats({
-        totalReserve: formatEther(result[0]),
-        totalLoans: result[1].toString(),
-        pendingLoans: result[2].toString(),
-        approvedLoans: result[3].toString(),
+        totalReserve: formatEther(statsResult[0]),
+        totalLoans: statsResult[1].toString(),
+        pendingLoans: statsResult[2].toString(),
+        approvedLoans: statsResult[3].toString(),
+        userDeposits,
       });
     } catch (err) {
       console.error("Error loading stats:", err);
@@ -109,16 +122,22 @@ export function Dashboard() {
   if (!isConnected) {
     return (
       <Container maxWidth="sm">
-        <Typography variant="h4" gutterBottom fontWeight={500}>
-          Decentralized Crypto Reserve & Lending Bank
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
-          A World Bank–inspired blockchain prototype. Connect your wallet to view
-          the reserve dashboard and participate.
-        </Typography>
-        <Alert severity="info" sx={{ mt: 2 }}>
-          Connect your wallet using the button in the top bar to get started.
-        </Alert>
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <Typography variant="h4" gutterBottom fontWeight={600}>
+            Decentralized Crypto Reserve and Lending Bank
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
+            A World Bank–inspired blockchain prototype
+          </Typography>
+          <Typography variant="body1" color="text.secondary" paragraph>
+            Transparent, on-chain reserve where users deposit funds and request loans.
+            All transactions are verifiable on the blockchain.
+          </Typography>
+          <Alert severity="info" sx={{ mt: 3, textAlign: "left" }}>
+            Connect your wallet using the button in the top bar to view the reserve
+            dashboard, make deposits, and request loans.
+          </Alert>
+        </Box>
       </Container>
     );
   }
@@ -213,6 +232,62 @@ export function Dashboard() {
           />
         </Grid>
       </Grid>
+
+      {parseInt(stats.totalLoans, 10) > 0 && (
+        <Card elevation={1} sx={{ mt: 3 }}>
+          <CardContent>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+              <Typography variant="body2" color="text.secondary">
+                Loan activity (approved / total)
+              </Typography>
+              <Typography variant="body2" fontWeight={500}>
+                {(
+                  (parseInt(stats.approvedLoans, 10) / parseInt(stats.totalLoans, 10)) *
+                  100
+                ).toFixed(0)}
+                %
+              </Typography>
+            </Box>
+            <LinearProgress
+              variant="determinate"
+              value={
+                parseInt(stats.totalLoans, 10) > 0
+                  ? (parseInt(stats.approvedLoans, 10) / parseInt(stats.totalLoans, 10)) * 100
+                  : 0
+              }
+              sx={{ height: 8, borderRadius: 1 }}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {parseFloat(stats.userDeposits) > 0 && (
+        <Card elevation={1} sx={{ mt: 2 }}>
+          <CardContent>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Person color="primary" />
+              <Typography variant="body2" color="text.secondary">
+                Your deposits to reserve
+              </Typography>
+            </Box>
+            <Typography variant="h6" fontWeight={600} sx={{ mt: 0.5 }}>
+              {parseFloat(stats.userDeposits).toFixed(4)} MATIC
+            </Typography>
+          </CardContent>
+        </Card>
+      )}
+
+      <Box display="flex" gap={2} flexWrap="wrap" sx={{ mb: 3 }}>
+        <Button variant="contained" onClick={() => navigate("/deposit")}>
+          Deposit
+        </Button>
+        <Button variant="outlined" onClick={() => navigate("/loan")}>
+          Request Loan
+        </Button>
+        <Button variant="outlined" onClick={() => navigate("/qr")}>
+          QR Codes
+        </Button>
+      </Box>
 
       <Grid container spacing={3} sx={{ mt: 1 }}>
         {isBankOrAdmin && (

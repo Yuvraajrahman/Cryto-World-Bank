@@ -16,14 +16,16 @@ import {
   ListItemText,
   Chip,
   Collapse,
+  Link,
 } from "@mui/material";
-import { RequestQuote, ExpandMore, ExpandLess } from "@mui/icons-material";
+import { RequestQuote, OpenInNew } from "@mui/icons-material";
 import { useWorldBankContract } from "../hooks/useContract";
 import { useRole } from "../hooks/useRole";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { parseEther, formatEther } from "viem";
 import { RiskScoreCard } from "../components/ML/RiskScoreCard";
 import { XAIExplanation } from "../components/ML/XAIExplanation";
+import { getTxExplorerUrl } from "../utils/blockExplorer";
 
 function TabPanel({
   children,
@@ -48,6 +50,7 @@ export function Loan() {
   const contract = useWorldBankContract();
   const { isBankOrAdmin } = useRole();
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
   const [tabValue, setTabValue] = useState(0);
   const [amount, setAmount] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -56,6 +59,7 @@ export function Loan() {
   const [error, setError] = useState("");
   const [showRiskAnalysis, setShowRiskAnalysis] = useState(false);
   const [fraudScore, setFraudScore] = useState(0);
+  const [txHash, setTxHash] = useState<string | null>(null);
   const [userLoans, setUserLoans] = useState<
     { id: bigint; borrower: string; amount: bigint; purpose: string; status: number; requestedAt: bigint; approvedAt: bigint }[]
   >([]);
@@ -115,15 +119,20 @@ export function Loan() {
     setLoading(true);
     setError("");
     setSuccess(false);
+    setTxHash(null);
 
     try {
-      await contract.write.requestLoan([parseEther(amount), purpose]);
+      const hash = await contract.write.requestLoan([parseEther(amount), purpose]);
       setSuccess(true);
+      setTxHash(typeof hash === "string" ? hash : String(hash));
       setAmount("");
       setPurpose("");
       setShowRiskAnalysis(false);
       await loadUserLoans();
-      setTimeout(() => setSuccess(false), 5000);
+      setTimeout(() => {
+        setSuccess(false);
+        setTxHash(null);
+      }, 8000);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Transaction failed");
     } finally {
@@ -192,6 +201,18 @@ export function Loan() {
             {success && (
               <Alert severity="success" sx={{ mb: 2 }}>
                 Loan request submitted successfully.
+                {txHash && chainId && (
+                  <Box mt={1}>
+                    <Link
+                      href={getTxExplorerUrl(chainId, txHash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}
+                    >
+                      View on explorer <OpenInNew fontSize="small" />
+                    </Link>
+                  </Box>
+                )}
               </Alert>
             )}
 

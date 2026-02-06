@@ -9,18 +9,22 @@ import {
   Box,
   Alert,
   CircularProgress,
+  Link,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
-import { useAccount } from "wagmi";
+import { Add, OpenInNew } from "@mui/icons-material";
+import { useAccount, useChainId } from "wagmi";
 import { parseEther } from "viem";
 import { useWorldBankContract } from "../hooks/useContract";
+import { getTxExplorerUrl } from "../utils/blockExplorer";
 
 export function Deposit() {
   const contract = useWorldBankContract();
   const { isConnected } = useAccount();
+  const chainId = useChainId();
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const handleDeposit = async () => {
@@ -32,6 +36,7 @@ export function Deposit() {
     setLoading(true);
     setError("");
     setSuccess(false);
+    setTxHash(null);
 
     try {
       const hash = await contract.write.depositToReserve({
@@ -39,8 +44,12 @@ export function Deposit() {
       });
       if (hash) {
         setSuccess(true);
+        setTxHash(typeof hash === "string" ? hash : String(hash));
         setAmount("");
-        setTimeout(() => setSuccess(false), 5000);
+        setTimeout(() => {
+          setSuccess(false);
+          setTxHash(null);
+        }, 8000);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Transaction failed");
@@ -92,7 +101,19 @@ export function Deposit() {
 
           {success && (
             <Alert severity="success" sx={{ mb: 2 }}>
-              Deposit successful! Transaction confirmed.
+              Deposit successful. Transaction confirmed.
+              {txHash && chainId && (
+                <Box mt={1}>
+                  <Link
+                    href={getTxExplorerUrl(chainId, txHash)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}
+                  >
+                    View on explorer <OpenInNew fontSize="small" />
+                  </Link>
+                </Box>
+              )}
             </Alert>
           )}
 

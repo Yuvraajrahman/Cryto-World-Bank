@@ -8,6 +8,7 @@ import { Loan } from "./pages/Loan";
 import { Admin } from "./pages/Admin";
 import { QRPage } from "./pages/QRPage";
 import { RiskDashboard } from "./pages/RiskDashboard";
+import { Register } from "./pages/Register";
 
 const BitcoinLogoBg = () => (
   <Box
@@ -56,6 +57,7 @@ function App() {
         >
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/deposit" element={<Deposit />} />
             <Route path="/loan" element={<Loan />} />
             <Route path="/qr" element={<QRPage />} />

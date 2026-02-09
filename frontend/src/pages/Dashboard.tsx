@@ -25,8 +25,10 @@ import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { useWorldBankContract } from "../hooks/useContract";
 import { useRole } from "../hooks/useRole";
+import { useUser } from "../hooks/useUser";
 import { CONTRACT_ADDRESS } from "../config/contracts";
 import { useNavigate } from "react-router-dom";
+import { api } from "../services/api";
 
 function StatsCard({
   title,
@@ -64,8 +66,10 @@ function StatsCard({
 }
 
 export function Dashboard() {
-  const { isConnected } = useAccount();
+  // Get the connected wallet address and connection status
+  const { address, isConnected } = useAccount();
   const { isBankOrAdmin } = useRole();
+  const { user, loading: userLoading } = useUser();
   const contract = useWorldBankContract();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -170,6 +174,23 @@ export function Dashboard() {
           ? "Transparent, on-chain global reserve system powered by AI/ML security"
           : "Transparent, on-chain global reserve. Deposit and request loans."}
       </Typography>
+
+      {user && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          <Typography variant="body2">
+            <strong>Account Type:</strong> {user.type === 'borrower' ? 'Borrower' : 'Bank User'}
+            {user.data?.name && ` - ${user.data.name}`}
+          </Typography>
+        </Alert>
+      )}
+
+      {!user && !userLoading && isConnected && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          <Typography variant="body2">
+            You are not registered. Please register as a borrower or bank user to use the platform.
+          </Typography>
+        </Alert>
+      )}
 
       {isBankOrAdmin && (
         <Alert

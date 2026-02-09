@@ -6,12 +6,18 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { AccountBalanceWallet, AccountBalance, Person } from "@mui/icons-material";
+import { AccountBalanceWallet, AccountBalance, Person, PersonAdd } from "@mui/icons-material";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useNavigate } from "react-router-dom";
+import { useAccount } from "wagmi";
 import { useDemoMode } from "../../context/DemoModeContext";
+import { useUser } from "../../hooks/useUser";
 
 export function AppBar() {
   const { demoRole, setDemoRole } = useDemoMode();
+  const navigate = useNavigate();
+  const { address, isConnected } = useAccount();
+  const { user } = useUser();
 
   return (
     <MuiAppBar position="sticky" elevation={0}>
@@ -36,6 +42,18 @@ export function AppBar() {
           Crypto Reserve Bank
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+          {isConnected && !user && (
+            <Button
+              size="small"
+              variant="outlined"
+              color="inherit"
+              startIcon={<PersonAdd />}
+              onClick={() => navigate("/register")}
+              sx={{ borderColor: "rgba(255,255,255,0.5)" }}
+            >
+              Register
+            </Button>
+          )}
           <Button
             size="small"
             variant={demoRole === "bank" ? "contained" : "outlined"}

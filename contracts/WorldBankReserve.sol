@@ -12,6 +12,18 @@ contract WorldBankReserve is ReentrancyGuard, Ownable {
     uint256 public totalReserve;
     uint256 public loanCounter;
     bool public paused;
+    
+    // National Bank management
+    struct NationalBankInfo {
+        address nationalBankAddress;
+        string name;
+        string country;
+        bool isActive;
+        uint256 totalBorrowed;
+    }
+    
+    mapping(address => NationalBankInfo) public nationalBanks;
+    address[] public nationalBankAddresses;
 
     enum LoanStatus {
         Pending,
@@ -57,6 +69,9 @@ contract WorldBankReserve is ReentrancyGuard, Ownable {
         uint256 indexed loanId,
         address indexed borrower
     );
+    
+    event NationalBankRegistered(address indexed nationalBank, string name, string country);
+    event LentToNationalBank(address indexed nationalBank, uint256 amount);
 
     modifier whenNotPaused() {
         require(!paused, "Contract is paused");
@@ -65,6 +80,64 @@ contract WorldBankReserve is ReentrancyGuard, Ownable {
 
     constructor() Ownable(msg.sender) {
         loanCounter = 0;
+    }
+    
+    /**
+     * @dev Register a national bank
+     */
+    function registerNationalBank(
+        address _nationalBankAddress,
+        string memory _name,
+        string memory _country
+    ) external onlyOwner {
+        require(_nationalBankAddress != address(0), "Invalid national bank address");
+        require(!nationalBanks[_nationalBankAddress].isActive, "National bank already registered");
+        
+        nationalBanks[_nationalBankAddress] = NationalBankInfo({
+            nationalBankAddress: _nationalBankAddress,
+            name: _name,
+            country: _country,
+            isActive: true,
+            totalBorrowed: 0
+        });
+        
+        nationalBankAddresses.push(_nationalBankAddress);
+        emit NationalBankRegistered(_nationalBankAddress, _name, _country);
+    }
+    
+    /**
+     * @dev Lend to a national bank
+     */
+    function lendToNationalBank(address _nationalBankAddress, uint256 _amount) 
+        external 
+        onlyOwner 
+        nonReentrant 
+    {
+        require(nationalBanks[_nationalBankAddress].isActive, "National bank not registered");
+        require(_amount > 0, "Amount must be greater than 0");
+        require(totalReserve >= _amount, "Insufficient reserve balance");
+        
+        nationalBanks[_nationalBankAddress].totalBorrowed += _amount;
+        totalReserve -= _amount;
+        
+        (bool success, ) = payable(_nationalBankAddress).call{value: _amount}("");
+        require(success, "Transfer failed");
+        
+        emit LentToNationalBank(_nationalBankAddress, _amount);
+    }
+    
+    /**
+     * @dev Get national bank count
+     */
+    function getNationalBankCount() external view returns (uint256) {
+        return nationalBankAddresses.length;
+    }
+    
+    /**
+     * @dev Get all national bank addresses
+     */
+    function getAllNationalBanks() external view returns (address[] memory) {
+        return nationalBankAddresses;
     }
 
     /**

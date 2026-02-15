@@ -4,7 +4,7 @@
 
 **Document Type:** Project Whitepaper  
 **Competition:** Blockchain Olympiad Bangladesh 2025 (BCOLBD) — Blockchain Category  
-**Version:** 2.0  
+**Version:** 3.0  
 **Date:** February 2025  
 **Team:** [Team Name]  
 **Institution:** [Institution Name]
@@ -264,7 +264,333 @@ As the platform operates within the regulated banking domain:
 
 ---
 
-## V. Valuation and Distribution Strategy
+## V. Methodology
+
+### A. Development Methodology
+
+The project adopts a **lightweight Agile/Scrum** methodology tailored for an academic prototype with a fixed two-month development window. The iterative approach enables incremental delivery of demonstrable features while accommodating evolving requirements inherent in research-oriented development.
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                AGILE DEVELOPMENT LIFECYCLE                            │
+│                     (2-Month Window)                                  │
+└──────────────────────────────────────────────────────────────────────┘
+
+  SPRINT 1 (Weeks 1–3)        SPRINT 2 (Weeks 4–6)       SPRINT 3 (Weeks 7–8)
+  ┌──────────────────┐        ┌──────────────────┐        ┌──────────────────┐
+  │ FOUNDATION &     │        │ LENDING FEATURES │        │ AI/ML SECURITY   │
+  │ CORE BANKING     │        │ & COMMUNICATION  │        │ & POLISH         │
+  │                  │        │                  │        │                  │
+  │ • Smart contract │───────>│ • Installment    │───────>│ • Fraud detection│
+  │   development    │        │   payment system │        │   model          │
+  │ • Frontend setup │        │ • Borrowing limit│        │ • Risk dashboard │
+  │ • Wallet integr. │        │   enforcement    │        │   integration    │
+  │ • Dashboard &    │        │ • Chat system    │        │ • Security audit │
+  │   Deposit flow   │        │ • Income verif.  │        │ • Documentation  │
+  │ • Database schema│        │ • Bank hierarchy │        │ • Demo prep      │
+  └────────┬─────────┘        └────────┬─────────┘        └────────┬─────────┘
+           │                           │                           │
+           ▼                           ▼                           ▼
+     Sprint Review              Sprint Review              Final Demo &
+     & Retrospective            & Retrospective            Competition
+                                                           Submission
+```
+
+### B. Agile Sprint Plan (8-Week Schedule)
+
+| Sprint | Duration | Goal | Key Deliverables |
+|--------|----------|------|------------------|
+| **Sprint 1** | Weeks 1–3 | Foundation and Core Banking | Smart contract suite (WorldBankReserve, NationalBank, LocalBank); React frontend scaffolding; wallet integration (MetaMask, WalletConnect); Dashboard and Deposit pages; database schema design (15 tables, 3NF) |
+| **Sprint 2** | Weeks 4–6 | Lending Features and Communication | Loan request and approval workflow; installment payment system; borrowing limit calculation engine; borrower–bank chat; income verification upload; hierarchical bank registration flows |
+| **Sprint 3** | Weeks 7–8 | AI/ML Security and Finalization | Fraud detection model (Random Forest + SHAP); risk dashboard integration; anomaly detection prototype; security audit and testing; documentation completion; demo preparation and competition submission |
+
+### C. User Stories per Sprint
+
+**Sprint 1 — Foundation**
+- US-1.1: As a user, I want to connect my wallet so that I can interact with the platform.
+- US-1.2: As a user, I want to deposit to the reserve so that the bank has funds to lend.
+- US-1.3: As an admin, I want to register National Banks so that the hierarchy is established.
+- US-1.4: As a developer, I want a normalized database schema so that all entities are properly modeled.
+
+**Sprint 2 — Lending**
+- US-2.1: As a borrower, I want to request a loan so that I can access capital.
+- US-2.2: As an approver, I want to approve or reject loans so that I can manage bank risk.
+- US-2.3: As a borrower, I want installment schedules for large loans so that repayment is manageable.
+- US-2.4: As a borrower, I want to chat with the bank so that I can discuss my loan application.
+
+**Sprint 3 — AI/ML and Polish**
+- US-3.1: As a bank operator, I want fraud risk scores so that I can make informed approval decisions.
+- US-3.2: As a bank operator, I want explainable AI so that I understand why a loan is flagged.
+- US-3.3: As an admin, I want a risk dashboard so that I can monitor security across all loans.
+
+---
+
+## VI. Feasibility Analysis
+
+### A. Technical Feasibility
+
+| Component | Assessment | Evidence |
+|-----------|------------|----------|
+| **Smart contracts** | Fully feasible | Three contracts implemented, compiled, and tested with Hardhat (12+ passing unit tests); Solidity 0.8.20 with OpenZeppelin provides battle-tested primitives |
+| **Frontend DApp** | Fully feasible | React 18 + TypeScript application with all pages implemented; Wagmi and RainbowKit provide mature wallet integration |
+| **Blockchain deployment** | Fully feasible | Polygon Mumbai and Ethereum Sepolia testnets provide zero-cost, production-equivalent environments with free faucet access |
+| **AI/ML integration** | Feasible with constraints | Random Forest inference on tabular data achieves sub-50ms latency; SHAP explanations computable in real-time; prototype scope limits to fraud detection |
+| **Database backend** | Feasible | PostgreSQL schema designed (15 tables, 3NF); FastAPI provides async REST framework with automatic OpenAPI documentation |
+
+**Conclusion:** All core components are technically feasible within the prototype scope. The smart contract and frontend layers are already implemented and validated.
+
+### B. Economic Feasibility
+
+| Cost Category | Estimate | Notes |
+|---------------|----------|-------|
+| **Blockchain deployment** | $0 | Public testnets (Sepolia, Mumbai) — no real cryptocurrency required |
+| **Frontend hosting** | $0 | Vercel free tier or localhost for demo |
+| **Backend hosting** | $0 | Render free tier or localhost |
+| **AI/ML training** | $0 | Local machine (16 GB RAM, 16 GB VRAM) or Google Colab free tier |
+| **Development tools** | $0 | Hardhat, VS Code, Git — all open-source |
+| **Total prototype cost** | **$0** | Entire prototype operates at zero financial cost |
+
+**Conclusion:** The prototype is economically viable at zero cost, leveraging free-tier services and open-source tooling.
+
+### C. Operational Feasibility
+
+| Phase | Timeline | Activities |
+|-------|----------|------------|
+| **Pre-Thesis 1** | Completed | Requirements analysis, system modeling, database design, software engineering planning, initial prototype |
+| **Pre-Thesis 2** | Current (8 weeks) | Smart contract finalization, frontend completion, fraud detection implementation, documentation |
+| **Final Thesis** | 4–8 weeks | Additional ML experiments, evaluation, final report, competition submission |
+
+### D. Schedule Feasibility
+
+The 8-week Agile plan (Section V.B) distributes work across three sprints with defined deliverables per sprint. Risk mitigation includes:
+
+- **Buffer:** Sprint 3 includes documentation and polish time as contingency.
+- **Scope flexibility:** AI/ML features beyond fraud detection are designated as exploratory/future work.
+- **Parallel workstreams:** Frontend, smart contract, and documentation tasks can proceed concurrently.
+
+---
+
+## VII. System Modeling
+
+### A. Use Case Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      CRYPTO WORLD BANK SYSTEM                        │
+│                                                                      │
+│  ┌─────────┐                                        ┌─────────┐     │
+│  │Borrower │                                        │  Bank   │     │
+│  │ (User)  │                                        │Approver │     │
+│  └────┬────┘                                        └────┬────┘     │
+│       │                                                  │          │
+│       ├──── UC1: Connect Wallet ─────────────────────────┤          │
+│       │                                                  │          │
+│       ├──── UC2: Deposit to Reserve                      │          │
+│       │                                                  │          │
+│       ├──── UC3: Request Loan ──────────────────────┐    │          │
+│       │                                             │    │          │
+│       ├──── UC4: View Loan Status                   │    │          │
+│       │                                             │    │          │
+│       ├──── UC5: Pay Installment                    │    │          │
+│       │                                             ▼    │          │
+│       ├──── UC6: Upload Income Proof     UC7: Review ────┤          │
+│       │                                  Loan Request    │          │
+│       ├──── UC8: Chat with Bank ─────────────────────────┤          │
+│       │                                                  │          │
+│       │                                  UC9: Approve/   │          │
+│       │                                  Reject Loan ────┤          │
+│       │                                                  │          │
+│       │                                  UC10: View Risk │          │
+│       │                                  Dashboard ──────┤          │
+│       │                                                  │          │
+│  ┌────┴────┐                                        ┌────┴────┐     │
+│  │ World   │                                        │National │     │
+│  │  Bank   │                                        │  Bank   │     │
+│  │ Admin   │                                        │         │     │
+│  └────┬────┘                                        └────┬────┘     │
+│       │                                                  │          │
+│       ├──── UC11: Register National Bank                 │          │
+│       ├──── UC12: Lend to National Bank                  │          │
+│       ├──── UC13: Pause/Unpause System                   │          │
+│       ├──── UC14: Emergency Withdraw                     │          │
+│       │                                                  │          │
+│       │                          UC15: Register ─────────┤          │
+│       │                          Local Bank              │          │
+│       │                          UC16: Lend to ──────────┤          │
+│       │                          Local Bank              │          │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Actors:**
+- **Borrower (User):** Requests loans, makes deposits, pays installments, chats with bank.
+- **Bank Approver:** Reviews and approves/rejects loan requests; views AI risk dashboard.
+- **World Bank Admin (Owner):** Manages reserve, registers National Banks, emergency controls.
+- **National Bank:** Registers Local Banks, borrows from World Bank, lends to Local Banks.
+
+### B. Sequence Diagram — Loan Request and Approval Flow
+
+```
+Borrower          Frontend         LocalBank.sol      Blockchain       Approver        AI/ML Service
+   │                  │                  │                │               │                 │
+   │ 1. Connect       │                  │                │               │                 │
+   │    Wallet        │                  │                │               │                 │
+   │─────────────────>│                  │                │               │                 │
+   │                  │ 2. Read wallet   │                │               │                 │
+   │                  │    address       │                │               │                 │
+   │                  │─────────────────>│                │               │                 │
+   │                  │                  │                │               │                 │
+   │ 3. Enter loan    │                  │                │               │                 │
+   │    amount +      │                  │                │               │                 │
+   │    purpose       │                  │                │               │                 │
+   │─────────────────>│                  │                │               │                 │
+   │                  │ 4. Prepare       │                │               │                 │
+   │                  │    unsigned tx   │                │               │                 │
+   │                  │─────────────────>│                │               │                 │
+   │                  │                  │                │               │                 │
+   │ 5. Sign tx       │                  │                │               │                 │
+   │    (MetaMask)    │                  │                │               │                 │
+   │<─ ─ ─ ─ ─ ─ ─ ─>│                  │                │               │                 │
+   │                  │ 6. Broadcast     │                │               │                 │
+   │                  │    signed tx     │                │               │                 │
+   │                  │─────────────────>│ 7. Validate &  │               │                 │
+   │                  │                  │    execute     │               │                 │
+   │                  │                  │───────────────>│               │                 │
+   │                  │                  │                │               │                 │
+   │                  │                  │ 8. Emit        │               │                 │
+   │                  │                  │ LoanRequested  │               │                 │
+   │                  │                  │    event       │               │                 │
+   │                  │                  │───────────────>│               │                 │
+   │                  │                  │                │               │                 │
+   │                  │ 9. Tx confirmed  │                │               │                 │
+   │                  │<─────────────────│                │               │                 │
+   │ 10. Show         │                  │                │               │                 │
+   │    success       │                  │                │               │                 │
+   │<─────────────────│                  │                │               │                 │
+   │                  │                  │                │               │                 │
+   │                  │                  │                │ 11. View      │                 │
+   │                  │                  │                │     pending   │                 │
+   │                  │                  │                │     loans     │                 │
+   │                  │                  │                │<──────────────│                 │
+   │                  │                  │                │               │                 │
+   │                  │                  │                │               │ 12. Request     │
+   │                  │                  │                │               │     risk score  │
+   │                  │                  │                │               │────────────────>│
+   │                  │                  │                │               │                 │
+   │                  │                  │                │               │ 13. Return      │
+   │                  │                  │                │               │     fraud score │
+   │                  │                  │                │               │     + SHAP      │
+   │                  │                  │                │               │<────────────────│
+   │                  │                  │                │               │                 │
+   │                  │                  │                │ 14. Approve   │                 │
+   │                  │                  │                │     loan tx   │                 │
+   │                  │                  │                │<──────────────│                 │
+   │                  │                  │ 15. Execute    │               │                 │
+   │                  │                  │     approveLoan│               │                 │
+   │                  │                  │<───────────────│               │                 │
+   │                  │                  │                │               │                 │
+   │                  │                  │ 16. Transfer   │               │                 │
+   │                  │                  │     funds to   │               │                 │
+   │                  │                  │     borrower   │               │                 │
+   │                  │                  │───────────────>│               │                 │
+   │                  │                  │                │               │                 │
+   │ 17. Receive      │                  │ 18. Emit      │               │                 │
+   │     funds        │                  │ LoanApproved  │               │                 │
+   │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│───────────────>│               │                 │
+   │                  │                  │                │               │                 │
+```
+
+### C. Entity-Relationship Diagram (ERD)
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                    ENTITY-RELATIONSHIP DIAGRAM                        │
+│                    Crypto World Bank DBMS                             │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│   WORLD_BANK    │ 1   N │ NATIONAL_BANK   │ 1   N │   LOCAL_BANK    │
+│─────────────────│──────>│─────────────────│──────>│─────────────────│
+│ PK world_bank_id│       │PK nat_bank_id   │       │PK local_bank_id │
+│    name         │       │FK world_bank_id │       │FK nat_bank_id   │
+│    total_reserve│       │   name          │       │   name          │
+│    created_at   │       │   country       │       │   city          │
+│    updated_at   │       │   total_borrowed│       │   total_borrowed│
+└─────────────────┘       │   total_lent    │       │   total_lent    │
+                          └────────┬────────┘       └───┬──────┬──────┘
+                                   │ 1                  │ 1    │ 1
+                                   │                    │      │
+                                   ▼ N                  ▼ N    │
+                          ┌─────────────────┐           │      │
+                          │   BANK_USER     │<──────────┘      │
+                          │─────────────────│                  │
+                          │PK bank_user_id  │                  │
+                          │   wallet_address│                  │
+                          │   bank_type     │                  │
+                          │FK nat_bank_id   │                  │
+                          │FK local_bank_id │                  │
+                          │   name, email   │                  │
+                          │   role          │                  │
+                          └────────┬────────┘                  │
+                                   │                           │
+                     ┌─────────────┼───────────────┐           │
+                     │ reviews     │ approves      │           │
+                     ▼ N           ▼ N             │           │
+           ┌─────────────────┐  ┌──────────────────┴──────┐    │
+           │  INCOME_PROOF   │  │      LOAN_REQUEST       │    │
+           │─────────────────│  │─────────────────────────│    │
+           │PK proof_id      │  │PK loan_id               │    │
+           │FK borrower_id   │  │FK borrower_id           │    │
+           │FK reviewed_by   │  │FK local_bank_id ────────┘    │
+           │   file_path     │  │FK approved_by               │
+           │   status        │  │FK rejected_by               │
+           └─────────────────┘  │   amount, purpose           │
+                                │   status                    │
+┌─────────────────┐             │   is_installment            │
+│    BORROWER     │ 1         N │   blockchain_tx_hash        │
+│─────────────────│────────────>│   deadline                  │
+│PK borrower_id   │             └──┬──────┬──────┬────────────┘
+│   wallet_address│                │ 1    │ 1    │ 1
+│   name, email   │                │      │      │
+│   country, city │                ▼ N    ▼ N    ▼ N
+│   is_first_time │    ┌───────────┐  ┌──────┐  ┌──────────────┐
+│   consec_paid   │    │INSTALLMENT│  │ CHAT │  │AI_ML_SECURITY│
+└────┬───────┬────┘    │───────────│  │_MSG  │  │_LOG          │
+     │ 1     │ 1       │PK inst_id │  │──────│  │──────────────│
+     │       │         │FK loan_id │  │PK id │  │PK sec_log_id │
+     ▼ 1     ▼ N       │  number   │  │FK    │  │FK loan_id    │
+┌────────┐ ┌────────┐  │  amt_due  │  │loan  │  │FK txn_id     │
+│BORROW- │ │TRANSAC-│  │  status   │  │_id   │  │FK reviewed_by│
+│ING_    │ │TION    │  └───────────┘  │sender│  │  risk_score  │
+│LIMIT   │ │────────│                 │recvr │  │  risk_type   │
+│────────│ │PK tx_id│                 │text  │  └──────────────┘
+│PK id   │ │FK borr │                 └──────┘
+│FK borr │ │FK loan │
+│ 6m lim │ │ amount │     ┌─────────────┐  ┌──────────────┐  ┌───────────┐
+│ 1y lim │ │ type   │     │AI_CHATBOT   │  │ MARKET_DATA  │  │ PROFILE   │
+└────────┘ └────────┘     │_LOG         │  │──────────────│  │_SETTINGS  │
+                          │─────────────│  │PK id         │  │───────────│
+                          │PK log_id    │  │  crypto_type │  │PK id      │
+                          │  user_wallet│  │  price_usd   │  │  user_type│
+                          │  question   │  │  volume_24h  │  │  user_id  │
+                          │  response   │  │  market_cap  │  │  terms    │
+                          │  intent     │  │  timestamp   │  │  prefs    │
+                          └─────────────┘  └──────────────┘  └───────────┘
+```
+
+**Key Relationships:**
+- `WORLD_BANK` (1) → (N) `NATIONAL_BANK` → (N) `LOCAL_BANK` — Hierarchical banking structure
+- `BORROWER` (1) → (N) `LOAN_REQUEST` — One borrower, many loan applications
+- `LOAN_REQUEST` (1) → (N) `INSTALLMENT` — One loan, multiple payment installments
+- `LOAN_REQUEST` (1) → (N) `CHAT_MESSAGE` — One loan, many chat messages
+- `BORROWER` (1) → (1) `BORROWING_LIMIT` — One computed limit per borrower
+- `LOAN_REQUEST` / `TRANSACTION` → (N) `AI_ML_SECURITY_LOG` — Security monitoring
+
+**Normalization:** All tables are in Third Normal Form (3NF). Selective denormalization is applied to `BORROWING_LIMIT` (cached computed fields) and `BORROWER.consecutive_paid_loans` (updated via triggers) for query performance.
+
+---
+
+## VIII. Valuation and Distribution Strategy
 
 ### A. Value Proposition
 
@@ -305,7 +631,7 @@ The Crypto World Bank generates value across multiple dimensions:
 
 ---
 
-## VI. Conclusion
+## IX. Conclusion
 
 The Crypto World Bank addresses a **complex, multi-party coordination and trust problem** in hierarchical development finance by leveraging the unique properties of blockchain technology: immutability, programmable enforcement, and cryptographic auditability. The solution goes beyond existing DeFi lending protocols by introducing a four-tier institutional hierarchy, AI/ML-augmented risk assessment, and a comprehensive governance framework that addresses network membership, business operations, and technology infrastructure.
 

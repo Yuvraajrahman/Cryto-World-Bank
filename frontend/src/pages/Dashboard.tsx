@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Container,
   Grid,
@@ -28,7 +28,6 @@ import { useRole } from "../hooks/useRole";
 import { useUser } from "../hooks/useUser";
 import { CONTRACT_ADDRESS } from "../config/contracts";
 import { useNavigate } from "react-router-dom";
-import { api } from "../services/api";
 
 function StatsCard({
   title,
@@ -82,15 +81,7 @@ export function Dashboard() {
     userDeposits: "0",
   });
 
-  useEffect(() => {
-    if (!isConnected) {
-      setLoading(false);
-      return;
-    }
-    loadStats();
-  }, [isConnected, address]);
-
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     if (CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
       setError("Contract not deployed. Set VITE_CONTRACT_ADDRESS and deploy first.");
       setLoading(false);
@@ -121,7 +112,15 @@ export function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [address, contract]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      setLoading(false);
+      return;
+    }
+    loadStats();
+  }, [isConnected, address, loadStats]);
 
   if (!isConnected) {
     return (

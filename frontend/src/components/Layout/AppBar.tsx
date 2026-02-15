@@ -16,7 +16,7 @@ import { useUser } from "../../hooks/useUser";
 export function AppBar() {
   const { demoRole, setDemoRole } = useDemoMode();
   const navigate = useNavigate();
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const { user } = useUser();
 
   return (

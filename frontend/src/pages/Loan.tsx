@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Container,
   Card,
@@ -65,15 +65,7 @@ export function Loan() {
   >([]);
   const [loadingLoans, setLoadingLoans] = useState(true);
 
-  useEffect(() => {
-    if (isConnected && address) {
-      loadUserLoans();
-    } else {
-      setLoadingLoans(false);
-    }
-  }, [isConnected, address]);
-
-  const loadUserLoans = async () => {
+  const loadUserLoans = useCallback(async () => {
     if (!address) return;
     try {
       const loanIds = await contract.read.getUserLoans([address]);
@@ -88,7 +80,15 @@ export function Loan() {
     } finally {
       setLoadingLoans(false);
     }
-  };
+  }, [address, contract]);
+
+  useEffect(() => {
+    if (isConnected && address) {
+      loadUserLoans();
+    } else {
+      setLoadingLoans(false);
+    }
+  }, [isConnected, address, loadUserLoans]);
 
   const analyzeFraudRisk = () => {
     const amt = parseFloat(amount) || 0;

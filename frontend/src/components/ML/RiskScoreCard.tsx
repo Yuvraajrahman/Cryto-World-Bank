@@ -7,7 +7,7 @@ interface RiskScoreCardProps {
   label: string;
 }
 
-export function RiskScoreCard({ score, type, label }: RiskScoreCardProps) {
+export function RiskScoreCard({ score, type: _type, label }: RiskScoreCardProps) {
   const getColor = () => {
     if (score > 0.7) return "error";
     if (score > 0.4) return "warning";

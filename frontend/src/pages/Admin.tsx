@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Container,
   Card,
@@ -84,11 +84,16 @@ export function Admin() {
   const demoReserveLeft = DEMO_TOTAL_RESERVE_ETH - demoApprovedLoans.reduce((s, l) => s + l.amountEth, 0);
   const demoTotalDisbursed = demoApprovedLoans.reduce((s, l) => s + l.amountEth, 0);
 
-  useEffect(() => {
-    checkAdmin();
-  }, [address]);
+  const loadPendingLoans = useCallback(async () => {
+    try {
+      const loans = await contract.read.getPendingLoans();
+      setPendingLoans(loans.map((l: LoanItem) => l));
+    } catch (err) {
+      console.error("Error loading pending loans:", err);
+    }
+  }, [contract]);
 
-  const checkAdmin = async () => {
+  const checkAdmin = useCallback(async () => {
     try {
       const owner = await contract.read.owner();
       const admin = owner.toLowerCase() === address?.toLowerCase();
@@ -101,16 +106,11 @@ export function Admin() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [address, contract, loadPendingLoans]);
 
-  const loadPendingLoans = async () => {
-    try {
-      const loans = await contract.read.getPendingLoans();
-      setPendingLoans(loans.map((l: LoanItem) => l));
-    } catch (err) {
-      console.error("Error loading pending loans:", err);
-    }
-  };
+  useEffect(() => {
+    checkAdmin();
+  }, [checkAdmin]);
 
   const handleApprove = async (loanId: bigint) => {
     setActionLoading(true);
@@ -496,11 +496,14 @@ export function Admin() {
         <DialogActions>
           <Button onClick={() => setSelectedLoan(null)}>Cancel</Button>
           <Button
-            onClick={() =>
-              selectedLoan?.action === "approve"
-                ? handleApprove(selectedLoan.id)
-                : handleReject(selectedLoan.id)
-            }
+            onClick={() => {
+              if (!selectedLoan) return;
+              if (selectedLoan.action === "approve") {
+                handleApprove(selectedLoan.id);
+              } else {
+                handleReject(selectedLoan.id);
+              }
+            }}
             color={selectedLoan?.action === "approve" ? "success" : "error"}
             variant="contained"
             disabled={actionLoading}

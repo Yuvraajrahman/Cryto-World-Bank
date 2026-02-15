@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   Button,
-  TextField,
 } from "@mui/material";
 import { Download, Share } from "@mui/icons-material";
 
@@ -92,7 +91,7 @@ export function QRGenerator({ value, title, subtitle }: QRGeneratorProps) {
           >
             Download
           </Button>
-          {typeof navigator !== "undefined" && navigator.share && (
+          {typeof navigator !== "undefined" && typeof navigator.share === "function" && (
             <Button
               variant="outlined"
               startIcon={<Share />}

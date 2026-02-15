@@ -50,8 +50,8 @@ export function Register() {
 
   useEffect(() => {
     // Load banks
-    api.getNationalBanks().then((national) => setBanks({ ...banks, national })).catch(console.error);
-    api.getLocalBanks().then((local) => setBanks({ ...banks, local })).catch(console.error);
+    api.getNationalBanks().then((national) => setBanks((prev) => ({ ...prev, national }))).catch(console.error);
+    api.getLocalBanks().then((local) => setBanks((prev) => ({ ...prev, local }))).catch(console.error);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -216,9 +216,9 @@ export function Register() {
                     onChange={(e) => {
                       setFormData({ ...formData, bankType: e.target.value, nationalBankId: "", localBankId: "" });
                       if (e.target.value === "national") {
-                        api.getNationalBanks().then((banks) => setBanks({ ...banks, national: banks })).catch(console.error);
+                        api.getNationalBanks().then((banks) => setBanks((prev) => ({ ...prev, national: banks }))).catch(console.error);
                       } else {
-                        api.getLocalBanks().then((banks) => setBanks({ ...banks, local: banks })).catch(console.error);
+                        api.getLocalBanks().then((banks) => setBanks((prev) => ({ ...prev, local: banks }))).catch(console.error);
                       }
                     }}
                   >

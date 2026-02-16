@@ -27,7 +27,27 @@ We demonstrate that blockchain technology is uniquely suited to this domain beca
 
 ---
 
-## I. Problem Statement and Proposed Solution
+## I. Literature Review
+
+The design of the Crypto World Bank is informed by a comprehensive review of 17 peer-reviewed papers spanning seven domains. Full detailed reviews (Abstract, Introduction, Motivation, Methodology, Results, Conclusion) for all papers are available in `LITERATURE_REVIEW.md`.
+
+**Decentralized Lending and DeFi Protocols.** Werner et al. [10] systematize DeFi protocol design in their SoK paper, identifying that existing lending platforms are uniformly pool-based and over-collateralized, lacking institutional hierarchy—a gap this project directly addresses. Bastankhah et al. [1] introduce an adaptive, data-driven DeFi lending protocol with a dual fast/slow control architecture, demonstrating that dynamic interest rate adjustment significantly outperforms static utilization curves used by Aave and Compound. An IEEE evaluation framework [9] provides standardized metrics for assessing protocol capital efficiency, risk management, and governance quality, revealing that higher capital efficiency correlates with higher risk exposure.
+
+**ML Fraud Detection in Blockchain.** Palaiokrassas et al. [2] leverage ML for multichain DeFi fraud detection across 23 protocols (54M+ transactions), demonstrating that DeFi-specific behavioral features improve XGBoost and Neural Network classifiers to F1-scores of 0.76–0.85, compared to 0.08 with transactional features alone. Agarwal et al. [3] present RiskSEA, a scalable graph embedding system deployed at Coinbase that combines node2vec embeddings with behavioral features, achieving F1: 0.851 on all 266M Ethereum addresses. Rahouti et al. [16] survey ML approaches for Bitcoin security, finding Random Forest achieves 94%+ precision—supporting its selection as the primary fraud detection model in this system.
+
+**Explainable AI in Lending.** Adom et al. [4] provide a direct comparison of LIME and SHAP on loan approval systems, finding SHAP provides deeper, more consistent feature attributions via Shapley values, while LIME offers faster runtime. Lundberg and Lee [11] introduce the SHAP framework itself, providing the theoretical foundation (local accuracy, missingness, consistency properties) that this system adopts for generating explainable loan risk assessments. Bracke et al. [17] apply SHAP to credit default models in a Bank of England regulatory context, demonstrating that SHAP feature attributions align with domain expert expectations and satisfy regulatory explainability requirements.
+
+**Reinforcement Learning for Lending Policy.** Qu et al. [5] apply offline RL (CQL, BC, TD3-BC) to optimize Aave interest rates using historical data, with TD3-BC demonstrating superior performance during stress events (May 2021 crash, March 2023 USDC depeg). Kiatsupaibul et al. [6] formulate credit underwriting as an MDP, showing RL-based approaches discover superior underwriting policies compared to traditional greedy (static threshold) methods—validating our planned DQN/PPO modules for adaptive borrowing limits.
+
+**CBDC and Financial Inclusion.** Tan [7] develops an IMF model showing CBDCs in developing countries can bank large unbanked populations through a two-tier distribution model (central bank → commercial banks → users) that directly parallels our four-tier hierarchy. Mhlanga [8] demonstrates through systematic review that blockchain technology facilitates financial inclusion across transactions, savings, credit provision, and insurance—supporting the Crypto World Bank's mission of transparent, programmable lending for underserved populations.
+
+**Smart Contract Security and Governance.** Atzei et al. [13] catalog Ethereum smart contract attack vectors (reentrancy, integer overflow, access control), directly informing our use of OpenZeppelin's ReentrancyGuard and Solidity 0.8.20 overflow protection. Tolmach et al. [15] survey 42 formal verification tools, recommending multi-tool approaches combining static analysis (Slither) and symbolic execution (Mythril). Beck et al. [14] propose a three-dimensional blockchain governance framework (IT, network, business) that maps directly to our three-pillar governance structure. Liu et al. [12] introduce Isolation Forest for unsupervised anomaly detection—adopted as our secondary detection model for wallet behavior analysis where labeled fraud data is scarce.
+
+**Identified Gaps.** Across these 17 papers, four gaps motivate the Crypto World Bank: (1) no hierarchical institutional model exists in DeFi lending [10, 1, 9]; (2) limited integration of AI/ML security analytics with DeFi lending [2, 3, 16]; (3) insufficient explainability in automated lending decisions [4, 11, 17]; and (4) inadequate governance frameworks for multi-tier decentralized finance systems [14].
+
+---
+
+## II. Problem Statement and Proposed Solution
 
 ### A. Problem Formulation
 
@@ -78,7 +98,7 @@ The platform further integrates:
 
 ---
 
-## II. Market Analysis and Partnership Ecosystem
+## III. Market Analysis and Partnership Ecosystem
 
 ### A. Market Sizing
 
@@ -112,7 +132,7 @@ Partner incentives are allocated and enforced through the blockchain platform it
 
 ---
 
-## III. Competitive Landscape and Risk Assessment
+## IV. Competitive Landscape and Risk Assessment
 
 ### A. Direct Competition
 
@@ -145,7 +165,7 @@ Partner incentives are allocated and enforced through the blockchain platform it
 
 ---
 
-## IV. System Architecture and Governance Framework
+## V. System Architecture and Governance Framework
 
 ### A. High-Level Architecture
 
@@ -264,7 +284,7 @@ As the platform operates within the regulated banking domain:
 
 ---
 
-## V. Methodology
+## VI. Methodology
 
 ### A. Development Methodology
 
@@ -325,7 +345,7 @@ The project adopts a **lightweight Agile/Scrum** methodology tailored for an aca
 
 ---
 
-## VI. Feasibility Analysis
+## VII. Feasibility Analysis
 
 ### A. Technical Feasibility
 
@@ -370,135 +390,116 @@ The 8-week Agile plan (Section V.B) distributes work across three sprints with d
 
 ---
 
-## VII. System Modeling
+## VIII. System Modeling
 
 ### A. Use Case Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                      CRYPTO WORLD BANK SYSTEM                        │
-│                                                                      │
-│  ┌─────────┐                                        ┌─────────┐     │
-│  │Borrower │                                        │  Bank   │     │
-│  │ (User)  │                                        │Approver │     │
-│  └────┬────┘                                        └────┬────┘     │
-│       │                                                  │          │
-│       ├──── UC1: Connect Wallet ─────────────────────────┤          │
-│       │                                                  │          │
-│       ├──── UC2: Deposit to Reserve                      │          │
-│       │                                                  │          │
-│       ├──── UC3: Request Loan ──────────────────────┐    │          │
-│       │                                             │    │          │
-│       ├──── UC4: View Loan Status                   │    │          │
-│       │                                             │    │          │
-│       ├──── UC5: Pay Installment                    │    │          │
-│       │                                             ▼    │          │
-│       ├──── UC6: Upload Income Proof     UC7: Review ────┤          │
-│       │                                  Loan Request    │          │
-│       ├──── UC8: Chat with Bank ─────────────────────────┤          │
-│       │                                                  │          │
-│       │                                  UC9: Approve/   │          │
-│       │                                  Reject Loan ────┤          │
-│       │                                                  │          │
-│       │                                  UC10: View Risk │          │
-│       │                                  Dashboard ──────┤          │
-│       │                                                  │          │
-│  ┌────┴────┐                                        ┌────┴────┐     │
-│  │ World   │                                        │National │     │
-│  │  Bank   │                                        │  Bank   │     │
-│  │ Admin   │                                        │         │     │
-│  └────┬────┘                                        └────┬────┘     │
-│       │                                                  │          │
-│       ├──── UC11: Register National Bank                 │          │
-│       ├──── UC12: Lend to National Bank                  │          │
-│       ├──── UC13: Pause/Unpause System                   │          │
-│       ├──── UC14: Emergency Withdraw                     │          │
-│       │                                                  │          │
-│       │                          UC15: Register ─────────┤          │
-│       │                          Local Bank              │          │
-│       │                          UC16: Lend to ──────────┤          │
-│       │                          Local Bank              │          │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 CRYPTO WORLD BANK SYSTEM                                  │
+│                                                                                          │
+│  ┌─────────┐                                                                ┌─────────┐ │
+│  │Borrower │                                                                │  Bank   │ │
+│  │ (User)  │                                                                │Approver │ │
+│  └────┬────┘                                                                └────┬────┘ │
+│       ├── (Connect Wallet) ──────────────────────────────────────────────────────┤      │
+│       ├── (Deposit to Reserve)                                                   │      │
+│       ├── (Request Loan) ───────────────────────────── (Review Loan Request) ────┤      │
+│       ├── (View My Loans)                              (Approve Loan) ───────────┤      │
+│       ├── (Pay Installment)                            (Reject Loan) ────────────┤      │
+│       ├── (Upload Income Proof) ──────────────────── (Review Income Proof) ──────┤      │
+│       ├── (Chat with Bank) ─────────────────────────── (Chat with Borrower) ─────┤      │
+│       ├── (View Borrowing Limit)                       (View Risk Dashboard) ────┤      │
+│       ├── (Generate QR Code)                           (View AI/ML Scores) ──────┤      │
+│       ├── (View Market Data)                           (View Anomaly Alerts) ────┤      │
+│       ├── (Manage Profile)                             (View XAI Explanations) ──┤      │
+│       ├── (Accept Terms & Conditions)                                            │      │
+│       │                                                                          │      │
+│  ┌────┴────┐                                                                ┌────┴────┐ │
+│  │ World   │                                                                │National │ │
+│  │  Bank   │                                                                │  Bank   │ │
+│  │ Admin   │                                                                │         │ │
+│  └────┬────┘                                                                └────┬────┘ │
+│       ├── (Register National Bank)                     (Register Local Bank) ────┤      │
+│       ├── (Lend to National Bank)                      (Borrow from WB) ─────────┤      │
+│       ├── (View All Statistics)                        (Lend to Local Bank) ──────┤      │
+│       ├── (Pause / Unpause System)                     (Set Bank Approver) ──────┤      │
+│       ├── (Emergency Withdraw)                         (Add Bank User) ──────────┤      │
+│       ├── (Review Security Logs)                       (View LB Portfolio) ──────┤      │
+│                                                                                          │
+└──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Actors:**
-- **Borrower (User):** Requests loans, makes deposits, pays installments, chats with bank.
-- **Bank Approver:** Reviews and approves/rejects loan requests; views AI risk dashboard.
-- **World Bank Admin (Owner):** Manages reserve, registers National Banks, emergency controls.
-- **National Bank:** Registers Local Banks, borrows from World Bank, lends to Local Banks.
+**Actors (4):** Borrower, Bank Approver, World Bank Admin, National Bank — **28 use cases total.** Full diagram in `USE_CASE_DIAGRAM.md`.
 
-### B. Sequence Diagram — Loan Request and Approval Flow
+### B. Sequence Diagram — Loan Request, AI Risk Assessment, and Approval Flow
 
 ```
-Borrower          Frontend         LocalBank.sol      Blockchain       Approver        AI/ML Service
+Borrower          Frontend         MetaMask         LocalBank.sol      Polygon PoS      Backend API      AI/ML Service    Approver UI      Approver Wallet
    │                  │                  │                │               │                 │
-   │ 1. Connect       │                  │                │               │                 │
-   │    Wallet        │                  │                │               │                 │
-   │─────────────────>│                  │                │               │                 │
-   │                  │ 2. Read wallet   │                │               │                 │
-   │                  │    address       │                │               │                 │
-   │                  │─────────────────>│                │               │                 │
-   │                  │                  │                │               │                 │
-   │ 3. Enter loan    │                  │                │               │                 │
-   │    amount +      │                  │                │               │                 │
-   │    purpose       │                  │                │               │                 │
-   │─────────────────>│                  │                │               │                 │
-   │                  │ 4. Prepare       │                │               │                 │
-   │                  │    unsigned tx   │                │               │                 │
-   │                  │─────────────────>│                │               │                 │
-   │                  │                  │                │               │                 │
-   │ 5. Sign tx       │                  │                │               │                 │
-   │    (MetaMask)    │                  │                │               │                 │
-   │<─ ─ ─ ─ ─ ─ ─ ─>│                  │                │               │                 │
-   │                  │ 6. Broadcast     │                │               │                 │
-   │                  │    signed tx     │                │               │                 │
-   │                  │─────────────────>│ 7. Validate &  │               │                 │
-   │                  │                  │    execute     │               │                 │
-   │                  │                  │───────────────>│               │                 │
-   │                  │                  │                │               │                 │
-   │                  │                  │ 8. Emit        │               │                 │
-   │                  │                  │ LoanRequested  │               │                 │
-   │                  │                  │    event       │               │                 │
-   │                  │                  │───────────────>│               │                 │
-   │                  │                  │                │               │                 │
-   │                  │ 9. Tx confirmed  │                │               │                 │
-   │                  │<─────────────────│                │               │                 │
-   │ 10. Show         │                  │                │               │                 │
-   │    success       │                  │                │               │                 │
-   │<─────────────────│                  │                │               │                 │
-   │                  │                  │                │               │                 │
-   │                  │                  │                │ 11. View      │                 │
-   │                  │                  │                │     pending   │                 │
-   │                  │                  │                │     loans     │                 │
-   │                  │                  │                │<──────────────│                 │
-   │                  │                  │                │               │                 │
-   │                  │                  │                │               │ 12. Request     │
-   │                  │                  │                │               │     risk score  │
-   │                  │                  │                │               │────────────────>│
-   │                  │                  │                │               │                 │
-   │                  │                  │                │               │ 13. Return      │
-   │                  │                  │                │               │     fraud score │
-   │                  │                  │                │               │     + SHAP      │
-   │                  │                  │                │               │<────────────────│
-   │                  │                  │                │               │                 │
-   │                  │                  │                │ 14. Approve   │                 │
-   │                  │                  │                │     loan tx   │                 │
-   │                  │                  │                │<──────────────│                 │
-   │                  │                  │ 15. Execute    │               │                 │
-   │                  │                  │     approveLoan│               │                 │
-   │                  │                  │<───────────────│               │                 │
-   │                  │                  │                │               │                 │
-   │                  │                  │ 16. Transfer   │               │                 │
-   │                  │                  │     funds to   │               │                 │
-   │                  │                  │     borrower   │               │                 │
-   │                  │                  │───────────────>│               │                 │
-   │                  │                  │                │               │                 │
-   │ 17. Receive      │                  │ 18. Emit      │               │                 │
-   │     funds        │                  │ LoanApproved  │               │                 │
-   │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│───────────────>│               │                 │
-   │                  │                  │                │               │                 │
+   │                    │                  │                   │                  │                  │                  │                  │
+   │  1. Open DApp      │                  │                   │                  │                  │                  │                  │
+   │───────────────────>│                  │                   │                  │                  │                  │                  │
+   │  2. Connect Wallet │                  │                   │                  │                  │                  │                  │
+   │───────────────────>│ 3. eth_reqAccts  │                   │                  │                  │                  │                  │
+   │                    │─────────────────>│                   │                  │                  │                  │                  │
+   │                    │ 4. Return addr   │                   │                  │                  │                  │                  │
+   │                    │<─────────────────│                   │                  │                  │                  │                  │
+   │  5. Enter amount   │                  │                   │                  │                  │                  │                  │
+   │     + purpose      │                  │                   │                  │                  │                  │                  │
+   │───────────────────>│ 6. GET /limit    │                   │                  │                  │                  │                  │
+   │                    │──────────────────────────────────────────────────────────────────────────>│                  │                  │
+   │                    │ 7. limit OK      │                   │                  │                  │                  │                  │
+   │                    │<──────────────────────────────────────────────────────────────────────────│                  │                  │
+   │                    │ 8. requestLoan() │                   │                  │                  │                  │                  │
+   │                    │─────────────────>│                   │                  │                  │                  │                  │
+   │  9. Confirm tx?    │                  │                   │                  │                  │                  │                  │
+   │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│                   │                  │                  │                  │                  │
+   │  10. Confirm       │                  │                   │                  │                  │                  │                  │
+   │─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>│ 11. Sign + Send  │                  │                  │                  │                  │
+   │                    │                  │──────────────────>│ 12-18. Validate  │                  │                  │                  │
+   │                    │                  │                   │  require(amt>0)  │                  │                  │                  │
+   │                    │                  │                   │  loanCounter++   │                  │                  │                  │
+   │                    │                  │                   │  Store Loan{}    │                  │                  │                  │
+   │                    │                  │                   │  emit            │                  │                  │                  │
+   │                    │                  │                   │  LoanRequested   │                  │                  │                  │
+   │                    │                  │                   │─────────────────>│                  │                  │                  │
+   │                    │                  │                   │                  │ 19. PoS confirm  │                  │                  │
+   │                    │ 20. hash: 0xa... │                   │                  │                  │                  │                  │
+   │                    │<──────────────────────────────────────────────────────────────────────────│                  │                  │
+   │  21. "Success!"    │                  │                   │                  │ 22. Event detect │                  │                  │
+   │<───────────────────│                  │                   │                  │─────────────────>│ 23. INSERT DB    │                  │
+   │                    │                  │                   │                  │                  │ 24. Trigger ML   │                  │
+   │                    │                  │                   │                  │                  │─────────────────>│ 25. Extract feat │
+   │                    │                  │                   │                  │                  │                  │ 26. RF predict   │
+   │                    │                  │                   │                  │                  │                  │ 27. SHAP explain │
+   │                    │                  │                   │                  │                  │                  │ 28. IF anomaly   │
+   │                    │                  │                   │                  │                  │ 29. Return score │                  │
+   │                    │                  │                   │                  │                  │<─────────────────│                  │
+   │                    │                  │                   │                  │                  │ 30. Store log    │                  │
+   │                    │                  │                   │                  │                  │                  │ 31. Open pending │
+   │                    │                  │                   │                  │                  │                  │────────────────>│
+   │                    │                  │                   │                  │                  │ 32. GET /pending │                  │
+   │                    │                  │                   │                  │                  │<────────────────────────────────────│
+   │                    │                  │                   │                  │                  │ 33. Return list  │                  │
+   │                    │                  │                   │                  │                  │────────────────────────────────────>│
+   │                    │                  │                   │                  │                  │                  │ 34. Display risk │
+   │                    │                  │                   │                  │                  │                  │ 35. Click Approve│
+   │                    │                  │                   │                  │                  │                  │────────────────>│
+   │                    │                  │                   │                  │                  │                  │                  │ 36. Sign
+   │                    │                  │                   │                  │                  │                  │                  │ approveLoan()
+   │                    │                  │                   │ 37-42. Verify    │                  │                  │                  │
+   │                    │                  │                   │  onlyApprover    │                  │                  │                  │
+   │                    │                  │                   │  status=Pending  │                  │                  │                  │
+   │                    │                  │                   │  Transfer ETH    │                  │                  │                  │
+   │                    │                  │                   │  emit Approved   │                  │                  │                  │
+   │  43. Funds recv    │                  │                   │─────────────────>│                  │                  │                  │
+   │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│                  │ 44. Event sync   │                  │                  │
+   │                    │                  │                   │                  │─────────────────>│ 45-47. UPDATE    │                  │
+   │                    │                  │                   │                  │                  │   LOAN, TX, LIM  │                  │
 ```
+
+**49 interaction steps** spanning 9 participants. Full detail in `SEQUENCE_DIAGRAM.md`.
 
 ### C. Entity-Relationship Diagram (ERD)
 
@@ -588,9 +589,214 @@ Borrower          Frontend         LocalBank.sol      Blockchain       Approver 
 
 **Normalization:** All tables are in Third Normal Form (3NF). Selective denormalization is applied to `BORROWING_LIMIT` (cached computed fields) and `BORROWER.consecutive_paid_loans` (updated via triggers) for query performance.
 
+### D. Activity Diagram — Loan Request to Repayment
+
+```
+                                          ┌───────────┐
+                                          │   START   │
+                                          └─────┬─────┘
+                                                │
+                                                ▼
+                                    ┌───────────────────────┐
+                                    │  Borrower Opens DApp  │
+                                    └───────────┬───────────┘
+                                                │
+                                                ▼
+                                    ┌───────────────────────┐
+                                    │  Connect Wallet       │
+                                    │  (MetaMask)           │
+                                    └───────────┬───────────┘
+                                                │
+                                                ▼
+                                       ◇─────────────────◇
+                                      ╱  Wallet           ╲
+                                     ╱   Connected?        ╲
+                                    ◇─────────────────────◇
+                                    │ Yes                    │ No → END
+                                    ▼
+                        ┌──────────────────┐
+                        │  Read Address &  │
+                        │  Determine Role  │
+                        └────────┬─────────┘
+                                 ▼
+                    ┌────────────────────────┐
+                    │  Navigate to Loan Page │
+                    │  Enter Amount & Purpose│
+                    └────────────┬───────────┘
+                                 │
+                                 ▼
+                        ◇─────────────────◇
+                       ╱  First-Time       ╲
+                      ╱   Borrower?         ╲
+                     ◇──────────────────────◇
+                     │ Yes                    │ No ─────────────────────────┐
+                     ▼                                                     │
+         ┌─────────────────────┐                                           │
+         │  Upload Income      │                                           │
+         │  Proof Document     │                                           │
+         └─────────┬───────────┘                                           │
+                   ▼                                                       │
+          ◇─────────────────◇                                              │
+         ╱  Approved?        ╲                                             │
+        ◇────────────────────◇                                             │
+        │ Yes            │ No → END                                        │
+        └────────────────┤                                                 │
+                         └─────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+                    ┌────────────────────────┐
+                    │  Query Borrowing Limit │
+                    └────────────┬───────────┘
+                                 ▼
+                        ◇─────────────────◇
+                       ╱  Within Limit?    ╲ ─── No → END
+                      ◇──────────────────◇
+                                 │ Yes
+                                 ▼
+                    ┌──────────────────────────┐
+                    │  MetaMask: Confirm Tx    │
+                    └────────────┬─────────────┘
+                                 ▼
+                        ◇─────────────────◇
+                       ╱  Confirmed?       ╲ ─── No → END
+                      ◇──────────────────◇
+                                 │ Yes
+                                 ▼
+                    ┌──────────────────────────┐
+                    │  Smart Contract:         │
+                    │  Validate → Create Loan  │
+                    │  → Emit LoanRequested    │
+                    └────────────┬─────────────┘
+                                 │
+          ═══════ APPROVER SWIMLANE ═══════
+                                 │
+                                 ▼
+                    ┌────────────────────────┐
+                    │  View Pending + AI     │
+                    │  Risk + SHAP Features  │
+                    └────────────┬───────────┘
+                                 ▼
+                        ◇─────────────────◇
+                       ╱  Approve?         ╲
+                      ◇──────────────────◇
+                      │ Yes          │ No → Reject → END
+                      ▼
+         ┌──────────────────────────┐
+         │  approveLoan() → Verify  │
+         │  → Transfer ETH         │
+         │  → Emit LoanApproved    │
+         └────────────┬─────────────┘
+                      │
+                      ▼
+         ┌──────────────────────────┐
+         │  Borrower Receives Funds │
+         │  Installment Schedule    │
+         └────────────┬─────────────┘
+                      │
+                      ▼
+             ◇─────────────────◇
+            ╱  Installment Due? ╲ ─── All Paid → Loan Complete → END
+           ◇────────────────────◇
+                      │ Yes
+                      ▼
+         ┌──────────────────────────┐
+         │  payInstallment() → Sign │
+         └──────── (loop) ──────────┘
+```
+
+Full detail in `ACTIVITY_DIAGRAM.md`.
+
+### E. Component Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    <<subsystem>> PRESENTATION LAYER                           │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌──────────────┐  ┌──────────────────────┐ │
+│  │ Dashboard  │  │ LoanModule │  │ AdminPanel │  │RiskDashboard │  │ WalletProvider       │ │
+│  │○IDashboard │  │○ILoanSvc   │  │○IAdminSvc  │  │○IRiskSvc     │  │ (Wagmi+RainbowKit)   │ │
+│  └──────┬─────┘  └──────┬─────┘  └──────┬─────┘  └──────┬───────┘  │○IWalletService       │ │
+│         │               │               │               │          └──────────┬────────────┘ │
+└─────────┼───────────────┼───────────────┼───────────────┼───────────────────┼────────────────┘
+          │               │               │               │                   │
+══════════╪═══════════════╪═══════════════╪═══════════════╪═══════════════════╪═════════════════
+          │               │               │               │                   │
+┌─────────┼───────────────┼───────────────┼───────────────┼───────────────────┼────────────────┐
+│         │     <<subsystem>> SMART CONTRACT LAYER        │                   │                 │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐                │
+│  │ WorldBankReserve.sol │  │ NationalBank.sol     │  │ LocalBank.sol        │                │
+│  │ ○IReserve            │─>│ ○INationalBank       │─>│ ○ILocalBank          │                │
+│  │ +depositToReserve()  │  │ +registerLocalBank() │  │ +requestLoan()       │                │
+│  │ +registerNatBank()   │  │ +borrowFromWB()      │  │ +approveLoan()       │                │
+│  │ +pause()/unpause()   │  │ +lendToLocalBank()   │  │ +payInstallment()    │                │
+│  └──────────────────────┘  └──────────────────────┘  └──────────────────────┘                │
+│  ┌──────────────────────┐  ┌──────────────────────┐                                         │
+│  │ OpenZeppelin         │  │ Solidity 0.8.20      │                                         │
+│  │ +ReentrancyGuard     │  │ +overflow protection │                                         │
+│  │ +Ownable             │  │ +require() checks    │                                         │
+│  └──────────────────────┘  └──────────────────────┘                                         │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+          │
+══════════╪════════════════════════════════════════════════════════════════════════════════════
+          │
+┌─────────┼───────────────────────────────────────────────────────────────────────────────────┐
+│         │     <<subsystem>> BACKEND SERVICES LAYER                                           │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │EventListener │  │ FastAPI      │  │ AI/ML Service │  │ PostgreSQL   │  │ Redis Cache  │  │
+│  │○IEventSync   │─>│ ○ILoanAPI   │─>│ ○IMLService   │  │ ○IDataStore  │  │ ○ICacheSvc   │  │
+│  │+onLoanReq()  │  │ ○IRiskAPI   │  │ +predictFraud │  │ (15 tables)  │  │ +marketData  │  │
+│  │+onDeposit()  │  │ ○IUserAPI   │  │ +detectAnomaly│  │              │  │ +limits      │  │
+│  └──────────────┘  └──────┬──────┘  │ +explainSHAP  │  └──────────────┘  └──────────────┘  │
+│                           │         └──────────────┘                                        │
+└───────────────────────────┼─────────────────────────────────────────────────────────────────┘
+          │                 │
+══════════╪═════════════════╪══════════════════════════════════════════════════════════════════
+          │                 │
+┌─────────┼─────────────────┼─────────────────────────────────────────────────────────────────┐
+│         │  <<external>>   │                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                    │
+│  │ MetaMask     │  │ Polygon PoS  │  │ CoinGecko API│  │ Alchemy RPC  │                    │
+│  │ ○IWalletAuth │  │ ○IConsensus  │  │ ○IMarketData │  │ ○IRPC        │                    │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘                    │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+Full detail in `COMPONENT_DIAGRAM.md`.
+
+### F. Data Flow Diagram
+
+**Level 0 (Context):**
+
+```
+                                                                              ┌─────────────────────┐
+  ┌─────────────┐   Loan Request, Deposit, Payment                           │  Polygon Blockchain │
+  │  Borrower   │────────────────────────────────────┐  Signed Tx ──────────>│  Network            │
+  └─────────────┘                                     │  Confirmed Events <──│                     │
+         ▲                                            │                      └─────────────────────┘
+         │  Loan Status, Funds,                       │
+         │  Limits, Market Data                       ▼
+         │                                  ┌──────────────────┐
+         └──────────────────────────────────│  CRYPTO WORLD    │──────────────┐
+                                            │  BANK SYSTEM     │              │
+  ┌─────────────┐  Approve/Reject          │                  │              ▼
+  │  Bank       │  Pending Loans + Risk    │                  │    ┌──────────────────┐
+  │  Approver   │<────────────────────────>│                  │    │  CoinGecko API   │
+  └─────────────┘                          └──────────────────┘    │  (Market Data)   │
+                                                    ▲              └──────────────────┘
+  ┌─────────────┐   Register, Lend, Control         │
+  │  World Bank │<─────────────────────────────────>│
+  │  Admin      │                                    │
+  └─────────────┘                                    │
+  ┌─────────────┐   Register Local, Borrow/Lend     │
+  │  National   │<─────────────────────────────────>│
+  │  Bank       │
+  └─────────────┘
+```
+
+**Level 1 — 8 processes:** (1) Process Loan Request, (2) Manage Loan Lifecycle, (3) AI/ML Risk Assessment, (4) Execute Blockchain Transaction, (5) Synchronize Event Data, (6) Calculate Borrowing Limits, (7) Fetch & Cache Market Data, (8) Manage Bank Hierarchy. **5 data stores:** D1: LOAN_REQUEST, D2: TRANSACTION, D3: AI_ML_SECURITY_LOG, D4: BORROWING_LIMIT, D5: BORROWER. Full Level 1 diagram in `DATAFLOW_DIAGRAM.md`.
+
 ---
 
-## VIII. Valuation and Distribution Strategy
+## IX. Valuation and Distribution Strategy
 
 ### A. Value Proposition
 
@@ -631,7 +837,7 @@ The Crypto World Bank generates value across multiple dimensions:
 
 ---
 
-## IX. Conclusion
+## X. Conclusion
 
 The Crypto World Bank addresses a **complex, multi-party coordination and trust problem** in hierarchical development finance by leveraging the unique properties of blockchain technology: immutability, programmable enforcement, and cryptographic auditability. The solution goes beyond existing DeFi lending protocols by introducing a four-tier institutional hierarchy, AI/ML-augmented risk assessment, and a comprehensive governance framework that addresses network membership, business operations, and technology infrastructure.
 
@@ -660,18 +866,40 @@ The platform is positioned at the intersection of decentralized finance, institu
 
 ## Appendix C: References
 
-[1] M. Bartoletti and L. Pompianu, "An empirical analysis of smart contracts: platforms, applications, and design patterns," in *Proc. Int. Conf. Financial Cryptography and Data Security*, 2017.
+[1] S. M. Werner, D. Perez, L. Gudgeon, A. Klages-Mundt, D. Harz, and W. J. Knottenbelt, "SoK: Decentralized Finance (DeFi)," *arXiv preprint arXiv:2101.08778*, 2022.
 
-[2] S. M. Werner, D. Perez, L. Gudgeon, A. Klages-Mundt, D. Harz, and W. J. Knottenbelt, "SoK: Decentralized Finance (DeFi)," *arXiv preprint arXiv:2101.08778*, 2021.
+[2] M. Bartoletti and L. Pompianu, "An empirical analysis of smart contracts: platforms, applications, and design patterns," in *Proc. Int. Conf. Financial Cryptography and Data Security*, pp. 494–509, 2017.
 
-[3] Aave Protocol, "Aave V3 Technical Paper," 2022. [Online]. Available: https://aave.com
+[3] L. Gudgeon, S. Werner, D. Perez, and W. J. Knottenbelt, "DeFi protocols for loanable funds: Interest rates, liquidity and market efficiency," in *Proc. ACM Conf. Advances in Financial Technologies (AFT)*, 2020.
 
-[4] Compound Finance, "Compound: The Money Market Protocol," 2019. [Online]. Available: https://compound.finance
+[4] P. Tolmach, Y. Li, S. W. Lin, and Y. Liu, "A survey of smart contract formal specification and verification," *ACM Computing Surveys*, vol. 54, no. 7, pp. 1–38, 2021.
 
-[5] S. M. Lundberg and S.-I. Lee, "A unified approach to interpreting model predictions," in *Advances in Neural Information Processing Systems (NeurIPS)*, 2017.
+[5] G. Angeris and T. Chitra, "A note on privacy in constant function market makers," *arXiv preprint arXiv:2103.01193*, 2022.
 
-[6] F. T. Liu, K. M. Ting, and Z.-H. Zhou, "Isolation Forest," in *Proc. IEEE Int. Conf. Data Mining (ICDM)*, 2008.
+[6] R. Auer and R. Böhme, "The technology of retail central bank digital currencies," *BIS Quarterly Review*, pp. 85–100, Mar. 2020.
 
-[7] BCOLBD 2025, "Blockchain Olympiad Bangladesh: Guideline and Evaluation Scheme," 2025.
+[7] D. K. C. Lee, L. Yan, and Y. Wang, "A global perspective on central bank digital currency," *China Economic Journal*, vol. 14, no. 1, pp. 52–66, 2021.
 
-[8] OpenZeppelin, "OpenZeppelin Contracts," 2024. [Online]. Available: https://openzeppelin.com/contracts
+[8] H. Rahouti, K. Xiong, and N. Ghosh, "Bitcoin concepts, threats, and machine-learning security solutions," *IEEE Access*, vol. 6, pp. 67189–67205, 2018.
+
+[9] F. Poursafaei, G. B. Hamad, and Z. Zilic, "Detecting malicious Ethereum entities via application of machine learning classification," in *Proc. IEEE Int. Conf. Blockchain Computing and Applications*, 2020.
+
+[10] W. Chen, Z. Zheng, J. Cui, E. Ngai, P. Zheng, and Y. Zhou, "Detecting Ponzi schemes on Ethereum: Towards healthier blockchain technology," in *Proc. WWW Conference*, pp. 1409–1418, 2018.
+
+[11] F. T. Liu, K. M. Ting, and Z.-H. Zhou, "Isolation Forest," in *Proc. IEEE Int. Conf. Data Mining (ICDM)*, pp. 413–422, 2008.
+
+[12] M. Ahmed, A. N. Mahmood, and M. R. Islam, "A survey of anomaly detection techniques in financial domain," *Future Generation Computer Systems*, vol. 55, pp. 278–288, 2016.
+
+[13] S. M. Lundberg and S.-I. Lee, "A unified approach to interpreting model predictions," in *Advances in Neural Information Processing Systems (NeurIPS)*, pp. 4765–4774, 2017.
+
+[14] P. Bracke, A. Datta, C. Jung, and S. Sen, "Machine learning explainability in finance: An application to default risk analysis," *Bank of England Staff Working Paper No. 816*, 2019.
+
+[15] N. Atzei, M. Bartoletti, and T. Cimoli, "A survey of attacks on Ethereum smart contracts (SoK)," in *Proc. Int. Conf. Principles of Security and Trust (POST)*, pp. 164–186, 2017.
+
+[16] R. Beck, C. Müller-Bloch, and J. L. King, "Governance in the blockchain economy: A framework and research agenda," *Journal of the Association for Information Systems*, vol. 19, no. 10, pp. 1020–1034, 2018.
+
+[17] P. De Filippi and A. Wright, *Blockchain and the Law: The Rule of Code*. Harvard University Press, 2018.
+
+[18] BCOLBD 2025, "Blockchain Olympiad Bangladesh: Guideline and Evaluation Scheme," 2025.
+
+[19] OpenZeppelin, "OpenZeppelin Contracts," 2024. [Online]. Available: https://openzeppelin.com/contracts

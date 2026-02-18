@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   Container,
   Grid,
@@ -70,6 +70,8 @@ export function Dashboard() {
   const { isBankOrAdmin } = useRole();
   const { user, loading: userLoading } = useUser();
   const contract = useWorldBankContract();
+  const contractRef = useRef(contract);
+  contractRef.current = contract;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -87,13 +89,15 @@ export function Dashboard() {
       setLoading(false);
       return;
     }
+    setLoading(true);
     try {
       setError("");
-      const statsResult = await contract.read.getStats();
+      const c = contractRef.current as unknown as { read: { getStats: () => Promise<readonly bigint[]>; getUserDeposits: (args: [string]) => Promise<bigint> } };
+      const statsResult = await c.read.getStats();
       let userDeposits = "0";
       if (address) {
         try {
-          const dep = await contract.read.getUserDeposits([address]);
+          const dep = await c.read.getUserDeposits([address]);
           userDeposits = formatEther(dep);
         } catch {
           userDeposits = "0";
@@ -112,7 +116,7 @@ export function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [address, contract]);
+  }, [address]);
 
   useEffect(() => {
     if (!isConnected) {

@@ -11,3 +11,4 @@ dist/
 deployment-info.json
 frontend/dist/
 frontend/node_modules/
+ml-backend/venv/

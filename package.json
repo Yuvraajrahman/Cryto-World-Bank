@@ -8,9 +8,11 @@
     "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
     "frontend:dev": "cd frontend && npm run dev",
-    "frontend:build": "cd frontend && npm run build"
+    "frontend:build": "cd frontend && npm run build",
+    "dev": "concurrently \"npm run frontend:dev\" \"cd backend && npm run dev\""
   },
   "devDependencies": {
+    "concurrently": "^9.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.6",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@types/node": "^20.10.0",

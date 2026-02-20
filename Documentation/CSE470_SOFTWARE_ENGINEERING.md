@@ -36,19 +36,15 @@ The Crypto World Bank is a decentralized lending platform built on blockchain te
 gantt
     title 2-Month Development Timeline
     dateFormat  YYYY-MM-DD
-    axisFormat  %Y-%m
 
     section Month 1
-    Sprint 1: Foundation & Core Banking       :s1, 2026-01-06, 21d
-    Sprint 1 Submission                       :milestone, 2026-01-27, 0d
+    Sprint 1 Foundation and Core Banking     :s1, 2026-01-06, 21d
 
     section Month 2
-    Sprint 2: Lending, Payment & Communication :s2, after s1, 21d
-    Sprint 2 Submission                       :milestone, 2026-02-17, 0d
+    Sprint 2 Lending and Communication       :s2, 2026-01-27, 21d
 
     section Month 3
-    Sprint 3: AI/ML Security, Testing & Finalization :s3, after s2, 14d
-    Demo Ready                                :milestone, 2026-03-02, 0d
+    Sprint 3 AI/ML Security and Finalization :s3, 2026-02-17, 14d
 ```
 
 ### 2.2 Sprint Breakdown

@@ -24,6 +24,15 @@
 │              │         │  ○ IWalletService    │                │                        │                                        │
 │              │         └──────────┬───────────┘                │                        │                                        │
 │              │                    │                            │                        │                                        │
+│                                                                                                                                  │
+│     ┌────────────────────┐     ┌────────────────────┐     ┌────────────────────┐     ┌────────────────────┐                       │
+│     │  <<component>>     │     │  <<component>>     │     │  <<component>>     │     │  <<component>>     │                       │
+│     │  ChatModule        │     │  ProfileModule     │     │  MarketDataModule  │     │  ChatbotModule     │                       │
+│     │                    │     │                    │     │                    │     │                    │                       │
+│     │  ○ IChatService    │     │  ○ IProfileService │     │  ○ IMarketDataView │     │  ○ IChatbotUI      │                       │
+│     └────────────────────┘     └────────────────────┘     └────────────────────┘     └────────────────────┘                       │
+│                                                                                                                                  │
+│              │                    │                            │                        │                                        │
 └──────────────┼────────────────────┼────────────────────────────┼────────────────────────┼────────────────────────────────────────┘
                │                    │                            │                        │
                │        ┌──────────▼───────────┐                │                        │
@@ -96,6 +105,16 @@
 │                              │  + (15 tables)   │     │                  │     │                  │                              │
 │                              └──────────────────┘     └──────────────────┘     └──────────────────┘                              │
 │                                                                                                                                  │
+│     ┌────────────────────┐     ┌──────────────────────────┐     ┌──────────────────────────┐                                     │
+│     │  <<component>>     │     │  <<component>>           │     │  <<component>>           │                                     │
+│     │  WebSocket Service │     │  Chatbot Service         │     │  Income Proof Service    │                                     │
+│     │                    │     │                          │     │                          │                                     │
+│     │  ○ IWebSocket      │     │  ○ IChatbotService       │     │  ○ IIncomeService        │                                     │
+│     │                    │     │  + classifyIntent()      │     │  + upload()              │                                     │
+│     │                    │     │  + generateResponse()    │     │  + validate()            │                                     │
+│     │                    │     │  + logInteraction()      │     │  + getStatus()           │                                     │
+│     └────────────────────┘     └──────────────────────────┘     └──────────────────────────┘                                     │
+│                                                                                                                                  │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
                │
 ═══════════════╪═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -125,5 +144,12 @@
 - `IMLService` — AI/ML fraud detection and explainability
 - `IDataStore` — Database persistence (15 tables)
 - `ICacheService` — Redis caching for market data and limits
+- `IChatService` — Borrower-bank real-time chat messaging
+- `IProfileService` — Profile management and terms acceptance
+- `IMarketDataView` — Crypto price charts and statistics visualization
+- `IChatbotUI` — AI chatbot interaction interface
+- `IWebSocket` — Real-time messaging, typing indicators, notifications
+- `IChatbotService` — NLP processing, intent classification, response generation
+- `IIncomeService` — Income proof upload, validation, and review workflow
 
-**Dependencies:** WorldBankReserve → NationalBank → LocalBank (hierarchical); FastAPI → AI/ML Service (risk assessment); EventListener → PostgreSQL (event sync)
+**Dependencies:** WorldBankReserve → NationalBank → LocalBank (hierarchical); FastAPI → AI/ML Service (risk assessment); EventListener → PostgreSQL (event sync); ChatModule → WebSocket Service (real-time chat); ChatbotModule → Chatbot Service (NLP processing); ProfileModule → FastAPI (profile CRUD); MarketDataModule → CoinGecko API (price data); Income Proof Service → File Storage (document storage); FastAPI → Chatbot Service (intent routing); FastAPI → Income Proof Service (upload endpoint)

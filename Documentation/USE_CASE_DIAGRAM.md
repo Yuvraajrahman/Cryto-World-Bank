@@ -39,6 +39,9 @@
      │   ──────────>│  ( Chat with Bank )                                                                      │             │
      │              │        ─ ─ ─ <<extend>> ─ ─ ─                                                            │             │
      │              │  ( Chat with Borrower )  ────────────────────────────────────────────────────────────────│<────────── │
+     │   ──────────>│  ( Use AI Chatbot )                                                                      │             │
+     │              │        │ <<include>>                                                                      │             │
+     │              │        └──> ( Query Loan Data )                                                          │             │
      │              │                                                                                           │             │
      │              │                  ── AI/ML SECURITY (Bank Only) ──                                        │             │
      │              │                             ( View Risk Dashboard )  ─────────────────────────────────────│<────────── │
@@ -79,8 +82,8 @@
 - `<<include>>` — Required sub-flow that always executes (e.g., Request Loan always includes Check Borrowing Limit)
 - `<<extend>>` — Optional extension triggered by a condition (e.g., Chat with Bank may extend to Chat with Borrower)
 
-**Use Cases (28 total):**
-- **Borrower (12):** Connect Wallet, Accept Terms, Manage Profile, Request Loan, View My Loans, Pay Installment, Deposit to Reserve, View Borrowing Limit, View Market Data, Generate QR Code, Chat with Bank, Upload Income Proof
+**Use Cases (29 total):**
+- **Borrower (13):** Connect Wallet, Accept Terms, Manage Profile, Request Loan, View My Loans, Pay Installment, Deposit to Reserve, View Borrowing Limit, View Market Data, Generate QR Code, Chat with Bank, Upload Income Proof, Use AI Chatbot
 - **Bank Approver (11):** Connect Wallet, Review Loan Request, Approve Loan, Reject Loan, Review Income Proof, Chat with Borrower, View Risk Dashboard, View AI/ML Fraud Scores, View Anomaly Alerts, View XAI Explanations
 - **World Bank Admin (6):** Register National Bank, Lend to National Bank, View All Statistics, Pause/Unpause System, Emergency Withdraw, Review Security Logs
 - **National Bank (6):** Register Local Bank, Borrow from World Bank, Lend to Local Bank, Set Bank Approver, Add Bank User, View Local Bank Portfolio

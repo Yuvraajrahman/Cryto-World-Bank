@@ -525,6 +525,244 @@ AI_CHATBOT_LOG (Independent table for chatbot interactions)
 PROFILE_SETTINGS (Independent table for user profiles)
 ```
 
+### 4.1 Mermaid ER Diagram
+
+To view this diagram, open in Markdown preview (`Ctrl+Shift+V`) or paste the Mermaid block at [mermaid.live](https://mermaid.live).
+
+```mermaid
+erDiagram
+    WORLD_BANK {
+        int world_bank_id PK
+        varchar name UK "NOT NULL, UNIQUE"
+        decimal total_reserve "NOT NULL, DEFAULT 0"
+        timestamp created_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    NATIONAL_BANK {
+        int national_bank_id PK
+        int world_bank_id FK "NOT NULL"
+        varchar name "NOT NULL"
+        varchar country "NOT NULL"
+        varchar address
+        decimal total_borrowed "DEFAULT 0"
+        decimal total_lent "DEFAULT 0"
+        timestamp created_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    LOCAL_BANK {
+        int local_bank_id PK
+        int national_bank_id FK "NOT NULL"
+        varchar name "NOT NULL"
+        varchar city "NOT NULL"
+        varchar address
+        decimal total_borrowed "DEFAULT 0"
+        decimal total_lent "DEFAULT 0"
+        timestamp created_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    BANK_USER {
+        int bank_user_id PK
+        varchar wallet_address UK "NOT NULL, UNIQUE"
+        enum bank_type "national or local"
+        int national_bank_id FK "NULL"
+        int local_bank_id FK "NULL"
+        varchar name "NOT NULL"
+        varchar email UK
+        enum role "approver or viewer"
+        boolean is_active "DEFAULT TRUE"
+        timestamp created_at "NOT NULL"
+    }
+
+    BORROWER {
+        int borrower_id PK
+        varchar wallet_address UK "NOT NULL, UNIQUE"
+        varchar name "NOT NULL"
+        varchar email UK
+        varchar phone
+        varchar country "NOT NULL"
+        varchar city
+        boolean is_first_time "DEFAULT TRUE"
+        decimal total_borrowed_lifetime "DEFAULT 0"
+        int consecutive_paid_loans "DEFAULT 0"
+        boolean can_multiple_loans "DEFAULT FALSE"
+        timestamp created_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    INCOME_PROOF {
+        int proof_id PK
+        int borrower_id FK "NOT NULL"
+        varchar file_path "NOT NULL"
+        varchar file_hash "NOT NULL, SHA-256"
+        varchar file_type "NOT NULL"
+        bigint file_size "NOT NULL"
+        enum status "pending, approved, rejected"
+        int reviewed_by FK "NULL"
+        timestamp reviewed_at "NULL"
+        text notes
+        timestamp uploaded_at "NOT NULL"
+    }
+
+    LOAN_REQUEST {
+        int loan_id PK
+        int borrower_id FK "NOT NULL"
+        int local_bank_id FK "NOT NULL"
+        decimal amount "NOT NULL"
+        varchar purpose "NOT NULL"
+        varchar cryptocurrency_type "DEFAULT ETH"
+        enum status "pending, approved, rejected, active, completed, defaulted"
+        timestamp requested_at "NOT NULL"
+        int approved_by FK "NULL"
+        timestamp approved_at "NULL"
+        int rejected_by FK "NULL"
+        timestamp rejected_at "NULL"
+        text rejection_reason
+        decimal gas_cost "DEFAULT 0"
+        boolean is_installment "DEFAULT FALSE"
+        int total_installments "DEFAULT 1"
+        timestamp deadline "NULL"
+        varchar blockchain_tx_hash UK
+        timestamp created_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    INSTALLMENT {
+        int installment_id PK
+        int loan_id FK "NOT NULL"
+        int installment_number "NOT NULL"
+        decimal amount_due "NOT NULL"
+        decimal amount_paid "DEFAULT 0"
+        timestamp due_date "NOT NULL"
+        timestamp paid_at "NULL"
+        enum status "pending, paid, overdue, partial"
+        varchar blockchain_tx_hash UK
+        timestamp created_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    TRANSACTION {
+        int transaction_id PK
+        int borrower_id FK "NULL"
+        int local_bank_id FK "NULL"
+        int national_bank_id FK "NULL"
+        enum transaction_type "loan_approved, installment_paid, loan_completed, loan_defaulted"
+        decimal amount "NOT NULL"
+        varchar cryptocurrency_type "DEFAULT ETH"
+        timestamp transaction_date "NOT NULL"
+        varchar blockchain_tx_hash UK
+        int related_loan_id FK "NULL"
+        timestamp created_at "NOT NULL"
+    }
+
+    BORROWING_LIMIT {
+        int limit_id PK
+        int borrower_id FK_UK "NOT NULL, UNIQUE"
+        decimal six_month_limit "DEFAULT 0"
+        decimal six_month_borrowed "DEFAULT 0"
+        decimal six_month_remaining "DEFAULT 0"
+        decimal one_year_limit "DEFAULT 0"
+        decimal one_year_borrowed "DEFAULT 0"
+        decimal one_year_remaining "DEFAULT 0"
+        timestamp last_calculated_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    CHAT_MESSAGE {
+        int message_id PK
+        int loan_id FK "NOT NULL"
+        enum sender_type "borrower or bank"
+        int sender_id "NOT NULL"
+        enum receiver_type "borrower or bank"
+        int receiver_id "NOT NULL"
+        text message_text "NOT NULL"
+        boolean is_read "DEFAULT FALSE"
+        timestamp sent_at "NOT NULL"
+        timestamp read_at "NULL"
+    }
+
+    AI_CHATBOT_LOG {
+        int log_id PK
+        varchar user_wallet "NOT NULL"
+        enum user_type "borrower, bank_user, national_bank, local_bank"
+        text question "NOT NULL"
+        text response "NOT NULL"
+        varchar intent
+        decimal confidence
+        timestamp created_at "NOT NULL"
+    }
+
+    AI_ML_SECURITY_LOG {
+        int security_log_id PK
+        int loan_id FK "NULL"
+        int transaction_id FK "NULL"
+        varchar user_wallet "NOT NULL"
+        enum risk_type "fraud, anomaly, attack, suspicious_pattern"
+        decimal risk_score "NOT NULL"
+        varchar ml_model
+        json features
+        text explanation
+        enum action_taken "none, flagged, blocked, reviewed"
+        timestamp detected_at "NOT NULL"
+        int reviewed_by FK "NULL"
+        timestamp reviewed_at "NULL"
+    }
+
+    MARKET_DATA {
+        int market_data_id PK
+        varchar cryptocurrency_type "NOT NULL"
+        decimal price_usd "NOT NULL"
+        decimal price_eth "NOT NULL"
+        decimal volume_24h
+        decimal market_cap
+        decimal change_24h
+        timestamp timestamp "NOT NULL"
+    }
+
+    PROFILE_SETTINGS {
+        int profile_id PK
+        enum user_type "borrower, bank_user, national_bank, local_bank, world_bank"
+        int user_id "NOT NULL"
+        boolean terms_accepted "DEFAULT FALSE"
+        varchar terms_version
+        timestamp terms_accepted_at "NULL"
+        json preferences
+        timestamp created_at "NOT NULL"
+        timestamp updated_at "NOT NULL"
+    }
+
+    %% === HIERARCHICAL BANKING RELATIONSHIPS ===
+    WORLD_BANK ||--o{ NATIONAL_BANK : "registers"
+    NATIONAL_BANK ||--o{ LOCAL_BANK : "registers"
+    NATIONAL_BANK ||--o{ BANK_USER : "employs"
+    LOCAL_BANK ||--o{ BANK_USER : "employs"
+
+    %% === LENDING FLOW RELATIONSHIPS ===
+    BORROWER ||--o{ LOAN_REQUEST : "requests"
+    LOCAL_BANK ||--o{ LOAN_REQUEST : "receives"
+    BANK_USER ||--o{ LOAN_REQUEST : "approves"
+    LOAN_REQUEST ||--o{ INSTALLMENT : "has"
+    LOAN_REQUEST ||--o{ TRANSACTION : "generates"
+    BORROWER ||--o{ TRANSACTION : "has"
+    LOCAL_BANK ||--o{ TRANSACTION : "processes"
+    NATIONAL_BANK ||--o{ TRANSACTION : "processes"
+    BORROWER ||--|| BORROWING_LIMIT : "has"
+
+    %% === INCOME VERIFICATION ===
+    BORROWER ||--o{ INCOME_PROOF : "submits"
+    BANK_USER ||--o{ INCOME_PROOF : "reviews"
+
+    %% === COMMUNICATION ===
+    LOAN_REQUEST ||--o{ CHAT_MESSAGE : "has"
+
+    %% === AI/ML SECURITY ===
+    LOAN_REQUEST ||--o{ AI_ML_SECURITY_LOG : "monitored_by"
+    TRANSACTION ||--o{ AI_ML_SECURITY_LOG : "monitored_by"
+    BANK_USER ||--o{ AI_ML_SECURITY_LOG : "reviews"
+```
+
 ---
 
 ## 5. Key Relationships

@@ -6,7 +6,7 @@
 **Duration:** 2 Months (8 Weeks)  
 **Methodology:** Agile/Scrum  
 **Sprints:** 3 Sprints  
-**Date:** 2024
+**Date:** February 2026
 
 ---
 
@@ -20,11 +20,11 @@ The Crypto World Bank is a decentralized lending platform built on blockchain te
 
 **Agile/Scrum Framework** with the following characteristics:
 - **Sprint Duration:** 2-3 weeks per sprint
-- **Team Size:** 5-7 developers
-- **Daily Standups:** 15 minutes
-- **Sprint Planning:** 2 hours at sprint start
-- **Sprint Review:** 1 hour at sprint end
-- **Retrospective:** 1 hour at sprint end
+- **Team Size:** 2 developers (thesis project)
+- **Weekly Sync:** Progress review, blockers, planning (replaces daily standup for 2-person team)
+- **Sprint Planning:** 1 hour at sprint start
+- **Sprint Review:** 30 minutes at sprint end
+- **Retrospective:** 30 minutes at sprint end
 
 ---
 
@@ -37,27 +37,23 @@ The Crypto World Bank is a decentralized lending platform built on blockchain te
 │                   2-MONTH DEVELOPMENT TIMELINE                  │
 └─────────────────────────────────────────────────────────────────┘
 
-Week 1-2:  Sprint 1 (Foundation & Core Banking)
-Week 3-4:  Sprint 2 (Lending & Payment Features)
-Week 5-6:  Sprint 3 (Advanced Features & Security)
-Week 7:    Integration & Testing
-Week 8:    Deployment & Documentation
+Week 1-3:  Sprint 1 (Foundation & Core Banking)
+Week 4-6:  Sprint 2 (Lending, Payment & Communication)
+Week 7-8:  Sprint 3 (AI/ML Security, Testing & Finalization)
 ```
 
 ### 2.2 Sprint Breakdown
 
 | Sprint | Duration | Focus Area | Key Deliverables |
 |--------|----------|------------|-----------------|
-| **Sprint 1** | Weeks 1-2 | Foundation & Core Banking | Smart contracts, basic UI, user authentication |
-| **Sprint 2** | Weeks 3-4 | Lending & Payment Features | Loan requests, installments, chat system |
-| **Sprint 3** | Weeks 5-6 | Advanced Features & Security | AI/ML integration, profiles, market data |
-| **Buffer** | Week 7 | Integration & Testing | End-to-end testing, bug fixes |
-| **Release** | Week 8 | Deployment | Production deployment, documentation |
+| **Sprint 1** | Weeks 1-3 | Foundation & Core Banking | Smart contracts, basic UI, wallet integration, database schema |
+| **Sprint 2** | Weeks 4-6 | Lending, Payment & Communication | Loan requests, installments, borrowing limits, chat, income verification, bank hierarchy |
+| **Sprint 3** | Weeks 7-8 | AI/ML Security, Testing & Finalization | AI/ML integration, risk dashboard, profiles, market data, testing, documentation |
 
 ---
 
 ## 3. Sprint 1: Foundation & Core Banking
-**Duration:** 2 Weeks (Weeks 1-2)  
+**Duration:** 3 Weeks (Weeks 1-3)  
 **Sprint Goal:** Establish core blockchain infrastructure and hierarchical banking structure
 
 ### 3.1 Sprint Backlog
@@ -109,9 +105,9 @@ Week 8:    Deployment & Documentation
    - **I want** gas costs deducted from my loan amount  
    - **So that** I understand the true cost of borrowing
    - **Acceptance Criteria:**
-     - Gas estimation before loan approval
-     - Gas deducted from loan amount
-     - Standard gas limits enforced
+     - Gas estimation displayed before transaction confirmation
+     - Gas fees borne by transaction initiator (borrower for loan requests, approver for approvals)
+     - Polygon PoS low-fee environment ($0.001-$0.01 per tx) for retail viability
      - **Story Points:** 3
 
 #### Epic 2: Frontend Foundation
@@ -208,7 +204,7 @@ Week 8:    Deployment & Documentation
 ---
 
 ## 4. Sprint 2: Lending & Payment Features
-**Duration:** 2 Weeks (Weeks 3-4)  
+**Duration:** 3 Weeks (Weeks 4-6)  
 **Sprint Goal:** Implement complete lending flow with installment payments and communication
 
 ### 4.1 Sprint Backlog
@@ -352,19 +348,33 @@ Week 8:    Deployment & Documentation
       - Version control
       - **Story Points:** 3
 
+#### Epic 7b: QR Code System
+**Story Points:** 3
+
+**User Stories:**
+
+24. **US-2.13: QR Code Generation & Scanning**
+    - **As a** user  
+    - **I want** to generate and scan QR codes for wallet addresses and loan pages  
+    - **So that** I can quickly share and access information
+    - **Acceptance Criteria:**
+      - Generate QR for wallet address, loan page URL, or contract address
+      - Scan/paste QR content with type-based action (view address, navigate, display raw)
+      - **Story Points:** 3
+
 ### 4.2 Sprint 2 Burndown
 
-**Total Story Points:** 55  
+**Total Story Points:** 58  
 **Team Velocity:** ~27 points per week (estimated)
 
 | Day | Planned | Completed | Remaining |
 |-----|---------|-----------|-----------|
-| Day 1 | 0 | 0 | 55 |
-| Day 3 | 18 | 17 | 38 |
-| Day 5 | 27 | 26 | 29 |
-| Day 7 | 36 | 35 | 20 |
-| Day 10 | 45 | 44 | 11 |
-| Day 14 | 55 | 55 | 0 |
+| Day 1 | 0 | 0 | 58 |
+| Day 3 | 19 | 18 | 40 |
+| Day 5 | 29 | 28 | 30 |
+| Day 7 | 38 | 37 | 21 |
+| Day 10 | 48 | 47 | 11 |
+| Day 14 | 58 | 58 | 0 |
 
 ### 4.3 Sprint 2 Deliverables
 
@@ -378,8 +388,8 @@ Week 8:    Deployment & Documentation
 ---
 
 ## 5. Sprint 3: Advanced Features & Security
-**Duration:** 2 Weeks (Weeks 5-6)  
-**Sprint Goal:** Implement AI/ML security, market data visualization, and AI chatbot
+**Duration:** 2 Weeks (Weeks 7-8)  
+**Sprint Goal:** Implement AI/ML security, market data visualization, AI chatbot, and finalize testing & documentation
 
 ### 5.1 Sprint Backlog
 
@@ -388,7 +398,7 @@ Week 8:    Deployment & Documentation
 
 **User Stories:**
 
-24. **US-3.1: Cryptocurrency Market Data API**
+25. **US-3.1: Cryptocurrency Market Data API**
     - **As a** developer  
     - **I want** to fetch live cryptocurrency prices  
     - **So that** users can see market data
@@ -398,7 +408,7 @@ Week 8:    Deployment & Documentation
       - Data caching
       - **Story Points:** 3
 
-25. **US-3.2: Market Value Graph**
+26. **US-3.2: Market Value Graph**
     - **As a** borrower  
     - **I want** to see a graph of cryptocurrency prices  
     - **So that** I can track market trends
@@ -413,7 +423,7 @@ Week 8:    Deployment & Documentation
 
 **User Stories:**
 
-26. **US-3.3: AI Chatbot Integration**
+27. **US-3.3: AI Chatbot Integration**
     - **As a** user  
     - **I want** to ask an AI chatbot questions  
     - **So that** I can get instant help
@@ -423,7 +433,7 @@ Week 8:    Deployment & Documentation
       - Context-aware responses
       - **Story Points:** 5
 
-27. **US-3.4: Chatbot Training Data**
+28. **US-3.4: Chatbot Training Data**
     - **As a** developer  
     - **I want** to train the chatbot  
     - **So that** it can answer common questions
@@ -433,7 +443,7 @@ Week 8:    Deployment & Documentation
       - Response generation
       - **Story Points:** 5
 
-28. **US-3.5: Chatbot Features**
+29. **US-3.5: Chatbot Features**
     - **As a** user  
     - **I want** the chatbot to answer questions about loan limits and payments  
     - **So that** I can get quick information
@@ -448,7 +458,7 @@ Week 8:    Deployment & Documentation
 
 **User Stories:**
 
-29. **US-3.6: Data Collection for ML**
+30. **US-3.6: Data Collection for ML**
     - **As a** developer  
     - **I want** to collect transaction data  
     - **So that** ML models can be trained
@@ -458,7 +468,7 @@ Week 8:    Deployment & Documentation
       - Data pipeline
       - **Story Points:** 5
 
-30. **US-3.7: Fraud Detection Model**
+31. **US-3.7: Fraud Detection Model**
     - **As a** system  
     - **I want** to detect fraudulent loan requests  
     - **So that** I can protect the platform
@@ -468,7 +478,7 @@ Week 8:    Deployment & Documentation
       - Integration with loan approval
       - **Story Points:** 8
 
-31. **US-3.8: Anomaly Detection**
+32. **US-3.8: Anomaly Detection**
     - **As a** system  
     - **I want** to detect anomalous transactions  
     - **So that** I can identify suspicious activity
@@ -478,7 +488,7 @@ Week 8:    Deployment & Documentation
       - Dashboard visualization
       - **Story Points:** 5
 
-32. **US-3.9: Security Logging**
+33. **US-3.9: Security Logging**
     - **As a** developer  
     - **I want** to log all security events  
     - **So that** I can monitor and improve security
@@ -493,7 +503,7 @@ Week 8:    Deployment & Documentation
 
 **User Stories:**
 
-33. **US-3.10: Unit Testing**
+34. **US-3.10: Unit Testing**
     - **As a** developer  
     - **I want** unit tests for all smart contracts  
     - **So that** I can ensure code quality
@@ -502,7 +512,7 @@ Week 8:    Deployment & Documentation
       - All critical functions tested
       - **Story Points:** 5
 
-34. **US-3.11: Integration Testing**
+35. **US-3.11: Integration Testing**
     - **As a** developer  
     - **I want** integration tests  
     - **So that** I can verify system components work together
@@ -511,7 +521,7 @@ Week 8:    Deployment & Documentation
       - API integration tests
       - **Story Points:** 5
 
-35. **US-3.12: Security Testing**
+36. **US-3.12: Security Testing**
     - **As a** developer  
     - **I want** security audits  
     - **So that** I can identify vulnerabilities
@@ -542,83 +552,46 @@ Week 8:    Deployment & Documentation
 - ✅ Comprehensive testing suite
 - ✅ Security audit completed
 
----
+### 5.4 Integration, Testing & Deployment (Weeks 7-8)
 
-## 6. Integration & Testing Phase
-**Duration:** 1 Week (Week 7)
+These activities run in parallel with Sprint 3 development:
 
-### 6.1 Activities
+**Integration Activities:**
+- Integrate all sprint deliverables
+- Resolve integration issues
+- Performance optimization
 
-1. **System Integration**
-   - Integrate all sprint deliverables
-   - Resolve integration issues
-   - Performance optimization
-
-2. **End-to-End Testing**
-   - Complete user journey testing
-   - Cross-browser testing
-   - Mobile responsiveness testing
-
-3. **Bug Fixing**
-   - Fix critical bugs
-   - Address security vulnerabilities
-   - Performance improvements
-
-4. **Documentation**
-   - Update technical documentation
-   - User guides
-   - API documentation
-
-### 6.2 Testing Checklist
-
-- [ ] Smart contract functionality
+**Testing Checklist:**
+- [ ] Smart contract functionality (Hardhat unit tests)
 - [ ] Frontend-backend integration
-- [ ] Database operations
-- [ ] Chat system real-time communication
-- [ ] Installment payment flow
-- [ ] AI chatbot responses
-- [ ] Market data updates
-- [ ] Security layer monitoring
+- [ ] Database operations (PostgreSQL)
+- [ ] Chat system real-time communication (WebSocket)
+- [ ] Installment payment flow (on-chain)
+- [ ] AI chatbot responses (NLP pipeline)
+- [ ] Market data updates (CoinGecko API + Redis cache)
+- [ ] Security layer monitoring (AI/ML risk scores)
 - [ ] Mobile responsiveness
 - [ ] Cross-browser compatibility
 
----
+**Deployment Activities:**
+- Deploy smart contracts to testnet (Polygon Mumbai / Ethereum Sepolia)
+- Deploy frontend (Vercel free tier)
+- Deploy backend API (Render free tier)
+- Set up monitoring (application and blockchain event listeners)
 
-## 7. Deployment & Release Phase
-**Duration:** 1 Week (Week 8)
-
-### 7.1 Deployment Activities
-
-1. **Production Deployment**
-   - Deploy smart contracts to mainnet (or testnet)
-   - Deploy frontend to production server
-   - Database migration to production
-
-2. **Monitoring Setup**
-   - Application monitoring (Sentry, LogRocket)
-   - Blockchain monitoring (The Graph, Alchemy)
-   - Performance monitoring
-
-3. **Final Documentation**
-   - Complete all course documentation
-   - User manual
-   - Developer guide
-
-### 7.2 Release Checklist
-
+**Release Checklist:**
 - [ ] All features implemented
 - [ ] All tests passing
 - [ ] Security audit completed
 - [ ] Documentation complete
 - [ ] Production deployment successful
 - [ ] Monitoring active
-- [ ] User training completed
 
 ---
 
-## 8. Agile Artifacts
+## 6. Agile Artifacts
 
-### 8.1 Product Backlog
+### 6.1 Product Backlog
 
 The complete product backlog includes all user stories from all sprints, plus additional items for future releases:
 
@@ -631,11 +604,11 @@ The complete product backlog includes all user stories from all sprints, plus ad
 - Automated loan approval using ML
 - Credit scoring system
 
-### 8.2 Sprint Backlog
+### 6.2 Sprint Backlog
 
 Each sprint has its own backlog (detailed in sections 3, 4, and 5).
 
-### 8.3 Definition of Done
+### 6.3 Definition of Done
 
 A user story is considered "Done" when:
 - ✅ Code is written and reviewed
@@ -646,7 +619,7 @@ A user story is considered "Done" when:
 - ✅ Feature is deployed to staging
 - ✅ Product Owner has accepted the story
 
-### 8.4 Definition of Ready
+### 6.4 Definition of Ready
 
 A user story is "Ready" for sprint planning when:
 - ✅ User story is clearly written
@@ -657,35 +630,33 @@ A user story is "Ready" for sprint planning when:
 
 ---
 
-## 9. Team Roles & Responsibilities
+## 7. Team Roles & Responsibilities
 
-### 9.1 Scrum Team Structure
+### 7.1 Team Structure
 
-| Role | Responsibilities | Count |
-|------|------------------|-------|
-| **Product Owner** | Backlog management, stakeholder communication | 1 |
-| **Scrum Master** | Facilitate sprints, remove impediments | 1 |
-| **Blockchain Developer** | Smart contract development | 2 |
-| **Frontend Developer** | React/TypeScript UI development | 2 |
-| **Backend Developer** | API, database, ML integration | 1 |
-| **ML Engineer** | AI/ML model development | 1 |
-| **QA Engineer** | Testing, quality assurance | 1 |
+This is a 2-person thesis project. Both members share responsibilities across all domains.
 
-**Total Team Size:** 9 members
+| Team Member | Primary Focus | Secondary Focus |
+|-------------|---------------|-----------------|
+| **Md. Bokhtiar Rahman Juboraz (20301138)** | Smart contract development, blockchain integration, backend API | AI/ML model development, documentation |
+| **Md. Mahir Ahnaf Ahmed (20301083)** | Frontend development (React/TypeScript), UI/UX design | Database design, testing, documentation |
 
-### 9.2 Daily Standup Format
+**Supervisor:** Mr. Annajiat Alim Rasel, Senior Lecturer, Dept. of CSE, Brac University
 
-**Time:** 15 minutes  
-**Format:**
-1. What did I complete yesterday?
-2. What will I work on today?
-3. Are there any blockers?
+### 7.2 Collaboration Process
+
+**Weekly Sync Format:**
+1. What was completed this week?
+2. What is planned for next week?
+3. Are there any blockers or dependency issues?
+
+**Code Review:** All pull requests reviewed by the other team member before merge.
 
 ---
 
-## 10. Risk Management
+## 8. Risk Management
 
-### 10.1 Identified Risks
+### 8.1 Identified Risks
 
 | Risk | Probability | Impact | Mitigation Strategy |
 |------|-------------|--------|---------------------|
@@ -696,7 +667,7 @@ A user story is "Ready" for sprint planning when:
 | Scope creep | High | Medium | Strict sprint boundaries, backlog management |
 | Team member unavailability | Low | High | Cross-training, documentation |
 
-### 10.2 Risk Response Plan
+### 8.2 Risk Response Plan
 
 - **High Priority Risks:** Weekly review and mitigation
 - **Medium Priority Risks:** Bi-weekly review
@@ -704,21 +675,21 @@ A user story is "Ready" for sprint planning when:
 
 ---
 
-## 11. Metrics & KPIs
+## 9. Metrics & KPIs
 
-### 11.1 Sprint Metrics
+### 9.1 Sprint Metrics
 
 - **Velocity:** Story points completed per sprint
 - **Burndown:** Progress tracking
 - **Sprint Goal Achievement:** % of sprint goal met
 
-### 11.2 Quality Metrics
+### 9.2 Quality Metrics
 
 - **Test Coverage:** > 80%
 - **Bug Density:** < 5 bugs per 1000 lines of code
 - **Code Review Coverage:** 100%
 
-### 11.3 Performance Metrics
+### 9.3 Performance Metrics
 
 - **Page Load Time:** < 2 seconds
 - **Transaction Confirmation:** < 30 seconds
@@ -726,23 +697,63 @@ A user story is "Ready" for sprint planning when:
 
 ---
 
-## 12. Communication Plan
+## 10. Communication Plan
 
-### 12.1 Communication Channels
+### 10.1 Communication Channels
 
-- **Daily Standups:** 15 minutes, every day
-- **Sprint Planning:** 2 hours, start of sprint
-- **Sprint Review:** 1 hour, end of sprint
-- **Retrospective:** 1 hour, end of sprint
-- **Stakeholder Updates:** Weekly
+- **Weekly Sync:** Progress review, blockers, planning
+- **Sprint Planning:** 1 hour, start of sprint
+- **Sprint Review:** 30 minutes, end of sprint
+- **Retrospective:** 30 minutes, end of sprint
+- **Supervisor Updates:** Bi-weekly
 
-### 12.2 Tools
+### 10.2 Tools
 
-- **Project Management:** Jira/Trello
-- **Version Control:** GitHub
-- **Communication:** Slack/Discord
-- **Documentation:** Confluence/Notion
-- **CI/CD:** GitHub Actions
+- **Version Control:** GitHub (primary collaboration platform)
+- **Documentation:** Overleaf (LaTeX report), Markdown files in repository
+- **Communication:** In-person meetings, email (professor updates bi-weekly)
+- **IDE:** VS Code with Cursor AI assistant
+- **CI/CD:** GitHub Actions (planned)
+
+---
+
+## 11. SDLC Stage Mapping
+
+The Agile sprint structure maps to the standard Software Development Life Cycle (SDLC) stages (ref: [GeeksforGeeks SDLC](https://www.geeksforgeeks.org/software-engineering/software-development-life-cycle-sdlc/)):
+
+| SDLC Stage | Project Activity | Timeline |
+|------------|------------------|----------|
+| **1. Planning & Requirements Analysis** | Feasibility studies (technical, economic, operational, schedule); professor meetings; BCOLBD 2025 guideline review; stakeholder requirement gathering | Pre-Sprint |
+| **2. Defining Requirements (SRS)** | System analysis (CSE471); use case definitions (29 use cases); non-functional requirements; system constraints; user stories (US-1.x through US-3.x) | Pre-Sprint + Sprint 1 |
+| **3. Designing Architecture** | Three-layer architecture (Presentation, Smart Contract, Off-chain); database schema (15 tables, 3NF); component diagram; data flow diagram; ERD | Sprint 1 |
+| **4. Development (Coding)** | Smart contracts (Solidity), frontend (React/TypeScript), backend (FastAPI/Python), AI/ML models | Sprints 1–3 |
+| **5. Testing** | Hardhat unit tests (12+ tests); frontend integration tests; AI/ML model evaluation; end-to-end testing | Week 7 (Integration & Testing) |
+| **6. Deployment** | Testnet deployment (Polygon Mumbai / Ethereum Sepolia); frontend on Vercel; backend on Render | Week 8 (Release) |
+| **7. Maintenance** | Post-deployment monitoring; AI/ML model retraining; bug fixes; feature iteration | Post-Release |
+
+---
+
+## 12. Design Decisions and Alternatives Considered
+
+Per professor requirement: *"For every decision you take, first present the alternative and then justify your first and second choices."*
+
+The complete decision justification document is maintained in `DECISION_JUSTIFICATION_PLAN.md`. Summary:
+
+| Decision Area | 1st Choice | 2nd Choice | Key Criterion |
+|---------------|------------|------------|---------------|
+| Development Methodology | Agile / Scrum | Incremental / Spiral | Evolving scope, sprint milestones |
+| Software Architecture | DApp + Off-chain AI | Hybrid with Oracle | Gas cost, ML iteration flexibility |
+| Frontend Framework | React + TypeScript | Vue + TypeScript | Web3 library ecosystem (Wagmi, RainbowKit) |
+| Smart Contract Platform | Ethereum / EVM (Solidity) | Solana (Rust) | Largest ecosystem, free testnets, OpenZeppelin |
+| UI Design System | Material Design 3 (MUI) | Tailwind CSS | Professional banking UI, development speed |
+| Release Cycle | Incremental releases | Continuous deployment | Professor milestones, integration risk |
+| Fraud Detection Algorithm | Random Forest | XGBoost | SHAP compatibility, 94%+ precision |
+| Anomaly Detection | Isolation Forest | Autoencoder | Unsupervised, no labeled data needed |
+| XAI Method | SHAP | LIME | Theoretical foundation, regulatory compliance |
+| Database | PostgreSQL | SQLite | CSE370 alignment, 3NF schema, async support |
+| Hosting / Deployment | Vercel + Render | Localhost | $0 cost, public URL, CI/CD |
+
+Each decision includes 2–3 alternatives evaluated, the chosen option with justification, and a backup option with rationale for when it would be preferred. See `DECISION_JUSTIFICATION_PLAN.md` for full details including criteria analysis.
 
 ---
 
@@ -750,18 +761,18 @@ A user story is "Ready" for sprint planning when:
 
 This Agile development plan provides a structured approach to building the Crypto World Bank platform over 2 months with 3 sprints. The methodology ensures:
 
-- ✅ Incremental delivery of features
-- ✅ Continuous feedback and improvement
-- ✅ Risk mitigation through early testing
-- ✅ Team collaboration and communication
-- ✅ Quality assurance throughout development
+- Incremental delivery of features aligned with SDLC stages
+- Continuous feedback and improvement through sprint reviews
+- Risk mitigation through early testing and integration
+- Justified design decisions with documented alternatives
+- Quality assurance throughout development
 
 The plan is flexible and can be adjusted based on team velocity and changing requirements.
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2024  
+**Document Version:** 3.0  
+**Last Updated:** February 2026  
 **Author:** Software Engineering Team  
 **Course:** CSE470 - Software Engineering
 

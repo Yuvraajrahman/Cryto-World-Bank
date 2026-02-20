@@ -354,3 +354,651 @@
   └── end loop ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
      │                          │                         │                        │                         │                         │
 ```
+
+---
+
+### Sequence Diagram 3: Income Verification
+
+> **Participants:** Borrower, Frontend, FastAPI, PostgreSQL, FileStorage, BankApprover. This diagram covers the full income-proof upload lifecycle — from the borrower uploading a document, through server-side validation and storage, to a bank approver reviewing and deciding on the proof.
+
+```
+  Borrower                   Frontend                     FastAPI                     PostgreSQL                  FileStorage                 BankApprover
+     │                          │                            │                            │                          │                            │
+     │  1. Open Income          │                            │                            │                          │                            │
+     │     Verification page    │                            │                            │                          │                            │
+     │─────────────────────────>│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  2. GET /income-proof/     │                            │                          │                            │
+     │                          │     status (borrower_id)   │                            │                          │                            │
+     │                          │───────────────────────────>│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  3. Query INCOME_PROOF     │                          │                            │
+     │                          │                            │     table                  │                          │                            │
+     │                          │                            │───────────────────────────>│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  4. Return status           │                          │                            │
+     │                          │                            │     (or empty)             │                          │                            │
+     │                          │                            │<───────────────────────────│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  5. Return verification    │                            │                          │                            │
+     │                          │     status                 │                            │                          │                            │
+     │                          │<───────────────────────────│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  6. Show upload form     │                            │                            │                          │                            │
+     │     (if no verified      │                            │                            │                          │                            │
+     │      proof exists)       │                            │                            │                          │                            │
+     │<─────────────────────────│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  7. Select file          │                            │                            │                          │                            │
+     │     + Upload             │                            │                            │                          │                            │
+     │─────────────────────────>│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  8. Client-side validation │                            │                          │                            │
+     │                          │     (type, size ≤ 5MB)     │                            │                          │                            │
+     │                          │─────────┐                  │                            │                          │                            │
+     │                          │         │ validate         │                            │                          │                            │
+     │                          │<────────┘                  │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  9. POST /income-proof/    │                            │                          │                            │
+     │                          │     upload (file,          │                            │                          │                            │
+     │                          │     borrower_id)           │                            │                          │                            │
+     │                          │───────────────────────────>│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  10. Server-side           │                          │                            │
+     │                          │                            │      validation            │                          │                            │
+     │                          │                            │      + SHA-256 hash        │                          │                            │
+     │                          │                            │─────────┐                  │                          │                            │
+     │                          │                            │         │ validate + hash  │                          │                            │
+     │                          │                            │<────────┘                  │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  11. Store encrypted file  │                          │                            │
+     │                          │                            │──────────────────────────────────────────────────────>│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  12. Return file_path      │                          │                            │
+     │                          │                            │<──────────────────────────────────────────────────────│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  13. INSERT INTO           │                          │                            │
+     │                          │                            │      INCOME_PROOF          │                          │                            │
+     │                          │                            │      (status='pending')    │                          │                            │
+     │                          │                            │───────────────────────────>│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  14. Confirm insert        │                          │                            │
+     │                          │                            │<───────────────────────────│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  15. Return success        │                            │                          │                            │
+     │                          │<───────────────────────────│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  16. Show "Pending       │                            │                            │                          │                            │
+     │      Review" status      │                            │                            │                          │                            │
+     │<─────────────────────────│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  [Note: Bank Review Phase]                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  17. View pending          │                            │                          │                            │
+     │                          │      income proofs         │                            │                          │                            │
+     │                          │<──────────────────────────────────────────────────────────────────────────────────────────────────────────────────│
+     │                          │                            │                            │                          │                            │
+     │                          │  18. GET /income-proofs/   │                            │                          │                            │
+     │                          │      pending               │                            │                          │                            │
+     │                          │───────────────────────────>│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  19. Query pending         │                          │                            │
+     │                          │                            │      INCOME_PROOF records  │                          │                            │
+     │                          │                            │───────────────────────────>│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  20. Return pending        │                          │                            │
+     │                          │                            │      proofs               │                          │                            │
+     │                          │                            │<───────────────────────────│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  21. Return proofs list    │                            │                          │                            │
+     │                          │<───────────────────────────│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  22. Display proofs        │                            │                          │                            │
+     │                          │      for review            │                            │                          │                            │
+     │                          │──────────────────────────────────────────────────────────────────────────────────────────────────────────────────>│
+     │                          │                            │                            │                          │                            │
+     │                          │  23. Approve/Reject        │                            │                          │                            │
+     │                          │      with notes            │                            │                          │                            │
+     │                          │<──────────────────────────────────────────────────────────────────────────────────────────────────────────────────│
+     │                          │                            │                            │                          │                            │
+     │                          │  24. PATCH /income-proof/  │                            │                          │                            │
+     │                          │      {id} (status, notes)  │                            │                          │                            │
+     │                          │───────────────────────────>│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  25. UPDATE INCOME_PROOF   │                          │                            │
+     │                          │                            │      SET status,           │                          │                            │
+     │                          │                            │      reviewed_by,          │                          │                            │
+     │                          │                            │      reviewed_at           │                          │                            │
+     │                          │                            │───────────────────────────>│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  26. Confirm update        │                          │                            │
+     │                          │                            │<───────────────────────────│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  27. Return updated        │                            │                          │                            │
+     │                          │      status                │                            │                          │                            │
+     │                          │<───────────────────────────│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  28. Show confirmation     │                            │                          │                            │
+     │                          │──────────────────────────────────────────────────────────────────────────────────────────────────────────────────>│
+     │                          │                            │                            │                          │                            │
+```
+
+---
+
+### Sequence Diagram 4: Chat System
+
+> **Participants:** Borrower, Frontend, WebSocket, FastAPI, PostgreSQL, BankApprover. This diagram covers the real-time chat between a borrower and a bank approver on a specific loan request, including chat history loading, typing indicators, real-time message delivery, and read receipts.
+
+```
+  Borrower                   Frontend                     WebSocket                   FastAPI                     PostgreSQL                  BankApprover
+     │                          │                            │                            │                          │                            │
+     │  1. Open loan details    │                            │                            │                          │                            │
+     │     → Click "Chat"       │                            │                            │                          │                            │
+     │─────────────────────────>│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  2. GET /chat/history      │                            │                          │                            │
+     │                          │     (loan_request_id)      │                            │                          │                            │
+     │                          │──────────────────────────────────────────────────────── >│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │  3. Query CHAT_MESSAGE   │                            │
+     │                          │                            │                            │     WHERE loan_request_id│                            │
+     │                          │                            │                            │     ORDER BY sent_at     │                            │
+     │                          │                            │                            │────────────────────────>│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │  4. Return messages      │                            │
+     │                          │                            │                            │<────────────────────────│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  5. Return formatted       │                            │                          │                            │
+     │                          │     chat history           │                            │                          │                            │
+     │                          │<──────────────────────────────────────────────────────── │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  6. Display chat window  │                            │                            │                          │                            │
+     │     with history         │                            │                            │                          │                            │
+     │<─────────────────────────│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  7. Type message         │                            │                            │                          │                            │
+     │─────────────────────────>│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  8. Emit "typing" event    │                            │                          │                            │
+     │                          │───────────────────────────>│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  9. Forward typing         │                          │                            │
+     │                          │                            │     indicator              │                          │                            │
+     │                          │                            │──────────────────────────────────────────────────────────────────────────────────── >│
+     │                          │                            │                            │                          │                            │
+     │  10. Send message        │                            │                            │                          │                            │
+     │─────────────────────────>│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  11. POST /chat/send       │                            │                          │                            │
+     │                          │      (loan_request_id,     │                            │                          │                            │
+     │                          │       sender_id, message)  │                            │                          │                            │
+     │                          │──────────────────────────────────────────────────────── >│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │  12. INSERT INTO         │                            │
+     │                          │                            │                            │      CHAT_MESSAGE        │                            │
+     │                          │                            │                            │────────────────────────>│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │  13. Confirm insert      │                            │
+     │                          │                            │                            │<────────────────────────│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  14. Emit "new_message"    │                          │                            │
+     │                          │                            │      event                 │                          │                            │
+     │                          │                            │<──────────────────────────── │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  15. Deliver real-time     │                          │                            │
+     │                          │                            │      notification          │                          │                            │
+     │                          │                            │──────────────────────────────────────────────────────────────────────────────────── >│
+     │                          │                            │                            │                          │                            │
+     │                          │  16. Return success        │                            │                          │                            │
+     │                          │<──────────────────────────────────────────────────────── │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  17. View notification     │                            │                          │                            │
+     │                          │      → Open chat           │                            │                          │                            │
+     │                          │<──────────────────────────────────────────────────────────────────────────────────────────────────────────────────│
+     │                          │                            │                            │                          │                            │
+     │                          │  18. Read message          │                            │                          │                            │
+     │                          │<──────────────────────────────────────────────────────────────────────────────────────────────────────────────────│
+     │                          │                            │                            │                          │                            │
+     │                          │  19. PATCH /chat/read      │                            │                          │                            │
+     │                          │      (message_id)          │                            │                          │                            │
+     │                          │──────────────────────────────────────────────────────── >│                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │  20. UPDATE              │                            │
+     │                          │                            │                            │      CHAT_MESSAGE        │                            │
+     │                          │                            │                            │      SET is_read=true    │                            │
+     │                          │                            │                            │────────────────────────>│                            │
+     │                          │                            │                            │                          │                            │
+```
+
+---
+
+### Sequence Diagram 5: AI Chatbot Interaction
+
+> **Participants:** Borrower, Frontend, ChatbotService, NLPEngine, PostgreSQL. This diagram shows the AI chatbot session lifecycle — initialisation with user context, natural-language question processing via the NLP engine (intent classification and entity extraction), conditional data retrieval based on intent, and response formatting.
+
+```
+  Borrower                   Frontend                     ChatbotService              NLPEngine                   PostgreSQL
+     │                          │                            │                            │                          │
+     │  1. Open AI Chatbot      │                            │                            │                          │
+     │─────────────────────────>│                            │                            │                          │
+     │                          │                            │                            │                          │
+     │                          │  2. Initialize session     │                            │                          │
+     │                          │     (borrower_id)          │                            │                          │
+     │                          │───────────────────────────>│                            │                          │
+     │                          │                            │                            │                          │
+     │                          │                            │  3. Load user context      │                          │
+     │                          │                            │     (BORROWER,             │                          │
+     │                          │                            │      LOAN_REQUEST,         │                          │
+     │                          │                            │      BORROWING_LIMIT)      │                          │
+     │                          │                            │───────────────────────────────────────────────────────>│
+     │                          │                            │                            │                          │
+     │                          │                            │  4. Return user data       │                          │
+     │                          │                            │<───────────────────────────────────────────────────────│
+     │                          │                            │                            │                          │
+     │                          │  5. Return welcome message │                            │                          │
+     │                          │     + context summary      │                            │                          │
+     │                          │<───────────────────────────│                            │                          │
+     │                          │                            │                            │                          │
+     │  6. Display chatbot      │                            │                            │                          │
+     │     interface            │                            │                            │                          │
+     │<─────────────────────────│                            │                            │                          │
+     │                          │                            │                            │                          │
+     │  7. Ask question         │                            │                            │                          │
+     │     (e.g., "What's my   │                            │                            │                          │
+     │      borrowing limit?")  │                            │                            │                          │
+     │─────────────────────────>│                            │                            │                          │
+     │                          │                            │                            │                          │
+     │                          │  8. POST /chatbot/ask      │                            │                          │
+     │                          │     (session_id, message)  │                            │                          │
+     │                          │───────────────────────────>│                            │                          │
+     │                          │                            │                            │                          │
+     │                          │                            │  9. Tokenize +             │                          │
+     │                          │                            │     Remove stop words      │                          │
+     │                          │                            │───────────────────────────>│                          │
+     │                          │                            │                            │                          │
+     │                          │                            │                            │  10. Classify intent     │
+     │                          │                            │                            │      (loan_limit /       │
+     │                          │                            │                            │       payment_due /      │
+     │                          │                            │                            │       bank_info /        │
+     │                          │                            │                            │       general)           │
+     │                          │                            │                            │─────────┐               │
+     │                          │                            │                            │         │ classify       │
+     │                          │                            │                            │<────────┘               │
+     │                          │                            │                            │                          │
+     │                          │                            │                            │  11. Extract entities    │
+     │                          │                            │                            │─────────┐               │
+     │                          │                            │                            │         │ extract        │
+     │                          │                            │                            │<────────┘               │
+     │                          │                            │                            │                          │
+     │                          │                            │  12. Return intent         │                          │
+     │                          │                            │      + entities            │                          │
+     │                          │                            │<───────────────────────────│                          │
+     │                          │                            │                            │                          │
+     │                          │                            │                            │                          │
+  ┌── alt ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ [intent = loan_limit]       │                            │                            │                          │       │
+  │  │                          │                            │                            │                          │       │
+  │  │                          │                            │  13a. Query                │                          │       │
+  │  │                          │                            │       BORROWING_LIMIT      │                          │       │
+  │  │                          │                            │───────────────────────────────────────────────────────>│       │
+  │  │                          │                            │  13a. Return limit data    │                          │       │
+  │  │                          │                            │<───────────────────────────────────────────────────────│       │
+  │  │                          │                            │                            │                          │       │
+  ├── [intent = payment_due] ───────────────────────────────────────────────────────────────────────────────────────────────┤
+  │  │                          │                            │                            │                          │       │
+  │  │                          │                            │  13b. Query INSTALLMENT    │                          │       │
+  │  │                          │                            │       WHERE status=        │                          │       │
+  │  │                          │                            │       'pending'            │                          │       │
+  │  │                          │                            │───────────────────────────────────────────────────────>│       │
+  │  │                          │                            │  13b. Return pending       │                          │       │
+  │  │                          │                            │       installments         │                          │       │
+  │  │                          │                            │<───────────────────────────────────────────────────────│       │
+  │  │                          │                            │                            │                          │       │
+  ├── [intent = bank_info] ─────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │  │                          │                            │                            │                          │       │
+  │  │                          │                            │  13c. Query LOCAL_BANK /   │                          │       │
+  │  │                          │                            │       NATIONAL_BANK        │                          │       │
+  │  │                          │                            │───────────────────────────────────────────────────────>│       │
+  │  │                          │                            │  13c. Return bank data     │                          │       │
+  │  │                          │                            │<───────────────────────────────────────────────────────│       │
+  │  │                          │                            │                            │                          │       │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+     │                          │                            │                            │                          │
+     │                          │                            │  14. Format response       │                          │
+     │                          │                            │      with data             │                          │
+     │                          │                            │─────────┐                  │                          │
+     │                          │                            │         │ format           │                          │
+     │                          │                            │<────────┘                  │                          │
+     │                          │                            │                            │                          │
+     │                          │                            │  15. INSERT INTO           │                          │
+     │                          │                            │      AI_CHATBOT_LOG        │                          │
+     │                          │                            │───────────────────────────────────────────────────────>│
+     │                          │                            │                            │                          │
+     │                          │  16. Return formatted      │                            │                          │
+     │                          │      response              │                            │                          │
+     │                          │<───────────────────────────│                            │                          │
+     │                          │                            │                            │                          │
+     │  17. Display response    │                            │                            │                          │
+     │<─────────────────────────│                            │                            │                          │
+     │                          │                            │                            │                          │
+```
+
+---
+
+### Sequence Diagram 6: Hierarchical Banking (World Bank → National Bank → Local Bank → Borrower)
+
+> **Participants:** WorldBankAdmin, Frontend, SmartContract (WorldBankReserve.sol), Blockchain, NationalBank, SmartContract (NationalBank.sol), LocalBank, SmartContract (LocalBank.sol), Borrower. This diagram illustrates the three-tier fund flow — deposit into the world-bank reserve, cascading loan approvals down through national and local banks, and repayment cascading back up.
+
+```
+  WorldBankAdmin       Frontend              WBReserve.sol          Blockchain             NationalBank           NationalBank.sol        LocalBank              LocalBank.sol           Borrower
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │  1. Deposit funds  │                      │                      │                      │                      │                      │                      │                      │
+     │    to reserve      │                      │                      │                      │                      │                      │                      │                      │
+     │───────────────────>│                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  2. deposit()         │                      │                      │                      │                      │                      │                      │
+     │                    │  {value: amount}      │                      │                      │                      │                      │                      │                      │
+     │                    │─────────────────────>│                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │  3. Record           │                      │                      │                      │                      │                      │
+     │                    │                      │     transaction      │                      │                      │                      │                      │                      │
+     │                    │                      │────────────────────>│                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │  4. Confirm          │                      │                      │                      │                      │                      │
+     │                    │                      │<────────────────────│                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  5. Request loan      │                      │                      │                      │                      │                      │                      │
+     │                    │     from World Bank   │                      │                      │                      │                      │                      │                      │
+     │                    │<─────────────────────────────────────────────────────────────────────│                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  6. requestLoan       │                      │                      │                      │                      │                      │                      │
+     │                    │     (amount)          │                      │                      │                      │                      │                      │                      │
+     │                    │─────────────────────>│                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │  7. Check available  │                      │                      │                      │                      │                      │
+     │                    │                      │     reserve          │                      │                      │                      │                      │                      │
+     │                    │                      │─────────┐            │                      │                      │                      │                      │                      │
+     │                    │                      │         │ check      │                      │                      │                      │                      │                      │
+     │                    │                      │<────────┘            │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │  8. Approve NB     │                      │                      │                      │                      │                      │                      │                      │
+     │     loan           │                      │                      │                      │                      │                      │                      │                      │
+     │───────────────────>│                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  9. approveLoan       │                      │                      │                      │                      │                      │                      │
+     │                    │     (nb_address,      │                      │                      │                      │                      │                      │                      │
+     │                    │      amount)          │                      │                      │                      │                      │                      │                      │
+     │                    │─────────────────────>│                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │  10. Transfer funds  │                      │                      │                      │                      │                      │
+     │                    │                      │      to NB contract  │                      │                      │                      │                      │                      │
+     │                    │                      │────────────────────>│                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │  11. Receive funds   │                      │                      │                      │                      │
+     │                    │                      │                      │─────────────────────────────────────────────>│                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  12. Request loan     │                      │                      │                      │                      │                      │                      │
+     │                    │      from National    │                      │                      │                      │                      │                      │                      │
+     │                    │      Bank             │                      │                      │                      │                      │                      │                      │
+     │                    │<───────────────────────────────────────────────────────────────────────────────────────────────────────────────────│                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  13. requestLoan      │                      │                      │                      │                      │                      │                      │
+     │                    │      (amount)         │                      │                      │                      │                      │                      │                      │
+     │                    │──────────────────────────────────────────────────────────────────────────────────────────>│                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  14. Approve LB       │                      │                      │                      │                      │                      │                      │
+     │                    │      loan             │                      │                      │                      │                      │                      │                      │
+     │                    │<─────────────────────────────────────────────────────────────────────│                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │  15. approveLoan      │                      │                      │                      │                      │                      │                      │
+     │                    │      (lb_address,     │                      │                      │                      │                      │                      │                      │
+     │                    │       amount)         │                      │                      │                      │                      │                      │                      │
+     │                    │──────────────────────────────────────────────────────────────────────────────────────────>│                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │  16. Transfer to     │                      │                      │
+     │                    │                      │                      │                      │                      │      LB contract     │                      │                      │
+     │                    │                      │                      │  17. Transfer        │                      │                      │                      │                      │
+     │                    │                      │                      │      on-chain        │                      │                      │                      │                      │
+     │                    │                      │                      │────────────────────────────────────────────────────────────────────────────────────────────>│                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │  18. Receive funds   │                      │
+     │                    │                      │                      │                      │                      │                      │──────────────────── >│                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │  [Note: Repayment cascades back up]       │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │  19. payInstallment()│
+     │                    │                      │                      │                      │                      │                      │                      │<─────────────────────│
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │  20. Forward share   │                      │
+     │                    │                      │                      │                      │                      │                      │      to NB           │                      │
+     │                    │                      │                      │                      │                      │                      │<─────────────────────│                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │                      │                      │                      │  21. Forward share   │                      │                      │
+     │                    │                      │                      │                      │                      │      to NB           │                      │                      │
+     │                    │                      │                      │                      │                      │<─────────────────────│                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+     │                    │                      │  22. Forward share   │                      │                      │                      │                      │                      │
+     │                    │                      │      to WB           │                      │                      │                      │                      │                      │
+     │                    │                      │<──────────────────────────────────────────────────────────────────│                      │                      │                      │
+     │                    │                      │                      │                      │                      │                      │                      │                      │
+```
+
+---
+
+### Sequence Diagram 7: Market Data Retrieval
+
+> **Participants:** Borrower, Frontend, FastAPI, RedisCache, PostgreSQL, CoinGeckoAPI. This diagram shows how live cryptocurrency prices are fetched (with a Redis caching layer and CoinGecko as the external source), how historical chart data is queried, and the auto-refresh polling mechanism.
+
+```
+  Borrower                   Frontend                     FastAPI                     RedisCache                  PostgreSQL                  CoinGeckoAPI
+     │                          │                            │                            │                          │                            │
+     │  1. Navigate to Market   │                            │                            │                          │                            │
+     │     Data dashboard       │                            │                            │                          │                            │
+     │─────────────────────────>│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  2. GET /market-data/      │                            │                          │                            │
+     │                          │     prices (crypto_ids[])  │                            │                          │                            │
+     │                          │───────────────────────────>│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  3. Check cache            │                          │                            │
+     │                          │                            │     (key: market_prices_   │                          │                            │
+     │                          │                            │      {crypto_id})          │                          │                            │
+     │                          │                            │───────────────────────────>│                          │                            │
+     │                          │                            │                            │                          │                            │
+  ┌── alt ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ [Cache Hit]                 │                            │                            │                          │                            │       │
+  │  │                          │                            │                            │                          │                            │       │
+  │  │                          │                            │  4a. Return cached data    │                          │                            │       │
+  │  │                          │                            │<───────────────────────────│                          │                            │       │
+  │  │                          │                            │                            │                          │                            │       │
+  ├── [Cache Miss] ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │  │                          │                            │                            │                          │                            │       │
+  │  │                          │                            │  4b. GET /simple/price?    │                          │                            │       │
+  │  │                          │                            │      ids=...               │                          │                            │       │
+  │  │                          │                            │      &vs_currencies=usd    │                          │                            │       │
+  │  │                          │                            │──────────────────────────────────────────────────────────────────────────────────────────>│       │
+  │  │                          │                            │                            │                          │                            │       │
+  │  │                          │                            │  5b. Return price data     │                          │                            │       │
+  │  │                          │                            │<──────────────────────────────────────────────────────────────────────────────────────────│       │
+  │  │                          │                            │                            │                          │                            │       │
+  │  │                          │                            │  6b. SET cache             │                          │                            │       │
+  │  │                          │                            │      (TTL: 5 min)          │                          │                            │       │
+  │  │                          │                            │───────────────────────────>│                          │                            │       │
+  │  │                          │                            │                            │                          │                            │       │
+  │  │                          │                            │  7b. INSERT/UPDATE         │                          │                            │       │
+  │  │                          │                            │      MARKET_DATA           │                          │                            │       │
+  │  │                          │                            │──────────────────────────────────────────────────────>│                            │       │
+  │  │                          │                            │                            │                          │                            │       │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+     │                          │                            │                            │                          │                            │
+     │                          │  8. Return price data      │                            │                          │                            │
+     │                          │<───────────────────────────│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  9. Render price cards   │                            │                            │                          │                            │
+     │<─────────────────────────│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  10. Select crypto for   │                            │                            │                          │                            │
+     │      historical chart    │                            │                            │                          │                            │
+     │─────────────────────────>│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  11. GET /market-data/     │                            │                          │                            │
+     │                          │      history (crypto_id,   │                            │                          │                            │
+     │                          │      range)                │                            │                          │                            │
+     │                          │───────────────────────────>│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  12. Query MARKET_DATA     │                          │                            │
+     │                          │                            │      WHERE crypto_id       │                          │                            │
+     │                          │                            │      AND date range        │                          │                            │
+     │                          │                            │──────────────────────────────────────────────────────>│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │  13. Return historical     │                          │                            │
+     │                          │                            │      data                  │                          │                            │
+     │                          │                            │<──────────────────────────────────────────────────────│                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  14. Return data points    │                            │                          │                            │
+     │                          │<───────────────────────────│                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │  15. Render Chart.js       │                            │                          │                            │
+     │                          │      line chart            │                            │                          │                            │
+     │                          │      (tooltips,            │                            │                          │                            │
+     │                          │       time range)          │                            │                          │                            │
+     │                          │─────────┐                  │                            │                          │                            │
+     │                          │         │ render           │                            │                          │                            │
+     │                          │<────────┘                  │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │  16. Display interactive │                            │                            │                          │                            │
+     │      chart               │                            │                            │                          │                            │
+     │<─────────────────────────│                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+     │                          │                            │                            │                          │                            │
+  ┌── loop [Auto-refresh every 5 minutes] ──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │  │                          │                            │                            │                          │                            │       │
+  │  │                          │  17. GET /market-data/     │                            │                          │                            │       │
+  │  │                          │      prices (polling)      │                            │                          │                            │       │
+  │  │                          │───────────────────────────>│                            │                          │                            │       │
+  │  │                          │                            │  (cache / fetch cycle      │                          │                            │       │
+  │  │                          │                            │   repeats as above)        │                          │                            │       │
+  │  │                          │  18. Return updated        │                            │                          │                            │       │
+  │  │                          │      prices                │                            │                          │                            │       │
+  │  │                          │<───────────────────────────│                            │                          │                            │       │
+  │  │                          │                            │                            │                          │                            │       │
+  │  │  19. Re-render price     │                            │                            │                          │                            │       │
+  │  │      cards               │                            │                            │                          │                            │       │
+  │  │<─────────────────────────│                            │                            │                          │                            │       │
+  │  │                          │                            │                            │                          │                            │       │
+  └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+     │                          │                            │                            │                          │                            │
+```
+
+---
+
+### Sequence Diagram 8: Borrowing Limit Calculation
+
+> **Participants:** System/Trigger, FastAPI, PostgreSQL, BorrowingLimitEngine. This diagram shows the borrowing-limit recalculation triggered by events such as a new loan request, approval, payment, or a scheduled cron job. The engine gathers 6-month and 12-month transaction history, applies a loyalty multiplier, enforces concurrent-loan and yearly caps, and persists the result.
+
+```
+  System/Trigger               FastAPI                     BorrowingLimitEngine         PostgreSQL
+     │                            │                            │                            │
+     │                            │                            │                            │
+     │  [Note: Trigger — Loan Request / Approval / Payment / Scheduled Job]                 │
+     │                            │                            │                            │
+     │  1. Calculate borrowing    │                            │                            │
+     │     limit (borrower_id)    │                            │                            │
+     │───────────────────────────>│                            │                            │
+     │                            │                            │                            │
+     │                            │  2. Process limit          │                            │
+     │                            │     calculation            │                            │
+     │                            │───────────────────────────>│                            │
+     │                            │                            │                            │
+     │                            │                            │  3. Query TRANSACTION      │
+     │                            │                            │     (last 6 months)        │
+     │                            │                            │───────────────────────────>│
+     │                            │                            │                            │
+     │                            │                            │  4. Return 6-month         │
+     │                            │                            │     transactions           │
+     │                            │                            │<───────────────────────────│
+     │                            │                            │                            │
+     │                            │                            │  5. Calculate 6-month      │
+     │                            │                            │     rolling sum            │
+     │                            │                            │─────────┐                  │
+     │                            │                            │         │ compute          │
+     │                            │                            │<────────┘                  │
+     │                            │                            │                            │
+     │                            │                            │  6. Query TRANSACTION      │
+     │                            │                            │     (last 12 months)       │
+     │                            │                            │───────────────────────────>│
+     │                            │                            │                            │
+     │                            │                            │  7. Return 12-month        │
+     │                            │                            │     transactions           │
+     │                            │                            │<───────────────────────────│
+     │                            │                            │                            │
+     │                            │                            │  8. Calculate 12-month     │
+     │                            │                            │     rolling sum            │
+     │                            │                            │─────────┐                  │
+     │                            │                            │         │ compute          │
+     │                            │                            │<────────┘                  │
+     │                            │                            │                            │
+     │                            │                            │  9. Query BORROWER         │
+     │                            │                            │     .consecutive_paid_loans│
+     │                            │                            │───────────────────────────>│
+     │                            │                            │                            │
+     │                            │                            │  10. Return consecutive    │
+     │                            │                            │      count                 │
+     │                            │                            │<───────────────────────────│
+     │                            │                            │                            │
+     │                            │                            │  11. Apply loyalty         │
+     │                            │                            │      multiplier            │
+     │                            │                            │─────────┐                  │
+     │                            │                            │         │ compute          │
+     │                            │                            │<────────┘                  │
+     │                            │                            │                            │
+     │                            │                            │  12. Query active          │
+     │                            │                            │      LOAN_REQUEST count    │
+     │                            │                            │───────────────────────────>│
+     │                            │                            │                            │
+     │                            │                            │  13. Return active loan    │
+     │                            │                            │      count                 │
+     │                            │                            │<───────────────────────────│
+     │                            │                            │                            │
+     │                            │                            │  14. Check max concurrent  │
+     │                            │                            │      loans (3)             │
+     │                            │                            │─────────┐                  │
+     │                            │                            │         │ check            │
+     │                            │                            │<────────┘                  │
+     │                            │                            │                            │
+     │                            │                            │  15. Check yearly limit    │
+     │                            │                            │      not exceeded          │
+     │                            │                            │─────────┐                  │
+     │                            │                            │         │ check            │
+     │                            │                            │<────────┘                  │
+     │                            │                            │                            │
+     │                            │                            │  16. Final limit =         │
+     │                            │                            │      min(6mo, 12mo) ×      │
+     │                            │                            │      loyalty ×             │
+     │                            │                            │      availability          │
+     │                            │                            │─────────┐                  │
+     │                            │                            │         │ compute          │
+     │                            │                            │<────────┘                  │
+     │                            │                            │                            │
+     │                            │                            │  17. UPSERT               │
+     │                            │                            │      BORROWING_LIMIT       │
+     │                            │                            │───────────────────────────>│
+     │                            │                            │                            │
+     │                            │                            │  18. Confirm update        │
+     │                            │                            │<───────────────────────────│
+     │                            │                            │                            │
+     │                            │  19. Return calculated     │                            │
+     │                            │      limit                 │                            │
+     │                            │<───────────────────────────│                            │
+     │                            │                            │                            │
+     │  20. Return limit result   │                            │                            │
+     │<───────────────────────────│                            │                            │
+     │                            │                            │                            │
+```

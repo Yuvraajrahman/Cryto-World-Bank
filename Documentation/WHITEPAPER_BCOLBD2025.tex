@@ -829,7 +829,7 @@ This paper and project planning have been structured in accordance with the \hre
 
 \subsection{Development Methodology}
 
-The project adopts a \textbf{lightweight Agile/Scrum} methodology tailored for an academic prototype with a fixed two-month development window. The iterative approach enables incremental delivery of demonstrable features while accommodating evolving requirements inherent in research-oriented development.
+The project adopts a \textbf{lightweight Agile/Scrum} methodology tailored for an academic prototype with a fixed two-month development window. The full methodology and sprint backlog are documented in the \href{https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/CSE470_SOFTWARE_ENGINEERING.md}{CSE470 Software Engineering} document. The iterative approach enables incremental delivery of demonstrable features while accommodating evolving requirements inherent in research-oriented development.
 
 \vspace{8pt}
 \begin{tcolorbox}[
@@ -930,30 +930,13 @@ Sprint 3 & Weeks 7--8 & AI/ML Security and Finalization & Fraud detection model 
 \end{tabular}
 \end{moderntable}
 
-\subsection{User Stories per Sprint}
+\subsection{Sprint Deliverables Summary}
 
-\textbf{Sprint 1 --- Foundation}
-\begin{itemize}[noitemsep]
-\item US-1.1: As a user, I want to connect my wallet so that I can interact with the platform.
-\item US-1.2: As a user, I want to deposit to the reserve so that the bank has funds to lend.
-\item US-1.3: As an admin, I want to register National Banks so that the hierarchy is established.
-\item US-1.4: As a developer, I want a normalized database schema so that all entities are properly modeled.
-\end{itemize}
+\textbf{Sprint 1 --- Foundation:} Smart contracts (WorldBankReserve, NationalBank, LocalBank), wallet integration, dashboard, database schema (15 tables, 3NF).
 
-\textbf{Sprint 2 --- Lending}
-\begin{itemize}[noitemsep]
-\item US-2.1: As a borrower, I want to request a loan so that I can access capital.
-\item US-2.2: As an approver, I want to approve or reject loans so that I can manage bank risk.
-\item US-2.3: As a borrower, I want installment schedules for large loans so that repayment is manageable.
-\item US-2.4: As a borrower, I want to chat with the bank so that I can discuss my loan application.
-\end{itemize}
+\textbf{Sprint 2 --- Lending:} Loan request/approval workflow, installment payments, borrowing limits, borrower--bank chat, income verification, hierarchical bank registration.
 
-\textbf{Sprint 3 --- AI/ML and Polish}
-\begin{itemize}[noitemsep]
-\item US-3.1: As a bank operator, I want fraud risk scores so that I can make informed approval decisions.
-\item US-3.2: As a bank operator, I want explainable AI so that I understand why a loan is flagged.
-\item US-3.3: As an admin, I want a risk dashboard so that I can monitor security across all loans.
-\end{itemize}
+\textbf{Sprint 3 --- AI/ML and Polish:} Fraud detection (Random Forest + SHAP), risk dashboard, anomaly detection, security audit, documentation. The full user story backlog (US-1.1 through US-3.12) is in the \href{https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/CSE470_SOFTWARE_ENGINEERING.md}{CSE470 Software Engineering} document.
 
 \subsection{SDLC Stage Mapping}
 
@@ -1482,7 +1465,7 @@ The project addresses software engineering principles through systematic plannin
 \item Activity diagrams capturing the control flow of key operations including hierarchical fund distribution and cascading repayment.
 \item Component diagrams depicting the system's modular architecture across the presentation, smart contract, and off-chain service layers.
 \item Data flow diagrams (Level 0 and Level 1) mapping information movement between system components.
-\item An Agile development methodology with a three-sprint, eight-week schedule, user stories, sprint backlogs, and burndown tracking.
+\item An Agile development methodology with a three-sprint, eight-week schedule, sprint backlogs, and burndown tracking.
 \item SDLC stage mapping, design decision analysis, Gantt charts, and risk assessment matrices.
 \item Revenue projection bar charts and comparative analysis visualizations.
 \end{itemize}

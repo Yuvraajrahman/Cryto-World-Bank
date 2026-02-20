@@ -386,24 +386,13 @@ The project adopts a **lightweight Agile/Scrum** methodology tailored for an aca
 | **Sprint 2** | Weeks 4–6 | Lending Features and Communication | Loan request and approval workflow; installment payment system; borrowing limit calculation engine; borrower–bank chat; income verification upload; hierarchical bank registration flows |
 | **Sprint 3** | Weeks 7–8 | AI/ML Security and Finalization | Fraud detection model (Random Forest + SHAP); risk dashboard integration; anomaly detection prototype; security audit and testing; documentation completion; demo preparation and competition submission |
 
-### C. User Stories per Sprint
+### C. Sprint Deliverables Summary
 
-**Sprint 1 — Foundation**
-- US-1.1: As a user, I want to connect my wallet so that I can interact with the platform.
-- US-1.2: As a user, I want to deposit to the reserve so that the bank has funds to lend.
-- US-1.3: As an admin, I want to register National Banks so that the hierarchy is established.
-- US-1.4: As a developer, I want a normalized database schema so that all entities are properly modeled.
+**Sprint 1 — Foundation:** Smart contracts (WorldBankReserve, NationalBank, LocalBank), wallet integration, dashboard, database schema (15 tables, 3NF).
 
-**Sprint 2 — Lending**
-- US-2.1: As a borrower, I want to request a loan so that I can access capital.
-- US-2.2: As an approver, I want to approve or reject loans so that I can manage bank risk.
-- US-2.3: As a borrower, I want installment schedules for large loans so that repayment is manageable.
-- US-2.4: As a borrower, I want to chat with the bank so that I can discuss my loan application.
+**Sprint 2 — Lending:** Loan request/approval workflow, installment payments, borrowing limits, borrower–bank chat, income verification, hierarchical bank registration.
 
-**Sprint 3 — AI/ML and Polish**
-- US-3.1: As a bank operator, I want fraud risk scores so that I can make informed approval decisions.
-- US-3.2: As a bank operator, I want explainable AI so that I understand why a loan is flagged.
-- US-3.3: As an admin, I want a risk dashboard so that I can monitor security across all loans.
+**Sprint 3 — AI/ML and Polish:** Fraud detection (Random Forest + SHAP), risk dashboard, anomaly detection, security audit, documentation. The full user story backlog (US-1.1 through US-3.12) is in the [CSE470 Software Engineering](https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/CSE470_SOFTWARE_ENGINEERING.md) document.
 
 ### D. SDLC Stage Mapping
 

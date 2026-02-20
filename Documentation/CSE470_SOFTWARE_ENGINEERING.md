@@ -36,21 +36,19 @@ The Crypto World Bank is a decentralized lending platform built on blockchain te
 gantt
     title 2-Month Development Timeline
     dateFormat  YYYY-MM-DD
-    axisFormat  %b %d
+    axisFormat  %Y-%m
 
-    section Sprint 1
-    Foundation & Core Banking       :s1, 2026-01-06, 21d
+    section Month 1
+    Sprint 1: Foundation & Core Banking       :s1, 2026-01-06, 21d
+    Sprint 1 Submission                       :milestone, 2026-01-27, 0d
 
-    section Sprint 2
-    Lending, Payment & Communication :s2, after s1, 21d
+    section Month 2
+    Sprint 2: Lending, Payment & Communication :s2, after s1, 21d
+    Sprint 2 Submission                       :milestone, 2026-02-17, 0d
 
-    section Sprint 3
-    AI/ML Security, Testing & Finalization :s3, after s2, 14d
-
-    section Milestones
-    Smart Contracts Deployed         :milestone, 2026-01-27, 0d
-    Lending Flow Complete            :milestone, 2026-02-17, 0d
-    Demo Ready                       :milestone, 2026-03-02, 0d
+    section Month 3
+    Sprint 3: AI/ML Security, Testing & Finalization :s3, after s2, 14d
+    Demo Ready                                :milestone, 2026-03-02, 0d
 ```
 
 ### 2.2 Sprint Breakdown
@@ -69,126 +67,31 @@ gantt
 
 ### 3.1 Sprint Backlog
 
-#### Epic 1: Smart Contract Development
-**Story Points:** 21
+#### Epic 1: Smart Contract Development (21 pts)
 
-**User Stories:**
+| ID | Story | Pts |
+|----|-------|-----|
+| US-1.1 | World Bank contract — reserve management, national bank registration | 5 |
+| US-1.2 | National Bank contract — borrow from WB, lend to Local Banks | 5 |
+| US-1.3 | Local Bank contract — borrow from NB, lend to users | 5 |
+| US-1.4 | Role-based access control — WB/NB/LB Admin, Bank User, Borrower | 3 |
+| US-1.5 | Gas cost management — initiator pays; Polygon low-fee ($0.001–0.01/tx) | 3 |
 
-1. **US-1.1: World Bank Smart Contract**
-   - **As a** system administrator  
-   - **I want** a smart contract for the Crypto World Bank  
-   - **So that** I can manage the global reserve and national bank relationships
-   - **Acceptance Criteria:**
-     - Contract deployed on testnet
-     - Functions: depositToReserve, getTotalReserve
-     - Events: ReserveDeposited
-     - **Story Points:** 5
+#### Epic 2: Frontend Foundation (13 pts)
 
-2. **US-1.2: National Bank Smart Contract**
-   - **As a** national bank administrator  
-   - **I want** a smart contract for national banks  
-   - **So that** I can borrow from World Bank and lend to Local Banks
-   - **Acceptance Criteria:**
-     - Contract with borrowing/lending functions
-     - Relationship with World Bank contract
-     - **Story Points:** 5
+| ID | Story | Pts |
+|----|-------|-----|
+| US-1.6 | Wallet connection — MetaMask, WalletConnect, Sepolia/Mumbai | 3 |
+| US-1.7 | Dashboard UI — Material Design 3, responsive, blockchain-themed | 5 |
+| US-1.8 | Navigation & layout — AppBar, role-based menu | 3 |
+| US-1.9 | Blockchain visual elements — tx hash, security badges | 2 |
 
-3. **US-1.3: Local Bank Smart Contract**
-   - **As a** local bank administrator  
-   - **I want** a smart contract for local banks  
-   - **So that** I can borrow from National Banks and lend to users
-   - **Acceptance Criteria:**
-     - Contract with borrowing/lending functions
-     - Relationship with National Bank contract
-     - **Story Points:** 5
+#### Epic 3: Database Schema (8 pts)
 
-4. **US-1.4: Role-Based Access Control**
-   - **As a** system administrator  
-   - **I want** role-based access control in smart contracts  
-   - **So that** only authorized users can perform specific actions
-   - **Acceptance Criteria:**
-     - Roles: World Bank Admin, National Bank Admin, Local Bank Admin, Bank User, Borrower
-     - Modifiers for each role
-     - **Story Points:** 3
-
-5. **US-1.5: Gas Cost Management**
-   - **As a** borrower  
-   - **I want** gas costs deducted from my loan amount  
-   - **So that** I understand the true cost of borrowing
-   - **Acceptance Criteria:**
-     - Gas estimation displayed before transaction confirmation
-     - Gas fees borne by transaction initiator (borrower for loan requests, approver for approvals)
-     - Polygon PoS low-fee environment ($0.001-$0.01 per tx) for retail viability
-     - **Story Points:** 3
-
-#### Epic 2: Frontend Foundation
-**Story Points:** 13
-
-**User Stories:**
-
-6. **US-1.6: Wallet Connection**
-   - **As a** user  
-   - **I want** to connect my MetaMask or WalletConnect wallet  
-   - **So that** I can interact with the platform
-   - **Acceptance Criteria:**
-     - MetaMask integration
-     - WalletConnect support
-     - Network switching (Sepolia/Mumbai)
-     - **Story Points:** 3
-
-7. **US-1.7: Dashboard UI**
-   - **As a** user  
-   - **I want** a dashboard showing my account overview  
-   - **So that** I can see my balance and activity
-   - **Acceptance Criteria:**
-     - Material Design 3 UI
-     - Responsive layout
-     - Blockchain-themed visual elements
-     - **Story Points:** 5
-
-8. **US-1.8: Navigation & Layout**
-   - **As a** user  
-   - **I want** intuitive navigation  
-   - **So that** I can access all features easily
-   - **Acceptance Criteria:**
-     - AppBar with wallet connection
-     - Bottom navigation for mobile
-     - Role-based menu items
-     - **Story Points:** 3
-
-9. **US-1.9: Blockchain Visual Elements**
-   - **As a** user  
-   - **I want** visual reminders that this is blockchain technology  
-   - **So that** I understand the security and transparency
-   - **Acceptance Criteria:**
-     - Blockchain-themed animations
-     - Transaction hash displays
-     - Security badges
-     - **Story Points:** 2
-
-#### Epic 3: Database Schema
-**Story Points:** 8
-
-**User Stories:**
-
-10. **US-1.10: Database Design**
-    - **As a** developer  
-    - **I want** a complete database schema  
-    - **So that** I can store all system data
-    - **Acceptance Criteria:**
-      - All tables defined (see CSE370 documentation)
-      - Relationships established
-      - Indexes created
-      - **Story Points:** 5
-
-11. **US-1.11: Database Migration Scripts**
-    - **As a** developer  
-    - **I want** database migration scripts  
-    - **So that** I can deploy the database easily
-    - **Acceptance Criteria:**
-      - Migration scripts for all tables
-      - Seed data for testing
-      - **Story Points:** 3
+| ID | Story | Pts |
+|----|-------|-----|
+| US-1.10 | Database design — 15 tables, 3NF (see CSE370) | 5 |
+| US-1.11 | Migration scripts and seed data | 3 |
 
 ### 3.2 Sprint 1 Burndown
 
@@ -229,158 +132,43 @@ xychart-beta
 
 ### 4.1 Sprint Backlog
 
-#### Epic 4: Loan Management
-**Story Points:** 21
+#### Epic 4: Loan Management (21 pts)
 
-**User Stories:**
+| ID | Story | Pts |
+|----|-------|-----|
+| US-2.1 | Loan request — form, one per bank, on-chain storage | 5 |
+| US-2.2 | Loan approval/rejection — pending view, approver per bank | 5 |
+| US-2.3 | Income verification — file upload, document storage | 5 |
+| US-2.4 | Borrowing limit — 6mo/1yr calc, 3+ paid exception | 5 |
+| US-2.5 | Loan request visibility — hide after approval | 1 |
 
-12. **US-2.1: Loan Request System**
-    - **As a** borrower  
-    - **I want** to request a loan from a local bank  
-    - **So that** I can borrow money
-    - **Acceptance Criteria:**
-      - Request form with amount and purpose
-      - One request per bank per user
-      - Request stored on blockchain
-      - **Story Points:** 5
+#### Epic 5: Installment Payment (13 pts)
 
-13. **US-2.2: Loan Approval/Rejection**
-    - **As a** bank user  
-    - **I want** to approve or reject loan requests  
-    - **So that** I can manage lending
-    - **Acceptance Criteria:**
-      - View pending requests
-      - Approve/reject functionality
-      - Only one approver per bank
-      - **Story Points:** 5
+| ID | Story | Pts |
+|----|-------|-----|
+| US-2.6 | Installment logic — auto setup for ≥100 ETH, configurable count | 5 |
+| US-2.7 | Installment UI — list, pay button, confirmation | 5 |
+| US-2.8 | Deadline tracking — display, overdue warnings | 3 |
 
-14. **US-2.3: First-Time Borrower Verification**
-    - **As a** bank user  
-    - **I want** to review income proof documents  
-    - **So that** I can verify first-time borrowers
-    - **Acceptance Criteria:**
-      - File upload for income proof
-      - Document storage (IPFS or encrypted)
-      - Approval/rejection workflow
-      - **Story Points:** 5
+#### Epic 6: Chat System (13 pts)
 
-15. **US-2.4: Borrowing Limit Calculation**
-    - **As a** system  
-    - **I want** to calculate borrowing limits  
-    - **So that** users cannot exceed their limits
-    - **Acceptance Criteria:**
-      - 6-month and 1-year limit calculations
-      - Transaction history tracking
-      - Exception for 3+ consecutive paid loans
-      - **Story Points:** 5
+| ID | Story | Pts |
+|----|-------|-----|
+| US-2.9 | Borrower–bank chat — real-time, history, read/unread | 8 |
+| US-2.10 | Chat notifications — in-app, unread count | 5 |
 
-16. **US-2.5: Loan Request Visibility**
-    - **As a** borrower  
-    - **I want** my loan requests to disappear after approval  
-    - **So that** I don't see duplicate requests
-    - **Acceptance Criteria:**
-      - Requests hidden after approval
-      - Request list in borrower profile
-      - **Story Points:** 1
+#### Epic 7: Profile Management (8 pts)
 
-#### Epic 5: Installment Payment System
-**Story Points:** 13
+| ID | Story | Pts |
+|----|-------|-----|
+| US-2.11 | Profile pages — all user types, role-specific | 5 |
+| US-2.12 | Terms and conditions — view, acceptance tracking | 3 |
 
-**User Stories:**
+#### Epic 7b: QR Code System (3 pts)
 
-17. **US-2.6: Installment Payment Logic**
-    - **As a** borrower  
-    - **I want** to pay loans in installments if amount >= 100 ETH  
-    - **So that** I can manage large loans
-    - **Acceptance Criteria:**
-      - Automatic installment setup for >= 100 ETH
-      - Configurable number of installments
-      - Payment schedule generation
-      - **Story Points:** 5
-
-18. **US-2.7: Installment Payment Interface**
-    - **As a** borrower  
-    - **I want** to see and pay installments  
-    - **So that** I can track my payments
-    - **Acceptance Criteria:**
-      - Installment list in dashboard
-      - Pay installment button
-      - Payment confirmation
-      - **Story Points:** 5
-
-19. **US-2.8: Deadline Tracking**
-    - **As a** borrower  
-    - **I want** to see payment deadlines  
-    - **So that** I know when payments are due
-    - **Acceptance Criteria:**
-      - Deadline display in dashboard
-      - Overdue warnings
-      - Countdown timer
-      - **Story Points:** 3
-
-#### Epic 6: Chat System
-**Story Points:** 13
-
-**User Stories:**
-
-20. **US-2.9: Borrower-Bank Chat**
-    - **As a** borrower  
-    - **I want** to chat with the bank about my loan  
-    - **So that** I can ask questions
-    - **Acceptance Criteria:**
-      - Real-time chat interface
-      - Message history
-      - Read/unread status
-      - **Story Points:** 8
-
-21. **US-2.10: Chat Notifications**
-    - **As a** user  
-    - **I want** notifications for new messages  
-    - **So that** I don't miss important communications
-    - **Acceptance Criteria:**
-      - Push notifications (optional)
-      - In-app notifications
-      - Unread message count
-      - **Story Points:** 5
-
-#### Epic 7: Profile Management
-**Story Points:** 8
-
-**User Stories:**
-
-22. **US-2.11: User Profile Pages**
-    - **As a** user  
-    - **I want** a dedicated profile section  
-    - **So that** I can manage my account
-    - **Acceptance Criteria:**
-      - Profile pages for all user types
-      - Role-specific features
-      - Terms and conditions page
-      - **Story Points:** 5
-
-23. **US-2.12: Terms and Conditions**
-    - **As a** user  
-    - **I want** to view terms and conditions  
-    - **So that** I understand the platform rules
-    - **Acceptance Criteria:**
-      - Terms page in profile
-      - Acceptance tracking
-      - Version control
-      - **Story Points:** 3
-
-#### Epic 7b: QR Code System
-**Story Points:** 3
-
-**User Stories:**
-
-24. **US-2.13: QR Code Generation & Scanning**
-    - **As a** user  
-    - **I want** to generate and scan QR codes for wallet addresses and loan pages  
-    - **So that** I can quickly share and access information
-    - **Acceptance Criteria:**
-      - Generate QR for wallet address, loan page URL, or contract address
-      - Scan/paste QR content with type-based action (view address, navigate, display raw)
-      - **Story Points:** 3
+| ID | Story | Pts |
+|----|-------|-----|
+| US-2.13 | QR generation & scan — wallet, loan URL, contract address | 3 |
 
 ### 4.2 Sprint 2 Burndown
 
@@ -422,142 +210,37 @@ xychart-beta
 
 ### 5.1 Sprint Backlog
 
-#### Epic 8: Market Data Visualization
-**Story Points:** 8
+#### Epic 8: Market Data Visualization (8 pts)
 
-**User Stories:**
+| ID | Story | Pts |
+|----|-------|-----|
+| US-3.1 | Market data API — CoinGecko/CoinMarketCap, caching | 3 |
+| US-3.2 | Market value graph — Chart.js/Recharts, live + historical | 5 |
 
-25. **US-3.1: Cryptocurrency Market Data API**
-    - **As a** developer  
-    - **I want** to fetch live cryptocurrency prices  
-    - **So that** users can see market data
-    - **Acceptance Criteria:**
-      - Integration with CoinGecko/CoinMarketCap API
-      - Real-time price updates
-      - Data caching
-      - **Story Points:** 3
+#### Epic 9: AI Chatbot (13 pts)
 
-26. **US-3.2: Market Value Graph**
-    - **As a** borrower  
-    - **I want** to see a graph of cryptocurrency prices  
-    - **So that** I can track market trends
-    - **Acceptance Criteria:**
-      - Interactive graph (Chart.js/Recharts)
-      - Live updates
-      - Historical data display
-      - **Story Points:** 5
+| ID | Story | Pts |
+|----|-------|-----|
+| US-3.3 | Chatbot integration — NLP, context-aware responses | 5 |
+| US-3.4 | Chatbot training — dataset, intent recognition | 5 |
+| US-3.5 | Chatbot features — loan limit, payment, bank contact queries | 3 |
 
-#### Epic 9: AI Chatbot
-**Story Points:** 13
+#### Epic 10: AI/ML Security Layer (21 pts)
 
-**User Stories:**
+| ID | Story | Pts |
+|----|-------|-----|
+| US-3.6 | ML data collection — transaction logging, feature extraction | 5 |
+| US-3.7 | Fraud detection model — risk scoring, loan approval integration | 8 |
+| US-3.8 | Anomaly detection — alerts, dashboard | 5 |
+| US-3.9 | Security logging — event tracking, bank dashboard | 3 |
 
-27. **US-3.3: AI Chatbot Integration**
-    - **As a** user  
-    - **I want** to ask an AI chatbot questions  
-    - **So that** I can get instant help
-    - **Acceptance Criteria:**
-      - Chatbot interface
-      - Natural language processing
-      - Context-aware responses
-      - **Story Points:** 5
+#### Epic 11: Testing & QA (13 pts)
 
-28. **US-3.4: Chatbot Training Data**
-    - **As a** developer  
-    - **I want** to train the chatbot  
-    - **So that** it can answer common questions
-    - **Acceptance Criteria:**
-      - Training dataset
-      - Intent recognition
-      - Response generation
-      - **Story Points:** 5
-
-29. **US-3.5: Chatbot Features**
-    - **As a** user  
-    - **I want** the chatbot to answer questions about loan limits and payments  
-    - **So that** I can get quick information
-    - **Acceptance Criteria:**
-      - "What is my loan limit?" query
-      - "How much do I owe this month?" query
-      - "Which bank should I contact?" query
-      - **Story Points:** 3
-
-#### Epic 10: AI/ML Security Layer
-**Story Points:** 21
-
-**User Stories:**
-
-30. **US-3.6: Data Collection for ML**
-    - **As a** developer  
-    - **I want** to collect transaction data  
-    - **So that** ML models can be trained
-    - **Acceptance Criteria:**
-      - Transaction logging
-      - Feature extraction
-      - Data pipeline
-      - **Story Points:** 5
-
-31. **US-3.7: Fraud Detection Model**
-    - **As a** system  
-    - **I want** to detect fraudulent loan requests  
-    - **So that** I can protect the platform
-    - **Acceptance Criteria:**
-      - ML model for fraud detection
-      - Risk scoring
-      - Integration with loan approval
-      - **Story Points:** 8
-
-32. **US-3.8: Anomaly Detection**
-    - **As a** system  
-    - **I want** to detect anomalous transactions  
-    - **So that** I can identify suspicious activity
-    - **Acceptance Criteria:**
-      - Anomaly detection algorithm
-      - Alert system
-      - Dashboard visualization
-      - **Story Points:** 5
-
-33. **US-3.9: Security Logging**
-    - **As a** developer  
-    - **I want** to log all security events  
-    - **So that** I can monitor and improve security
-    - **Acceptance Criteria:**
-      - Security log table
-      - Event tracking
-      - Dashboard for bank users
-      - **Story Points:** 3
-
-#### Epic 11: Testing & Quality Assurance
-**Story Points:** 13
-
-**User Stories:**
-
-34. **US-3.10: Unit Testing**
-    - **As a** developer  
-    - **I want** unit tests for all smart contracts  
-    - **So that** I can ensure code quality
-    - **Acceptance Criteria:**
-      - Test coverage > 80%
-      - All critical functions tested
-      - **Story Points:** 5
-
-35. **US-3.11: Integration Testing**
-    - **As a** developer  
-    - **I want** integration tests  
-    - **So that** I can verify system components work together
-    - **Acceptance Criteria:**
-      - End-to-end test scenarios
-      - API integration tests
-      - **Story Points:** 5
-
-36. **US-3.12: Security Testing**
-    - **As a** developer  
-    - **I want** security audits  
-    - **So that** I can identify vulnerabilities
-    - **Acceptance Criteria:**
-      - Smart contract audit
-      - Penetration testing
-      - **Story Points:** 3
+| ID | Story | Pts |
+|----|-------|-----|
+| US-3.10 | Unit testing — smart contracts, >80% coverage | 5 |
+| US-3.11 | Integration testing — E2E, API tests | 5 |
+| US-3.12 | Security testing — contract audit, penetration testing | 3 |
 
 ### 5.2 Sprint 3 Burndown
 
@@ -703,7 +386,7 @@ flowchart LR
 
 ### 6.1 Product Backlog
 
-The complete product backlog includes all user stories from all sprints, plus additional items for future releases:
+The complete product backlog includes the condensed user stories (US-1.1 through US-3.12) from sections 3–5, plus additional items for future releases:
 
 **Future Features (Post-MVP):**
 - Multi-cryptocurrency support

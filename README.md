@@ -1,266 +1,250 @@
-# Crypto World Bank - Sprint 1 Implementation
+<p align="center">
+  <img src="Documentation/bracu_logo_12-0-2022.png" alt="BRAC University" width="120" />
+</p>
 
-A decentralized lending platform built on blockchain technology with a hierarchical banking structure (World Bank → National Banks → Local Banks → Users).
+<h1 align="center">Decentralized Crypto World Bank</h1>
+<p align="center">
+  <strong>A Blockchain-Based Hierarchical Lending Platform with AI-Enhanced Security</strong>
+</p>
 
-## 🏗️ Project Structure
+<p align="center">
+  <a href="#-overview">Overview</a> •
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-demo">Demo</a> •
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-documentation">Documentation</a>
+</p>
+
+---
+
+## 📋 Overview
+
+**Crypto World Bank** is a prototype decentralized application (DApp) that implements a **four-tier hierarchical lending architecture** on an Ethereum Virtual Machine (EVM)–compatible blockchain. The system models capital flows across institutional tiers—mirroring traditional development finance—while enabling shared ledger visibility, programmable enforcement, and AI-augmented risk assessment.
+
+### 🎯 Project Goals
+
+| Goal | Description |
+|------|-------------|
+| **Hierarchical Lending** | Design and implement a four-tier architecture (World Bank → National Bank → Local Bank → Borrower) on EVM-compatible blockchains |
+| **Transparency** | Enable auditable, tamper-evident capital flows with role-based access control enforced by smart contracts |
+| **AI/ML Security** | Integrate fraud detection (Random Forest), anomaly identification (Isolation Forest), and explainable risk assessment (SHAP) |
+| **Financial Inclusion** | Target underserved populations in developing economies with transparent, programmable lending |
+
+### 🏛️ Four-Tier Hierarchy
 
 ```
-Cryto-World-Bank/
-├── contracts/              # Smart contracts (Solidity)
-│   ├── WorldBankReserve.sol
-│   ├── NationalBank.sol
-│   └── LocalBank.sol
-├── backend/               # Backend API (Node.js/Express)
-│   ├── src/
-│   │   ├── server.js
-│   │   ├── database/
-│   │   │   ├── connection.js
-│   │   │   ├── schema.sql
-│   │   │   └── migrate.js
-│   │   └── routes/
-│   │       ├── users.js
-│   │       ├── banks.js
-│   │       ├── loans.js
-│   │       └── transactions.js
-│   └── package.json
-├── frontend/              # Frontend (React/TypeScript)
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   └── config/
-│   └── package.json
-└── Documentation/         # Project documentation
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   World Bank    │────▶│ National Banks  │────▶│  Local Banks    │────▶│    Borrowers    │
+│ (Global Reserve)│     │ (Regional)      │     │ (Retail)        │     │ (End Users)     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+         │                        │                        │                        │
+    Lends at 3% APR         Lends at 5% APR          Lends at 8% APR         Repays with interest
 ```
+
+- **Tier 1 — World Bank:** Maintains global crypto reserve; allocates capital to National Banks
+- **Tier 2 — National Banks:** Borrow from World Bank; lend to Local Banks within jurisdiction
+- **Tier 3 — Local Banks:** Process loan requests; employ approvers for loan lifecycle
+- **Tier 4 — Borrowers:** Submit loan requests; repay via configurable installments; build on-chain credit history
+
+---
+
+## 🏗️ Architecture
+
+The system employs a **three-layer decentralized application architecture**:
+
+![Component Diagram](Documentation/Diagrams/CSE471/Component Diagram.png)
+
+| Layer | Technologies | Key Components |
+|-------|--------------|-----------------|
+| **Presentation** | React 18, TypeScript, Material-UI, Wagmi, RainbowKit | Dashboard, Loan Module, Admin Panel, Risk AI, Chat, Profile |
+| **Smart Contract** | Solidity 0.8.20, OpenZeppelin, EVM (Polygon/Ethereum) | WorldBankReserve, NationalBank, LocalBank |
+| **Off-Chain Services** | Node.js/Express, MongoDB | REST API, Event Listener, AI/ML Analytics (planned) |
+
+### Key Flows
+
+| Flow | Diagram |
+|------|---------|
+| Loan Request → AI Risk Check → Approval | [Sequence Diagram 1](Documentation/Diagrams/CSE471/Sequence%20Diagram%201%20Loan%20Request%2C%20AI%20Risk%20Check%2C%20and%20Approval%20Decision.png) |
+| Hierarchical Banking (WB → NB → LB → Borrower) | [Sequence Diagram 6](Documentation/Diagrams/CSE471/Sequence%20Diagram%206%20Hierarchical%20Banking%20(World%20Bank%20→%20National%20Bank%20→%20Local%20Bank%20→%20Borrower).png) |
+| Installment Payment Loop | [Sequence Diagram 2](Documentation/Diagrams/CSE471/Sequence%20Diagram%202%20%20Installment%20Payment%20Loop.png) |
+| Data Flow (Context) | [Dataflow Diagram Level 0](Documentation/Diagrams/CSE471/Dataflow%20Diagram%20(Context%20Diagram%20Level%20-%200).png) |
+
+---
+
+## 🎬 Demo
+
+### Implemented Features
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| **Wallet Connection** | ✅ | MetaMask / WalletConnect via RainbowKit |
+| **Dashboard** | ✅ | Account overview, reserve stats |
+| **Deposit to Reserve** | ✅ | On-chain reserve contributions |
+| **Hierarchical Bank Registration** | ✅ | World Bank → National → Local |
+| **Loan Request & Approval** | ✅ | Request, approve, reject workflow |
+| **Installment Payments** | ✅ | Configurable repayment schedules |
+| **Borrowing Limits** | ✅ | Rolling 6-month / 1-year windows |
+| **Chat System** | ✅ | Borrower–bank communication |
+| **Income Verification** | ✅ | Document upload and verification |
+| **AI/ML Fraud Detection** | 🔄 | Random Forest + SHAP (in progress) |
+| **Risk Dashboard** | 🔄 | AI risk scores (in progress) |
+
+### Use Case Overview
+
+![Use Case Diagram](Documentation/Diagrams/CSE471/Usecase diagram.png)
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- MySQL 8.0+
-- MetaMask browser extension
-- Hardhat (for smart contract development)
+- **Node.js** 18+
+- **MetaMask** browser extension
+- **Hardhat** (for smart contract development)
+- **MongoDB** (local or Atlas)
 
-### 1. Database Setup
+### 1. Clone & Install
 
 ```bash
-# Create MySQL database
-mysql -u root -p
-CREATE DATABASE crypto_world_bank;
-exit
+git clone https://github.com/Yuvraajrahman/Cryto-World-Bank.git
+cd Cryto-World-Bank
 
-# Navigate to backend
-cd backend
-
-# Install dependencies
+# Install root dependencies (Hardhat, OpenZeppelin)
 npm install
 
-# Create .env file
+# Install frontend
+cd frontend && npm install && cd ..
+
+# Install backend
+cd backend && npm install && cd ..
+```
+
+### 2. Environment Setup
+
+```bash
+# Root .env (for Hardhat)
 cp .env.example .env
-# Edit .env with your database credentials
+# Add: PRIVATE_KEY, MUMBAI_RPC_URL or SEPOLIA_RPC_URL
 
-# Run migrations
-npm run migrate
-```
-
-### 2. Backend Setup
-
-```bash
+# Backend .env
 cd backend
+cp .env.example .env
+# Add: MONGODB_URI, PORT
 
-# Install dependencies (if not done)
-npm install
-
-# Start development server
-npm run dev
-# Server runs on http://localhost:3001
+# Frontend .env
+cd ../frontend
+echo "VITE_API_URL=http://localhost:3001/api" > .env
+echo "VITE_CONTRACT_ADDRESS=0xYourDeployedAddress" >> .env
+echo "VITE_WALLETCONNECT_PROJECT_ID=your-project-id" >> .env
 ```
 
-### 3. Smart Contracts Setup
+### 3. Smart Contracts
 
 ```bash
-# Install dependencies
-npm install
-
-# Compile contracts
+# Compile
 npm run compile
 
-# Deploy to testnet (Mumbai or Sepolia)
-# Update .env with your private key and RPC URLs
-npm run deploy:mumbai
-# or
-npm run deploy:sepolia
-
-# Copy ABI to frontend
-npm run copy-abi
-```
-
-### 4. Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Create .env file
-echo "VITE_API_URL=http://localhost:3001/api" > .env
-echo "VITE_CONTRACT_ADDRESS=0xYourDeployedContractAddress" >> .env
-echo "VITE_WALLETCONNECT_PROJECT_ID=your-project-id" >> .env
-
-# Start development server
-npm run dev
-# Frontend runs on http://localhost:5173
-```
-
-## 🔐 MetaMask Configuration for 2 Accounts
-
-### Account 1: World Bank Admin / Bank User
-
-1. Open MetaMask
-2. Create or import account (Account 1)
-3. Add testnet network:
-   - **Mumbai Testnet:**
-     - Network Name: Mumbai Testnet
-     - RPC URL: https://rpc-mumbai.maticvigil.com/
-     - Chain ID: 80001
-     - Currency Symbol: MATIC
-   - **Sepolia Testnet:**
-     - Network Name: Sepolia
-     - RPC URL: https://sepolia.infura.io/v3/YOUR_INFURA_KEY
-     - Chain ID: 11155111
-     - Currency Symbol: ETH
-4. Get test tokens from faucets:
-   - Mumbai: https://faucet.polygon.technology/
-   - Sepolia: https://sepoliafaucet.com/
-
-### Account 2: Borrower
-
-1. In MetaMask, click account icon → Create Account (Account 2)
-2. Switch to the same testnet network
-3. Get test tokens for this account too
-
-### Using Both Accounts
-
-- Switch between accounts in MetaMask using the account dropdown
-- Account 1 can be used as World Bank admin or bank user
-- Account 2 can be used as a borrower
-- Both accounts can interact with the same deployed contracts
-
-## 📋 Sprint 1 Features Completed
-
-### ✅ Smart Contracts
-- [x] World Bank Reserve contract with hierarchical structure
-- [x] National Bank contract
-- [x] Local Bank contract
-- [x] Role-based access control
-- [x] Deposit and lending functions
-
-### ✅ Backend
-- [x] Express.js server setup
-- [x] MySQL database schema (all 15 tables)
-- [x] Database migration scripts
-- [x] REST API endpoints:
-  - User registration and management
-  - Bank management (World, National, Local)
-  - Loan request and approval
-  - Transaction tracking
-
-### ✅ Frontend
-- [x] Wallet connection (MetaMask/WalletConnect)
-- [x] Dashboard UI with blockchain elements
-- [x] Navigation and layout
-- [x] User registration flow
-- [x] Account overview
-
-## 🔌 API Endpoints
-
-### Users
-- `GET /api/users/:walletAddress` - Get user by wallet
-- `POST /api/users/borrower` - Register borrower
-- `POST /api/users/bank-user` - Register bank user
-
-### Banks
-- `GET /api/banks/world` - Get World Bank info
-- `GET /api/banks/national` - Get all national banks
-- `GET /api/banks/local` - Get all local banks
-- `POST /api/banks/national` - Register national bank
-- `POST /api/banks/local` - Register local bank
-
-### Loans
-- `GET /api/loans/borrower/:walletAddress` - Get borrower loans
-- `GET /api/loans/pending/:localBankId` - Get pending loans
-- `POST /api/loans/request` - Create loan request
-- `POST /api/loans/approve/:loanId` - Approve loan
-- `POST /api/loans/reject/:loanId` - Reject loan
-
-### Transactions
-- `GET /api/transactions/borrower/:walletAddress` - Get transactions
-- `GET /api/transactions/limits/:walletAddress` - Get borrowing limits
-
-## 🧪 Testing
-
-### Test Smart Contracts
-```bash
+# Run tests
 npm test
+
+# Deploy to testnet
+npm run deploy:mumbai   # or deploy:sepolia
+
+# Update frontend/src/config/contracts.ts with deployed addresses
 ```
 
-### Test Backend API
+### 4. Run Application
+
 ```bash
-cd backend
-# Use Postman or curl to test endpoints
-curl http://localhost:3001/api/health
+# Start backend (port 3001)
+cd backend && npm run dev
+
+# Start frontend (port 5173) — in another terminal
+cd frontend && npm run dev
+
+# Or run both concurrently
+npm run dev
 ```
 
-## 📝 Environment Variables
+### 5. MetaMask Configuration
 
-### Backend (.env)
+| Network | RPC URL | Chain ID |
+|---------|---------|----------|
+| **Polygon Mumbai** | `https://rpc-mumbai.maticvigil.com/` | 80001 |
+| **Ethereum Sepolia** | `https://sepolia.infura.io/v3/YOUR_KEY` | 11155111 |
+
+**Faucets:** [Polygon Faucet](https://faucet.polygon.technology/) | [Sepolia Faucet](https://sepoliafaucet.com/)
+
+---
+
+## 📁 Project Structure
+
 ```
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=crypto_world_bank
-PORT=3001
+Cryto-World-Bank/
+├── contracts/                 # Solidity smart contracts
+│   ├── WorldBankReserve.sol
+│   ├── NationalBank.sol
+│   └── LocalBank.sol
+├── frontend/                  # React + TypeScript DApp
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   └── services/
+│   └── package.json
+├── backend/                   # Node.js + Express API
+│   ├── src/
+│   │   ├── server.js
+│   │   ├── database/
+│   │   └── routes/
+│   └── package.json
+├── Documentation/             # Whitepaper, diagrams, reports
+│   ├── WHITEPAPER_BCOLBD2025.tex
+│   ├── Diagrams/
+│   │   ├── CSE470/           # Agile, SDLC, Design Decisions
+│   │   └── CSE471/           # Use cases, sequences, dataflow
+│   └── LiteratureReviews/
+└── scripts/                  # Deployment scripts
 ```
 
-### Frontend (.env)
-```
-VITE_API_URL=http://localhost:3001/api
-VITE_CONTRACT_ADDRESS=0xYourContractAddress
-VITE_WALLETCONNECT_PROJECT_ID=your-project-id
-```
-
-### Hardhat (.env)
-```
-PRIVATE_KEY=your_private_key
-MUMBAI_RPC_URL=https://rpc-mumbai.maticvigil.com/
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
-POLYGONSCAN_API_KEY=your_key
-ETHERSCAN_API_KEY=your_key
-```
-
-## 🎯 Next Steps (Sprint 2)
-
-- Loan request and approval system
-- Installment payment functionality
-- Chat system between borrowers and banks
-- Profile management pages
-- Terms and conditions
+---
 
 ## 📚 Documentation
 
-See the `Documentation/` folder for:
-- Database schema (CSE370_DATABASE_MANAGEMENT.md)
-- Software engineering plan (CSE470_SOFTWARE_ENGINEERING.md)
-- System flows and use cases
+| Document | Description |
+|----------|-------------|
+| [**Whitepaper**](Documentation/WHITEPAPER_BCOLBD2025.tex) | Full technical whitepaper (LaTeX) for BCOLBD 2025 & thesis |
+| [**CSE470 Software Engineering**](Documentation/CSE470_SOFTWARE_ENGINEERING.md) | Agile methodology, sprints, user stories |
+| [**CSE471 System Analysis**](Documentation/COMPONENT_DIAGRAM.md) | Component, sequence, activity diagrams |
+| [**CSE370 Database**](Documentation/CSE370_DATABASE_MANAGEMENT.md) | ERD, schema, 3NF design |
+| [**Literature Reviews**](Documentation/LiteratureReviews/) | 16 peer-reviewed paper summaries |
 
-## 🤝 Contributing
+---
 
-This is a course project. Follow the sprint structure outlined in the documentation.
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Smart Contracts** | Solidity 0.8.20, OpenZeppelin (Ownable, ReentrancyGuard) |
+| **Frontend** | React 18, TypeScript, Vite, Material-UI, Wagmi, RainbowKit, Viem |
+| **Backend** | Node.js, Express, MongoDB |
+| **Blockchain** | Polygon Mumbai, Ethereum Sepolia (testnets) |
+| **AI/ML (planned)** | Python, FastAPI, scikit-learn, SHAP |
+
+---
+
+## 🎓 Academic Context
+
+- **Institution:** BRAC University, Department of Computer Science and Engineering  
+- **Project:** B.Sc. Final Year Thesis (Pre-Thesis 1)  
+- **Competition:** Blockchain Olympiad Bangladesh (BCOLBD) 2025 — AI Category  
+- **Supervisor:** Mr. Annajiat Alim Rasel  
+
+**Authors:** Md. Bokhtiar Rahman Juboraz (20301138) • Md. Mahir Ahnaf Ahmed (20301083)
+
+---
 
 ## 📄 License
 
 MIT License
-

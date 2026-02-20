@@ -7,58 +7,58 @@
 ```mermaid
 flowchart TD
     A([START]) --> B[Borrower Opens DApp]
-    B --> C["Connect Wallet<br>(MetaMask / WalletConnect)"]
+    B --> C["Connect Wallet<br>MetaMask or WalletConnect"]
     C --> D{Wallet Connected?}
-    D -- Yes --> E["Read Wallet Address and<br>Determine Role"]
-    D -- No --> F["Show Connect Wallet Error"]
+    D -->|Yes| E["Read Wallet Address and<br>Determine Role"]
+    D -->|No| F["Show Connect Wallet Error"]
     F --> END1([END])
 
     E --> G["Navigate to Loan Page<br>Enter Amount and Purpose"]
     G --> H{Is First-Time Borrower?}
-    H -- Yes --> I[Upload Income Proof Document]
+    H -->|Yes| I[Upload Income Proof Document]
     I --> J{Income Proof Approved?}
-    J -- Yes --> K["Query Borrowing Limit<br>(6-month and 1-year rolling windows)"]
-    J -- No --> L["Reject: Income Not Verified"]
+    J -->|Yes| K["Query Borrowing Limit<br>6-month and 1-year rolling windows"]
+    J -->|No| L["Reject: Income Not Verified"]
     L --> END2([END])
-    H -- No --> K
+    H -->|No| K
 
     K --> M{Amount Within Borrowing Limit?}
-    M -- Yes --> N["Prepare Transaction<br>requestLoan(amount, purpose)"]
-    M -- No --> O["Reject: Limit Exceeded"]
+    M -->|Yes| N["Prepare Transaction<br>requestLoan amount, purpose"]
+    M -->|No| O["Reject: Limit Exceeded"]
     O --> END3([END])
 
     N --> P["MetaMask Prompts User<br>Display Gas Estimate"]
     P --> Q{User Confirms Transaction?}
-    Q -- Yes --> R["Sign and Broadcast Transaction<br>to Polygon Network"]
-    Q -- No --> S[Transaction Cancelled]
+    Q -->|Yes| R["Sign and Broadcast Transaction<br>to Polygon Network"]
+    Q -->|No| S[Transaction Cancelled]
     S --> END4([END])
 
-    R --> T["Smart Contract Validates and Executes:<br>- Check amount is positive<br>- Check purpose is not empty<br>- Check reserve balance<br>- Create Loan struct<br>- Emit LoanRequested"]
+    R --> T["Smart Contract Validates and Executes<br>Check amount positive, purpose not empty<br>Check reserve balance, Create Loan struct<br>Emit LoanRequested"]
     T --> U{Transaction Successful?}
-    U -- No --> V["Show Error: Tx Failed"]
+    U -->|No| V["Show Error: Tx Failed"]
     V --> END5([END])
-    U -- Yes --> W["Display Success:<br>Loan Requested — Show Tx Hash"]
-    W --> X["Event Listener Detects<br>LoanRequested Event<br>→ Store in Database<br>→ Trigger AI/ML Risk Assessment"]
+    U -->|Yes| W["Display Success<br>Loan Requested, Show Tx Hash"]
+    W --> X["Event Listener Detects LoanRequested Event<br>Store in Database<br>Trigger AI/ML Risk Assessment"]
 
     subgraph APPROVER["Bank Approver Swimlane"]
         Y["View Pending Loans<br>with AI Risk Scores<br>and SHAP Explanations"]
         Y --> Z{Approve or Reject?}
-        Z -- Reject --> AA["Sign rejectLoan()<br>Record Reason<br>Notify Borrower"]
+        Z -->|Reject| AA["Sign rejectLoan<br>Record Reason<br>Notify Borrower"]
         AA --> END6([END])
-        Z -- Approve --> AB["Sign approveLoan()<br>via Approver Wallet"]
-        AB --> AC["Smart Contract:<br>- Verify approver role<br>- Verify loan pending<br>- Verify balance<br>- Transfer ETH to borrower wallet<br>- Emit LoanApproved"]
+        Z -->|Approve| AB["Sign approveLoan<br>via Approver Wallet"]
+        AB --> AC["Smart Contract<br>Verify approver role, loan pending<br>Verify balance, Transfer ETH to borrower<br>Emit LoanApproved"]
     end
     X --> Y
 
     AC --> AD{"Loan Amount at least 100 ETH?"}
-    AD -- Yes --> AE["Generate Installment Plan<br>(N installments with due dates)"]
-    AD -- No --> AF[Single Payment Due by Deadline]
+    AD -->|Yes| AE["Generate Installment Plan<br>N installments with due dates"]
+    AD -->|No| AF[Single Payment Due by Deadline]
     AE --> AG["Borrower Receives Funds in Wallet<br>Update Borrowing Limit<br>Update Transaction Log"]
     AF --> AG
     AG --> AH{Installment Due?}
-    AH -- Yes --> AI["Pay Installment<br>via payInstallment — Sign tx"]
+    AH -->|Yes| AI["Pay Installment<br>via payInstallment, Sign tx"]
     AI --> AH
-    AH -- Paid All --> AJ["Loan Completed<br>Update consecutive paid loans count"]
+    AH -->|Paid All| AJ["Loan Completed<br>Update consecutive paid loans count"]
     AJ --> END7([END])
 ```
 
@@ -68,25 +68,25 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A([START]) --> B["Borrower Registers /<br>Logs into DApp"]
+    A([START]) --> B["Borrower Registers or<br>Logs into DApp"]
     B --> C{Is First-Time Borrower?}
-    C -- Yes --> D["Prompt: Upload Income Proof<br>(PDF / Image)"]
-    C -- No --> E["Income Already Verified<br>Proceed to Loan Page"]
+    C -->|Yes| D["Prompt: Upload Income Proof<br>PDF or Image"]
+    C -->|No| E["Income Already Verified<br>Proceed to Loan Page"]
     D --> F["Borrower Selects<br>File and Uploads"]
-    F --> G["Server Receives File — Validate:<br>- File type (PDF/IMG)<br>- File size under 5 MB<br>- Not corrupted"]
+    F --> G["Server Receives File, Validate<br>File type PDF or IMG<br>File size under 5 MB<br>Not corrupted"]
     G --> H{File Valid?}
-    H -- Yes --> I["Store File on Server<br>Link to Borrower Record<br>Set Status: PENDING"]
-    H -- No --> J["Return Error:<br>Invalid file type or size exceeded"]
+    H -->|Yes| I["Store File on Server<br>Link to Borrower Record<br>Set Status: PENDING"]
+    H -->|No| J["Return Error:<br>Invalid file type or size exceeded"]
     J --> K[Borrower Re-uploads File]
-    K -. retry .-> F
+    K -.->|retry| F
 
     subgraph APPROVER["Bank Approver Swimlane"]
         L["Bank Approver Views<br>Pending Income Proofs<br>in Admin Dashboard"]
-        L --> M["Review Document:<br>- Check authenticity<br>- Verify income amount<br>- Cross-reference data"]
+        L --> M["Review Document<br>Check authenticity<br>Verify income amount<br>Cross-reference data"]
         M --> N{Approve or Reject?}
-        N -- Reject --> O["Set Status: REJECTED<br>Record Rejection Reason<br>Notify Borrower"]
+        N -->|Reject| O["Set Status: REJECTED<br>Record Rejection Reason<br>Notify Borrower"]
         O --> END1([END])
-        N -- Approve --> P["Set Status: APPROVED<br>Update Borrower Record:<br>incomeVerified = true<br>Notify Borrower"]
+        N -->|Approve| P["Set Status: APPROVED<br>Update Borrower Record<br>incomeVerified true<br>Notify Borrower"]
     end
     I --> L
 
@@ -138,26 +138,26 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A([START]) --> B["User Clicks AI Help /<br>Opens Chatbot Widget"]
-    B --> C["Load User Context:<br>- Wallet address<br>- Role (Borrower/Bank)<br>- Active loans<br>- Payment history"]
-    C --> D["Display Welcome Message:<br>Hello! I am your Crypto<br>World Bank assistant.<br>How can I help you?"]
-    D --> E_input["User Types Question<br>in Chat Input"]
-    E_input --> F["NLP Pipeline Processes Input:<br>1. Tokenize Input<br>2. Remove Stop Words<br>3. Classify Intent<br>4. Extract Entities"]
+    A([START]) --> B["User Clicks AI Help or Opens Chatbot Widget"]
+    B --> C["Load User Context: Wallet, Role, Active loans, Payment history"]
+    C --> D["Display Welcome Message"]
+    D --> E1["User Types Question in Chat Input"]
+    E1 --> F["NLP Pipeline: Tokenize, Remove Stop Words, Classify Intent, Extract Entities"]
     F --> G{Intent Classification}
-    G -- loan_limit --> H["LOAN LIMIT HANDLER<br>Query:<br>- Borrowing limit left<br>- 6-month and 1-year caps<br>- Current utilization"]
-    G -- payment_due --> I_handler["PAYMENT DUE HANDLER<br>Query:<br>- Next due date<br>- Amount owed<br>- Installment breakdown<br>- Overdue penalties"]
-    G -- bank_info --> J["BANK INFO HANDLER<br>Query:<br>- Bank name<br>- Interest rate<br>- Supported currencies<br>- Contact info<br>- Operating hours"]
-    G -- general --> K["GENERAL HANDLER<br>Search FAQ and Knowledge Base<br>for best match<br>If no match:<br>I am not sure, please contact support"]
-    H --> L["Query User-Specific Data<br>from Database / Smart Contract<br>as Needed"]
-    I_handler --> L
+    G -->|loan limit| H["LOAN LIMIT HANDLER: Borrowing limit, 6m and 1y caps, Utilization"]
+    G -->|payment due| I1["PAYMENT DUE HANDLER: Next due date, Amount owed, Installment breakdown"]
+    G -->|bank info| J["BANK INFO HANDLER: Bank name, Interest rate, Currencies, Contact"]
+    G -->|general| K["GENERAL HANDLER: Search FAQ, If no match contact support"]
+    H --> L["Query Data from Database or Smart Contract"]
+    I1 --> L
     J --> L
     K --> L
-    L --> M["Format Response:<br>- Natural language text<br>- Include specific data<br>- Add action suggestions<br>(e.g., Pay Now link)"]
-    M --> N_log["Log Interaction:<br>- User ID<br>- Question text<br>- Detected intent<br>- Response given<br>- Timestamp"]
-    N_log --> O["Display Response in<br>Chatbot UI"]
-    O --> P{User Asks Another Question?}
-    P -- Yes --> E_input
-    P -- No --> END1([END])
+    L --> M["Format Response: Natural language, Include data, Add action links"]
+    M --> N1["Log Interaction: User ID, Question, Intent, Response, Timestamp"]
+    N1 --> O["Display Response in Chatbot UI"]
+    O --> P{Another Question}
+    P -->|Yes| E1
+    P -->|No| END1([END])
 ```
 
 ---
@@ -231,20 +231,20 @@ flowchart TD
 flowchart TD
     A([START]) --> B["Borrower Navigates to<br>Dashboard Page"]
     B --> C["Select an Active Loan<br>from Loan List"]
-    C --> D["Identify Crypto Type<br>Associated with Loan<br>(e.g., ETH, MATIC, BTC)"]
-    D --> E{"Cache Exists and<br>Not Stale?<br>(under 5 min old)"}
-    E -- "Yes (Fresh)" --> J["Render Price Chart:<br>- Line chart with price over time<br>- Interactive tooltips on hover<br>- Time range selector:<br>1D / 7D / 1M / 3M"]
-    E -- "No (Stale / Missing)" --> F["Fetch Live Data from<br>CoinGecko API:<br>GET /coins/id/market_chart<br>vs_currency=usd, days=30"]
+    C --> D["Identify Crypto Type<br>Associated with Loan<br>e.g. ETH, MATIC, BTC"]
+    D --> E{"Cache Exists and<br>Not Stale?<br>under 5 min old"}
+    E -->|Yes Fresh| J["Render Price Chart:<br>Line chart with price over time<br>Interactive tooltips on hover<br>Time range selector: 1D 7D 1M 3M"]
+    E -->|No Stale or Missing| F["Fetch Live Data from<br>CoinGecko API<br>GET /coins/id/market_chart<br>vs_currency=usd, days=30"]
     F --> G{API Response Successful?}
-    G -- Yes --> H["Store Response in Cache<br>with Timestamp"]
-    G -- No --> I_err["Show Error:<br>Market data currently<br>unavailable. Showing<br>last cached data."]
+    G -->|Yes| H["Store Response in Cache<br>with Timestamp"]
+    G -->|No| I_err["Show Error:<br>Market data currently<br>unavailable. Showing<br>last cached data."]
     H --> J
     I_err --> J
-    J --> K["Display Statistics:<br>- Current Price<br>- 24h Change percent<br>- 7d High / Low<br>- Market Cap<br>- Loan Value in USD"]
+    J --> K["Display Statistics:<br>Current Price<br>24h Change percent<br>7d High and Low<br>Market Cap<br>Loan Value in USD"]
     K --> L["Start Polling Timer:<br>setInterval every 5 min"]
     L --> M{User Still on Dashboard?}
-    M -- "Yes (poll: re-fetch and re-render)" --> E
-    M -- No --> N["Clear Timer / Cleanup"]
+    M -->|Yes poll re-fetch| E
+    M -->|No| N["Clear Timer and Cleanup"]
     N --> END1([END])
 ```
 
@@ -255,29 +255,29 @@ flowchart TD
 ```mermaid
 flowchart TD
     A([START]) --> B["User Navigates to<br>Profile Page"]
-    B --> C["Identify User Type:<br>Borrower / Local Bank /<br>National Bank / World Bank"]
-    C --> D["Load Profile Data from<br>Database and Smart Contract<br>(name, wallet, role,<br>stats, preferences)"]
+    B --> C["Identify User Type:<br>Borrower, Local Bank,<br>National Bank, World Bank"]
+    C --> D["Load Profile Data from<br>Database and Smart Contract<br>name, wallet, role,<br>stats, preferences"]
     D --> E_dash["Display Role-Specific<br>Profile Dashboard:<br>Borrower: loans, limit, repayment history<br>Bank: approvals, reserve, pending requests"]
     E_dash --> F{User Selects Action}
-    F -- Edit Profile --> G["Open Edit Form:<br>- Display Name<br>- Email<br>- Phone<br>- Avatar"]
-    F -- "Accept T and C" --> H["Display Full Terms and<br>Conditions Document"]
-    F -- Manage Prefs --> I_prefs["Toggle Options:<br>- Theme (Light / Dark)<br>- Email Notifs (On / Off)<br>- Push Notifs (On / Off)<br>- Language"]
-    F -- View History --> J["Identify Role and Show:<br>Borrower: Past Loans, Payment Records,<br>Income Verifications<br>Bank: Approved Loans, Rejected Loans,<br>Pending Reviews"]
+    F -->|Edit Profile| G["Open Edit Form:<br>Display Name<br>Email<br>Phone<br>Avatar"]
+    F -->|Accept T and C| H["Display Full Terms and<br>Conditions Document"]
+    F -->|Manage Prefs| I_prefs["Toggle Options:<br>Theme Light or Dark<br>Email Notifs On or Off<br>Push Notifs On or Off<br>Language"]
+    F -->|View History| J["Identify Role and Show:<br>Borrower: Past Loans, Payment Records,<br>Income Verifications<br>Bank: Approved Loans, Rejected Loans,<br>Pending Reviews"]
 
-    G --> K["Validate Input Fields:<br>- Required fields<br>- Email format<br>- Phone format"]
+    G --> K["Validate Input Fields:<br>Required fields<br>Email format<br>Phone format"]
     K --> L{Validation Passed?}
-    L -- No --> LE["Show Errors<br>Highlight Invalid Fields"]
-    LE -. back to form .-> G
-    L -- Yes --> N_save["Save Updated Profile to DB<br>Show Success Toast"]
+    L -->|No| LE["Show Errors<br>Highlight Invalid Fields"]
+    LE -.->|back to form| G
+    L -->|Yes| N_save["Save Updated Profile to DB<br>Show Success Toast"]
 
     H --> O["User Reads and Scrolls to Bottom<br>Click I Accept"]
-    O --> P["Update Database:<br>accepted_terms = true<br>accepted_date = now()"]
+    O --> P["Update Database:<br>accepted_terms = true<br>accepted_date = now"]
 
     I_prefs --> Q["Save Preferences to Database<br>Apply Theme Immediately<br>Show Success"]
 
-    J --> R["Render History Table<br>with Pagination and Filters<br>(date, status, type)"]
+    J --> R["Render History Table<br>with Pagination and Filters<br>date, status, type"]
 
-    N_save --> S["Return to Profile<br>Dashboard (Refreshed)"]
+    N_save --> S["Return to Profile<br>Dashboard Refreshed"]
     P --> S
     Q --> S
     R --> S

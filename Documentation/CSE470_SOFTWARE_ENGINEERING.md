@@ -32,14 +32,25 @@ The Crypto World Bank is a decentralized lending platform built on blockchain te
 
 ### 2.1 Overall Timeline
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                   2-MONTH DEVELOPMENT TIMELINE                  │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+gantt
+    title 2-Month Development Timeline
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b %d
 
-Week 1-3:  Sprint 1 (Foundation & Core Banking)
-Week 4-6:  Sprint 2 (Lending, Payment & Communication)
-Week 7-8:  Sprint 3 (AI/ML Security, Testing & Finalization)
+    section Sprint 1
+    Foundation & Core Banking       :s1, 2026-01-06, 21d
+
+    section Sprint 2
+    Lending, Payment & Communication :s2, after s1, 21d
+
+    section Sprint 3
+    AI/ML Security, Testing & Finalization :s3, after s2, 14d
+
+    section Milestones
+    Smart Contracts Deployed         :milestone, 2026-01-27, 0d
+    Lending Flow Complete            :milestone, 2026-02-17, 0d
+    Demo Ready                       :milestone, 2026-03-02, 0d
 ```
 
 ### 2.2 Sprint Breakdown
@@ -183,6 +194,15 @@ Week 7-8:  Sprint 3 (AI/ML Security, Testing & Finalization)
 
 **Total Story Points:** 42  
 **Team Velocity:** ~21 points per week (estimated)
+
+```mermaid
+xychart-beta
+    title "Sprint 1 Burndown Chart (42 Story Points)"
+    x-axis ["Day 1", "Day 3", "Day 5", "Day 7", "Day 10", "Day 14"]
+    y-axis "Remaining Story Points" 0 --> 45
+    line "Ideal" [42, 30, 22, 15, 7, 0]
+    line "Actual" [42, 30, 22, 15, 7, 0]
+```
 
 | Day | Planned | Completed | Remaining |
 |-----|---------|-----------|-----------|
@@ -367,6 +387,15 @@ Week 7-8:  Sprint 3 (AI/ML Security, Testing & Finalization)
 **Total Story Points:** 58  
 **Team Velocity:** ~27 points per week (estimated)
 
+```mermaid
+xychart-beta
+    title "Sprint 2 Burndown Chart (58 Story Points)"
+    x-axis ["Day 1", "Day 3", "Day 5", "Day 7", "Day 10", "Day 14"]
+    y-axis "Remaining Story Points" 0 --> 62
+    line "Ideal" [58, 40, 30, 21, 11, 0]
+    line "Actual" [58, 40, 30, 21, 11, 0]
+```
+
 | Day | Planned | Completed | Remaining |
 |-----|---------|-----------|-----------|
 | Day 1 | 0 | 0 | 58 |
@@ -535,6 +564,15 @@ Week 7-8:  Sprint 3 (AI/ML Security, Testing & Finalization)
 **Total Story Points:** 55  
 **Team Velocity:** ~27 points per week (estimated)
 
+```mermaid
+xychart-beta
+    title "Sprint 3 Burndown Chart (55 Story Points)"
+    x-axis ["Day 1", "Day 3", "Day 5", "Day 7", "Day 10", "Day 14"]
+    y-axis "Remaining Story Points" 0 --> 58
+    line "Ideal" [55, 38, 29, 20, 11, 0]
+    line "Actual" [55, 38, 29, 20, 11, 0]
+```
+
 | Day | Planned | Completed | Remaining |
 |-----|---------|-----------|-----------|
 | Day 1 | 0 | 0 | 55 |
@@ -553,6 +591,22 @@ Week 7-8:  Sprint 3 (AI/ML Security, Testing & Finalization)
 - ✅ Security audit completed
 
 ### 5.4 Integration, Testing & Deployment (Weeks 7-8)
+
+```mermaid
+flowchart LR
+    DEV["Development\n(Sprints 1-3)"] --> INT["Integration\n& Resolution"]
+    INT --> TEST["Testing\n(Hardhat, E2E,\nAI/ML eval)"]
+    TEST --> |"Pass"| DEPLOY["Deployment\n(Testnet +\nVercel + Render)"]
+    TEST --> |"Fail"| FIX["Bug Fix"] --> TEST
+    DEPLOY --> MON["Monitoring\n& Release"]
+
+    style DEV fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style INT fill:#fef3c7,stroke:#d97706,color:#1e293b
+    style TEST fill:#fce7f3,stroke:#db2777,color:#1e293b
+    style FIX fill:#fee2e2,stroke:#dc2626,color:#1e293b
+    style DEPLOY fill:#d1fae5,stroke:#059669,color:#1e293b
+    style MON fill:#d1fae5,stroke:#059669,color:#1e293b
+```
 
 These activities run in parallel with Sprint 3 development:
 
@@ -586,6 +640,62 @@ These activities run in parallel with Sprint 3 development:
 - [ ] Documentation complete
 - [ ] Production deployment successful
 - [ ] Monitoring active
+
+---
+
+## 5.5 Sprint Story Points Distribution
+
+```mermaid
+pie title Story Points Distribution Across Sprints (155 Total)
+    "Sprint 1: Foundation & Core Banking" : 42
+    "Sprint 2: Lending & Communication" : 58
+    "Sprint 3: AI/ML Security & Testing" : 55
+```
+
+```mermaid
+pie title Sprint 1 Story Points by Epic (42 Total)
+    "Epic 1: Smart Contract Development" : 21
+    "Epic 2: Frontend Foundation" : 13
+    "Epic 3: Database Schema" : 8
+```
+
+```mermaid
+pie title Sprint 2 Story Points by Epic (58 Total)
+    "Epic 4: Loan Management" : 21
+    "Epic 5: Installment Payment" : 13
+    "Epic 6: Chat System" : 13
+    "Epic 7: Profile Management" : 8
+    "Epic 7b: QR Code System" : 3
+```
+
+```mermaid
+pie title Sprint 3 Story Points by Epic (55 Total)
+    "Epic 8: Market Data Visualization" : 8
+    "Epic 9: AI Chatbot" : 13
+    "Epic 10: AI/ML Security Layer" : 21
+    "Epic 11: Testing & QA" : 13
+```
+
+---
+
+## 5.6 Agile/Scrum Process Flow
+
+```mermaid
+flowchart LR
+    subgraph Cycle["Scrum Sprint Cycle"]
+        direction TB
+        PB["Product\nBacklog"] --> SP["Sprint\nPlanning\n(1 hour)"]
+        SP --> SB["Sprint\nBacklog"]
+        SB --> DEV["Development\n(2-3 weeks)"]
+        DEV --> WS["Weekly\nSync"]
+        WS --> DEV
+        DEV --> SR["Sprint\nReview\n(30 min)"]
+        SR --> RETRO["Retrospective\n(30 min)"]
+        RETRO --> INC["Potentially\nShippable\nIncrement"]
+    end
+
+    INC --> |"Feedback"| PB
+```
 
 ---
 
@@ -636,6 +746,24 @@ A user story is "Ready" for sprint planning when:
 
 This is a 2-person thesis project. Both members share responsibilities across all domains.
 
+```mermaid
+flowchart TD
+    SUP["Mr. Annajiat Alim Rasel\nSupervisor / Senior Lecturer\nDept. of CSE, Brac University"]
+
+    subgraph Team["Development Team"]
+        direction LR
+        DEV1["Md. Bokhtiar Rahman Juboraz\n(20301138)\n\nPrimary: Smart Contracts,\nBlockchain, Backend API\n\nSecondary: AI/ML, Docs"]
+        DEV2["Md. Mahir Ahnaf Ahmed\n(20301083)\n\nPrimary: Frontend\n(React/TypeScript), UI/UX\n\nSecondary: Database, Testing, Docs"]
+    end
+
+    SUP -->|"Bi-weekly updates"| Team
+    DEV1 <-->|"Code review,\nweekly sync"| DEV2
+
+    style SUP fill:#1a3c6e,stroke:#1a3c6e,color:white
+    style DEV1 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style DEV2 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+```
+
 | Team Member | Primary Focus | Secondary Focus |
 |-------------|---------------|-----------------|
 | **Md. Bokhtiar Rahman Juboraz (20301138)** | Smart contract development, blockchain integration, backend API | AI/ML model development, documentation |
@@ -657,6 +785,23 @@ This is a 2-person thesis project. Both members share responsibilities across al
 ## 8. Risk Management
 
 ### 8.1 Identified Risks
+
+```mermaid
+quadrantChart
+    title Risk Assessment Matrix
+    x-axis Low Probability --> High Probability
+    y-axis Low Impact --> High Impact
+    quadrant-1 High Priority
+    quadrant-2 Monitor
+    quadrant-3 Accept
+    quadrant-4 Mitigate
+    Smart contract vulnerabilities: [0.5, 0.85]
+    Integration complexity: [0.5, 0.8]
+    Gas cost fluctuations: [0.75, 0.5]
+    Scope creep: [0.75, 0.5]
+    ML model accuracy: [0.5, 0.5]
+    Team member unavailability: [0.2, 0.8]
+```
 
 | Risk | Probability | Impact | Mitigation Strategy |
 |------|-------------|--------|---------------------|
@@ -721,6 +866,43 @@ This is a 2-person thesis project. Both members share responsibilities across al
 
 The Agile sprint structure maps to the standard Software Development Life Cycle (SDLC) stages (ref: [GeeksforGeeks SDLC](https://www.geeksforgeeks.org/software-engineering/software-development-life-cycle-sdlc/)):
 
+```mermaid
+flowchart TD
+    S1["1. Planning &\nRequirements Analysis"]
+    S2["2. Defining\nRequirements (SRS)"]
+    S3["3. Designing\nArchitecture"]
+    S4["4. Development\n(Coding)"]
+    S5["5. Testing"]
+    S6["6. Deployment"]
+    S7["7. Maintenance"]
+
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7
+    S7 -.->|"Iteration"| S1
+
+    S1 -.- N1["Feasibility studies, professor meetings,\nBCOLBD 2025 guideline review"]
+    S2 -.- N2["System analysis (CSE471), 29 use cases,\nuser stories US-1.x to US-3.x"]
+    S3 -.- N3["Three-layer architecture, DB schema\n(15 tables, 3NF), ERD, DFD"]
+    S4 -.- N4["Solidity, React/TypeScript,\nFastAPI/Python, AI/ML models"]
+    S5 -.- N5["Hardhat unit tests (12+),\nfrontend integration, AI/ML eval"]
+    S6 -.- N6["Polygon Mumbai / Sepolia,\nVercel + Render"]
+    S7 -.- N7["Monitoring, model retraining,\nbug fixes, feature iteration"]
+
+    style S1 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style S2 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style S3 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style S4 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style S5 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style S6 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style S7 fill:#dbeafe,stroke:#2563eb,color:#1e293b
+    style N1 fill:#f8fafc,stroke:#94a3b8,color:#64748b
+    style N2 fill:#f8fafc,stroke:#94a3b8,color:#64748b
+    style N3 fill:#f8fafc,stroke:#94a3b8,color:#64748b
+    style N4 fill:#f8fafc,stroke:#94a3b8,color:#64748b
+    style N5 fill:#f8fafc,stroke:#94a3b8,color:#64748b
+    style N6 fill:#f8fafc,stroke:#94a3b8,color:#64748b
+    style N7 fill:#f8fafc,stroke:#94a3b8,color:#64748b
+```
+
 | SDLC Stage | Project Activity | Timeline |
 |------------|------------------|----------|
 | **1. Planning & Requirements Analysis** | Feasibility studies (technical, economic, operational, schedule); professor meetings; BCOLBD 2025 guideline review; stakeholder requirement gathering | Pre-Sprint |
@@ -738,6 +920,46 @@ The Agile sprint structure maps to the standard Software Development Life Cycle 
 Per professor requirement: *"For every decision you take, first present the alternative and then justify your first and second choices."*
 
 The complete decision justification document is maintained in `DECISION_JUSTIFICATION_PLAN.md`. Summary:
+
+```mermaid
+flowchart LR
+    subgraph Tech["Technology Stack Decisions"]
+        direction TB
+        A1["Frontend"] --> A1a["1st: React + TS"]
+        A1 --> A1b["2nd: Vue + TS"]
+        A2["Smart Contract"] --> A2a["1st: EVM/Solidity"]
+        A2 --> A2b["2nd: Solana/Rust"]
+        A3["Database"] --> A3a["1st: PostgreSQL"]
+        A3 --> A3b["2nd: SQLite"]
+        A4["UI Framework"] --> A4a["1st: MUI (Material 3)"]
+        A4 --> A4b["2nd: Tailwind CSS"]
+    end
+
+    subgraph AIML["AI/ML Decisions"]
+        direction TB
+        B1["Fraud Detection"] --> B1a["1st: Random Forest"]
+        B1 --> B1b["2nd: XGBoost"]
+        B2["Anomaly"] --> B2a["1st: Isolation Forest"]
+        B2 --> B2b["2nd: Autoencoder"]
+        B3["Explainability"] --> B3a["1st: SHAP"]
+        B3 --> B3b["2nd: LIME"]
+    end
+
+    style A1a fill:#059669,stroke:#059669,color:white
+    style A2a fill:#059669,stroke:#059669,color:white
+    style A3a fill:#059669,stroke:#059669,color:white
+    style A4a fill:#059669,stroke:#059669,color:white
+    style B1a fill:#059669,stroke:#059669,color:white
+    style B2a fill:#059669,stroke:#059669,color:white
+    style B3a fill:#059669,stroke:#059669,color:white
+    style A1b fill:#f1f5f9,stroke:#94a3b8,color:#64748b
+    style A2b fill:#f1f5f9,stroke:#94a3b8,color:#64748b
+    style A3b fill:#f1f5f9,stroke:#94a3b8,color:#64748b
+    style A4b fill:#f1f5f9,stroke:#94a3b8,color:#64748b
+    style B1b fill:#f1f5f9,stroke:#94a3b8,color:#64748b
+    style B2b fill:#f1f5f9,stroke:#94a3b8,color:#64748b
+    style B3b fill:#f1f5f9,stroke:#94a3b8,color:#64748b
+```
 
 | Decision Area | 1st Choice | 2nd Choice | Key Criterion |
 |---------------|------------|------------|---------------|

@@ -11,6 +11,7 @@
 ---
 
 ```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 150, 'rankSpacing': 280}}}%%
 graph TB
 
     %% ════════════════════════════════════════════════

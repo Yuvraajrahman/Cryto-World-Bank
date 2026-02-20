@@ -1,6 +1,6 @@
 % Decentralized Crypto World Bank — Project Report
 % BRAC University — Department of Computer Science and Engineering
-% Following BRAC University Thesis/Project Template
+% Following BRAC University Pre-Thesis / Final Year Project Template
 % ═══════════════════════════════════════════════════════════════════
 % MODERNIZED LaTeX — Feb 2026
 % ═══════════════════════════════════════════════════════════════════
@@ -10,7 +10,8 @@
 % ── Core Encoding & Typography ─────────────────────────────────────
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{mathptmx}
+\usepackage[condensed]{plex-sans}
+\renewcommand*\familydefault{\sfdefault}
 \usepackage{microtype}
 \usepackage[a4paper,width=155mm,top=25mm,bottom=25mm]{geometry}
 \usepackage{setspace}
@@ -156,19 +157,18 @@
 %==============================================================================
 \thispagestyle{empty}
 
-\begin{tikzpicture}[remember picture,overlay]
-    \fill[PrimaryBlue] (current page.north west) rectangle ([yshift=-6cm]current page.north east);
-    \fill[AccentBlue] ([yshift=-6cm]current page.north west) rectangle ([yshift=-6.3cm]current page.north east);
-\end{tikzpicture}
-
 \begin{center}
 
-\vspace*{0.6cm}
+\vspace*{0.5cm}
 
-{\color{white}\LARGE\bfseries Decentralized Crypto World Bank}\\[0.4em]
-{\color{white!90}\large A Blockchain-Based Hierarchical Lending Platform\\[0.2em]with AI-Enhanced Security}
+\includegraphics[width=3.8cm]{bracu_logo_12-0-2022.png}
 
-\vspace{3.5cm}
+\vspace{1.2cm}
+
+{\LARGE\bfseries\color{PrimaryBlue} Decentralized Crypto World Bank}\\[0.5em]
+{\large\color{PrimaryBlue!80} A Blockchain-Based Hierarchical Lending Platform\\[0.2em]with AI-Enhanced Security}
+
+\vspace{2cm}
 
 {\large by}
 
@@ -179,9 +179,9 @@
 {\Large\bfseries\color{PrimaryBlue} Md.\ Mahir Ahnaf Ahmed}\\[0.2em]
 {\color{GrayText}20301083}
 
-\vspace{2.5cm}
+\vspace{2cm}
 
-A thesis submitted to the Department of Computer Science and Engineering\\
+A pre-thesis 1 report submitted to the Department of Computer Science and Engineering\\
 in partial fulfillment of the requirements for the degree of\\
 \textbf{B.Sc.\ in Computer Science}
 
@@ -211,11 +211,11 @@ February 2026
 It is hereby declared that
 
 \begin{enumerate}
-\item The thesis submitted is my/our own original work while completing degree at Brac University.
+\item The report submitted is my/our own original work while completing degree at Brac University.
 
-\item The thesis does not contain material previously published or written by a third party, except where this is appropriately cited through full and accurate referencing.
+\item The report does not contain material previously published or written by a third party, except where this is appropriately cited through full and accurate referencing.
 
-\item The thesis does not contain material which has been accepted, or submitted, for any other degree or diploma at a university or other institution.
+\item The report does not contain material which has been accepted, or submitted, for any other degree or diploma at a university or other institution.
 
 \item We have acknowledged all main sources of help.
 \end{enumerate}
@@ -242,7 +242,7 @@ It is hereby declared that
 \section*{Approval}
 \addcontentsline{toc}{section}{Approval}
 
-The thesis/project titled ``Decentralized Crypto World Bank: A Blockchain-Based Hierarchical Lending Platform with AI-Enhanced Security'' submitted by
+The pre-thesis 1 report of final year project titled ``Decentralized Crypto World Bank: A Blockchain-Based Hierarchical Lending Platform with AI-Enhanced Security'' submitted by
 
 \begin{enumerate}
 \item Md. Bokhtiar Rahman Juboraz (20301138)
@@ -274,14 +274,14 @@ Brac University
 \vspace{1.5cm}
 
 \begin{flushleft}
-Thesis Coordinator:\\
+Pre-Thesis Coordinator:\\
 (Member)
 \end{flushleft}
 
 \begin{flushright}
 \vspace{-0.5cm}
 \hrulefill\\
-\mbox{[Thesis Coordinator Name]}\\
+\mbox{[Pre-Thesis Coordinator Name]}\\
 \mbox{[Designation]}\\
 Department of Computer Science and Engineering\\
 Brac University
@@ -309,8 +309,10 @@ Brac University
 %  ABSTRACT PAGE
 %==============================================================================
 
+\renewcommand{\abstractname}{\Large\bfseries\color{PrimaryBlue}Abstract}
 \begin{abstract}
 \addcontentsline{toc}{section}{Abstract}
+\normalsize
 
 International development finance is delivered through layered institutional structures in which multilateral development institutions, national financial intermediaries, and local lenders jointly channel capital to end borrowers. While this model enables risk distribution and local market access, it is associated with operational challenges, including limited cross-tier transparency, lengthy cross-border settlement processes, high reconciliation and compliance overhead, and constrained scalability of risk assessment workflows. At the same time, approximately 1.4 billion adults remain unbanked according to the World Bank Global Findex (2021), highlighting the need for more efficient and accessible credit delivery mechanisms.
 
@@ -337,21 +339,25 @@ By integrating hierarchical institutional structures with transparent ledger inf
 \section{Literature Review}
 %==============================================================================
 
+\begin{doublespacing}
+
 The design of the Crypto World Bank is informed by a comprehensive review of 17 peer-reviewed papers spanning seven domains. Full detailed reviews (Abstract, Introduction, Motivation, Methodology, Results, Conclusion) for all papers are available in the project documentation repository.
 
-\textbf{Decentralized Lending and DeFi Protocols.} Werner et al.~[10] systematize DeFi protocol design in their SoK paper, identifying that existing lending platforms are uniformly pool-based and over-collateralized, lacking institutional hierarchy—a gap this project directly addresses. Bastankhah et al.~[1] introduce an adaptive, data-driven DeFi lending protocol with a dual fast/slow control architecture, demonstrating that dynamic interest rate adjustment significantly outperforms static utilization curves used by Aave and Compound. An IEEE evaluation framework [9] provides standardized metrics for assessing protocol capital efficiency, risk management, and governance quality, revealing that higher capital efficiency correlates with higher risk exposure.
+\hangindent=0.5in \textbf{Decentralized Lending and DeFi Protocols.} Werner et al.~[10] systematize DeFi protocol design in their SoK paper, identifying that existing lending platforms are uniformly pool-based and over-collateralized, lacking institutional hierarchy—a gap this project directly addresses. Bastankhah et al.~[1] introduce an adaptive, data-driven DeFi lending protocol with a dual fast/slow control architecture, demonstrating that dynamic interest rate adjustment significantly outperforms static utilization curves used by Aave and Compound. An IEEE evaluation framework [9] provides standardized metrics for assessing protocol capital efficiency, risk management, and governance quality, revealing that higher capital efficiency correlates with higher risk exposure.
 
-\textbf{ML Fraud Detection in Blockchain.} Palaiokrassas et al.~[2] leverage ML for multichain DeFi fraud detection across 23 protocols (54M+ transactions), demonstrating that DeFi-specific behavioral features improve XGBoost and Neural Network classifiers to F1-scores of 0.76--0.85, compared to 0.08 with transactional features alone. Agarwal et al.~[3] present RiskSEA, a scalable graph embedding system deployed at Coinbase that combines node2vec embeddings with behavioral features, achieving F1: 0.851 on all 266M Ethereum addresses. Rahouti et al.~[16] survey ML approaches for Bitcoin security, finding Random Forest achieves 94\%+ precision—supporting its selection as the primary fraud detection model in this system.
+\hangindent=0.5in \textbf{ML Fraud Detection in Blockchain.} Palaiokrassas et al.~[2] leverage ML for multichain DeFi fraud detection across 23 protocols (54M+ transactions), demonstrating that DeFi-specific behavioral features improve XGBoost and Neural Network classifiers to F1-scores of 0.76--0.85, compared to 0.08 with transactional features alone. Agarwal et al.~[3] present RiskSEA, a scalable graph embedding system deployed at Coinbase that combines node2vec embeddings with behavioral features, achieving F1: 0.851 on all 266M Ethereum addresses. Rahouti et al.~[16] survey ML approaches for Bitcoin security, finding Random Forest achieves 94\%+ precision—supporting its selection as the primary fraud detection model in this system.
 
-\textbf{Explainable AI in Lending.} Adom et al.~[4] provide a direct comparison of LIME and SHAP on loan approval systems, finding SHAP provides deeper, more consistent feature attributions via Shapley values, while LIME offers faster runtime. Lundberg and Lee [11] introduce the SHAP framework itself, providing the theoretical foundation (local accuracy, missingness, consistency properties) that this system adopts for generating explainable loan risk assessments. Bracke et al.~[17] apply SHAP to credit default models in a Bank of England regulatory context, demonstrating that SHAP feature attributions align with domain expert expectations and satisfy regulatory explainability requirements.
+\hangindent=0.5in \textbf{Explainable AI in Lending.} Adom et al.~[4] provide a direct comparison of LIME and SHAP on loan approval systems, finding SHAP provides deeper, more consistent feature attributions via Shapley values, while LIME offers faster runtime. Lundberg and Lee [11] introduce the SHAP framework itself, providing the theoretical foundation (local accuracy, missingness, consistency properties) that this system adopts for generating explainable loan risk assessments. Bracke et al.~[17] apply SHAP to credit default models in a Bank of England regulatory context, demonstrating that SHAP feature attributions align with domain expert expectations and satisfy regulatory explainability requirements.
 
-\textbf{Reinforcement Learning for Lending Policy.} Qu et al.~[5] apply offline RL (CQL, BC, TD3-BC) to optimize Aave interest rates using historical data, with TD3-BC demonstrating superior performance during stress events (May 2021 crash, March 2023 USDC depeg). Kiatsupaibul et al.~[6] formulate credit underwriting as an MDP, showing RL-based approaches discover superior underwriting policies compared to traditional greedy (static threshold) methods—validating our planned DQN/PPO modules for adaptive borrowing limits.
+\hangindent=0.5in \textbf{Reinforcement Learning for Lending Policy.} Qu et al.~[5] apply offline RL (CQL, BC, TD3-BC) to optimize Aave interest rates using historical data, with TD3-BC demonstrating superior performance during stress events (May 2021 crash, March 2023 USDC depeg). Kiatsupaibul et al.~[6] formulate credit underwriting as an MDP, showing RL-based approaches discover superior underwriting policies compared to traditional greedy (static threshold) methods—validating our planned DQN/PPO modules for adaptive borrowing limits.
 
-\textbf{CBDC and Financial Inclusion.} Tan [7] develops an IMF model showing CBDCs in developing countries can bank large unbanked populations through a two-tier distribution model (central bank $\to$ commercial banks $\to$ users) that directly parallels our four-tier hierarchy. Mhlanga [8] demonstrates through systematic review that blockchain technology facilitates financial inclusion across transactions, savings, credit provision, and insurance—supporting the Crypto World Bank's mission of transparent, programmable lending for underserved populations.
+\hangindent=0.5in \textbf{CBDC and Financial Inclusion.} Tan [7] develops an IMF model showing CBDCs in developing countries can bank large unbanked populations through a two-tier distribution model (central bank $\to$ commercial banks $\to$ users) that directly parallels our four-tier hierarchy. Mhlanga [8] demonstrates through systematic review that blockchain technology facilitates financial inclusion across transactions, savings, credit provision, and insurance—supporting the Crypto World Bank's mission of transparent, programmable lending for underserved populations.
 
-\textbf{Smart Contract Security and Governance.} Atzei et al.~[13] catalog Ethereum smart contract attack vectors (reentrancy, integer overflow, access control), directly informing our use of OpenZeppelin's ReentrancyGuard and Solidity 0.8.20 overflow protection. Tolmach et al.~[15] survey 42 formal verification tools, recommending multi-tool approaches combining static analysis (Slither) and symbolic execution (Mythril). Beck et al.~[14] propose a three-dimensional blockchain governance framework (IT, network, business) that maps directly to our three-pillar governance structure. Liu et al.~[12] introduce Isolation Forest for unsupervised anomaly detection—adopted as our secondary detection model for wallet behavior analysis where labeled fraud data is scarce.
+\hangindent=0.5in \textbf{Smart Contract Security and Governance.} Atzei et al.~[13] catalog Ethereum smart contract attack vectors (reentrancy, integer overflow, access control), directly informing our use of OpenZeppelin's ReentrancyGuard and Solidity 0.8.20 overflow protection. Tolmach et al.~[15] survey 42 formal verification tools, recommending multi-tool approaches combining static analysis (Slither) and symbolic execution (Mythril). Beck et al.~[14] propose a three-dimensional blockchain governance framework (IT, network, business) that maps directly to our three-pillar governance structure. Liu et al.~[12] introduce Isolation Forest for unsupervised anomaly detection—adopted as our secondary detection model for wallet behavior analysis where labeled fraud data is scarce.
 
-\textbf{Identified Gaps.} Across these 17 papers, four gaps motivate the Crypto World Bank: (1) no hierarchical institutional model exists in DeFi lending [10, 1, 9]; (2) limited integration of AI/ML security analytics with DeFi lending [2, 3, 16]; (3) insufficient explainability in automated lending decisions [4, 11, 17]; and (4) inadequate governance frameworks for multi-tier decentralized finance systems [14].
+\hangindent=0.5in \textbf{Identified Gaps.} Across these 17 papers, four gaps motivate the Crypto World Bank: (1) no hierarchical institutional model exists in DeFi lending [10, 1, 9]; (2) limited integration of AI/ML security analytics with DeFi lending [2, 3, 16]; (3) insufficient explainability in automated lending decisions [4, 11, 17]; and (4) inadequate governance frameworks for multi-tier decentralized finance systems [14].
+
+\end{doublespacing}
 
 %==============================================================================
 \section{Problem Statement and Proposed Solution}
@@ -1363,7 +1369,7 @@ Full ERD is in the project documentation repository.
 
 \subsection{Activity, Component, and Data Flow Diagrams}
 
-Activity diagrams (loan request to repayment, income verification, chat system, AI chatbot, hierarchical banking, market data, profile management), component diagrams (presentation, smart contract, backend, external subsystems), and data flow diagrams (Level 0 context and Level 1 with 12 processes and 11 data stores) are documented in the project documentation repository.
+Activity diagrams (loan request to repayment, income verification, chat system, AI chatbot, hierarchical banking, market data, profile management), component diagrams (presentation, smart contract, backend, external subsystems), and data flow diagrams (Level 0 context and Level 1 with 12 processes and 11 data stores) are documented in the project documentation \href{https://drive.google.com/drive/folders/1en_Mxk-q1YrfYVDmOe1efgS85c724CQ_?usp=sharing}{repository}.
 
 %==============================================================================
 \section{Valuation and Distribution Strategy}
@@ -1435,6 +1441,59 @@ Phase 3: Production Scale & Multi-chain deployment; full AI/ML backend; commerci
 \end{itemize}
 
 %==============================================================================
+\section{Academic Course Requirements Fulfillment}
+%==============================================================================
+
+The Crypto World Bank project integrates deliverables that satisfy the requirements of multiple undergraduate courses in the B.Sc.\ Computer Science program at BRAC University. The following summarizes how each course's objectives have been addressed within this project.
+
+\subsection{CSE370 --- Database Management}
+
+The project fulfills database management requirements through the design and implementation of a comprehensive relational data model. Deliverables include:
+\begin{itemize}[noitemsep]
+\item A fully normalized Entity-Relationship (ER) diagram modeling the four-tier institutional hierarchy (World Bank, National Banks, Local Banks, Borrowers), loan lifecycle states, and transaction records.
+\item Relational schema design with referential integrity constraints, primary and foreign key relationships, and indexing strategies for efficient query execution.
+\item A PostgreSQL database implementation supporting off-chain storage of user profiles, transaction metadata, audit logs, and AI/ML feature tables.
+\item Database-level access control and role-based permission modeling aligned with the on-chain role hierarchy.
+\end{itemize}
+
+\subsection{CSE470 --- Software Engineering}
+
+The project addresses software engineering principles through systematic planning, modeling, and development practices. Deliverables include:
+\begin{itemize}[noitemsep]
+\item Requirements analysis documented through functional and non-functional requirement specifications.
+\item Use case diagrams describing interactions among all four tiers of users and the system.
+\item Sequence diagrams illustrating end-to-end workflows for deposit, loan request, approval, repayment, and fraud detection processes.
+\item Activity diagrams capturing the control flow of key operations including hierarchical fund distribution and cascading repayment.
+\item Component diagrams depicting the system's modular architecture across the presentation, smart contract, and off-chain service layers.
+\item Data flow diagrams (Level 0 and Level 1) mapping information movement between system components.
+\item An Agile development methodology with a three-sprint, eight-week schedule, user stories, sprint backlogs, and burndown tracking.
+\item SDLC stage mapping, design decision analysis, Gantt charts, and risk assessment matrices.
+\item Revenue projection bar charts and comparative analysis visualizations.
+\end{itemize}
+
+\subsection{CSE471 --- System Analysis and Design}
+
+The project satisfies system analysis requirements through structured analytical modeling of the platform. Deliverables include:
+\begin{itemize}[noitemsep]
+\item Context-level and decomposition data flow diagrams analyzing information flow across the four-tier hierarchy.
+\item Activity diagrams for each major system process: user registration, deposit flow, loan origination, installment repayment, fund distribution, and fraud alert handling.
+\item Component interaction diagrams showing dependencies between the React frontend, smart contract layer, REST API, PostgreSQL database, and AI/ML analytics engine.
+\item Sequence diagrams modeling synchronous and asynchronous interactions including wallet connection, blockchain transaction submission, event listening, and off-chain data synchronization.
+\item Feasibility analysis covering technical, economic, and operational dimensions.
+\end{itemize}
+
+\subsection{CSE446 --- Blockchain and Cryptocurrencies}
+
+The project directly applies blockchain and cryptocurrency concepts through the development of production-grade Solidity smart contracts. Deliverables include:
+\begin{itemize}[noitemsep]
+\item Three auditable Solidity smart contracts (World Bank Reserve, National Bank, Local Bank) implementing role-based access control, reserve management, hierarchical fund distribution, loan lifecycle management, and emergency controls.
+\item Integration with OpenZeppelin security libraries including \texttt{Ownable} for ownership patterns and \texttt{ReentrancyGuard} for protection against reentrancy attacks.
+\item Deployment and testing on EVM-compatible public test networks (Ethereum Sepolia, Polygon Mumbai).
+\item Gas optimization strategies and transaction economics analysis for the hierarchical lending model.
+\item Wallet integration via Wagmi, RainbowKit, and Viem adhering to the EIP-1193 standard.
+\end{itemize}
+
+%==============================================================================
 \section{Conclusion}
 %==============================================================================
 
@@ -1478,6 +1537,7 @@ The platform's three smart contracts collectively support the following operatio
 
 \section{References}
 
+{\small
 \begin{enumerate}[label={[\arabic*]}]
 \item S.~M. Werner, D.~Perez, L.~Gudgeon, A.~Klages-Mundt, D.~Harz, and W.~J. Knottenbelt, ``SoK: Decentralized Finance (DeFi),'' \textit{arXiv preprint arXiv:2101.08778}, 2022. [Online]. Available: \url{https://arxiv.org/abs/2101.08778}
 \item M.~Bartoletti and L.~Pompianu, ``An empirical analysis of smart contracts: platforms, applications, and design patterns,'' in \textit{Proc. Int. Conf. Financial Cryptography and Data Security}, pp.~494--509, 2017. DOI: \url{https://doi.org/10.1007/978-3-319-70278-0_31}
@@ -1499,5 +1559,6 @@ The platform's three smart contracts collectively support the following operatio
 \item BCOLBD 2025, ``Blockchain Olympiad Bangladesh: Guideline and Evaluation Scheme,'' 2025. [Online]. Available: \url{https://bcolbd.org/uploads/guideline/BLOCKCHAIN\%20OLYMPIAD\%20BANGLADESH\%20Blockchain\%20Guideline.pdf}
 \item OpenZeppelin, ``OpenZeppelin Contracts,'' 2024. [Online]. Available: \url{https://openzeppelin.com/contracts}
 \end{enumerate}
+}
 
 \end{document}

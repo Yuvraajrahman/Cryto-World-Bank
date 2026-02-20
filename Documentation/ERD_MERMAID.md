@@ -118,7 +118,7 @@ erDiagram
     
     BORROWING_LIMIT {
         int limit_id PK
-        int borrower_id FK UK
+        int borrower_id FK
         decimal six_month_limit
         decimal six_month_remaining
         decimal one_year_limit
@@ -143,7 +143,7 @@ erDiagram
         int sender_id
         string receiver_type
         int receiver_id
-        text message_text
+        string message_text
         boolean is_read
         timestamp sent_at
     }
@@ -152,8 +152,8 @@ erDiagram
         int log_id PK
         string user_wallet
         string user_type
-        text question
-        text response
+        string question
+        string response
         string intent
         timestamp created_at
     }
@@ -176,7 +176,7 @@ erDiagram
         decimal price_usd
         decimal volume_24h
         decimal market_cap
-        timestamp timestamp
+        timestamp recorded_at
     }
     
     PROFILE_SETTINGS {
@@ -184,7 +184,7 @@ erDiagram
         string user_type
         int user_id
         boolean terms_accepted
-        json preferences
+        string preferences
         timestamp created_at
         timestamp updated_at
     }
@@ -202,7 +202,7 @@ erDiagram
     BORROWER ||--o{ TRANSACTION : "has"
     LOCAL_BANK ||--o{ TRANSACTION : "processes"
     NATIONAL_BANK ||--o{ TRANSACTION : "processes"
-    LOAN_REQUEST ||--o| TRANSACTION : "related_to"
+    LOAN_REQUEST |o--o{ TRANSACTION : "related_to"
     BORROWER ||--|| BORROWING_LIMIT : "has"
     BORROWER ||--o{ INCOME_PROOF : "submits"
     BANK_USER ||--o{ INCOME_PROOF : "reviews"

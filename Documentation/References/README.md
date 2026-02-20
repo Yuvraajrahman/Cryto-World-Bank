@@ -37,10 +37,23 @@ All references cited in `WHITEPAPER_BCOLBD2025.tex`. Links are provided for acce
 
 ---
 
-## How to download
+## Downloaded Papers (in this folder)
 
-- **arXiv:** Open the PDF link in a browser (e.g. `https://arxiv.org/pdf/2101.08778.pdf`) and save, or from a terminal:  
-  `curl -L -o "arxiv_2101_08778.pdf" "https://arxiv.org/pdf/2101.08778.pdf"`
-- **BIS / Bank of England:** Open the link in a browser; use “Download” or “PDF” where offered.
+| File | Reference | Size |
+|------|-----------|------|
+| `01_Werner_SoK_DeFi_2022.pdf` | [1] Werner et al. — SoK: Decentralized Finance | 723 KB |
+| `05_Angeris_Privacy_CFMM_2022.pdf` | [5] Angeris & Chitra — Privacy in CFMMs | 143 KB |
+| `06_Auer_CBDC_Technology_BIS_2020.pdf` | [6] Auer & Böhme — Technology of retail CBDC | 476 KB |
+| `13_Lundberg_SHAP_NeurIPS_2017.pdf` | [14] Lundberg & Lee — SHAP (NeurIPS 2017) | 906 KB |
+| `14_Bracke_ML_Explainability_BoE_2019.pdf` | [15] Bracke et al. — ML explainability in finance | 1,033 KB |
+| `18_BCOLBD_2025_Guideline.pdf` | [19] BCOLBD 2025 — Blockchain Olympiad Guideline | 381 KB |
+| `BIS_DeFi_Lending_WP1183_2024.pdf` | Economic impact source — BIS WP No. 1183 | 1,945 KB |
+
+---
+
+## How to download remaining papers
+
 - **DOI links:** Open the DOI URL; if your institution has access, you can download the PDF. Otherwise use author pages or preprint servers (e.g. ResearchGate, author websites) where allowed.
-- Save any downloaded PDFs into this `Documentation/References` folder for easy access.
+- **IEEE Access papers ([8] Rahouti et al.):** IEEE Access is open access — visit the DOI link and download directly.
+- **Books ([17] De Filippi & Wright):** Available for purchase from Harvard University Press.
+- Save any additional PDFs into this `Documentation/References` folder.

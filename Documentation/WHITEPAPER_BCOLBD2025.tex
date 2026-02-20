@@ -1,36 +1,154 @@
 % Decentralized Crypto World Bank — Project Report
 % BRAC University — Department of Computer Science and Engineering
 % Following BRAC University Thesis/Project Template
+% ═══════════════════════════════════════════════════════════════════
+% MODERNIZED LaTeX — Feb 2026
+% ═══════════════════════════════════════════════════════════════════
 
 \documentclass[11pt,a4paper]{article}
 
+% ── Core Encoding & Typography ─────────────────────────────────────
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{mathptmx} % Times New Roman
-\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm]{geometry}
+\usepackage{mathptmx}
+\usepackage{microtype}
+\usepackage[a4paper,width=155mm,top=25mm,bottom=25mm]{geometry}
 \usepackage{setspace}
 \singlespacing
 
+% ── Math & Symbols ─────────────────────────────────────────────────
 \usepackage{amsmath,amssymb}
+
+% ── Graphics & Color ───────────────────────────────────────────────
 \usepackage{graphicx}
+\usepackage[dvipsnames,svgnames,x11names,table]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric,shadows}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% ── Tables ─────────────────────────────────────────────────────────
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{
+    labelfont={bf,small},
+    textfont={small},
+    skip=6pt,
+    format=hang
+}
+
+% ── Boxes & Frames ─────────────────────────────────────────────────
+\usepackage[most]{tcolorbox}
+
+% ── Section Styling ────────────────────────────────────────────────
+\usepackage{titlesec}
+
+% ── Hyperlinks & Lists ─────────────────────────────────────────────
 \usepackage{hyperref}
 \usepackage{parskip}
 \usepackage{fancyhdr}
 \usepackage{enumitem}
-\usepackage{float}
-\usepackage{pmboxdraw}
 
+% ════════════════════════════════════════════════════════════════════
+%  COLOR PALETTE
+% ════════════════════════════════════════════════════════════════════
+\definecolor{PrimaryBlue}{HTML}{1A3C6E}
+\definecolor{AccentBlue}{HTML}{2563EB}
+\definecolor{LightBlue}{HTML}{EFF6FF}
+\definecolor{MidBlue}{HTML}{DBEAFE}
+\definecolor{DarkText}{HTML}{1E293B}
+\definecolor{GrayText}{HTML}{64748B}
+\definecolor{RowShade}{HTML}{F8FAFC}
+\definecolor{RowShadeAlt}{HTML}{F1F5F9}
+\definecolor{GreenAccent}{HTML}{059669}
+\definecolor{AmberAccent}{HTML}{D97706}
+\definecolor{RedAccent}{HTML}{DC2626}
+\definecolor{VioletAccent}{HTML}{7C3AED}
+
+% ════════════════════════════════════════════════════════════════════
+%  HYPERLINK SETUP
+% ════════════════════════════════════════════════════════════════════
 \hypersetup{
     colorlinks=true,
-    linkcolor=black,
+    linkcolor=PrimaryBlue,
     filecolor=magenta,
-    urlcolor=black,
-    citecolor=black,
+    urlcolor=AccentBlue,
+    citecolor=PrimaryBlue,
 }
 
+% ════════════════════════════════════════════════════════════════════
+%  SECTION HEADING STYLES
+% ════════════════════════════════════════════════════════════════════
+\titleformat{\section}
+    {\Large\bfseries\color{PrimaryBlue}}
+    {\thesection}{1em}{}
+    [\vspace{4pt}{\color{AccentBlue}\titlerule[1.2pt]}]
+
+\titleformat{\subsection}
+    {\large\bfseries\color{PrimaryBlue!85!black}}
+    {\thesubsection}{0.8em}{}
+
+\titleformat{\subsubsection}
+    {\normalsize\bfseries\color{PrimaryBlue!70!black}}
+    {\thesubsubsection}{0.6em}{}
+
+\titlespacing*{\section}{0pt}{20pt plus 4pt minus 2pt}{14pt plus 2pt minus 2pt}
+\titlespacing*{\subsection}{0pt}{16pt plus 3pt minus 2pt}{8pt plus 2pt minus 1pt}
+\titlespacing*{\subsubsection}{0pt}{12pt plus 2pt minus 1pt}{6pt plus 1pt minus 1pt}
+
+% ════════════════════════════════════════════════════════════════════
+%  TABLE STYLE HELPERS
+% ════════════════════════════════════════════════════════════════════
+\newcommand{\tableheadcolor}{\rowcolor{PrimaryBlue!12}}
+\newcommand{\tableheadfont}{\bfseries\small\color{PrimaryBlue}}
+
+\newenvironment{moderntable}[1][H]{%
+    \begin{table}[#1]\centering\small%
+    \renewcommand{\arraystretch}{1.35}%
+}{%
+    \end{table}%
+}
+
+% ════════════════════════════════════════════════════════════════════
+%  TCOLORBOX PRESETS
+% ════════════════════════════════════════════════════════════════════
+\newtcolorbox{layerbox}[1]{
+    colback=LightBlue,
+    colframe=AccentBlue,
+    coltitle=white,
+    fonttitle=\bfseries\small,
+    title=#1,
+    boxrule=0.8pt,
+    arc=3pt,
+    left=6pt,right=6pt,top=4pt,bottom=4pt,
+    drop shadow={opacity=0.15},
+}
+
+\newtcolorbox{highlightbox}[1][]{
+    colback=LightBlue,
+    colframe=AccentBlue!60,
+    boxrule=0.6pt,
+    arc=2pt,
+    left=8pt,right=8pt,top=6pt,bottom=6pt,
+    #1
+}
+
+% ════════════════════════════════════════════════════════════════════
+%  HEADER / FOOTER
+% ════════════════════════════════════════════════════════════════════
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\color{GrayText}Crypto World Bank}
+\fancyhead[R]{\small\color{GrayText}BRAC University}
+\fancyfoot[C]{\small\color{GrayText}\thepage}
+
+% ════════════════════════════════════════════════════════════════════
 \begin{document}
 
 %==============================================================================
@@ -38,39 +156,45 @@
 %==============================================================================
 \thispagestyle{empty}
 
+\begin{tikzpicture}[remember picture,overlay]
+    \fill[PrimaryBlue] (current page.north west) rectangle ([yshift=-6cm]current page.north east);
+    \fill[AccentBlue] ([yshift=-6cm]current page.north west) rectangle ([yshift=-6.3cm]current page.north east);
+\end{tikzpicture}
+
 \begin{center}
 
-\vspace*{1cm}
+\vspace*{0.6cm}
 
-{\Large \textbf{Decentralized Crypto World Bank: A Blockchain-Based\\[0.3em] Hierarchical Lending Platform with AI-Enhanced Security}}
+{\color{white}\LARGE\bfseries Decentralized Crypto World Bank}\\[0.4em]
+{\color{white!90}\large A Blockchain-Based Hierarchical Lending Platform\\[0.2em]with AI-Enhanced Security}
+
+\vspace{3.5cm}
+
+{\large by}
+
+\vspace{0.8cm}
+
+{\Large\bfseries\color{PrimaryBlue} Md.\ Bokhtiar Rahman Juboraz}\\[0.2em]
+{\color{GrayText}20301138}\\[1em]
+{\Large\bfseries\color{PrimaryBlue} Md.\ Mahir Ahnaf Ahmed}\\[0.2em]
+{\color{GrayText}20301083}
 
 \vspace{2.5cm}
 
-by
-
-\vspace{1cm}
-
-Md. Bokhtiar Rahman Juboraz\\
-20301138\\[0.8em]
-Md. Mahir Ahnaf Ahmed\\
-20301083
-
-\vspace{3cm}
-
 A thesis submitted to the Department of Computer Science and Engineering\\
 in partial fulfillment of the requirements for the degree of\\
-B.Sc. in Computer Science
+\textbf{B.Sc.\ in Computer Science}
 
 \vfill
 
+{\color{PrimaryBlue}\rule{0.4\textwidth}{0.6pt}}\\[0.8em]
 Department of Computer Science and Engineering\\
-Brac University\\
+\textbf{Brac University}\\
 February 2026
 
-\vspace{1.5cm}
+\vspace{1cm}
 
-\copyright\ 2026. Brac University\\
-All rights reserved.
+{\small\color{GrayText}\copyright\ 2026.\ Brac University --- All rights reserved.}
 
 \end{center}
 
@@ -188,14 +312,20 @@ Brac University
 \begin{abstract}
 \addcontentsline{toc}{section}{Abstract}
 
-International development finance relies on multi-tiered institutional hierarchies---from supranational reserves to national intermediaries to local disbursement entities---to coordinate the flow of capital across borders. These conventional systems, while providing governance and risk management, suffer from limited transparency, protracted settlement cycles, and opaque decision-making processes that erode stakeholder trust.
+International development finance is delivered through layered institutional structures in which multilateral development institutions, national financial intermediaries, and local lenders jointly channel capital to end borrowers. While this model enables risk distribution and local market access, it is associated with operational challenges, including limited cross-tier transparency, lengthy cross-border settlement processes, high reconciliation and compliance overhead, and constrained scalability of risk assessment workflows. At the same time, approximately 1.4 billion adults remain unbanked according to the World Bank Global Findex (2021), highlighting the need for more efficient and accessible credit delivery mechanisms.
 
-This project presents the \textbf{Crypto World Bank}, a decentralized application (DApp) that replicates the hierarchical lending model of traditional development finance institutions on a public Ethereum Virtual Machine (EVM) blockchain. The platform enforces a four-tier capital flow (World Bank $\to$ National Banks $\to$ Local Banks $\to$ Borrowers) through a suite of auditable smart contracts, while augmenting loan approval workflows with an off-chain AI/ML security layer for fraud detection, anomaly identification, and explainable risk assessment.
+This paper presents the \textbf{Crypto World Bank}, a prototype decentralized application (DApp) that implements a four-tier hierarchical lending architecture on an Ethereum Virtual Machine (EVM)--compatible blockchain. The system models capital flows across four roles---Reserve Authority, National Banks, Local Banks, and Borrowers---using auditable smart contracts that enforce role-based permissions, reserve allocation constraints, and configurable loan repayment schedules. The design aims to preserve institutional hierarchy while enabling shared ledger visibility and automated rule execution.
 
-We demonstrate that blockchain technology is uniquely suited to this domain because the underlying challenge is fundamentally one of \textbf{multi-party trust and coordination}---a class of problems for which distributed ledger technology provides superior guarantees over conventional centralized architectures. The document further presents the target market, partnership ecosystem, competitive landscape, risk profile, system architecture, governance framework, and a phased go-to-market strategy.
+To support risk management, the platform incorporates an off-chain analytics layer that applies machine learning techniques for transaction monitoring and decision support. A Random Forest classifier is used for supervised fraud detection, Isolation Forest for unsupervised anomaly detection, and SHAP-based feature attribution to provide interpretable risk signals for human reviewers. These tools are intended to augment, rather than replace, institutional credit governance.
+
+The prototype is deployed on public EVM test networks, including Ethereum test environments and Polygon infrastructure, where observed confirmation times are on the order of seconds and transaction costs are negligible under test conditions. Performance evaluation focuses on functional validation of hierarchical controls, transparency properties, and operational workflows rather than production-scale financial performance.
+
+We position blockchain in this context as a coordination technology that can provide shared state visibility, tamper-evident audit trails, and programmable process enforcement across multiple institutions. The paper further discusses governance design, security controls, regulatory considerations, and a phased deployment pathway involving academic validation and regulatory sandbox pilots.
+
+By integrating hierarchical institutional structures with transparent ledger infrastructure and data-driven risk analytics, the Crypto World Bank explores a hybrid architecture for institutional decentralized finance that targets improved operational efficiency and expanded access to credit in emerging markets.
 
 \vspace{0.5em}
-\noindent\textbf{Keywords:} Blockchain, Decentralized Finance, Hierarchical Lending, Smart Contracts, AI/ML Security, Fraud Detection, Explainable AI, Governance, Development Finance
+\noindent\textbf{Keywords:} Blockchain, Development Finance, Hierarchical Lending, Smart Contracts, DeFi, Financial Inclusion, Explainable AI, Governance
 \end{abstract}
 
 \newpage
@@ -270,10 +400,10 @@ A conventional cloud-hosted database infrastructure would necessitate a trusted 
 The Crypto World Bank implements a \textbf{four-tier, on-chain hierarchical lending architecture}:
 
 \begin{itemize}[noitemsep]
-\item \textbf{Tier 1 — World Bank:} Maintains the global crypto reserve. Allocates capital to registered National Banks through smart contract-mediated lending operations.
-\item \textbf{Tier 2 — National Banks:} Borrow from the World Bank reserve. Lend to registered Local Banks within their jurisdiction. Aggregate risk exposure at the national level.
-\item \textbf{Tier 3 — Local Banks:} Borrow from National Banks. Process loan requests from individual borrowers. Employ designated approvers for loan lifecycle management.
-\item \textbf{Tier 4 — Borrowers:} Submit loan requests to Local Banks. Repay through configurable installment schedules. Accumulate on-chain repayment history that informs future borrowing limits.
+\item \textbf{Tier 1 --- World Bank:} Maintains the global crypto reserve. Allocates capital to registered National Banks through smart contract-mediated lending operations.
+\item \textbf{Tier 2 --- National Banks:} Borrow from the World Bank reserve. Lend to registered Local Banks within their jurisdiction. Aggregate risk exposure at the national level.
+\item \textbf{Tier 3 --- Local Banks:} Borrow from National Banks. Process loan requests from individual borrowers. Employ designated approvers for loan lifecycle management.
+\item \textbf{Tier 4 --- Borrowers:} Submit loan requests to Local Banks. Repay through configurable installment schedules. Accumulate on-chain repayment history that informs future borrowing limits.
 \end{itemize}
 
 The platform further integrates:
@@ -290,21 +420,20 @@ The platform further integrates:
 
 \subsection{Market Sizing}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Market segments.}
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Segment} & \textbf{Description} & \textbf{Estimated Scale} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{4cm} >{\raggedright}p{5cm} >{\raggedright\arraybackslash}p{3cm} @{}}
+\toprule
+\tableheadfont Segment & \tableheadfont Description & \tableheadfont Estimated Scale \\
+\midrule
+\rowcolor{RowShade}
 Total Addressable Market (TAM) & Global decentralized lending market; DeFi lending TVL has historically exceeded \$50B & \$50B+ \\
-\hline
 Serviceable Addressable Market (SAM) & Institutional and semi-institutional lending requiring hierarchical structures & \$5--10B \\
-\hline
+\rowcolor{RowShade}
 Serviceable Obtainable Market (SOM) & Pilot deployments in regulatory sandboxes, academic prototypes, NGO-backed microfinance & \$50--200M \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 The market for \textbf{transparent, hierarchy-preserving decentralized lending} is presently unaddressed by existing DeFi protocols, which universally adopt flat, pool-based architectures. This represents a significant whitespace opportunity.
 
@@ -312,51 +441,45 @@ The market for \textbf{transparent, hierarchy-preserving decentralized lending} 
 
 The Crypto World Bank targets the \textbf{retail customer segment} --- individual borrowers and small businesses seeking transparent, accessible crypto-based lending services.
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Target customer segment profile.}
-\small
-\begin{tabular}{|p{3.5cm}|p{8cm}|}
-\hline
-\textbf{Characteristic} & \textbf{Description} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3.8cm} >{\raggedright\arraybackslash}p{8.2cm} @{}}
+\toprule
+\tableheadfont Characteristic & \tableheadfont Description \\
+\midrule
+\rowcolor{RowShade}
 Primary Users & Individual retail borrowers seeking personal or small business loans \\
-\hline
 Geographic Focus & Developing economies with limited traditional banking access (e.g., Bangladesh, Southeast Asia, Sub-Saharan Africa) \\
-\hline
+\rowcolor{RowShade}
 Loan Size Range & Micro to mid-range: 0.1 ETH -- 500 ETH equivalent (\textasciitilde\$200 -- \$1,000,000 at current rates) \\
-\hline
 User Profile & Digitally literate individuals with cryptocurrency wallet access; small business owners; gig-economy freelancers \\
-\hline
+\rowcolor{RowShade}
 Key Pain Points & High interest rates from informal lenders; lack of credit history in traditional systems; exclusion from banking due to documentation barriers \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \textbf{Why Retail:} The retail segment represents the largest underserved population in developing economies. According to the World Bank's Global Findex Database, approximately 1.4 billion adults remain unbanked, with the majority concentrated in developing countries. By targeting retail customers, the platform maximizes financial inclusion impact while generating the transaction volume necessary to sustain the lending ecosystem. The hierarchical banking model (World Bank $\to$ National $\to$ Local $\to$ Borrower) mirrors how traditional microfinance institutions reach retail customers in underserved regions, but with blockchain-enforced transparency and AI-enhanced risk assessment.
 
 \subsection{Partner Ecosystem}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Partner categories and roles.}
-\small
-\begin{tabular}{|p{3.2cm}|p{4cm}|p{4.5cm}|}
-\hline
-\textbf{Partner Category} & \textbf{Functional Role} & \textbf{Blockchain-Mediated Incentive} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3.2cm} >{\raggedright}p{4.2cm} >{\raggedright\arraybackslash}p{4.6cm} @{}}
+\toprule
+\tableheadfont Partner Category & \tableheadfont Functional Role & \tableheadfont Blockchain-Mediated Incentive \\
+\midrule
+\rowcolor{RowShade}
 Financial Regulators & Regulatory sandbox approval; compliance oversight & Reduced enforcement cost through on-chain transparency and audit trails \\
-\hline
 Banking Institutions & Network membership as National/Local Banks & Access to diversified global reserve; reduced inter-bank settlement friction \\
-\hline
+\rowcolor{RowShade}
 Payment Gateway Providers & Fiat-to-crypto on-ramp and off-ramp services & Volume-based transaction fees; expanded market reach \\
-\hline
-Academic and Research Institutions & Validation of AI/ML models; publication of research findings & Access to anonymized datasets; collaborative research opportunities \\
-\hline
+Academic \& Research Institutions & Validation of AI/ML models; publication of research findings & Access to anonymized datasets; collaborative research opportunities \\
+\rowcolor{RowShade}
 Non-Governmental Organizations & Pilot deployment; field testing with underserved borrower populations & Transparent, low-friction credit access for beneficiaries \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Incentive Alignment Through the Blockchain Platform}
 
@@ -374,22 +497,20 @@ Partner incentives are allocated and enforced through the blockchain platform it
 
 \subsection{Direct Competition}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Direct competition.}
-\small
-\begin{tabular}{|p{2.5cm}|p{3.2cm}|p{5cm}|}
-\hline
-\textbf{Competitor Category} & \textbf{Representative Examples} & \textbf{Crypto World Bank Differentiation} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{2.8cm} >{\raggedright}p{3.4cm} >{\raggedright\arraybackslash}p{5.5cm} @{}}
+\toprule
+\tableheadfont Competitor Category & \tableheadfont Representative Examples & \tableheadfont Crypto World Bank Differentiation \\
+\midrule
+\rowcolor{RowShade}
 DeFi lending protocols & Aave, Compound, MakerDAO & Hierarchical four-tier institutional model; integrated AI/ML risk layer; role-based governance \\
-\hline
 Traditional development finance & World Bank, IFC, ADB & On-chain transparency; programmable enforcement; near-instant settlement \\
-\hline
+\rowcolor{RowShade}
 Blockchain-native credit platforms & Centrifuge, Maple Finance, Goldfinch & Combined hierarchy and AI security; designed for institutional adoption \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Indirect Competition}
 
@@ -400,28 +521,24 @@ Blockchain-native credit platforms & Centrifuge, Maple Finance, Goldfinch & Comb
 
 \subsection{Risk Taxonomy and Mitigation Strategy}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Risk taxonomy and mitigation.}
-\small
-\begin{tabular}{|p{2.2cm}|p{3.2cm}|c|p{3.8cm}|}
-\hline
-\textbf{Risk Category} & \textbf{Description} & \textbf{Sev.} & \textbf{Mitigation} \\
-\hline
-Partner non-cooperation & Key ecosystem partners decline to participate & M & Initiate with low-barrier academic and NGO pilots; minimize switching costs \\
-\hline
-Incentive misalignment & Participant incentives diverge from network objectives & M & Codify rules in smart contracts; implement governance token alignment (future) \\
-\hline
-Smart contract vulnerability & Exploit in contract logic (reentrancy, overflow) & H & OpenZeppelin security primitives; formal audit (planned); pause mechanism \\
-\hline
-Regulatory adversity & Jurisdictional restrictions on crypto lending & M & Operate exclusively on testnets during prototype phase; engage regulatory sandbox programs \\
-\hline
-Market adoption failure & Insufficient user or institutional traction & L & Leverage academic and competition channels; open-source codebase \\
-\hline
-AI/ML model degradation & Fraud detection accuracy decays over time & L & Continuous model retraining pipeline; human-in-the-loop review; explainability via SHAP \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{2.4cm} >{\raggedright}p{3.2cm} c >{\raggedright\arraybackslash}p{4.2cm} @{}}
+\toprule
+\tableheadfont Risk Category & \tableheadfont Description & \tableheadfont Sev. & \tableheadfont Mitigation \\
+\midrule
+\rowcolor{RowShade}
+Partner non-cooperation & Key ecosystem partners decline to participate & {\color{AmberAccent}\textbf{M}} & Initiate with low-barrier academic and NGO pilots; minimize switching costs \\
+Incentive misalignment & Participant incentives diverge from network objectives & {\color{AmberAccent}\textbf{M}} & Codify rules in smart contracts; implement governance token alignment (future) \\
+\rowcolor{RowShade}
+Smart contract vulnerability & Exploit in contract logic (reentrancy, overflow) & {\color{RedAccent}\textbf{H}} & OpenZeppelin security primitives; formal audit (planned); pause mechanism \\
+Regulatory adversity & Jurisdictional restrictions on crypto lending & {\color{AmberAccent}\textbf{M}} & Operate exclusively on testnets during prototype phase; engage regulatory sandbox programs \\
+\rowcolor{RowShade}
+Market adoption failure & Insufficient user or institutional traction & {\color{GreenAccent}\textbf{L}} & Leverage academic and competition channels; open-source codebase \\
+AI/ML model degradation & Fraud detection accuracy decays over time & {\color{GreenAccent}\textbf{L}} & Continuous model retraining pipeline; human-in-the-loop review; explainability via SHAP \\
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Comparative Advantage}
 
@@ -438,58 +555,53 @@ AI/ML model degradation & Fraud detection accuracy decays over time & L & Contin
 
 The system employs a \textbf{three-layer decentralized application architecture}:
 
+\vspace{6pt}
+\begin{minipage}{\textwidth}
 \begin{center}
-\setlength{\fboxsep}{10pt}
-\setlength{\fboxrule}{0.6pt}
+\begin{layerbox}{PRESENTATION LAYER}
+\textbf{React 18} \(\cdot\) \textbf{TypeScript} \(\cdot\) \textbf{Material Design 3} \(\cdot\) \textbf{Wagmi} \(\cdot\) \textbf{Viem}\\[4pt]
+{\small Modules: Dashboard, Deposit, Loan, Admin, Risk AI, QR}
+\end{layerbox}
 
-\fbox{\parbox{0.88\textwidth}{%
-\textbf{PRESENTATION LAYER}\\[3pt]
-React 18 \(\cdot\) TypeScript \(\cdot\) Material Design 3 \(\cdot\) Wagmi \(\cdot\) Viem\\[2pt]
-Modules: Dashboard, Deposit, Loan, Admin, Risk AI, QR%
-}}
+\vspace{2pt}
+{\Large\color{AccentBlue} $\boldsymbol{\downarrow}$}
+\vspace{2pt}
 
-\vspace{6pt}
-{\Large $\downarrow$}
-\vspace{6pt}
+\begin{layerbox}{SMART CONTRACT LAYER \normalfont\small(EVM: Ethereum / Polygon)}
+\textbf{World Bank Reserve Contract} \(\cdot\) \textbf{National Bank Contract} \(\cdot\) \textbf{Local Bank Contract}\\[4pt]
+{\small Operations: Reserve Mgmt, Hierarchical Lending, Loan Lifecycle, Access Control, Emergency Controls}
+\end{layerbox}
 
-\fbox{\parbox{0.88\textwidth}{%
-\textbf{SMART CONTRACT LAYER (EVM: Ethereum / Polygon)}\\[3pt]
-World Bank Reserve Contract \(\cdot\) National Bank Contract \(\cdot\) Local Bank Contract\\[2pt]
-Operations: Reserve Mgmt, Hierarchical Lending, Loan Lifecycle,\\
-Access Control, Emergency Controls%
-}}
+\vspace{2pt}
+{\Large\color{AccentBlue} $\boldsymbol{\downarrow}$}
+\vspace{2pt}
 
-\vspace{6pt}
-{\Large $\downarrow$}
-\vspace{6pt}
-
-\fbox{\parbox{0.88\textwidth}{%
-\textbf{OFF-CHAIN SERVICES LAYER}\\[3pt]
-PostgreSQL (Relational DB) \(\cdot\) FastAPI (REST API)\\[2pt]
-AI/ML: Random Forest (Fraud) \(\cdot\) Isolation Forest (Anomaly)\\[2pt]
-SHAP (Explainability) \(\cdot\) Event Listener \(\cdot\) Cache (Redis)%
-}}
+\begin{layerbox}{OFF-CHAIN SERVICES LAYER}
+\textbf{PostgreSQL} (Relational DB) \(\cdot\) \textbf{FastAPI} (REST API)\\[4pt]
+{\small AI/ML: Random Forest (Fraud) \(\cdot\) Isolation Forest (Anomaly) \(\cdot\) SHAP (Explainability)}\\[2pt]
+{\small Event Listener \(\cdot\) Cache (Redis)}
+\end{layerbox}
 \end{center}
+\end{minipage}
+\vspace{6pt}
 
 \subsection{Blockchain Platform Selection}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Blockchain platform selection.}
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Criterion} & \textbf{Selection} & \textbf{Justification} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3cm} >{\raggedright}p{3.8cm} >{\raggedright\arraybackslash}p{5.2cm} @{}}
+\toprule
+\tableheadfont Criterion & \tableheadfont Selection & \tableheadfont Justification \\
+\midrule
+\rowcolor{RowShade}
 Platform & Ethereum Virtual Machine (EVM) & Largest developer ecosystem; battle-tested security model; extensive tooling \\
-\hline
 Network & Polygon Mumbai / Ethereum Sepolia (testnets) & Zero-cost deployment; production-equivalent behavior; free faucet access \\
-\hline
+\rowcolor{RowShade}
 Consensus & Proof-of-Stake (PoS) via Polygon validators & Energy-efficient; sub-2-second block finality; decentralized validator set \\
-\hline
 Smart contract language & Solidity 0.8.20 & Industry standard; mature compiler with overflow protection; rich library ecosystem \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Transaction Verification and Consensus}
 
@@ -500,24 +612,21 @@ Smart contract language & Solidity 0.8.20 & Industry standard; mature compiler w
 
 \subsection{On-Chain and Off-Chain Data Partitioning}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Data partitioning.}
-\small
-\begin{tabular}{|p{4.2cm}|p{2.5cm}|p{5cm}|}
-\hline
-\textbf{Data Category} & \textbf{Storage} & \textbf{Rationale} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{4.2cm} >{\raggedright}p{2.5cm} >{\raggedright\arraybackslash}p{5.3cm} @{}}
+\toprule
+\tableheadfont Data Category & \tableheadfont Storage & \tableheadfont Rationale \\
+\midrule
+\rowcolor{RowShade}
 Reserve balances, loan requests, approval/rejection events, repayment transactions & On-chain & Immutability, public auditability, trustless verification \\
-\hline
 User profiles, income verification documents, chat messages, AI/ML inference logs & Off-chain (PostgreSQL) & Data privacy, query flexibility, storage cost optimization \\
-\hline
+\rowcolor{RowShade}
 Borrowing limit computations & Off-chain with on-chain enforcement & Complex temporal aggregation; results committed as on-chain constraints \\
-\hline
 Cryptocurrency market data & Off-chain (cached) & High-frequency updates; external API dependency \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Data Model}
 
@@ -575,65 +684,59 @@ As the platform operates within the regulated banking domain:
 
 \subsubsection{Network Membership Governance}
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{|p{3.5cm}|p{8cm}|}
-\hline
-\textbf{Governance Aspect} & \textbf{Implementation} \\
-\hline
+\begin{moderntable}
+\caption{Network membership governance.}
+\begin{tabular}{@{} >{\raggedright}p{3.5cm} >{\raggedright\arraybackslash}p{8.5cm} @{}}
+\toprule
+\tableheadfont Governance Aspect & \tableheadfont Implementation \\
+\midrule
+\rowcolor{RowShade}
 Member on-boarding & World Bank owner registers National Banks; National Banks register Local Banks; Local Banks designate approvers --- all enforced on-chain \\
-\hline
 Member off-boarding & Deactivation flags in smart contracts; cascading access revocation \\
-\hline
+\rowcolor{RowShade}
 Regulatory oversight & Audit log emission via smart contract events; planned read-only regulator dashboard \\
-\hline
 Permission structure & Hierarchical: Owner $\to$ National Bank $\to$ Local Bank $\to$ Approver $\to$ Borrower; enforced by on-chain role-check modifiers \\
-\hline
+\rowcolor{RowShade}
 Network operations & Pause/unpause mechanism for emergency response; emergency withdrawal for critical situations \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsubsection{Business Network Governance}
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{|p{3.5cm}|p{8cm}|}
-\hline
-\textbf{Governance Aspect} & \textbf{Implementation} \\
-\hline
+\begin{moderntable}
+\caption{Business network governance.}
+\begin{tabular}{@{} >{\raggedright}p{3.5cm} >{\raggedright\arraybackslash}p{8.5cm} @{}}
+\toprule
+\tableheadfont Governance Aspect & \tableheadfont Implementation \\
+\midrule
+\rowcolor{RowShade}
 Business charter & Defined in this whitepaper; operational parameters codified in smart contract constants \\
-\hline
 Common services & Reserve management, loan lifecycle orchestration, event-driven notification system \\
-\hline
+\rowcolor{RowShade}
 Business SLA & Testnet phase: best-effort availability. Production phase: 99.5\% target uptime with multi-region deployment \\
-\hline
 Regulatory compliance & Architecture designed for audit trail generation; data partitioning supports GDPR-style data subject requests \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsubsection{Technology Infrastructure Governance}
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{|p{3.5cm}|p{8cm}|}
-\hline
-\textbf{Governance Aspect} & \textbf{Implementation} \\
-\hline
+\begin{moderntable}
+\caption{Technology infrastructure governance.}
+\begin{tabular}{@{} >{\raggedright}p{3.5cm} >{\raggedright\arraybackslash}p{8.5cm} @{}}
+\toprule
+\tableheadfont Governance Aspect & \tableheadfont Implementation \\
+\midrule
+\rowcolor{RowShade}
 Distributed IT structure & Client-side frontend (decentralized delivery); blockchain layer (fully decentralized); backend API (centralized, horizontally scalable) \\
-\hline
 Technology assessment & Continuous evaluation of EVM alternatives (L2 rollups, sidechains) for cost and performance optimization \\
-\hline
+\rowcolor{RowShade}
 On-chain / off-chain data services & Clearly partitioned (see Section IV.D); event listeners synchronize state between layers \\
-\hline
 Risk mitigation & Smart contract pause mechanism; ReentrancyGuard; input validation; planned formal security audit \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Asset Tokenization}
 
@@ -648,28 +751,24 @@ Risk mitigation & Smart contract pause mechanism; ReentrancyGuard; input validat
 
 All blockchain transaction costs (gas fees) are borne by the \textbf{transaction initiator}, following standard Ethereum/Polygon network conventions:
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Gas fee responsibility by transaction type.}
-\small
-\begin{tabular}{|p{3.8cm}|p{3cm}|p{4.5cm}|}
-\hline
-\textbf{Transaction Type} & \textbf{Gas Fee Payer} & \textbf{Rationale} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3.8cm} >{\raggedright}p{3cm} >{\raggedright\arraybackslash}p{5cm} @{}}
+\toprule
+\tableheadfont Transaction Type & \tableheadfont Gas Fee Payer & \tableheadfont Rationale \\
+\midrule
+\rowcolor{RowShade}
 Loan Request & Borrower & Borrower initiates the loan request transaction \\
-\hline
 Loan Approval & Bank Approver & Approver initiates the approval transaction \\
-\hline
+\rowcolor{RowShade}
 Loan Rejection & Bank Approver & Approver initiates the rejection transaction \\
-\hline
 Installment Payment & Borrower & Borrower initiates each installment payment \\
-\hline
+\rowcolor{RowShade}
 Deposit to Reserve & Depositor & Depositor initiates the reserve contribution \\
-\hline
 Bank Registration & Registering Authority & World Bank Admin or National Bank initiates registration \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 On \textbf{Polygon PoS} (the primary target network), gas fees are denominated in MATIC and are significantly lower than Ethereum mainnet --- typically \textbf{\$0.001--\$0.01 per transaction}, making the platform economically viable for retail users with smaller loan amounts. This low fee structure is critical for the retail customer segment, where even small transaction costs can disproportionately affect borrower economics.
 
@@ -677,26 +776,23 @@ On \textbf{Polygon PoS} (the primary target network), gas fees are denominated i
 
 The platform implements \textbf{market-standard interest rates} aligned with prevailing DeFi lending benchmarks:
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Interest rate parameters.}
-\small
-\begin{tabular}{|p{3.5cm}|p{3.5cm}|p{4.5cm}|}
-\hline
-\textbf{Parameter} & \textbf{Value} & \textbf{Benchmark} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3.5cm} >{\raggedright}p{3.5cm} >{\raggedright\arraybackslash}p{5cm} @{}}
+\toprule
+\tableheadfont Parameter & \tableheadfont Value & \tableheadfont Benchmark \\
+\midrule
+\rowcolor{RowShade}
 Base Annual Interest Rate & 5--12\% APR & Aligned with Aave/Compound variable rates for major crypto assets \\
-\hline
 Rate Determination & Set by Local Bank approvers within World Bank-defined bounds & Configurable per-bank to reflect local market conditions \\
-\hline
+\rowcolor{RowShade}
 Late Payment Penalty & 2\% of installment amount + 0.5\% per additional week overdue (capped at 10\%) & Industry-standard late fee structure \\
-\hline
 Interest Calculation & Simple interest on outstanding principal & Transparent, borrower-friendly method \\
-\hline
+\rowcolor{RowShade}
 Rate Transparency & All rate parameters stored on-chain as smart contract constants & Publicly auditable; no hidden fees \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 Interest rates are designed to balance lending sustainability with borrower affordability. The on-chain storage of rate parameters ensures borrowers can independently verify loan terms before execution. Local Banks may adjust rates within the bounds set by the World Bank tier, allowing localized pricing that reflects regional economic conditions.
 
@@ -708,78 +804,106 @@ Interest rates are designed to balance lending sustainability with borrower affo
 
 The project adopts a \textbf{lightweight Agile/Scrum} methodology tailored for an academic prototype with a fixed two-month development window. The iterative approach enables incremental delivery of demonstrable features while accommodating evolving requirements inherent in research-oriented development.
 
+\vspace{8pt}
+\begin{tcolorbox}[
+    colback=PrimaryBlue!5,
+    colframe=PrimaryBlue,
+    coltitle=white,
+    fonttitle=\bfseries\small,
+    title={\centering AGILE DEVELOPMENT LIFECYCLE --- 2-Month Window},
+    boxrule=0.8pt,
+    arc=4pt,
+]
 \begin{center}
-\setlength{\fboxsep}{8pt}
-\setlength{\fboxrule}{0.6pt}
+\begin{tikzpicture}[
+    sprint/.style={
+        draw=AccentBlue,
+        fill=LightBlue,
+        rounded corners=4pt,
+        minimum width=3.6cm,
+        minimum height=3.2cm,
+        text width=3.4cm,
+        align=left,
+        font=\small,
+        inner sep=6pt,
+    },
+    sprintlabel/.style={
+        font=\bfseries\small,
+        text=PrimaryBlue,
+    },
+    arrowstyle/.style={
+        ->,
+        >=stealth,
+        line width=1.2pt,
+        color=AccentBlue,
+    }
+]
+\node[sprint] (s1) at (0,0) {
+    {\sprintlabel SPRINT 1}\\
+    {\scriptsize Weeks 1--3}\\[3pt]
+    \textbf{Foundation \&}\\
+    \textbf{Core Banking}\\[2pt]
+    {\scriptsize
+    \textbullet\ Smart contracts\\
+    \textbullet\ Frontend setup\\
+    \textbullet\ Wallet integration\\
+    \textbullet\ Dashboard \& Deposit\\
+    \textbullet\ Database schema}
+};
 
-\fbox{\parbox{0.92\textwidth}{%
-\centering\textbf{AGILE DEVELOPMENT LIFECYCLE} --- 2-Month Window%
-}}
+\node[sprint] (s2) at (4.8,0) {
+    {\sprintlabel SPRINT 2}\\
+    {\scriptsize Weeks 4--6}\\[3pt]
+    \textbf{Lending Features}\\
+    \textbf{\& Communication}\\[2pt]
+    {\scriptsize
+    \textbullet\ Installment payments\\
+    \textbullet\ Borrowing limits\\
+    \textbullet\ Chat system\\
+    \textbullet\ Income verification\\
+    \textbullet\ Bank hierarchy}
+};
 
-\vspace{12pt}
+\node[sprint] (s3) at (9.6,0) {
+    {\sprintlabel SPRINT 3}\\
+    {\scriptsize Weeks 7--8}\\[3pt]
+    \textbf{AI/ML Security}\\
+    \textbf{\& Polish}\\[2pt]
+    {\scriptsize
+    \textbullet\ Fraud detection\\
+    \textbullet\ Risk dashboard\\
+    \textbullet\ Security audit\\
+    \textbullet\ Documentation\\
+    \textbullet\ Demo prep}
+};
 
-\fbox{\begin{minipage}[t]{0.27\textwidth}
-\centering\textbf{SPRINT 1}\\(Weeks 1--3)\\[6pt]
-\raggedright\textbf{Foundation \&\\Core Banking}\\[4pt]
-{\small%
-\begin{itemize}[noitemsep,leftmargin=*,topsep=0pt]
-\item Smart contract development
-\item Frontend setup
-\item Wallet integration
-\item Dashboard \& Deposit flow
-\item Database schema
-\end{itemize}}
-\end{minipage}}%
-\hfill{\Large $\Rightarrow$}\hfill%
-\fbox{\begin{minipage}[t]{0.27\textwidth}
-\centering\textbf{SPRINT 2}\\(Weeks 4--6)\\[6pt]
-\raggedright\textbf{Lending Features\\  \& Communication}\\[4pt]
-{\small%
-\begin{itemize}[noitemsep,leftmargin=*,topsep=0pt]
-\item Installment payment system
-\item Borrowing limit enforcement
-\item Chat system
-\item Income verification
-\item Bank hierarchy
-\end{itemize}}
-\end{minipage}}%
-\hfill{\Large $\Rightarrow$}\hfill%
-\fbox{\begin{minipage}[t]{0.27\textwidth}
-\centering\textbf{SPRINT 3}\\(Weeks 7--8)\\[6pt]
-\raggedright\textbf{AI/ML Security\\  \& Polish}\\[4pt]
-{\small%
-\begin{itemize}[noitemsep,leftmargin=*,topsep=0pt]
-\item Fraud detection model
-\item Risk dashboard integration
-\item Security audit
-\item Documentation
-\item Demo prep
-\end{itemize}}
-\end{minipage}}
+\draw[arrowstyle] (s1.east) -- (s2.west);
+\draw[arrowstyle] (s2.east) -- (s3.west);
+\end{tikzpicture}
 \end{center}
+\end{tcolorbox}
+\vspace{8pt}
 
 \subsection{Agile Sprint Plan (8-Week Schedule)}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Sprint plan.}
-\small
-\begin{tabular}{|p{1.2cm}|p{1.5cm}|p{2.2cm}|p{6.5cm}|}
-\hline
-\textbf{Sprint} & \textbf{Duration} & \textbf{Goal} & \textbf{Key Deliverables} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{1.2cm} >{\raggedright}p{1.5cm} >{\raggedright}p{2.2cm} >{\raggedright\arraybackslash}p{7cm} @{}}
+\toprule
+\tableheadfont Sprint & \tableheadfont Duration & \tableheadfont Goal & \tableheadfont Key Deliverables \\
+\midrule
+\rowcolor{RowShade}
 Sprint 1 & Weeks 1--3 & Foundation and Core Banking & Smart contract suite (WorldBankReserve, NationalBank, LocalBank); React frontend scaffolding; wallet integration; Dashboard and Deposit pages; database schema (15 tables, 3NF) \\
-\hline
 Sprint 2 & Weeks 4--6 & Lending Features and Communication & Loan request and approval workflow; installment payment system; borrowing limit engine; borrower--bank chat; income verification; hierarchical bank registration \\
-\hline
+\rowcolor{RowShade}
 Sprint 3 & Weeks 7--8 & AI/ML Security and Finalization & Fraud detection model (Random Forest + SHAP); risk dashboard; anomaly detection prototype; security audit; documentation; demo preparation \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{User Stories per Sprint}
 
-\textbf{Sprint 1 — Foundation}
+\textbf{Sprint 1 --- Foundation}
 \begin{itemize}[noitemsep]
 \item US-1.1: As a user, I want to connect my wallet so that I can interact with the platform.
 \item US-1.2: As a user, I want to deposit to the reserve so that the bank has funds to lend.
@@ -787,7 +911,7 @@ Sprint 3 & Weeks 7--8 & AI/ML Security and Finalization & Fraud detection model 
 \item US-1.4: As a developer, I want a normalized database schema so that all entities are properly modeled.
 \end{itemize}
 
-\textbf{Sprint 2 — Lending}
+\textbf{Sprint 2 --- Lending}
 \begin{itemize}[noitemsep]
 \item US-2.1: As a borrower, I want to request a loan so that I can access capital.
 \item US-2.2: As an approver, I want to approve or reject loans so that I can manage bank risk.
@@ -795,7 +919,7 @@ Sprint 3 & Weeks 7--8 & AI/ML Security and Finalization & Fraud detection model 
 \item US-2.4: As a borrower, I want to chat with the bank so that I can discuss my loan application.
 \end{itemize}
 
-\textbf{Sprint 3 — AI/ML and Polish}
+\textbf{Sprint 3 --- AI/ML and Polish}
 \begin{itemize}[noitemsep]
 \item US-3.1: As a bank operator, I want fraud risk scores so that I can make informed approval decisions.
 \item US-3.2: As a bank operator, I want explainable AI so that I understand why a loan is flagged.
@@ -806,65 +930,55 @@ Sprint 3 & Weeks 7--8 & AI/ML Security and Finalization & Fraud detection model 
 
 The project maps to the seven stages of the Software Development Life Cycle (SDLC):
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{SDLC stage mapping.}
-\small
-\begin{tabular}{|p{2.8cm}|p{4.5cm}|p{4cm}|}
-\hline
-\textbf{SDLC Stage} & \textbf{Project Activity} & \textbf{Deliverable} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{2.8cm} >{\raggedright}p{4.5cm} >{\raggedright\arraybackslash}p{4.5cm} @{}}
+\toprule
+\tableheadfont SDLC Stage & \tableheadfont Project Activity & \tableheadfont Deliverable \\
+\midrule
+\rowcolor{RowShade}
 1. Planning \& Requirements & Feasibility studies; professor consultations; BCOLBD guideline review & Feasibility Report; Project Plan \\
-\hline
 2. Defining Requirements & System analysis (CSE471); use case definitions; constraints & CSE471 document; UC-1 through UC-5 \\
-\hline
+\rowcolor{RowShade}
 3. Designing Architecture & Three-layer architecture; DB schema (3NF); smart contract interfaces & Architecture diagrams; ERD; DFD \\
-\hline
 4. Development & Sprint 1--3: smart contracts, frontend, backend, AI/ML & Source code; DApp prototype \\
-\hline
+\rowcolor{RowShade}
 5. Testing & Hardhat unit tests (12+); integration testing; AI/ML evaluation & Test reports; model metrics \\
-\hline
 6. Deployment & Testnet deployment; frontend (Vercel); backend (Render) & Live prototype on testnet \\
-\hline
+\rowcolor{RowShade}
 7. Maintenance & Monitoring; model retraining; bug fixes; iteration & Updated docs; retrained models \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Design Decisions and Alternatives Considered}
 
 For each major design decision, alternatives were evaluated and the first and second choices justified. The complete analysis is documented in the project decision justification report.
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Summary of design decisions.}
-\small
-\begin{tabular}{|p{2.5cm}|p{2.8cm}|p{2.8cm}|p{3.2cm}|}
-\hline
-\textbf{Decision Area} & \textbf{1st Choice} & \textbf{2nd Choice} & \textbf{Key Criterion} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{2.5cm} >{\raggedright}p{2.8cm} >{\raggedright}p{2.8cm} >{\raggedright\arraybackslash}p{3.5cm} @{}}
+\toprule
+\tableheadfont Decision Area & \tableheadfont 1st Choice & \tableheadfont 2nd Choice & \tableheadfont Key Criterion \\
+\midrule
+\rowcolor{RowShade}
 Methodology & Agile / Scrum & Incremental & Evolving scope, milestones \\
-\hline
 Architecture & DApp + Off-chain AI & Hybrid w/ Oracle & Gas cost, ML flexibility \\
-\hline
+\rowcolor{RowShade}
 Frontend & React + TypeScript & Vue + TypeScript & Web3 ecosystem \\
-\hline
 Smart Contract & EVM (Solidity) & Solana (Rust) & Ecosystem, free testnets \\
-\hline
+\rowcolor{RowShade}
 UI Design & MUI (Material 3) & Tailwind CSS & Banking UI, speed \\
-\hline
 Fraud Detection & Random Forest & XGBoost & SHAP, 94\%+ precision \\
-\hline
+\rowcolor{RowShade}
 Anomaly Detection & Isolation Forest & Autoencoder & Unsupervised, no labels \\
-\hline
 XAI Method & SHAP & LIME & Theory, regulatory \\
-\hline
+\rowcolor{RowShade}
 Database & PostgreSQL & SQLite & CSE370, 3NF, async \\
-\hline
 Hosting & Vercel + Render & Localhost & \$0 cost, public URL \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 %==============================================================================
 \section{Feasibility Analysis}
@@ -872,72 +986,65 @@ Hosting & Vercel + Render & Localhost & \$0 cost, public URL \\
 
 \subsection{Technical Feasibility}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Technical feasibility.}
-\small
-\begin{tabular}{|p{2.5cm}|p{2.2cm}|p{6cm}|}
-\hline
-\textbf{Component} & \textbf{Assessment} & \textbf{Evidence} \\
-\hline
-Smart contracts & Fully feasible & Three contracts implemented, compiled, and tested with Hardhat (12+ passing unit tests); Solidity 0.8.20 with OpenZeppelin \\
-\hline
-Frontend DApp & Fully feasible & React 18 + TypeScript application with all pages implemented; Wagmi and RainbowKit provide mature wallet integration \\
-\hline
-Blockchain deployment & Fully feasible & Polygon Mumbai and Ethereum Sepolia testnets provide zero-cost, production-equivalent environments with free faucet access \\
-\hline
-AI/ML integration & Feasible with constraints & Random Forest inference on tabular data achieves sub-50ms latency; SHAP explanations computable in real-time; prototype scope limits to fraud detection \\
-\hline
-Database backend & Feasible & PostgreSQL schema designed (15 tables, 3NF); FastAPI provides async REST framework with automatic OpenAPI documentation \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{2.5cm} >{\raggedright}p{2.2cm} >{\raggedright\arraybackslash}p{7cm} @{}}
+\toprule
+\tableheadfont Component & \tableheadfont Assessment & \tableheadfont Evidence \\
+\midrule
+\rowcolor{RowShade}
+Smart contracts & {\color{GreenAccent}\textbf{Fully feasible}} & Three contracts implemented, compiled, and tested with Hardhat (12+ passing unit tests); Solidity 0.8.20 with OpenZeppelin \\
+Frontend DApp & {\color{GreenAccent}\textbf{Fully feasible}} & React 18 + TypeScript application with all pages implemented; Wagmi and RainbowKit provide mature wallet integration \\
+\rowcolor{RowShade}
+Blockchain deployment & {\color{GreenAccent}\textbf{Fully feasible}} & Polygon Mumbai and Ethereum Sepolia testnets provide zero-cost, production-equivalent environments with free faucet access \\
+AI/ML integration & {\color{AmberAccent}\textbf{Feasible w/ constraints}} & Random Forest inference on tabular data achieves sub-50ms latency; SHAP explanations computable in real-time; prototype scope limits to fraud detection \\
+\rowcolor{RowShade}
+Database backend & {\color{GreenAccent}\textbf{Feasible}} & PostgreSQL schema designed (15 tables, 3NF); FastAPI provides async REST framework with automatic OpenAPI documentation \\
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \textbf{Conclusion:} All core components are technically feasible within the prototype scope. The smart contract and frontend layers are already implemented and validated.
 
 \subsection{Economic Feasibility}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Economic feasibility.}
-\begin{tabular}{|l|p{3cm}|p{5.5cm}|}
-\hline
-\textbf{Cost Category} & \textbf{Estimate} & \textbf{Notes} \\
-\hline
-Blockchain deployment & \$0 & Public testnets (Sepolia, Mumbai) — no real cryptocurrency required \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3.5cm} >{\raggedright}p{3cm} >{\raggedright\arraybackslash}p{5.5cm} @{}}
+\toprule
+\tableheadfont Cost Category & \tableheadfont Estimate & \tableheadfont Notes \\
+\midrule
+\rowcolor{RowShade}
+Blockchain deployment & \$0 & Public testnets (Sepolia, Mumbai) --- no real cryptocurrency required \\
 Frontend hosting & \$0 & Vercel free tier or localhost for demo \\
-\hline
+\rowcolor{RowShade}
 Backend hosting & \$0 & Render free tier or localhost \\
-\hline
-AI/ML training & \$0 & Local machine (16 GB RAM, 16 GB VRAM) or Google Colab free tier \\
-\hline
-Development tools & \$0 & Hardhat, VS Code, Git — all open-source \\
-\hline
-Total prototype cost & \textbf{\$0} & Entire prototype operates at zero financial cost \\
-\hline
+AI/ML training & \$0 & Local machine (16\,GB RAM, 16\,GB VRAM) or Google Colab free tier \\
+\rowcolor{RowShade}
+Development tools & \$0 & Hardhat, VS Code, Git --- all open-source \\
+\textbf{Total prototype cost} & \textbf{\$0} & Entire prototype operates at zero financial cost \\
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \textbf{Conclusion:} The prototype is economically viable at zero cost, leveraging free-tier services and open-source tooling.
 
 \subsection{Operational and Schedule Feasibility}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Operational phases.}
-\begin{tabular}{|l|p{8cm}|}
-\hline
-\textbf{Phase} & \textbf{Timeline / Activities} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3cm} >{\raggedright\arraybackslash}p{9cm} @{}}
+\toprule
+\tableheadfont Phase & \tableheadfont Timeline / Activities \\
+\midrule
+\rowcolor{RowShade}
 Pre-Thesis 1 & Completed: Requirements analysis, system modeling, database design, software engineering planning, initial prototype \\
-\hline
 Pre-Thesis 2 & Current (8 weeks): Smart contract finalization, frontend completion, fraud detection implementation, documentation \\
-\hline
+\rowcolor{RowShade}
 Final Thesis & 4--8 weeks: Additional ML experiments, evaluation, final report, competition submission \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 The 8-week Agile plan distributes work across three sprints with defined deliverables per sprint. Risk mitigation includes: \textbf{Buffer:} Sprint 3 includes documentation and polish time as contingency. \textbf{Scope flexibility:} AI/ML features beyond fraud detection are designated as exploratory/future work. \textbf{Parallel workstreams:} Frontend, smart contract, and documentation tasks can proceed concurrently.
 
@@ -945,163 +1052,217 @@ The 8-week Agile plan distributes work across three sprints with defined deliver
 
 The following projection models the annual revenue potential of the hierarchical lending system at full deployment scale. Calculations use a reference ETH price of \textbf{\$2,000} (February 2026 market rate) and interest rate parameters defined in Section IV.I.
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Revenue projection assumptions.}
-\small
-\begin{tabular}{|p{5cm}|p{6.5cm}|}
-\hline
-\textbf{Parameter} & \textbf{Value} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{5.5cm} >{\raggedright\arraybackslash}p{6.5cm} @{}}
+\toprule
+\tableheadfont Parameter & \tableheadfont Value \\
+\midrule
+\rowcolor{RowShade}
 Reference ETH price & \$2,000 (Feb 2026) \\
-\hline
 World Bank $\to$ National Bank rate & 3\% APR (wholesale inter-bank) \\
-\hline
+\rowcolor{RowShade}
 National Bank $\to$ Local Bank rate & 5\% APR (inter-bank) \\
-\hline
 Local Bank $\to$ Borrower rate & 8\% APR (retail lending, mid-range of 5--12\%) \\
-\hline
+\rowcolor{RowShade}
 Average loan term & 12 months \\
-\hline
 Loan turnover factor & 2$\times$ per year (6-month avg effective cycle) \\
-\hline
+\rowcolor{RowShade}
 Default rate provision & 3\% (conservative DeFi industry estimate) \\
-\hline
 Origination fee & 0.25\% per disbursement \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsubsection{Tier 1 --- World Bank (Global Reserve)}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{World Bank revenue projection (1,000,000 ETH reserve).}
-\small
-\begin{tabular}{|p{6cm}|r|r|}
-\hline
-\textbf{Metric} & \textbf{ETH} & \textbf{USD Equivalent} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{6cm} r r @{}}
+\toprule
+\tableheadfont Metric & \tableheadfont ETH & \tableheadfont USD Equivalent \\
+\midrule
+\rowcolor{RowShade}
 Total reserve capital & 1,000,000 & \$2,000,000,000 \\
-\hline
 Disbursed to 5 National Banks & 1,000,000 & \$2,000,000,000 \\
-\hline
+\rowcolor{RowShade}
 Annual interest income (3\%) & 30,000 & \$60,000,000 \\
-\hline
 Origination fees (0.25\%) & 2,500 & \$5,000,000 \\
-\hline
+\rowcolor{RowShade}
 Less: Default provision (3\%) & $-$975 & $-$\$1,950,000 \\
-\hline
+\midrule
 \textbf{Net annual revenue} & \textbf{31,525} & \textbf{\$63,050,000} \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsubsection{Tier 2 --- National Banks (5 Banks $\times$ 200,000 ETH)}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{National Bank revenue projection (per bank and combined).}
-\small
-\begin{tabular}{|p{6cm}|r|r|}
-\hline
-\textbf{Metric (per National Bank)} & \textbf{ETH} & \textbf{USD Equivalent} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{6cm} r r @{}}
+\toprule
+\tableheadfont Metric (per National Bank) & \tableheadfont ETH & \tableheadfont USD Equivalent \\
+\midrule
+\rowcolor{RowShade}
 Capital received from World Bank & 200,000 & \$400,000,000 \\
-\hline
 Cost of capital (3\% to World Bank) & $-$6,000 & $-$\$12,000,000 \\
-\hline
+\rowcolor{RowShade}
 Disbursed to 10 Local Banks (10,000 each) & 100,000 & \$200,000,000 \\
-\hline
 Interest income from Local Banks (5\%) & 5,000 & \$10,000,000 \\
-\hline
+\rowcolor{RowShade}
 Retained reserve direct lending (100,000 ETH at 6\%) & 6,000 & \$12,000,000 \\
-\hline
 Origination fees (0.25\%) & 500 & \$1,000,000 \\
-\hline
+\rowcolor{RowShade}
 Less: Default provision (3\%) & $-$345 & $-$\$690,000 \\
-\hline
+\midrule
 \textbf{Net annual revenue per bank} & \textbf{5,155} & \textbf{\$10,310,000} \\
-\hline
+\rowcolor{MidBlue}
 \textbf{Combined (5 banks)} & \textbf{25,775} & \textbf{\$51,550,000} \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsubsection{Tier 3 --- Local Banks (50 Banks $\times$ 10,000 ETH)}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Local Bank revenue projection (per bank and combined).}
-\small
-\begin{tabular}{|p{6cm}|r|r|}
-\hline
-\textbf{Metric (per Local Bank)} & \textbf{ETH} & \textbf{USD Equivalent} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{6cm} r r @{}}
+\toprule
+\tableheadfont Metric (per Local Bank) & \tableheadfont ETH & \tableheadfont USD Equivalent \\
+\midrule
+\rowcolor{RowShade}
 Capital received from National Bank & 10,000 & \$20,000,000 \\
-\hline
 Cost of capital (5\% to National Bank) & $-$500 & $-$\$1,000,000 \\
-\hline
+\rowcolor{RowShade}
 Loans issued: 20 borrowers $\times$ 1,000 ETH ($2\times$ turnover) & 20,000 & \$40,000,000 \\
-\hline
 Interest income from borrowers (8\%) & 1,600 & \$3,200,000 \\
-\hline
+\rowcolor{RowShade}
 Origination fees (0.25\% on 20,000 ETH) & 50 & \$100,000 \\
-\hline
 Less: Default provision (3\%) & $-$49.5 & $-$\$99,000 \\
-\hline
+\midrule
 \textbf{Net annual revenue per bank} & \textbf{1,100.5} & \textbf{\$2,201,000} \\
-\hline
+\rowcolor{MidBlue}
 \textbf{Combined (50 banks)} & \textbf{55,025} & \textbf{\$110,050,000} \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsubsection{Borrower Economics (1,000 Borrowers $\times$ 1,000 ETH)}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Borrower-level economics.}
-\small
-\begin{tabular}{|p{6cm}|r|r|}
-\hline
-\textbf{Metric (per Borrower)} & \textbf{ETH} & \textbf{USD Equivalent} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{6cm} r r @{}}
+\toprule
+\tableheadfont Metric (per Borrower) & \tableheadfont ETH & \tableheadfont USD Equivalent \\
+\midrule
+\rowcolor{RowShade}
 Average loan amount & 1,000 & \$2,000,000 \\
-\hline
 Annual interest cost (8\%) & 80 & \$160,000 \\
-\hline
+\rowcolor{RowShade}
 Estimated business return (15--20\% avg.) & 150--200 & \$300,000--400,000 \\
-\hline
+\midrule
 \textbf{Net borrower surplus (after interest)} & \textbf{70--120} & \textbf{\$140,000--240,000} \\
-\hline
+\rowcolor{MidBlue}
 \textbf{Aggregate (1,000 borrowers)} & \textbf{70,000--120,000} & \textbf{\$140M--240M} \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsubsection{System-Wide Revenue Summary}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{System-wide annual revenue summary.}
-\small
-\begin{tabular}{|p{5.5cm}|r|r|}
-\hline
-\textbf{Tier} & \textbf{Annual Revenue (ETH)} & \textbf{USD Equivalent} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{5.5cm} r r @{}}
+\toprule
+\tableheadfont Tier & \tableheadfont Annual Revenue (ETH) & \tableheadfont USD Equivalent \\
+\midrule
+\rowcolor{RowShade}
 Tier 1: World Bank (1 entity) & 31,525 & \$63,050,000 \\
-\hline
 Tier 2: National Banks (5 entities) & 25,775 & \$51,550,000 \\
-\hline
+\rowcolor{RowShade}
 Tier 3: Local Banks (50 entities) & 55,025 & \$110,050,000 \\
-\hline
+\midrule
+\rowcolor{MidBlue}
 \textbf{Total platform revenue} & \textbf{112,325} & \textbf{\$224,650,000} \\
-\hline
 Borrower surplus generated & 70,000--120,000 & \$140M--240M \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
+
+% ── BAR GRAPH: Revenue by Tier ─────────────────────────────────────
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=20pt,
+    width=0.80\textwidth,
+    height=7cm,
+    clip=false,
+    ylabel={Annual Revenue (USD Millions)},
+    ylabel style={font=\small},
+    symbolic x coords={World Bank,National Banks,Local Banks,Total Platform},
+    xtick=data,
+    xticklabel style={font=\small,text width=2.2cm,align=center},
+    yticklabel style={font=\small},
+    ymin=0,
+    ymax=280,
+    ytick={0,50,100,150,200,250},
+    nodes near coords,
+    nodes near coords style={font=\scriptsize\bfseries},
+    every node near coord/.append style={anchor=south,yshift=1pt},
+    enlarge x limits=0.22,
+    grid=major,
+    grid style={dashed,gray!30},
+    axis lines=left,
+    title={\textbf{Annual Revenue by Platform Tier}},
+    title style={font=\normalsize,at={(0.5,1.05)}},
+]
+\addplot[fill=AccentBlue!80,draw=AccentBlue] coordinates {
+    (World Bank,63.05) (National Banks,51.55) (Local Banks,110.05) (Total Platform,224.65)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Annual revenue projection by tier (USD millions, at \$2{,}000/ETH).}
+\end{figure}
+
+% ── BAR GRAPH: Interest Rate Spread ─────────────────────────────────
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=24pt,
+    width=0.70\textwidth,
+    height=6.5cm,
+    clip=false,
+    ylabel={APR (\%)},
+    ylabel style={font=\small},
+    symbolic x coords={WB$\to$NB,NB$\to$LB,LB$\to$Borrower},
+    xtick=data,
+    xticklabel style={font=\small},
+    yticklabel style={font=\small},
+    ymin=0,
+    ymax=11,
+    ytick={0,2,4,6,8,10},
+    nodes near coords={\pgfmathprintnumber\pgfplotspointmeta\%},
+    nodes near coords style={font=\small\bfseries},
+    every node near coord/.append style={anchor=south,yshift=1pt},
+    enlarge x limits=0.4,
+    grid=major,
+    grid style={dashed,gray!30},
+    axis lines=left,
+    title={\textbf{Interest Rate Spread Across Tiers}},
+    title style={font=\normalsize,at={(0.5,1.05)}},
+]
+\addplot[fill=PrimaryBlue!70,draw=PrimaryBlue] coordinates {
+    (WB$\to$NB,3) (NB$\to$LB,5) (LB$\to$Borrower,8)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Hierarchical interest rate spread (APR) across the four-tier lending structure.}
+\end{figure}
 
 \subsubsection{Global Economic Impact}
 
@@ -1129,7 +1290,7 @@ Beyond direct platform revenue, the Crypto World Bank creates broader economic v
 
 \subsection{Use Case Diagram}
 
-\textbf{Actors (4):} Borrower, Bank Approver, World Bank Admin, National Bank — \textbf{29 use cases total.} A high-level use case diagram is maintained in the project documentation repository.
+\textbf{Actors (4):} Borrower, Bank Approver, World Bank Admin, National Bank --- \textbf{29 use cases total.} A high-level use case diagram is maintained in the project documentation repository.
 
 \subsection{Sequence Diagram}
 
@@ -1139,12 +1300,66 @@ The loan request, AI risk assessment, and approval flow span \textbf{49 interact
 
 The ERD comprises 15 entities in 3NF. Key relationships:
 \begin{itemize}[noitemsep]
-\item \texttt{WORLD\_BANK} (1) $\to$ (N) \texttt{NATIONAL\_BANK} $\to$ (N) \texttt{LOCAL\_BANK} — Hierarchical banking structure
+\item \texttt{WORLD\_BANK} (1) $\to$ (N) \texttt{NATIONAL\_BANK} $\to$ (N) \texttt{LOCAL\_BANK} --- Hierarchical banking structure
 \item \texttt{BORROWER} (1) $\to$ (N) \texttt{LOAN\_REQUEST}; \texttt{LOAN\_REQUEST} (1) $\to$ (N) \texttt{INSTALLMENT}, \texttt{CHAT\_MESSAGE}; \texttt{BORROWER} (1) $\to$ (1) \texttt{BORROWING\_LIMIT}
 \item \texttt{LOAN\_REQUEST} / \texttt{TRANSACTION} $\to$ (N) \texttt{AI\_ML\_SECURITY\_LOG}
 \end{itemize}
 
 Full ERD is in the project documentation repository.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    tier/.style={
+        draw=AccentBlue,
+        fill=LightBlue,
+        rounded corners=3pt,
+        minimum width=3cm,
+        minimum height=1.8cm,
+        text width=2.8cm,
+        align=center,
+        font=\small,
+        inner sep=5pt,
+    },
+    tierarrow/.style={
+        ->,
+        >=stealth,
+        line width=1.2pt,
+        color=PrimaryBlue,
+    },
+]
+\node[tier,fill=PrimaryBlue!15] (wb) at (0,0) {%
+    \textbf{World Bank}\\[2pt]
+    {\scriptsize Global Reserve}\\
+    {\scriptsize 1,000,000 ETH}\\[2pt]
+    {\scriptsize\color{AccentBlue}\textit{Lends at 3\% APR}}};
+
+\node[tier] (nb) at (3.6,0) {%
+    \textbf{National Bank}\\[2pt]
+    {\scriptsize Regional Allocation}\\
+    {\scriptsize 200,000 ETH each}\\[2pt]
+    {\scriptsize\color{AccentBlue}\textit{Lends at 5\% APR}}};
+
+\node[tier] (lb) at (7.2,0) {%
+    \textbf{Local Bank}\\[2pt]
+    {\scriptsize Retail Lending}\\
+    {\scriptsize 10,000 ETH each}\\[2pt]
+    {\scriptsize\color{AccentBlue}\textit{Lends at 8\% APR}}};
+
+\node[tier,fill=AccentBlue!12] (br) at (10.8,0) {%
+    \textbf{Borrower}\\[2pt]
+    {\scriptsize Loan Requests}\\
+    {\scriptsize 0.1--500 ETH}\\[2pt]
+    {\scriptsize\color{GrayText}\textit{Repays with interest}}};
+
+\draw[tierarrow] (wb) -- (nb);
+\draw[tierarrow] (nb) -- (lb);
+\draw[tierarrow] (lb) -- (br);
+
+\draw[tierarrow,dashed,color=GrayText] (br.south) -- ++(0,-0.55) -| node[below,pos=0.25,font=\scriptsize,color=GrayText] {Repayment cascades upward with interest} (wb.south);
+\end{tikzpicture}
+\caption{Four-tier hierarchical capital flow with cascading repayment.}
+\end{figure}
 
 \subsection{Activity, Component, and Data Flow Diagrams}
 
@@ -1156,64 +1371,58 @@ Activity diagrams (loan request to repayment, income verification, chat system, 
 
 \subsection{Value Proposition}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Value proposition.}
-\small
-\begin{tabular}{|p{3.2cm}|p{4.5cm}|p{3.5cm}|}
-\hline
-\textbf{Value Type} & \textbf{Description} & \textbf{Beneficiary} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3.2cm} >{\raggedright}p{5cm} >{\raggedright\arraybackslash}p{3.5cm} @{}}
+\toprule
+\tableheadfont Value Type & \tableheadfont Description & \tableheadfont Beneficiary \\
+\midrule
+\rowcolor{RowShade}
 Operational efficiency & Elimination of manual reconciliation and multi-day settlement & Banking institutions \\
-\hline
 Audit cost reduction & Real-time on-chain auditability replaces periodic third-party audits & Regulators, institutions \\
-\hline
+\rowcolor{RowShade}
 Risk mitigation & AI/ML-augmented loan decisioning reduces default rates & Lenders, borrowers \\
-\hline
 Financial inclusion & Transparent, programmable lending accessible to underserved populations & Borrowers in developing economies \\
-\hline
+\rowcolor{RowShade}
 Research contribution & Novel intersection of hierarchical DeFi, AI security, and governance & Academic community \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Revenue Model}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Revenue model.}
-\begin{tabular}{|p{3.5cm}|p{5.5cm}|p{2cm}|}
-\hline
-\textbf{Revenue Stream} & \textbf{Mechanism} & \textbf{Phase} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3.5cm} >{\raggedright}p{5.5cm} >{\raggedright\arraybackslash}p{2cm} @{}}
+\toprule
+\tableheadfont Revenue Stream & \tableheadfont Mechanism & \tableheadfont Phase \\
+\midrule
+\rowcolor{RowShade}
 Loan origination fees & Configurable percentage (0.1--0.5\%) deducted at disbursement via smart contract & Phase 2 \\
-\hline
 Premium analytics services & Subscription-based access to advanced AI risk dashboards for institutional users & Phase 3 \\
-\hline
+\rowcolor{RowShade}
 Governance token economics & Network participation incentives distributed via governance token & Phase 3 \\
-\hline
 Grant and pilot funding & Academic research grants; regulatory sandbox program funding & Phase 1--2 \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Go-to-Market Strategy}
 
-\begin{table}[H]
-\centering
+\begin{moderntable}
 \caption{Go-to-market phases.}
-\begin{tabular}{|p{2.8cm}|p{6cm}|p{2.5cm}|}
-\hline
-\textbf{Phase} & \textbf{Activities} & \textbf{Timeline} \\
-\hline
+\begin{tabular}{@{} >{\raggedright}p{3cm} >{\raggedright}p{6.5cm} >{\raggedright\arraybackslash}p{2.5cm} @{}}
+\toprule
+\tableheadfont Phase & \tableheadfont Activities & \tableheadfont Timeline \\
+\midrule
+\rowcolor{RowShade}
 Phase 1: Academic Validation & Competition submission (BCOLBD 2025); thesis publication; open-source release & Current \\
-\hline
 Phase 2: Pilot Deployment & Regulatory sandbox application; partnership with one institutional entity; testnet-to-mainnet migration & 6--12 months \\
-\hline
+\rowcolor{RowShade}
 Phase 3: Production Scale & Multi-chain deployment; full AI/ML backend; commercial partnerships; governance token launch & 12--24 months \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \subsection{Launch Readiness}
 
@@ -1231,7 +1440,7 @@ Phase 3: Production Scale & Multi-chain deployment; full AI/ML backend; commerci
 
 The Crypto World Bank addresses a \textbf{complex, multi-party coordination and trust problem} in hierarchical development finance by leveraging the unique properties of blockchain technology: immutability, programmable enforcement, and cryptographic auditability. The solution goes beyond existing DeFi lending protocols by introducing a four-tier institutional hierarchy, AI/ML-augmented risk assessment, and a comprehensive governance framework that addresses network membership, business operations, and technology infrastructure.
 
-The platform is positioned at the intersection of decentralized finance, institutional lending, and applied AI security—a combination that is presently unaddressed in both the academic literature and the commercial blockchain landscape. With a working prototype, a defined market and partnership strategy, transparent risk assessment, and a phased go-to-market plan, the Crypto World Bank represents a viable and scalable contribution to the emerging field of blockchain-based development finance.
+The platform is positioned at the intersection of decentralized finance, institutional lending, and applied AI security---a combination that is presently unaddressed in both the academic literature and the commercial blockchain landscape. With a working prototype, a defined market and partnership strategy, transparent risk assessment, and a phased go-to-market plan, the Crypto World Bank represents a viable and scalable contribution to the emerging field of blockchain-based development finance.
 
 %==============================================================================
 \appendix
@@ -1239,26 +1448,23 @@ The platform is positioned at the intersection of decentralized finance, institu
 
 \section{Technology Stack}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|l|}
-\hline
-\textbf{Layer} & \textbf{Technology} & \textbf{Version / Notes} \\
-\hline
+\begin{moderntable}
+\begin{tabular}{@{} >{\raggedright}p{3cm} >{\raggedright}p{4.5cm} >{\raggedright\arraybackslash}p{4.5cm} @{}}
+\toprule
+\tableheadfont Layer & \tableheadfont Technology & \tableheadfont Version / Notes \\
+\midrule
+\rowcolor{RowShade}
 Smart Contract & Solidity, OpenZeppelin & 0.8.20; Ownable, ReentrancyGuard \\
-\hline
 Frontend & React, TypeScript, Vite, Material-UI & React 18; MUI v5; Material Design 3 theme \\
-\hline
+\rowcolor{RowShade}
 Wallet Integration & Wagmi, RainbowKit, Viem & EIP-1193 compliant \\
-\hline
 Build and Test & Hardhat & Automated test suite; deployment scripts \\
-\hline
+\rowcolor{RowShade}
 Target Networks & Polygon Mumbai, Ethereum Sepolia & Public testnets; zero-cost operation \\
-\hline
 AI/ML (planned) & Python, FastAPI, scikit-learn, SHAP & Random Forest, Isolation Forest, SHAP \\
-\hline
+\bottomrule
 \end{tabular}
-\end{table}
+\end{moderntable}
 
 \section{Smart Contract Capabilities}
 

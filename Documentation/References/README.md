@@ -37,15 +37,22 @@ All references cited in `WHITEPAPER_BCOLBD2025.tex`. Links are provided for acce
 
 ---
 
-## Downloaded Papers (in this folder)
+## Downloaded Papers
+
+Papers that have a **literature review** in this project are stored with that review in `Documentation/LiteratureReviews/`:
+
+| Reference | Location |
+|-----------|----------|
+| [1] Werner et al. — SoK: Decentralized Finance | `LiteratureReviews/paper_10_sok_defi/01_Werner_SoK_DeFi_2022.pdf` |
+| [14] Lundberg & Lee — SHAP (NeurIPS 2017) | `LiteratureReviews/paper_11_shap_unified_approach/13_Lundberg_SHAP_NeurIPS_2017.pdf` |
+| [15] Bracke et al. — ML explainability in finance | `LiteratureReviews/paper_17_ml_explainability_finance_default_risk/14_Bracke_ML_Explainability_BoE_2019.pdf` |
+
+Remaining PDFs in **this folder** (References):
 
 | File | Reference | Size |
 |------|-----------|------|
-| `01_Werner_SoK_DeFi_2022.pdf` | [1] Werner et al. — SoK: Decentralized Finance | 723 KB |
 | `05_Angeris_Privacy_CFMM_2022.pdf` | [5] Angeris & Chitra — Privacy in CFMMs | 143 KB |
 | `06_Auer_CBDC_Technology_BIS_2020.pdf` | [6] Auer & Böhme — Technology of retail CBDC | 476 KB |
-| `13_Lundberg_SHAP_NeurIPS_2017.pdf` | [14] Lundberg & Lee — SHAP (NeurIPS 2017) | 906 KB |
-| `14_Bracke_ML_Explainability_BoE_2019.pdf` | [15] Bracke et al. — ML explainability in finance | 1,033 KB |
 | `18_BCOLBD_2025_Guideline.pdf` | [19] BCOLBD 2025 — Blockchain Olympiad Guideline | 381 KB |
 | `BIS_DeFi_Lending_WP1183_2024.pdf` | Economic impact source — BIS WP No. 1183 | 1,945 KB |
 

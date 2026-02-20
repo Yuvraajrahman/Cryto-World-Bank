@@ -5,6 +5,30 @@
 **Total Papers Reviewed:** 17
 **Domains:** DeFi Lending, ML Fraud Detection, Explainable AI, Reinforcement Learning, Smart Contract Security, CBDC & Financial Inclusion
 
+### Individual review files
+
+Each paper has a dedicated review in the **[LiteratureReviews](LiteratureReviews/)** folder:
+
+| # | File | Paper focus |
+|---|------|-------------|
+| 1 | [paper_01_adaptive_defi_borrow_lending.md](LiteratureReviews/paper_01_adaptive_defi_borrow_lending.md) | Data-driven adaptive DeFi borrow-lending |
+| 2 | [paper_02_ml_multichain_defi_fraud_detection.md](LiteratureReviews/paper_02_ml_multichain_defi_fraud_detection.md) | ML for multichain DeFi fraud detection |
+| 3 | [paper_03_risksea_ethereum_fraud.md](LiteratureReviews/paper_03_risksea_ethereum_fraud.md) | RiskSEA – Ethereum fraud (graph + behavioral) |
+| 4 | [paper_04_lime_shap_loan_approval.md](LiteratureReviews/paper_04_lime_shap_loan_approval.md) | LIME vs SHAP in loan approval systems |
+| 5 | [paper_05_rl_interest_rate_defi_lending.md](LiteratureReviews/paper_05_rl_interest_rate_defi_lending.md) | RL for interest rate adjustment in DeFi |
+| 6 | [paper_06_rl_credit_scoring_underwriting.md](LiteratureReviews/paper_06_rl_credit_scoring_underwriting.md) | RL in credit scoring and underwriting |
+| 7 | [paper_07_cbdc_financial_inclusion.md](LiteratureReviews/paper_07_cbdc_financial_inclusion.md) | CBDC and financial inclusion (IMF) |
+| 8 | [paper_08_blockchain_financial_inclusion_sustainable_dev.md](LiteratureReviews/paper_08_blockchain_financial_inclusion_sustainable_dev.md) | Blockchain for financial inclusion & SDGs |
+| 9 | [paper_09_defi_lending_evaluation_system.md](LiteratureReviews/paper_09_defi_lending_evaluation_system.md) | DeFi lending protocol evaluation system |
+| 10 | [paper_10_sok_defi.md](LiteratureReviews/paper_10_sok_defi/paper_10_sok_defi.md) | SoK: Decentralized Finance (DeFi) |
+| 11 | [paper_11_shap_unified_approach.md](LiteratureReviews/paper_11_shap_unified_approach/paper_11_shap_unified_approach.md) | SHAP – unified model explanations |
+| 12 | [paper_12_isolation_forest.md](LiteratureReviews/paper_12_isolation_forest.md) | Isolation Forest for anomaly detection |
+| 13 | [paper_13_ethereum_smart_contract_attacks_sok.md](LiteratureReviews/paper_13_ethereum_smart_contract_attacks_sok.md) | SoK: Attacks on Ethereum smart contracts |
+| 14 | [paper_14_governance_blockchain_economy.md](LiteratureReviews/paper_14_governance_blockchain_economy.md) | Governance in the blockchain economy |
+| 15 | [paper_15_smart_contract_formal_verification.md](LiteratureReviews/paper_15_smart_contract_formal_verification.md) | Smart contract formal verification survey |
+| 16 | [paper_16_bitcoin_ml_security.md](LiteratureReviews/paper_16_bitcoin_ml_security.md) | Bitcoin threats and ML security solutions |
+| 17 | [paper_17_ml_explainability_finance_default_risk.md](LiteratureReviews/paper_17_ml_explainability_finance_default_risk/paper_17_ml_explainability_finance_default_risk.md) | ML explainability in finance (BoE) |
+
 ---
 
 ## Paper 1

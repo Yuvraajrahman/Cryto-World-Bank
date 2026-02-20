@@ -4,83 +4,83 @@
 ---
 
 ```
-                                                                                                                          
-     ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐   
-     │                                                                                                                  │   
-     │                                       CRYPTO WORLD BANK SYSTEM                                                   │   
-     │                                                                                                                  │   
-     │                                                                                                                  │   
-     │                                                                                                                  │   
-  ┌──┴──┐         ( Connect Wallet )                                                                             ┌──┴──┐
-  │     │────────────────────────────────────────────────────────────────────────────────────────────────────────>│     │
-  │     │                                                                                                        │     │
-  │     │         ( Deposit to Reserve )                                                                         │     │
-  │     │──────────────────────────────>                                                                         │     │
-  │     │                                                                                                        │     │
-  │     │         ( Request Loan )                                      ( Review Loan Request )                  │     │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│     │
-  │     │                                                                                                        │     │
-  │     │         ( View My Loans )                                     ( Approve Loan )                         │     │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│     │
-  │ B   │                                                                                                        │ B   │
-  │ o   │         ( Pay Installment )                                   ( Reject Loan )                          │ a   │
-  │ r   │──────────────────────────────>                    <────────────────────────────────────────────────────│ n   │
-  │ r   │                                                                                                        │ k   │
-  │ o   │         ( Upload Income Proof )                               ( Review Income Proof )                  │     │
-  │ w   │──────────────────────────────>                    <────────────────────────────────────────────────────│ A   │
-  │ e   │                                                                                                        │ p   │
-  │ r   │         ( Chat with Bank )─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ( Chat with Borrower )                    │ p   │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│ r   │
-  │     │                                                                                                        │ o   │
-  │     │         ( View Borrowing Limit )                              ( View Risk Dashboard )                  │ v   │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│ e   │
-  │     │                                                                                                        │ r   │
-  │     │         ( Generate QR Code )                                  ( View AI/ML Fraud Scores )              │     │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│     │
-  │     │                                                                                                        │     │
-  │     │         ( View Market Data )                                  ( View Anomaly Alerts )                  │     │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│     │
-  │     │                                                                                                        │     │
-  │     │         ( Manage Profile )                                    ( View XAI Explanations )                │     │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│     │
-  │     │                                                                                                        │     │
-  │     │         ( Accept Terms & Conditions )                                                                  │     │
-  │     │──────────────────────────────>                                                                         │     │
-  └──┬──┘                                                                                                        └──┬──┘
-     │                                                                                                                │    
-     │                                                                                                                │    
-     │                                                                                                                │    
-     │                                                                                                                │    
-     │                                                                                                                │    
-  ┌──┴──┐                                                                                                        ┌──┴──┐
-  │     │         ( Register National Bank )                            ( Register Local Bank )                  │     │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│     │
-  │     │                                                                                                        │     │
-  │ W   │         ( Lend to National Bank )                             ( Borrow from World Bank )               │ N   │
-  │ o   │──────────────────────────────>                    <────────────────────────────────────────────────────│ a   │
-  │ r   │                                                                                                        │ t   │
-  │ l   │         ( View All Statistics )                               ( Lend to Local Bank )                   │ i   │
-  │ d   │──────────────────────────────>                    <────────────────────────────────────────────────────│ o   │
-  │     │                                                                                                        │ n   │
-  │ B   │         ( Pause / Unpause System )                            ( Set Bank Approver )                    │ a   │
-  │ a   │──────────────────────────────>                    <────────────────────────────────────────────────────│ l   │
-  │ n   │                                                                                                        │     │
-  │ k   │         ( Emergency Withdraw )                                ( Add Bank User )                        │ B   │
-  │     │──────────────────────────────>                    <────────────────────────────────────────────────────│ a   │
-  │ A   │                                                                                                        │ n   │
-  │ d   │         ( Review Security Logs )                              ( View Local Bank Portfolio )             │ k   │
-  │ m   │──────────────────────────────>                    <────────────────────────────────────────────────────│     │
-  │ i   │                                                                                                        │     │
-  │ n   │                                                                                                        │     │
-  └─────┘                                                                                                        └─────┘
-     │                                                                                                                     
-     └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘   
+                    ┌───────────────────────────────────────────────────────────────────────────────────────────┐
+                    │                              CRYPTO WORLD BANK SYSTEM                                     │
+                    │                                                                                           │
+  Borrower          │                  ── WALLET & ONBOARDING ──                                               │          Bank Approver
+     O              │                                                                                           │               O
+    /|\  ──────────>│  ( Connect Wallet )                                                                      │<────────── /|\
+    / \  ──────────>│  ( Accept Terms & Conditions )                                                           │            / \
+     │   ──────────>│  ( Manage Profile )                                                                      │             │
+     │              │                                                                                           │             │
+     │              │                  ── LOAN LIFECYCLE ──                                                     │             │
+     │   ──────────>│  ( Request Loan )                                                                        │             │
+     │              │        │ <<include>>                                                                      │             │
+     │              │        ├──> ( Check Borrowing Limit )                                                    │             │
+     │              │        └──> ( Upload Income Proof )                                                      │             │
+     │   ──────────>│  ( View My Loans )                                                                       │             │
+     │   ──────────>│  ( Pay Installment )                                                                     │             │
+     │              │                                                                                           │             │
+     │              │                             ( Review Loan Request )  ─────────────────────────────────────│<────────── │
+     │              │                                   │ <<include>>                                           │             │
+     │              │                                   ├──> ( View AI/ML Fraud Scores )                       │             │
+     │              │                                   └──> ( View XAI Explanations )                         │             │
+     │              │                             ( Approve Loan )  ────────────────────────────────────────────│<────────── │
+     │              │                             ( Reject Loan )  ─────────────────────────────────────────────│<────────── │
+     │              │                             ( Review Income Proof )  ─────────────────────────────────────│<────────── │
+     │              │                                                                                           │             │
+     │              │                  ── FINANCE & DATA ──                                                     │             │
+     │   ──────────>│  ( Deposit to Reserve )                                                                  │             │
+     │   ──────────>│  ( View Borrowing Limit )                                                                │             │
+     │   ──────────>│  ( View Market Data )                                                                    │             │
+     │   ──────────>│  ( Generate QR Code )                                                                    │             │
+     │              │                                                                                           │             │
+     │              │                  ── COMMUNICATION ──                                                      │             │
+     │   ──────────>│  ( Chat with Bank )                                                                      │             │
+     │              │        ─ ─ ─ <<extend>> ─ ─ ─                                                            │             │
+     │              │  ( Chat with Borrower )  ────────────────────────────────────────────────────────────────│<────────── │
+     │              │                                                                                           │             │
+     │              │                  ── AI/ML SECURITY (Bank Only) ──                                        │             │
+     │              │                             ( View Risk Dashboard )  ─────────────────────────────────────│<────────── │
+     │              │                             ( View Anomaly Alerts )  ─────────────────────────────────────│<────────── │
+     │              │                                                                                           │             │
+     │              │═══════════════════════════════════════════════════════════════════════════════════════════│             │
+     │              │                                                                                           │             │
+  World Bank        │                  ── BANKING HIERARCHY ──                                                 │  National Bank
+  Admin             │                                                                                           │
+     O              │                                                                                           │               O
+    /|\  ──────────>│  ( Register National Bank )                                                              │<────────── /|\
+    / \  ──────────>│  ( Lend to National Bank )                                                               │            / \
+     │   ──────────>│  ( View All Statistics )                                                                 │             │
+     │   ──────────>│  ( Pause / Unpause System )                                                              │             │
+     │   ──────────>│  ( Emergency Withdraw )                                                                  │             │
+     │   ──────────>│  ( Review Security Logs )                                                                │             │
+     │              │                                                                                           │             │
+     │              │                             ( Register Local Bank )  ─────────────────────────────────────│<────────── │
+     │              │                             ( Borrow from World Bank )  ──────────────────────────────────│<────────── │
+     │              │                             ( Lend to Local Bank )  ──────────────────────────────────────│<────────── │
+     │              │                             ( Set Bank Approver )  ───────────────────────────────────────│<────────── │
+     │              │                             ( Add Bank User )  ──────────────────────────────────────────│<────────── │
+     │              │                             ( View Local Bank Portfolio )  ───────────────────────────────│<────────── │
+     │              │                                                                                           │             │
+                    └───────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Actors:** Borrower, Bank Approver, World Bank Admin, National Bank
+**Actors (4):**
+
+| Actor | Symbol | Role |
+|-------|--------|------|
+| Borrower | Left (top) | End user who deposits, requests loans, pays installments |
+| Bank Approver | Right (top) | Reviews/approves/rejects loans using AI risk data |
+| World Bank Admin | Left (bottom) | System owner — manages banks, pauses system, emergency controls |
+| National Bank | Right (bottom) | Mid-tier bank — borrows from World Bank, lends to Local Banks |
+
+**Relationships:**
+- `<<include>>` — Required sub-flow that always executes (e.g., Request Loan always includes Check Borrowing Limit)
+- `<<extend>>` — Optional extension triggered by a condition (e.g., Chat with Bank may extend to Chat with Borrower)
 
 **Use Cases (28 total):**
-- Borrower: Connect Wallet, Deposit, Request Loan, View Loans, Pay Installment, Upload Income Proof, Chat, View Borrowing Limit, QR Code, Market Data, Manage Profile, Accept Terms
-- Bank Approver: Review/Approve/Reject Loan, Review Income Proof, Chat, Risk Dashboard, Fraud Scores, Anomaly Alerts, XAI Explanations
-- World Bank Admin: Register National Bank, Lend, View Stats, Pause/Unpause, Emergency Withdraw, Security Logs
-- National Bank: Register Local Bank, Borrow, Lend to Local, Set Approver, Add User, View Portfolio
+- **Borrower (12):** Connect Wallet, Accept Terms, Manage Profile, Request Loan, View My Loans, Pay Installment, Deposit to Reserve, View Borrowing Limit, View Market Data, Generate QR Code, Chat with Bank, Upload Income Proof
+- **Bank Approver (11):** Connect Wallet, Review Loan Request, Approve Loan, Reject Loan, Review Income Proof, Chat with Borrower, View Risk Dashboard, View AI/ML Fraud Scores, View Anomaly Alerts, View XAI Explanations
+- **World Bank Admin (6):** Register National Bank, Lend to National Bank, View All Statistics, Pause/Unpause System, Emergency Withdraw, Review Security Logs
+- **National Bank (6):** Register Local Bank, Borrow from World Bank, Lend to Local Bank, Set Bank Approver, Add Bank User, View Local Bank Portfolio

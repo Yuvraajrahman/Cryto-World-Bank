@@ -10,6 +10,30 @@
 
 ---
 
+## Contents
+
+| § | Section |
+|---|---------|
+| 1 | Project Overview |
+| 2 | Sprint Structure |
+| 3 | Sprint 1: Foundation & Core Banking |
+| 4 | Sprint 2: Lending & Payment Features |
+| 5 | Sprint 3: Advanced Features & Security |
+| 6 | Agile Artifacts |
+| 7 | Team Roles & Responsibilities |
+| 8 | Risk Management |
+| 9 | Metrics & KPIs |
+| 10 | Communication Plan |
+| 11 | SDLC Stage Mapping |
+| 12 | Design Decisions and Alternatives Considered |
+| 13 | UML and Architecture |
+| 14 | Design Patterns |
+| 15 | Software Testing and Metrics |
+| 16 | Effort Estimation and Project Scheduling |
+| 17 | Conclusion |
+
+---
+
 ## 1. Project Overview
 
 ### 1.1 Project Scope
@@ -663,7 +687,7 @@ Each decision includes 2–3 alternatives evaluated, the chosen option with just
 
 ### 13.1 Use Case Diagram
 
-The Use Case diagram is maintained in the CSE471 report. See `Documentation/Diagrams/CSE471/Usecase diagram.png` and `CSE471_SYSTEM_ANALYSIS_AND_DESIGN REPORT.md` §3. It shows actors (Borrower, Bank User, World Bank, National Bank, Local Bank) and 29 use cases.
+The Use Case diagram is maintained in the CSE471 report. See [Usecase diagram.png](https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/Diagrams/CSE471/Usecase%20diagram.png) and [CSE471 System Analysis Report §4 Use Case Diagram](https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/CSE471_SYSTEM_ANALYSIS_AND_DESIGN%20REPORT.md#4-use-case-diagram). It shows actors (Borrower, Bank User, World Bank, National Bank, Local Bank) and 29 use cases.
 
 ### 13.2 Class Diagram (Conceptual)
 

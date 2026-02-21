@@ -7,6 +7,25 @@
 
 ---
 
+## Contents
+
+| § | Section |
+|---|---------|
+| 1 | Project Overview |
+| 2 | System Request and Business Value |
+| 3 | Diagram Index |
+| 4 | Use Case Diagram |
+| 5 | Activity Diagrams |
+| 6 | Data Flow Diagrams |
+| 7 | Sequence Diagrams |
+| 8 | Structure Charts and Program Specifications |
+| 9 | Logical to Physical Data Models |
+| 10 | User Interface Design |
+| 11 | Project Timeline and Resource Allocation |
+| 12 | Diagram Summary |
+
+---
+
 ## 1. Project Overview
 
 The Crypto World Bank is a decentralized lending platform with hierarchical banking (World Bank → National Banks → Local Banks → Users). This report presents the system analysis diagrams for the platform (Prethesis 1 scope).

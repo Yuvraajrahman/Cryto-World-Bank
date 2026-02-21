@@ -6,6 +6,7 @@ import userRoutes from './routes/users.js';
 import bankRoutes from './routes/banks.js';
 import loanRoutes from './routes/loans.js';
 import transactionRoutes from './routes/transactions.js';
+import blockchainRoutes from './routes/blockchain.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/banks', bankRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/blockchain', blockchainRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

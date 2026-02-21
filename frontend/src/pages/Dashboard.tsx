@@ -20,6 +20,10 @@ import {
   Security,
   Shield,
   Person,
+  SwapHoriz,
+  ShowChart,
+  Storage,
+  VerifiedUser,
 } from "@mui/icons-material";
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
@@ -61,6 +65,87 @@ function StatsCard({
         )}
       </CardContent>
     </Card>
+  );
+}
+
+const SERVICES = [
+  { title: "Crypto Trading", icon: SwapHoriz, desc: "Trade digital assets with low fees and instant settlement." },
+  { title: "Crypto Staking", icon: ShowChart, desc: "Earn rewards by staking your crypto and supporting the network." },
+  { title: "Crypto Lending", icon: RequestQuote, desc: "Borrow against your holdings or earn interest by lending." },
+  { title: "Crypto Mining", icon: Storage, desc: "Secure the blockchain and earn mining rewards." },
+  { title: "Crypto Custody", icon: Security, desc: "Institutional-grade secure storage for your digital assets." },
+  { title: "Crypto Insurance", icon: VerifiedUser, desc: "Protect your portfolio with comprehensive coverage." },
+];
+
+function ServiceCard({ title, icon: Icon, desc }: { title: string; icon: React.ElementType; desc: string }) {
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        height: "100%",
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: "divider",
+        bgcolor: "background.paper",
+        transition: "all 0.2s ease",
+        "&:hover": {
+          boxShadow: 2,
+          borderColor: "primary.light",
+        },
+      }}
+    >
+      <CardContent sx={{ p: 2.5 }}>
+        <Box
+          sx={{
+            width: 44,
+            height: 44,
+            borderRadius: 2,
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 1.5,
+          }}
+        >
+          <Icon sx={{ fontSize: 24 }} />
+        </Box>
+        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+          {title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {desc}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ServicesSection() {
+  return (
+    <Box
+      sx={{
+        mt: 4,
+        mb: 2,
+        py: 4,
+        px: 2,
+        borderRadius: 3,
+        background: "linear-gradient(160deg, #ffffff 0%, #f8fafc 40%, #f1f5f9 100%)",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <Typography variant="h5" fontWeight={600} textAlign="center" sx={{ mb: 3 }}>
+        Our Services
+      </Typography>
+      <Grid container spacing={2}>
+        {SERVICES.map((s) => (
+          <Grid item xs={12} sm={6} md={4} key={s.title}>
+            <ServiceCard title={s.title} icon={s.icon} desc={s.desc} />
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 }
 
@@ -144,6 +229,7 @@ export function Dashboard() {
             Connect your wallet using the button in the top bar to view the reserve
             dashboard, make deposits, and request loans.
           </Alert>
+          <ServicesSection />
         </Box>
       </Container>
     );
@@ -312,6 +398,8 @@ export function Dashboard() {
           QR Codes
         </Button>
       </Box>
+
+      <ServicesSection />
 
       <Grid container spacing={3} sx={{ mt: 1 }}>
         {isBankOrAdmin && (

@@ -1,0 +1,25 @@
+# Render.com deployment config
+# Deploy: Connect repo at render.com, or use: render deploy
+services:
+  - type: web
+    name: crypto-world-bank-api
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: MONGODB_URI
+        sync: false  # Add in Render dashboard: MongoDB Atlas connection string
+      - key: DB_NAME
+        value: crypto_world_bank
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BLOCKCHAIN_RPC_URL
+        value: https://rpc-mumbai.maticvigil.com/
+      - key: CONTRACT_ADDRESS
+        sync: false  # Add after deploying contract

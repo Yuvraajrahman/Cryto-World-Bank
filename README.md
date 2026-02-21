@@ -32,13 +32,17 @@
 
 ### 🏛️ Four-Tier Hierarchy
 
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   World Bank    │────▶│ National Banks  │────▶│  Local Banks    │────▶│    Borrowers    │
-│ (Global Reserve)│     │ (Regional)      │     │ (Retail)        │     │ (End Users)     │
-└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
-         │                        │                        │                        │
-    Lends at 3% APR         Lends at 5% APR          Lends at 8% APR         Repays with interest
+```mermaid
+flowchart LR
+    WB[World Bank - Global Reserve]
+    NB[National Banks - Regional]
+    LB[Local Banks - Retail]
+    BR[Borrowers - End Users]
+
+    WB -->|Lends at 3% APR| NB
+    NB -->|Lends at 5% APR| LB
+    LB -->|Lends at 8% APR| BR
+    BR -.->|Repays with interest| LB
 ```
 
 - **Tier 1 — World Bank:** Maintains global crypto reserve; allocates capital to National Banks
@@ -180,32 +184,49 @@ npm run dev
 
 ## 📁 Project Structure
 
-```
-Cryto-World-Bank/
-├── contracts/                 # Solidity smart contracts
-│   ├── WorldBankReserve.sol
-│   ├── NationalBank.sol
-│   └── LocalBank.sol
-├── frontend/                  # React + TypeScript DApp
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   └── services/
-│   └── package.json
-├── backend/                   # Node.js + Express API
-│   ├── src/
-│   │   ├── server.js
-│   │   ├── database/
-│   │   └── routes/
-│   └── package.json
-├── Documentation/             # Whitepaper, diagrams, reports
-│   ├── WHITEPAPER_BCOLBD2025.tex
-│   ├── Diagrams/
-│   │   ├── CSE470/           # Agile, SDLC, Design Decisions
-│   │   └── CSE471/           # Use cases, sequences, dataflow
-│   └── LiteratureReviews/
-└── scripts/                  # Deployment scripts
+```mermaid
+flowchart TB
+    subgraph root["Cryto-World-Bank/"]
+        subgraph contracts["contracts/"]
+            direction TB
+            WB[WorldBankReserve.sol]
+            NB[NationalBank.sol]
+            LB[LocalBank.sol]
+        end
+
+        subgraph frontend["frontend/"]
+            direction TB
+            subgraph fsrc["src/"]
+                comp[components/]
+                pages[pages/]
+                hooks[hooks/]
+                svc[services/]
+            end
+            pkg[package.json]
+        end
+
+        subgraph backend["backend/"]
+            direction TB
+            subgraph bsrc["src/"]
+                server[server.js]
+                db[database/]
+                routes[routes/]
+            end
+            bpkg[package.json]
+        end
+
+        subgraph docs["Documentation/"]
+            direction TB
+            wp[WHITEPAPER_BCOLBD2025.tex]
+            subgraph diag["Diagrams/"]
+                c470[CSE470/]
+                c471[CSE471/]
+            end
+            lr[LiteratureReviews/]
+        end
+
+        scripts[scripts/]
+    end
 ```
 
 ---

@@ -24,6 +24,7 @@
 | 10 | User Interface Design |
 | 11 | Project Timeline and Resource Allocation |
 | 12 | Diagram Summary |
+| 13 | Prototype Demonstration |
 
 ---
 
@@ -296,6 +297,28 @@ Aligns with CSE471 Lab: Module 1–4 (5 features each) over Weeks 4–8. See `CS
 | Data Flow | 3 | Data movement (context + level 1) |
 | Activity | 7 | Process flows |
 | Sequence | 9 | Message/event ordering |
+
+---
+
+## 13. Prototype Demonstration
+
+The following screenshots show the Crypto World Bank prototype in action:
+
+**Figure 1: Dashboard Overview**
+
+![Prototype Screenshot 1](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Prototype%20demonstration/Screenshot%202026-02-21%20233041.png)
+
+**Figure 2: Lending Interface**
+
+![Prototype Screenshot 2](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Prototype%20demonstration/Screenshot%202026-02-21%20233259.png)
+
+**Figure 3: Transaction & Chat**
+
+![Prototype Screenshot 3](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Prototype%20demonstration/Screenshot%202026-02-21%20233357.png)
+
+**Figure 4: Profile & Settings**
+
+![Prototype Screenshot 4](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Prototype%20demonstration/Screenshot%202026-02-21%20233442.png)
 
 ---
 

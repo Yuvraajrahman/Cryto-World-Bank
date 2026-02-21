@@ -122,19 +122,19 @@ The Crypto World Bank is a decentralized lending platform with hierarchical bank
 
 ### 6.2 Reject Path (Alternative)
 
-![Sequence Diagram 1B](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE471/Sequence%20Diagram%201B%20Reject%20Path%20%E2%80%94%20alt%20%5BReject%5D.png)
+![Sequence Diagram 1B](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE471/Sequence%20Diagram%201B%20%20Reject%20Path%20%E2%80%94%20alt%20%5BReject%5D.png)
 
 **Description:** Alternative flow when bank user rejects a loan request.
 
 ### 6.3 Installment Payment Loop
 
-![Sequence Diagram 2](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE471/Sequence%20Diagram%202%20Installment%20Payment%20Loop.png)
+![Sequence Diagram 2](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE471/Sequence%20Diagram%202%20%20Installment%20Payment%20Loop.png)
 
 **Description:** Borrower pays installments; system updates loan status until completion.
 
 ### 6.4 Income Verification
 
-![Sequence Diagram 3](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE471/Sequence%20Diagram%203%20Income%20Verification.png)
+![Sequence Diagram 3](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE471/Sequence%20Diagram%203%20%20Income%20Verification.png)
 
 **Description:** Borrower uploads income proof; bank user reviews and approves/rejects.
 

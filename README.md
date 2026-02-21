@@ -236,10 +236,15 @@ flowchart TB
 | Document | Description |
 |----------|-------------|
 | [**Whitepaper**](Documentation/WHITEPAPER_BCOLBD2025.tex) | Full technical whitepaper (LaTeX) for BCOLBD 2025 & thesis |
-| [**CSE470 Software Engineering**](Documentation/CSE470_SOFTWARE_ENGINEERING.md) | Agile methodology, sprints, user stories |
-| [**CSE471 System Analysis**](Documentation/COMPONENT_DIAGRAM.md) | Component, sequence, activity diagrams |
-| [**CSE370 Database**](Documentation/CSE370_DATABASE_MANAGEMENT.md) | ERD, schema, 3NF design |
 | [**Literature Reviews**](Documentation/LiteratureReviews/) | 16 peer-reviewed paper summaries |
+
+### Course Reports (Pre-Thesis 1)
+
+| Report | Description | Authors |
+|--------|-------------|---------|
+| [**CSE370 Database Management**](Documentation/CSE370_DATABASE_MANAGEMENT%20REPORT.md) | ERD, EER, schema, 3NF, indexing, SQL examples | Md. Bokhtiar Rahman Juboraz (20301138) • Md. Mahir Ahnaf Ahmed (20301083) |
+| [**CSE470 Software Engineering**](Documentation/CSE470_SOFTWARE_ENGINEERING%20REPORT.md) | Agile methodology, sprints, user stories, SDLC, design decisions | Md. Bokhtiar Rahman Juboraz (20301138) • Md. Mahir Ahnaf Ahmed (20301083) |
+| [**CSE471 System Analysis & Design**](Documentation/CSE471_SYSTEM_ANALYSIS_AND_DESIGN%20REPORT.md) | Use cases, sequence diagrams, activity diagrams, data flow, component diagrams | Md. Bokhtiar Rahman Juboraz (20301138) • Md. Mahir Ahnaf Ahmed (20301083) |
 
 ---
 

@@ -6,7 +6,8 @@
 **Duration:** 2 Months (8 Weeks)  
 **Methodology:** Agile/Scrum  
 **Sprints:** 3 Sprints  
-**Date:** February 2026
+**Date:** February 2026  
+**Authors:** Md. Bokhtiar Rahman Juboraz (20301138) • Md. Mahir Ahnaf Ahmed (20301083)
 
 ---
 

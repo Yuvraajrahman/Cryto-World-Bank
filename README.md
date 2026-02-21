@@ -52,7 +52,7 @@
 
 The system employs a **three-layer decentralized application architecture**:
 
-![Component Diagram](Documentation/Diagrams/CSE471/Component Diagram.png)
+![Component Diagram](Documentation/Diagrams/CSE471/Component%20Diagram.png)
 
 | Layer | Technologies | Key Components |
 |-------|--------------|-----------------|
@@ -91,7 +91,7 @@ The system employs a **three-layer decentralized application architecture**:
 
 ### Use Case Overview
 
-![Use Case Diagram](Documentation/Diagrams/CSE471/Usecase diagram.png)
+![Use Case Diagram](Documentation/Diagrams/CSE471/Usecase%20diagram.png)
 
 ---
 

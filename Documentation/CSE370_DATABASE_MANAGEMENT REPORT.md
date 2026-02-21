@@ -7,6 +7,23 @@
 
 ---
 
+## Contents
+
+| § | Section |
+|---|---------|
+| 1 | Project Overview |
+| 2 | Entity-Relationship Diagram (ERD) |
+| 3 | Generalization of the Graph |
+| 4 | Database Management Summary |
+| 5 | Indexing |
+| 6 | Functional Dependencies and Normalization |
+| 7 | ER to Relational Schema Mapping |
+| 8 | Relational Integrity Constraints |
+| 9 | SQL Examples |
+| 10 | EER and User Interface |
+
+---
+
 ## 1. Project Overview
 
 The Crypto World Bank is a decentralized lending platform with a hierarchical banking structure: **World Bank → National Banks → Local Banks → Users**. The database supports loan management, transaction tracking, chat systems, AI/ML security monitoring, income verification, and market data for cryptocurrency visualization.

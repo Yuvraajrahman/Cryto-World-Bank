@@ -3,7 +3,8 @@
 
 **Course:** CSE370 - Database Management  
 **Project:** Decentralized Crypto Reserve & Lending Bank  
-**Date:** 2024
+**Date:** 2024  
+**Authors:** Md. Bokhtiar Rahman Juboraz (20301138) • Md. Mahir Ahnaf Ahmed (20301083)
 
 ---
 

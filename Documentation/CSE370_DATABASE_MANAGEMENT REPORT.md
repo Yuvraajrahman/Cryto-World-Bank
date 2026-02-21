@@ -15,47 +15,21 @@ The Crypto World Bank is a decentralized lending platform with a hierarchical ba
 
 ## 2. Entity-Relationship Diagram (ERD)
 
+**All diagrams:** [Documentation/Diagrams/CSE370](https://github.com/Yuvraajrahman/Cryto-World-Bank/tree/main/Documentation/Diagrams/CSE370)
+
 ### 2.1 Core System Graph
 
-```mermaid
-flowchart TB
-    subgraph CRYPTO["CRYPTO WORLD BANK SYSTEM - Entity Relationship Model"]
-        direction TB
-        WB[WORLD_BANK]
-        NB[NATIONAL_BANK]
-        LB[LOCAL_BANK]
-        BU_N[BANK_USER National]
-        BU_L[BANK_USER Local]
-        BR[BORROWER]
-        LR[LOAN_REQUEST]
-        TX[TRANSACTION]
-        IP[INCOME_PROOF]
-        INST[INSTALLMENT]
-        CHAT[CHAT_MESSAGE]
-        AI[AI_ML_LOG]
+![Core System Graph](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE370/Core%20System%20Graph.png)
 
-        WB -->|1:N| NB
-        NB -->|1:N| LB
-        NB -->|1:N| BU_N
-        LB -->|1:N| BU_L
-        BU_N --> BR
-        BU_L --> BR
-        BR --> LR
-        BR --> TX
-        BR --> IP
-        LR --> INST
-        LR --> CHAT
-        LR --> AI
-    end
-```
+*Figure 1: Crypto World Bank System – Entity Relationship Model*
 
 ### 2.2 Entity-Relationship Diagram (ERD)
 
 **Full ERD with relational symbols and entity attributes:**
 
-[![ERD Diagram - Database Management](https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/Diagrams/CSE370/ERD%20diagram%20database%20management.png)](https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/Diagrams/CSE370/ERD%20diagram%20database%20management.png)
+![ERD Diagram - Database Management](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE370/ERD%20diagram%20database%20management.png)
 
-*Figure: Entity-Relationship Diagram for Crypto World Bank database. [View full image](https://github.com/Yuvraajrahman/Cryto-World-Bank/blob/main/Documentation/Diagrams/CSE370/ERD%20diagram%20database%20management.png)*
+*Figure 2: Entity-Relationship Diagram for Crypto World Bank database*
 
 ### 2.3 Enhanced Entity-Relationship (EER) Diagram
 
@@ -76,64 +50,9 @@ The EER model extends the ER model with **generalization/specialization**, **agg
 
 #### 2.3.2 EER Diagram – Full Model
 
-```mermaid
-flowchart TB
-    subgraph HIERARCHY["Banking Hierarchy (1:N)"]
-        WB[("WORLD_BANK<br/>PK: world_bank_id<br/>total_reserve, name")]
-        NB[("NATIONAL_BANK<br/>PK: national_bank_id<br/>FK: world_bank_id<br/>country, total_borrowed")]
-        LB[("LOCAL_BANK<br/>PK: local_bank_id<br/>FK: national_bank_id<br/>city, total_lent")]
-        WB -->|"1:N<br/>operates"| NB
-        NB -->|"1:N<br/>supervises"| LB
-    end
+![EER Diagram - Full Model](https://raw.githubusercontent.com/Yuvraajrahman/Cryto-World-Bank/main/Documentation/Diagrams/CSE370/EER%20Diagram%20%E2%80%93%20Full%20Model.png)
 
-    subgraph GENERALIZATION["Generalization: BANK_USER (d=disjoint)"]
-        BU[("BANK_USER<br/>PK: bank_user_id<br/>wallet_address, role<br/>discriminator: bank_type")]
-        NBU[("NATIONAL_BANK_USER<br/>FK: national_bank_id")]
-        LBU[("LOCAL_BANK_USER<br/>FK: local_bank_id")]
-        BU -.->|"d"| NBU
-        BU -.->|"d"| LBU
-        NB --> NBU
-        LB --> LBU
-    end
-
-    subgraph USERS["User Layer"]
-        BR[("BORROWER<br/>PK: borrower_id<br/>wallet_address, country<br/>consecutive_paid_loans")]
-        LB -->|"1:N<br/>serves"| BR
-    end
-
-    subgraph WEAK["Weak Entity (identifying relationship)"]
-        LR[("LOAN_REQUEST<br/>PK: loan_id<br/>FK: borrower_id, local_bank_id<br/>amount, status, deadline")]
-        INST[("INSTALLMENT<br/>PK: loan_id + installment_number<br/>FK: loan_id (identifying)<br/>amount_due, due_date, status")]
-        BR -->|"N:1<br/>requests"| LR
-        LB -->|"1:N<br/>receives"| LR
-        LR -->|"1:N<br/>identifies"| INST
-    end
-
-    subgraph AGGREGATION["Aggregation: Loan-Centric"]
-        TX[("TRANSACTION<br/>PK: transaction_id<br/>FK: borrower_id, related_loan_id<br/>transaction_type, amount")]
-        CHAT[("CHAT_MESSAGE<br/>PK: message_id<br/>FK: loan_id<br/>sender_type, message_text")]
-        AISEC[("AI_ML_SECURITY_LOG<br/>PK: security_log_id<br/>FK: loan_id, transaction_id<br/>risk_type, risk_score")]
-        LR --> TX
-        LR --> CHAT
-        LR --> AISEC
-        TX --> AISEC
-    end
-
-    subgraph MULTIVAL["Multi-valued (1:N)"]
-        IP[("INCOME_PROOF<br/>PK: proof_id<br/>FK: borrower_id<br/>file_hash, status")]
-        BL[("BORROWING_LIMIT<br/>PK: limit_id<br/>FK: borrower_id UNIQUE<br/>six_month_remaining (derived)")]
-        BR -->|"1:N"| IP
-        BR -->|"1:1"| BL
-        BU -.->|"reviews"| IP
-        BU -.->|"reviews"| AISEC
-    end
-
-    subgraph INDEPENDENT["Independent Entities"]
-        MD[("MARKET_DATA<br/>PK: market_data_id<br/>cryptocurrency_type, price_usd")]
-        AICHAT[("AI_CHATBOT_LOG<br/>PK: log_id<br/>user_wallet, intent")]
-        PS[("PROFILE_SETTINGS<br/>PK: profile_id<br/>user_type, user_id<br/>terms_accepted")]
-    end
-```
+*Figure 3: Enhanced Entity-Relationship Diagram – Full Model*
 
 #### 2.3.3 EER Constructs Applied
 
@@ -312,6 +231,6 @@ The React frontend serves as the **user interface** for the database: dashboard,
 
 ---
 
-**Document Version:** 1.2  
+**Document Version:** 1.3  
 **Course:** CSE370 - Database Management  
-**Changelog (v1.2):** Replaced Mermaid ER with linked ERD image; added comprehensive EER diagram (generalization, weak entities, aggregation, Chen notation, normalization).
+**Changelog (v1.3):** Replaced all Mermaid diagrams with embedded PNG images from [Documentation/Diagrams/CSE370](https://github.com/Yuvraajrahman/Cryto-World-Bank/tree/main/Documentation/Diagrams/CSE370).

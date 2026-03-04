@@ -1,0 +1,37 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Literature review summary table.}}{8}{table.2.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Blockchain platform selection criteria and justification.}}{12}{table.caption.11}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Database entity summary (15 entities).}}{17}{table.caption.15}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces EER constructs applied in the Crypto World Bank data model.}}{18}{table.caption.16}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Database indexing strategy.}}{19}{table.caption.17}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Representative functional dependencies.}}{20}{table.caption.18}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Relational integrity constraints.}}{20}{table.caption.19}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces Data partitioning between on-chain and off-chain storage.}}{21}{table.caption.20}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Network membership governance.}}{38}{table.caption.42}%
+\contentsline {table}{\numberline {3.9}{\ignorespaces Business network governance.}}{39}{table.caption.43}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Technology infrastructure governance.}}{39}{table.caption.44}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Sprint 1 backlog: Smart contract development (21 pts).}}{44}{table.caption.47}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Sprint 1 backlog: Frontend foundation (13 pts) and database schema (8 pts).}}{44}{table.caption.48}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Sprint 2 backlog: Lending and communication features (50 pts).}}{45}{table.caption.49}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Sprint 3 backlog: AI/ML security and finalization (38 pts).}}{46}{table.caption.50}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces SDLC stage mapping.}}{48}{table.caption.52}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Design decisions and alternatives considered.}}{50}{table.caption.54}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Market segments.}}{53}{table.caption.56}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Target customer segment profile.}}{54}{table.caption.57}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Partner categories and roles.}}{55}{table.caption.58}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Direct competition and differentiation.}}{56}{table.caption.59}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Risk taxonomy and mitigation strategy.}}{57}{table.caption.60}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Technical feasibility assessment.}}{58}{table.caption.61}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Economic feasibility --- zero-cost prototype.}}{59}{table.caption.62}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces Revenue projection assumptions.}}{60}{table.caption.63}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces System-wide annual revenue summary.}}{60}{table.caption.64}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Interest rate parameters.}}{61}{table.caption.66}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces Go-to-market phases.}}{63}{table.caption.68}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {A.1}{\ignorespaces Technology stack summary.}}{65}{table.caption.69}%
+\addvspace {10\p@ }

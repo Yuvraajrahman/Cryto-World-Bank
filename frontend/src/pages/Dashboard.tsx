@@ -28,6 +28,7 @@ import {
 import { useAccount } from "wagmi";
 import { formatEther } from "viem";
 import { useWorldBankContract } from "../hooks/useContract";
+import { useUviCoinBalance, useUviCoinFaucet, useHasClaimedFaucet } from "../hooks/useUviCoin";
 import { useRole } from "../hooks/useRole";
 import { useUser } from "../hooks/useUser";
 import { CONTRACT_ADDRESS } from "../config/contracts";
@@ -130,9 +131,8 @@ function ServicesSection() {
         py: 4,
         px: 2,
         borderRadius: 3,
-        background: "linear-gradient(160deg, #ffffff 0%, #f8fafc 40%, #f1f5f9 100%)",
-        border: "1px solid",
-        borderColor: "divider",
+        background: "linear-gradient(160deg, #141414 0%, #1a1a1a 40%, #0f0f0f 100%)",
+        border: "1px solid rgba(212, 175, 55, 0.2)",
       }}
     >
       <Typography variant="h5" fontWeight={600} textAlign="center" sx={{ mb: 3 }}>
@@ -156,6 +156,9 @@ export function Dashboard() {
   const { user, loading: userLoading } = useUser();
   const contract = useWorldBankContract();
   const contractRef = useRef(contract);
+  const { data: uviBalance } = useUviCoinBalance(address);
+  const { claimFaucet, isPending: faucetPending, isSuccess: faucetSuccess, isDeployed: uviDeployed } = useUviCoinFaucet();
+  const { data: hasClaimed } = useHasClaimedFaucet(address);
   contractRef.current = contract;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -383,6 +386,36 @@ export function Dashboard() {
             <Typography variant="h6" fontWeight={600} sx={{ mt: 0.5 }}>
               {parseFloat(stats.userDeposits).toFixed(4)} MATIC
             </Typography>
+          </CardContent>
+        </Card>
+      )}
+
+      {uviDeployed && (
+        <Card elevation={1} sx={{ mt: 2 }}>
+          <CardContent>
+            <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1}>
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Your UviCoin (UVI) balance
+                </Typography>
+                <Typography variant="h6" fontWeight={600} sx={{ mt: 0.5 }}>
+                  {uviBalance !== undefined ? `${Number(formatEther(uviBalance)).toFixed(2)} UVI` : "—"}
+                </Typography>
+              </Box>
+              {hasClaimed === false && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={claimFaucet}
+                  disabled={faucetPending}
+                >
+                  {faucetPending ? "Claiming…" : "Claim 1000 UVI"}
+                </Button>
+              )}
+              {faucetSuccess && (
+                <Chip label="Claimed!" size="small" color="success" />
+              )}
+            </Box>
           </CardContent>
         </Card>
       )}

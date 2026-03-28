@@ -7,6 +7,8 @@
     "test": "hardhat test",
     "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
+    "deploy:uvicoin:mumbai": "hardhat run scripts/deploy-uvicoin.ts --network mumbai",
+    "deploy:uvicoin:sepolia": "hardhat run scripts/deploy-uvicoin.ts --network sepolia",
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
     "dev": "concurrently \"npm run frontend:dev\" \"cd backend && npm run dev\""

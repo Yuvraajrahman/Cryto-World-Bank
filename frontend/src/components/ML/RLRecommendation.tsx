@@ -34,7 +34,8 @@ export function RLRecommendation({
     <Card
       elevation={3}
       sx={{
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #1a1a1a 0%, #2d2416 50%, #1a1510 100%)",
+        border: "1px solid rgba(212, 175, 55, 0.3)",
         color: "white",
       }}
     >

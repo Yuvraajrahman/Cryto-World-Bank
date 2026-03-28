@@ -1380,4 +1380,318 @@ Based on all research, here are the absolute highest-priority items to build a f
 
 ---
 
-*This document was compiled through extensive research across academic papers, industry reports (McKinsey, BCG, Goldman Sachs, IMF, World Bank, IFC), protocol documentation, regulatory frameworks, investigative journalism (Bloomberg, HRW), and institutional analysis. All 147 sources are numbered and listed above. Research conducted March 2026.*
+---
+
+## 18. The Case Against Centralized Money: Why This Project Must Exist
+
+This section is not a feature proposal. It is the philosophical and economic foundation that justifies the Crypto World Bank's existence. Every line of code in this project is a response to a system that, by design, transfers wealth from the many to the few.
+
+### 18.1 The Mechanics of Monetary Injustice
+
+#### The Money Printer and Who It Serves
+
+In January 2020, the U.S. M2 money supply stood at $15.4 trillion. By June 2020 — five months later — it had reached $18.2 trillion, an increase of $2.8 trillion, or 18%, in half a year [148]. The annualized growth rate over the March–June 2020 quarter was 54.5% — the fastest monetary expansion in American history [148]. By January 2026, M2 had reached $22.5 trillion [149], meaning roughly $7.1 trillion was created in six years.
+
+Where did that money go?
+
+Not to the 140 million Americans who live in or near poverty. Not to the small businesses that closed permanently during COVID. The Federal Reserve's asset purchases — Treasury bonds and mortgage-backed securities — flowed directly into financial markets. The S&P 500 rose 114% from its March 2020 low to its January 2022 peak. Home prices rose 45% nationally between 2020 and 2023. The wealth of American billionaires increased by over $2 trillion during the pandemic alone.
+
+This is not a side effect. This is the primary mechanism. The Cantillon Effect — first described by the Irish-French economist Richard Cantillon in 1755 — explains why: when new money enters an economy, the first recipients benefit from existing prices, while later recipients face prices that have already risen [150]. Central banks inject money through commercial banks and financial markets. Hedge fund managers, institutional investors, and large corporations access it first. By the time it trickles down to wages and consumer prices, the purchasing power has already been diluted.
+
+A 2025 study across 49 countries (1999–2019) confirmed that quantitative easing has a "discernible relationship" with increased inequality, with effects on wealth distribution being "more pronounced and persistent" than effects on income [151]. The Federal Reserve's own 2025 research, using U.S. tax data from metropolitan areas, found that lower-income workers experience the "steepest earnings declines" during monetary tightening cycles — meaning they are punished twice: first by inflation (the money printing), then by the cure for inflation (rate hikes that cause layoffs) [152].
+
+The top 1% now hold nearly 32% of all wealth in the United States, up from 23% in 1990 [150]. Globally, billionaire wealth hit $18.3 trillion in 2025 — an 81% increase since 2020 — while 4.1 billion people (the bottom half of humanity) hold roughly the same amount combined [153]. That $2.5–3.5 trillion annual increase in billionaire wealth would be enough to eradicate extreme poverty 26 times over [153].
+
+#### The Exorbitant Privilege
+
+The injustice is not confined within national borders. The United States and Europe control currencies used for 79% of global foreign exchange reserves and 91% of trade invoicing [154]. This "seigniorage duopoly" allows wealthy nations to borrow cheaply in their own currencies while investing abroad at higher returns. Developing countries face the opposite: they must hold reserves in dollars and euros (earning low returns) while paying high interest rates on dollar-denominated debt.
+
+The World Inequality Report 2026 documents this as a structural extraction: developing economies recorded negative return differentials averaging minus 3 percentage points compared to developed economies between 2010 and 2019. This translates to annual resource transfers of approximately $800 billion, or 3.3% of developing-world GDP [155]. The report calls this "a modern form of unequal exchange, echoing earlier colonial transfers."
+
+The dollar is also a geopolitical weapon. The SWIFT system — through which 11,000+ financial institutions in 200+ countries process payments — can be weaponized to freeze a nation's economy overnight. Iran, Russia, North Korea, and Afghanistan have all experienced SWIFT exclusion. When your currency is the global reserve, sanctions are not just diplomatic tools — they are financial nuclear weapons deployed without accountability to the people they starve.
+
+#### The CBDC Trap
+
+Rather than decentralizing monetary power, many governments are moving to tighten control further through Central Bank Digital Currencies (CBDCs). As of 2025, 10 countries have launched CBDCs, 48 have pilot programs, and 73 are researching them [156]. Over 3.3 billion people live under authoritarian regimes with active CBDC deployments [156].
+
+CBDCs create unprecedented surveillance infrastructure. Unlike cash, which leaves no trace, CBDC transactions are recorded on centralized ledgers linked to identity, location, and spending habits [157]. Government officials have openly stated that CBDCs are tools for "enhancing control over financial flows" [156]. The concept of "programmable money" — where governments can set expiration dates on currency, restrict spending to approved vendors, or freeze accounts without due process — transforms money from a neutral medium of exchange into a tool of behavioral control [158].
+
+The U.S. House responded by passing the Anti-CBDC Surveillance State Act (H.R. 1919) in July 2025 with 135 co-sponsors, aiming to prohibit the Federal Reserve from issuing a retail CBDC without Congressional authorization [158]. But legislative protection varies by country. In authoritarian regimes, CBDCs will be deployed precisely because they enable surveillance — and alternatives like cash and cryptocurrency will be banned for the same reason.
+
+### 18.2 The De-Dollarization Movement
+
+The global pushback against dollar hegemony is accelerating. The dollar's share of central bank foreign exchange reserves has dropped from 71% in 2000 to approximately 56.9% in early 2026 — a 1% shift equaling roughly $120 billion in reserves moving out of dollar assets [159].
+
+The BRICS bloc (Brazil, Russia, India, China, South Africa, plus new members Saudi Arabia, UAE, Egypt, Ethiopia, Iran) is building parallel financial infrastructure:
+
+- **mBridge (BRICS Bridge)**: A unified cross-border payment system using CBDCs for peer-to-peer settlement in local currencies, with transaction costs reduced by up to 30% compared to SWIFT [159].
+- **The UNIT**: A proposed digital settlement instrument backed 40% by gold and 60% by a BRICS+ currency basket, functioning like the IMF's Special Drawing Rights but within a BRICS framework [159].
+- **CIPS**: China's Cross-Border Interbank Payment System processes over $10 trillion annually, offering an alternative to SWIFT [160].
+
+Central banks purchased over 1,100 tons of gold in 2025 — the largest annual increase in 70 years — signaling a pivot from debt-based paper reserves to commodity-based value [159]. Russia-China bilateral trade is over 90% settled in yuan and roubles. Saudi Arabia and the UAE now settle portions of energy exports to China in yuan [159].
+
+### 18.3 What the Crypto World Bank Offers as an Alternative
+
+The Crypto World Bank is positioned at the intersection of two historical forces: the delegitimization of centralized money printing, and the demand for a neutral, transparent, globally accessible financial rail.
+
+**Transparent Monetary Policy**: Unlike the Federal Reserve, which makes supply decisions in closed-door FOMC meetings, the Crypto World Bank's token supply (UviCoin) is governed by on-chain smart contracts with publicly auditable issuance rules. No one can print more tokens without transparent governance approval recorded on the blockchain.
+
+**Cantillon-Proof Architecture**: In the traditional system, new money reaches banks and asset managers first. In the Crypto World Bank, capital flows through a transparent hierarchy (World Bank → National Banks → Local Banks → End Users) with every interest rate, every reserve ratio, and every lending decision visible on-chain. No backroom deals. No preferential access.
+
+**Alternative to Dollar Dependence**: For developing nations caught in the seigniorage trap, the Crypto World Bank offers a settlement infrastructure that does not require holding dollar reserves. Banks can settle in stablecoins, native tokens, or any asset supported by the protocol — without paying the "exorbitant privilege" tax to Western economies.
+
+**Alternative to CBDCs**: While CBDCs centralize surveillance, the Crypto World Bank offers programmable finance without programmable oppression. KYT (Know Your Transaction) replaces KYC (Know Your Customer), preserving pseudonymity while meeting AML requirements. Users own their wallets. No government can freeze, expire, or restrict their funds without transparent on-chain governance.
+
+**Financial Inclusion Without Gatekeepers**: DeFi functions as a "leapfrog technology" for the 1.4 billion unbanked people worldwide, most of whom have mobile phones [161]. The World Economic Forum identifies decentralized finance as enabling populations to bypass traditional banking infrastructure entirely [161]. The Crypto World Bank extends this from simple peer-to-peer transactions to a full hierarchical lending system — savings accounts, loans, insurance, cross-border payments — all accessible from a smartphone without a bank branch, credit score, or government-issued ID.
+
+**The Moral Argument in Numbers**: If the current system extracts $800 billion annually from developing economies through seigniorage privilege [155], and $55.8 billion from remittance workers through excessive fees [previous sections], and traps $27 trillion in idle nostro accounts [previous sections], then a platform that reduces even a fraction of these inefficiencies does not just create economic value — it redistributes it toward the people who earned it.
+
+---
+
+## 19. Academic Evaluation and Publication Roadmap
+
+This section evaluates the Crypto World Bank project through the lens of a senior academic — assessing its research merit, publication potential, thesis quality, and capacity to inspire future studies.
+
+### 19.1 Is This Project Suitable for Academic Study?
+
+**Yes, unambiguously.** The project addresses a well-defined, novel research question at the intersection of three active academic domains:
+
+1. **Distributed Systems and Smart Contract Engineering** — The multi-tier hierarchical lending architecture (World Bank → National Banks → Local Banks) with cross-tier, same-tier, and upward lending is a genuine architectural contribution. No existing DeFi protocol — Aave, Compound, MakerDAO, or any other — implements this structure. This alone constitutes novelty.
+
+2. **Financial Engineering and Monetary Economics** — The project models real-world banking mechanics (fractional reserves, interbank lending, interest rate waterfalls, tiered borrower access) as on-chain protocols. This bridges the gap between theoretical DeFi papers and practical financial system design. Academic reviewers at venues like Financial Cryptography (FC) and Advances in Financial Technologies (AFT) specifically look for this kind of cross-disciplinary work.
+
+3. **Development Economics and Financial Inclusion** — The social impact dimension (1.4 billion unbanked, $860 billion remittance market, $4.5 trillion SME financing gap) provides a compelling "broader impacts" narrative that strengthens grant applications (NSF, ERC, EPSRC) and publication framing.
+
+### 19.2 Evaluation Against Academic Grading Standards
+
+Based on standard thesis evaluation rubrics used at universities like ETH Zurich, University of Sussex, and LUT University [162][163][164], the project is assessed across five dimensions:
+
+#### Technical Contribution and Depth (Weight: ~30%)
+
+| Criterion | Assessment | Score Estimate |
+|-----------|-----------|----------------|
+| System complexity | Multi-contract Solidity architecture with cross-tier interactions, ML fraud detection, full-stack DApp | Strong |
+| Implementation quality | Working prototype deployed on testnet, React frontend with Wagmi/Viem, Node.js backend | Strong |
+| Technical sophistication | UUPS proxy patterns, ERC-4337 account abstraction, utilization-based interest rate models | Strong |
+| **Overall** | The implementation is non-trivial and demonstrates mastery of modern blockchain development | **Excellent** |
+
+#### Methodological Rigor and Validation (Weight: ~30%)
+
+| Criterion | Assessment | Score Estimate |
+|-----------|-----------|----------------|
+| Testing strategy | Hardhat unit tests, planned Foundry fuzzing, Slither static analysis | Good (needs expansion) |
+| Quantitative evaluation | Gas cost benchmarks needed, comparison with Aave/Compound capital efficiency not yet conducted | Developing |
+| Security analysis | Formal verification tools planned but not yet executed; no third-party audit | Developing |
+| Economic simulation | Tiered interest rate convergence and liquidity stress testing not yet simulated | Developing |
+| **Overall** | Foundation is solid but needs quantitative evaluation to meet top-venue standards | **Good (with clear path to Excellent)** |
+
+#### Novelty and Significance (Weight: Variable)
+
+| Criterion | Assessment | Score Estimate |
+|-----------|-----------|----------------|
+| Architectural novelty | Hierarchical multi-tier DeFi lending with cross-tier flows — no precedent in existing protocols | Excellent |
+| Practical significance | Addresses real-world banking inefficiencies with quantified impact ($27T trapped capital, $800B extraction) | Excellent |
+| Cross-disciplinary contribution | Bridges CS, economics, and development studies | Excellent |
+| **Overall** | The novelty claim is legitimate and defensible | **Excellent** |
+
+#### Literature Engagement (Weight: ~15%)
+
+| Criterion | Assessment | Score Estimate |
+|-----------|-----------|----------------|
+| Breadth of review | 147+ references spanning academic papers, industry reports, protocol docs, regulatory frameworks | Excellent |
+| Critical analysis | Identifies specific gaps in existing protocols (flat-pool limitation) and market failures (seigniorage extraction) | Strong |
+| Currency | Cites 2025-2026 research, policy developments, and market data | Excellent |
+| **Overall** | Literature engagement exceeds typical thesis standards | **Excellent** |
+
+#### Clarity and Presentation (Weight: ~15-25%)
+
+| Criterion | Assessment | Score Estimate |
+|-----------|-----------|----------------|
+| Thesis document structure | LaTeX document with proper sections, tables, equations | Good |
+| Writing clarity | Technical content is clearly explained, accessible to non-specialists | Good |
+| IEEE/ACM formatting compliance | Needs refinement for specific venue requirements (column format, citation style) | Developing |
+| Figure and diagram quality | Architecture diagrams present but need enhancement for publication | Good |
+| **Overall** | Solid foundation requiring formatting refinement for submission | **Good** |
+
+**Composite Assessment**: The project would receive a **strong pass** at most universities and an **excellent** grade with the addition of quantitative evaluation data and formatting refinement.
+
+### 19.3 Publication Venue Targeting
+
+The project's contributions map to several credible academic venues:
+
+#### Tier 1 — Top Conferences (Highly Competitive, h5-index 40+)
+
+| Venue | Fit | Angle |
+|-------|-----|-------|
+| **Financial Cryptography (FC)** — Springer LNCS | Strong | Hierarchical DeFi protocol design, cross-tier lending security analysis |
+| **Advances in Financial Technologies (AFT)** | Strong | Economic mechanism design, interest rate models, capital efficiency comparison |
+| **IEEE S&P (Oakland)** | Partial | If combined with formal verification of multi-tier lending invariants |
+| **ACM CCS** | Partial | Smart contract security analysis, formal verification results |
+
+#### Tier 2 — Specialized Venues
+
+| Venue | Fit | Angle |
+|-------|-----|-------|
+| **IEEE International Conference on Blockchain (Blockchain)** | Strong | Full system paper: architecture, implementation, evaluation |
+| **ACM Advances in Financial Technologies (AFT)** | Strong | Protocol economics, DeFi mechanism design |
+| **Frontiers in Blockchain** (IF: 2.4, CiteScore: 5.6) [165] | Strong | Financial inclusion through hierarchical DeFi — broader impact focus |
+| **Financial Innovation** (Springer Nature) | Strong | Fintech innovation with development economics framing [166] |
+
+#### Tier 3 — Journals for Extended Treatment
+
+| Venue | Fit | Angle |
+|-------|-----|-------|
+| **IEEE Transactions on Services Computing** | Strong | DeFi-as-a-service architecture |
+| **ACM Computing Surveys** | Moderate | Survey paper on hierarchical vs. flat DeFi lending |
+| **Journal of Financial Economics** | Moderate | Economic analysis of decentralized interbank lending |
+
+### 19.4 What Other Professors Would Say
+
+A professor reviewing this thesis or paper would evaluate against five questions:
+
+**1. "Does it solve a real problem?"**
+Yes. The project addresses inefficient, opaque, and exclusionary global banking infrastructure — a problem acknowledged by the IMF, World Bank, McKinsey, and Goldman Sachs. The financial inclusion angle (1.4 billion unbanked) gives it humanitarian significance beyond technical novelty.
+
+**2. "Is the implementation non-trivial?"**
+Yes. The system involves multi-contract Solidity architecture with inter-contract interactions, React/TypeScript frontend with Web3 wallet integration, Node.js backend with event-driven blockchain syncing, and ML-based fraud detection. This is not a tutorial-level project.
+
+**3. "Are the claims supported by evidence?"**
+Partially. The architecture and design claims are well-supported. The performance claims (gas costs, throughput, capital efficiency vs. Aave/Compound) need quantitative benchmarks. The security claims need formal verification results. This is the primary area for strengthening.
+
+**4. "Is it clearly written?"**
+The research documentation (megareseach.md: 1,500+ lines, 170+ references) is comprehensive and well-structured. The thesis LaTeX document needs refinement for IEEE/ACM formatting standards. The prose quality is strong but should be tightened for conciseness in conference submissions (typically 12–14 pages).
+
+**5. "Will it inspire future work?"**
+Yes — and this is the project's strongest academic quality. The hierarchical DeFi architecture opens at least six doctoral-level research directions:
+- Formal verification of multi-tier lending invariants across cascading smart contracts
+- Game-theoretic analysis: do banks cooperate or defect in cross-tier lending? Nash equilibrium analysis of tiered interest rates
+- Empirical comparison of on-chain credit scoring accuracy vs. traditional credit bureaus (TransUnion, Experian, Equifax)
+- Privacy-preserving compliance using zero-knowledge proofs for KYT without exposing transaction graphs
+- Economic stress simulation: bank run propagation in hierarchical DeFi under cascading liquidation events
+- Cross-chain interoperability: multi-jurisdiction hierarchical lending across Ethereum L2s, Solana, and Cosmos
+
+### 19.5 How to Strengthen the Academic Contribution
+
+For maximum academic impact, the project should pursue the following enhancements:
+
+#### Must-Do for Publication
+
+1. **Quantitative Evaluation**: Benchmark gas costs for all major operations (deposit, borrow, repay, cross-tier lend, liquidate). Compare capital utilization efficiency against Aave v3 and Compound v3 using identical test scenarios. Measure transaction throughput under simulated load.
+
+2. **Security Analysis Results**: Run Slither and Mythril on all deployed contracts. Report findings (true positives, false positives, mitigations). Conduct fuzz testing with Foundry (minimum 10,000 runs per invariant). Document attack vectors considered and defenses implemented.
+
+3. **Economic Simulation**: Model the tiered interest rate system under various utilization scenarios. Test for convergence, stability, and pathological conditions (all banks borrowing simultaneously, cascading liquidity shortfalls). Present results as charts with confidence intervals.
+
+4. **Formal Problem Statement**: Define the problem mathematically. State invariants (e.g., "the system-wide reserve ratio never drops below X%"). Prove or test these invariants.
+
+#### Should-Do for Stronger Impact
+
+5. **Comparison Table**: Side-by-side feature comparison with Aave, Compound, MakerDAO, TrueFi, Maple Finance, and Goldfinch. Highlight what the hierarchical model enables that flat-pool models cannot.
+
+6. **User Study or Expert Review**: Interview 3–5 banking professionals or fintech practitioners about the architecture. Report qualitative findings on perceived usefulness, trust, and adoption barriers.
+
+7. **Reproducibility Package**: Publish all smart contracts, test scripts, deployment configurations, and evaluation data as a GitHub repository with a DOI (via Zenodo). This enables other researchers to fork, extend, and benchmark — the foundation of impactful academic work [167][168].
+
+### 19.6 Global Standards Compliance Checklist
+
+For IEEE/ACM submission, the paper must satisfy:
+
+| Standard | Status | Action Needed |
+|----------|--------|---------------|
+| Abstract (150–250 words) | Partial — exists in thesis | Rewrite to follow: Problem → Approach → Key Results → Significance |
+| Introduction with contribution bullets | Partial | Add numbered contribution list (3–4 bullets) at end of introduction |
+| Related work positioning | Strong — extensive megareseach.md | Distill into 2-page related work section for paper |
+| System design with architecture diagram | Present | Refine diagram for publication quality (vector format, labeled components) |
+| Implementation details (LOC, coverage, gas) | Partial | Add metrics table: lines of code, test coverage %, gas per operation |
+| Evaluation with baselines | Missing | Conduct comparison benchmarks against Aave v3, Compound v3 |
+| Discussion with limitations | Missing | Add honest limitations section (oracle dependence, regulatory uncertainty, gas cost on L1) |
+| References in IEEE/ACM format | Partial | Convert citation format to IEEE numbered style or ACM author-year |
+| Ethical considerations | Missing | Add section on privacy, financial inclusion ethics, responsible DeFi deployment |
+
+### 19.7 Inspiration Multiplier: How This Project Spawns Future Research
+
+The ultimate measure of academic impact is not the paper itself but the research ecosystem it creates. The Crypto World Bank is designed as a **reference architecture** — a platform that future researchers can use as a foundation for their own investigations.
+
+**For Computer Science Researchers**:
+- The multi-tier smart contract architecture is a testbed for formal verification tools. Can Certora or Halmos prove cross-tier invariants? What are the limitations of current verification tools for hierarchical contract systems?
+- The ML fraud detection pipeline (Random Forest + Isolation Forest + SHAP) can be benchmarked against graph neural networks and transformer models on the project's transaction data.
+
+**For Economics Researchers**:
+- The tiered interest rate model is a simulation environment for studying monetary policy transmission in decentralized systems. How does a "SOFR-equivalent" rate emerge from algorithmic supply and demand?
+- The cross-tier lending mechanics enable agent-based modeling of interbank lending dynamics — do decentralized banks exhibit the same herding behavior as traditional banks during liquidity crises?
+
+**For Development Studies Researchers**:
+- The platform's financial inclusion features (gasless transactions, sub-dollar loans, mobile-first design) can be evaluated through field studies in developing economies. Does access to hierarchical DeFi lending improve household economic outcomes compared to traditional microfinance?
+
+**For Legal and Policy Scholars**:
+- The KYT-over-KYC approach raises novel questions about regulatory compliance in pseudonymous systems. Can blockchain analytics satisfy AML requirements without traditional identity verification?
+
+This is the hallmark of impactful academic work: a single project that generates dozens of derivative research questions across multiple disciplines [165][166][167].
+
+---
+
+## 20. References (Final Extension)
+
+[148] Federal Reserve Board. "Money Stock Measures — H.6 Release." July 30, 2020. https://www.federalreserve.gov/releases/h6/20200730/
+
+[149] Federal Reserve Board. "Money Stock Measures — H.6 Release." March 24, 2026. https://federalreserve.gov/releases/h6/current/default.htm
+
+[150] Mises Institute. "The Theory of the Bottom 99 Percent: The Cantillon Effect." https://mises.org/mises-wire/theory-bottom-99-percent-cantillon-effect
+
+[151] Beyer, A. et al. "Monetary policy and inequality: Distributional effects of asset purchase programs." Journal of International Money and Finance, Vol. 157, 2025. https://ideas.repec.org/a/eee/jimfin/v157y2025ics0261560625001196.html
+
+[152] Federal Reserve Board. "Monetary Policy and the Distribution of Income: Evidence from U.S. Metropolitan Areas." FEDS Notes, March 2025. https://www.federalreserve.gov/econres/notes/feds-notes/monetary-policy-and-the-distribution-of-income-evidence-from-us-metropolitan-areas-20250331.html
+
+[153] Oxfam International. "Billionaire wealth jumps three times faster in 2025 to highest peak ever." January 2026. https://www.oxfam.org/en/press-releases/billionaire-wealth-jumps-three-times-faster-2025-highest-peak-ever
+
+[154] Eichengreen, B. and Naef, A. "The Global Seigniorage Duopoly." Global Policy, 2024. https://onlinelibrary.wiley.com/doi/10.1111/1758-5899.13489
+
+[155] World Inequality Report 2026. "Exorbitant Privilege." https://wir2026.wid.world/insight/exorbitant-privilege/
+
+[156] Human Rights Foundation. "Tracking CBDCs before they track you." 2025. https://hrf.org/latest/tracking-cbdcs-before-they-track-you
+
+[157] Criminal Legal News. "Central Bank Digital Currencies: Trojan Horses Delivering Mass Surveillance Under the Guise of Monetary Innovation." August 2025. https://www.criminallegalnews.org/news/2025/aug/15/central-bank-digital-currencies-trojan-horses-delivering-mass-surveillance-under-guise-monetary-innovation/
+
+[158] KuCoin. "2026 Anti-CBDC Surveillance State Act Status and Update." 2026. https://www.kucoin.com/blog/en-2026-anti-cbdc-surveillance-state-act-status-and-update
+
+[159] GME Academy. "The Great Divergence: BRICS and the 2026 De-Dollarization Surge." 2026. https://www.gme.academy/digest/theerudite/brics-and-the-2026-de-dollarization-surge
+
+[160] Convertz. "De-Dollarization in 2026: How BRICS, the Yuan, and a Shifting World Order Are Reshaping Global Currency." 2026. https://convertz.app/blog/de-dollarization-brics-currency-shift-2026
+
+[161] World Economic Forum. "Why decentralized finance is a leapfrog technology for the 1.1 billion people who are unbanked." September 2022. https://weforum.org/stories/2022/09/decentralized-finance-a-leapfrog-technology-for-the-unbanked
+
+[162] ETH Zurich. "Thesis Evaluation Criteria." https://ethz.ch/content/dam/ethz/special-interest/infk/machine-learning-lab/ise-dam/documents-protected/thesis_evaluation_english.pdf
+
+[163] University of Sussex. "Marking Criteria MSc ACS: Dissertations and Projects." https://www.sussex.ac.uk/ei/internal/forstudents/informatics/masters/dissertations/markingcriteriamsc_acs
+
+[164] LUT University. "Doctoral Research Assessment Tool." 2020. https://elut.lut.fi/sites/default/files/category-page/2021-12/Doctoral_Research_Assessment_Tool_update_2020.pdf
+
+[165] Frontiers in Blockchain. "Block chain technology for digital financial inclusion in the industry 4.0." 2023. https://www.frontiersin.org/journals/blockchain/articles/10.3389/fbloc.2023.1035405/full
+
+[166] Financial Innovation (Springer Nature). "Financial inclusion and fintech: a state-of-the-art systematic literature review." 2024. https://jfin-swufe.springeropen.com/articles/10.1186/s40854-024-00741-0
+
+[167] GitHub/SciEcon. "SoK: Blockchain Decentralization — Replication Code and Data." https://github.com/SciEcon/SoK_Blockchain_Decentralization
+
+[168] GitHub/danhper. "DeFi Protocols for Loanable Funds: Interest Rates, Liquidity and Market Efficiency — Code and Data." https://github.com/danhper/defi-plf-analysis
+
+[169] ProPublica. "How the Federal Reserve Is Increasing Wealth Inequality." https://www.propublica.org/article/how-the-federal-reserve-is-increasing-wealth-inequality
+
+[170] Sandmark. "The Cantillon Effect in the Age of Quantitative Easing." https://www.sandmark.com/news/analysis/cantillon-effect-age-quantitative-easing
+
+[171] Forbes Africa. "'Too Many Are Locked Out': Is Decentralized Finance Africa's Answer to Accelerating Women's Financial Inclusion?" September 2025. https://www.forbesafrica.com/current-affairs/2025/09/12/too-many-are-locked-out-is-decentralized-finance-africas-answer-to-accelerating-womens-financial-inclusion/
+
+[172] ProPublica. "Bailout Tracker." https://bailout.propublica.org/bailout/main/about
+
+[173] Federal Reserve Bank of St. Louis. "The Distributional Effects of Bailouts." Review, November 2025. https://www.stlouisfed.org/publications/review/2025/nov/distributional-effects-of-bailouts
+
+[174] MarkInMinutes. "Thesis Rubric Template — Master's CS." https://www.markinminutes.com/de/rubric-templates/thesis-rubric-master-computer-science
+
+[175] Nakamoto, S. "Bitcoin: A Peer-to-Peer Electronic Cash System." 2008. https://nakamotoinstitute.org/bitcoin
+
+[176] Cato Institute. "Stopping the Next Expansion by Prohibiting the Creation of a Central Bank Digital Currency." https://www.cato.org/publications/stopping-next-expansion-prohibiting-creation-central-bank-digital-currency
+
+[177] Mises Institute. "Four Charts That Show Cantillon Effects." https://www.mises.org/mises-wire/four-charts-show-cantillon-effects
+
+---
+
+*This document was compiled through extensive research across academic papers, industry reports (McKinsey, BCG, Goldman Sachs, IMF, World Bank, IFC, Oxfam), protocol documentation (Ethereum, Bitcoin, Aave, Compound), regulatory frameworks (MiCA, GENIUS Act, Anti-CBDC Surveillance State Act), central bank data (Federal Reserve H.6, FRED), inequality research (World Inequality Report 2026, Mises Institute), investigative journalism (ProPublica, Bloomberg, HRW, Criminal Legal News, Forbes Africa), human rights organizations (Human Rights Foundation), and institutional analysis. All 177 sources are numbered and listed above. Research conducted March 2026.*

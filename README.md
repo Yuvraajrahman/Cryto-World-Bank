@@ -15,7 +15,7 @@
   <a href="#-documentation">Documentation</a>
 </p>
 
----
+-----
 
 ## 📋 Overview
 
@@ -61,7 +61,7 @@ The system employs a **three-layer decentralized application architecture**:
 | Layer | Technologies | Key Components |
 |-------|--------------|-----------------|
 | **Presentation** | React 18, TypeScript, Material-UI, Wagmi, RainbowKit | Dashboard, Loan Module, Admin Panel, Risk AI, Chat, Profile |
-| **Smart Contract** | Solidity 0.8.20, OpenZeppelin, EVM (Polygon/Ethereum) | WorldBankReserve, NationalBank, LocalBank |
+| **Smart Contract** | Solidity 0.8.20, OpenZeppelin, EVM (Polygon/Ethereum) | WorldBankReserve, NationalBank, LocalBank, UviCoin |
 | **Off-Chain Services** | Node.js/Express, MongoDB | REST API, Event Listener, AI/ML Analytics (planned) |
 
 ### Key Flows
@@ -90,6 +90,7 @@ The system employs a **three-layer decentralized application architecture**:
 | **Borrowing Limits** | ✅ | Rolling 6-month / 1-year windows |
 | **Chat System** | ✅ | Borrower–bank communication |
 | **Income Verification** | ✅ | Document upload and verification |
+| **UviCoin** | ✅ | ERC-20 project token (1M supply, faucet on testnet) |
 | **AI/ML Fraud Detection** | 🔄 | Random Forest + SHAP (in progress) |
 | **Risk Dashboard** | 🔄 | AI risk scores (in progress) |
 
@@ -140,6 +141,7 @@ cp .env.example .env
 cd ../frontend
 echo "VITE_API_URL=http://localhost:3001/api" > .env
 echo "VITE_CONTRACT_ADDRESS=0xYourDeployedAddress" >> .env
+echo "VITE_UVICOIN_ADDRESS=0xYourUviCoinAddress" >> .env
 echo "VITE_WALLETCONNECT_PROJECT_ID=your-project-id" >> .env
 ```
 
@@ -155,7 +157,10 @@ npm test
 # Deploy to testnet
 npm run deploy:mumbai   # or deploy:sepolia
 
-# Update frontend/src/config/contracts.ts with deployed addresses
+# Deploy UviCoin (project token)
+npm run deploy:uvicoin:mumbai   # or deploy:uvicoin:sepolia
+
+# Update frontend .env with deployed addresses (VITE_CONTRACT_ADDRESS, VITE_UVICOIN_ADDRESS)
 ```
 
 ### 4. Run Application
@@ -179,6 +184,20 @@ npm run dev
 | **Ethereum Sepolia** | `https://sepolia.infura.io/v3/YOUR_KEY` | 11155111 |
 
 **Faucets:** [Polygon Faucet](https://faucet.polygon.technology/) | [Sepolia Faucet](https://sepoliafaucet.com/)
+
+### 6. UviCoin (Project Token)
+
+UviCoin is an ERC-20 token for the Crypto World Bank project. **Deploy for free** on testnets using faucet MATIC/ETH:
+
+```bash
+# Deploy UviCoin to Mumbai (or Sepolia)
+npm run deploy:uvicoin:mumbai
+```
+
+- **Supply:** 1,000,000 UVI (18 decimals)
+- **Faucet:** Any address can claim 1,000 UVI once (testnet only)
+- **Owner mint:** Deployer can mint additional tokens
+- Add `VITE_UVICOIN_ADDRESS=<deployed-address>` to frontend `.env` to show balance on the Dashboard
 
 ---
 

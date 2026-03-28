@@ -455,6 +455,56 @@ The platform further integrates:
 \item \textbf{Off-chain AI/ML security analytics} for fraud detection (Random Forest), anomaly identification (Isolation Forest), and explainable risk assessment (SHAP).
 \end{itemize}
 
+\subsection{Cross-Tier Lending System}
+
+In traditional banking, capital does not flow strictly top-down. Banks at the same level routinely lend to each other through the interbank lending market (e.g., the federal funds market), and lower-tier banks with surplus reserves deposit excess capital upward with their parent institutions or central banks. The Crypto World Bank extends its hierarchical architecture to support these \textbf{multi-directional lending flows}, creating a more realistic and resilient financial ecosystem.
+
+\subsubsection{Same-Tier Lending}
+
+Banks at the same hierarchical level can lend to one another to manage short-term liquidity:
+
+\begin{itemize}[noitemsep]
+\item \textbf{National Bank $\leftrightarrow$ National Bank:} A national bank with excess reserves can lend to another experiencing a liquidity shortfall, analogous to the traditional interbank lending market. The lending rate floats based on supply and demand across national banks in the system, similar to the Secured Overnight Financing Rate (SOFR).
+\item \textbf{Local Bank $\leftrightarrow$ Local Bank:} Local banks within the same or different national jurisdictions can share liquidity through a peer lending pool. This prevents localized liquidity crunches when one bank has excess deposits while another faces elevated loan demand.
+\end{itemize}
+
+Same-tier lending is implemented through an on-chain \textbf{InterBankLendingPool} contract at each tier level, where banks with surplus offer short-term liquidity and banks with deficit can borrow at utilization-based floating rates.
+
+\subsubsection{Upward Lending}
+
+Lower-tier banks with surplus capital can lend upward through the hierarchy:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Local Banks $\to$ National Banks:} When local banks accumulate reserves beyond their minimum reserve ratio, they can deposit surplus capital into their parent national bank's liquidity pool, earning a deposit yield. This mirrors how commercial banks deposit excess reserves with central banks through standing deposit facilities.
+\item \textbf{National Banks $\to$ World Bank:} National banks can contribute surplus to the global reserve, strengthening the system's overall capital base. This provides a return channel for well-capitalized national banks and increases the reserve available for downward distribution to banks with higher demand.
+\end{itemize}
+
+Upward lending rates are lower than downward lending rates (reflecting the lower risk of lending to a higher-tier institution), creating a natural interest rate term structure across the hierarchy.
+
+\subsubsection{Tiered Borrower Access}
+
+Different borrower classes access different tiers based on loan size and organizational type:
+
+\begin{moderntable}
+\caption{Borrower tier access rules.}
+\begin{tabular}{@{} >{\raggedright}p{3cm} >{\raggedright}p{3.5cm} >{\raggedright}p{2.5cm} >{\raggedright\arraybackslash}p{3cm} @{}}
+\toprule
+\tableheadfont Borrower Type & \tableheadfont Accessible Tiers & \tableheadfont Loan Range & \tableheadfont Use Case \\
+\midrule
+\rowcolor{RowShade}
+Individual / End User & Local Bank only & 0.01--10 ETH & Personal, micro-enterprise \\
+Small Business / SME & Local Bank, National Bank & 1--100 ETH & Working capital, equipment \\
+\rowcolor{RowShade}
+Large Corporate & National Bank, World Bank & 50--10,000 ETH & Infrastructure, large projects \\
+Institutional / Sovereign & World Bank only & 1,000+ ETH & Development programs \\
+\bottomrule
+\end{tabular}
+\end{moderntable}
+
+End users and retail borrowers access the system exclusively through Local Banks, preserving the hierarchical intermediation model. Large corporate accounts and institutional borrowers can access higher tiers directly, subject to enhanced verification (on-chain credit history combined with off-chain documentation) and a borrower class designation in the smart contract that determines tier access permissions.
+
+This multi-directional lending model---combining downward capital distribution, same-tier interbank lending, upward surplus repatriation, and tiered borrower access---creates a more complete representation of real-world banking flows within the decentralized architecture.
+
 \section{Market Analysis and Partnership Ecosystem}
 
 \subsection{Market Sizing}

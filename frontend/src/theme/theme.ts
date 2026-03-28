@@ -1,50 +1,50 @@
 import { createTheme, alpha } from "@mui/material/styles";
 
 /**
- * Material Design 3 theme - Android 16 aesthetics
- * Minimalistic, clean, research-grade look
+ * Black & Golden theme
+ * Luxurious dark aesthetic with gold accents
  */
 export const theme = createTheme({
   palette: {
-    mode: "light",
+    mode: "dark",
     primary: {
-      main: "#6750A4",
-      light: "#EADDFF",
-      dark: "#21005D",
-      contrastText: "#FFFFFF",
+      main: "#D4AF37",
+      light: "#F4E4A6",
+      dark: "#B8962E",
+      contrastText: "#0a0a0a",
     },
     secondary: {
-      main: "#625B71",
-      light: "#E8DEF8",
-      dark: "#1D192B",
-      contrastText: "#FFFFFF",
+      main: "#C9A227",
+      light: "#E8D78A",
+      dark: "#8B6914",
+      contrastText: "#0a0a0a",
     },
     error: {
-      main: "#B3261E",
-      light: "#F9DEDC",
-      dark: "#410E0B",
+      main: "#CF6679",
+      light: "#FFCDD2",
+      dark: "#B00020",
       contrastText: "#FFFFFF",
     },
     success: {
-      main: "#2E7D32",
-      light: "#E8F5E9",
-      dark: "#1B5E20",
+      main: "#4CAF50",
+      light: "#C8E6C9",
+      dark: "#2E7D32",
     },
     warning: {
-      main: "#ED6C02",
-      light: "#FFF3E0",
-      dark: "#E65100",
+      main: "#FFB74D",
+      light: "#FFE0B2",
+      dark: "#F57C00",
     },
     background: {
-      default: "#FFFBFE",
-      paper: "#FFFBFE",
+      default: "#0a0a0a",
+      paper: "#141414",
     },
     text: {
-      primary: "#1C1B1F",
-      secondary: "#49454F",
-      disabled: "#79747E",
+      primary: "#FAFAFA",
+      secondary: "rgba(255, 255, 255, 0.7)",
+      disabled: "rgba(255, 255, 255, 0.38)",
     },
-    divider: alpha("#79747E", 0.2),
+    divider: alpha("#D4AF37", 0.2),
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -104,7 +104,7 @@ export const theme = createTheme({
   },
   shadows: [
     "none",
-    "0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px rgba(0, 0, 0, 0.15)",
+    "0px 1px 2px rgba(0, 0, 0, 0.5), 0px 1px 3px rgba(212, 175, 55, 0.1)",
     "0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px rgba(0, 0, 0, 0.15)",
     "0px 4px 8px rgba(0, 0, 0, 0.14)",
     "0px 6px 10px rgba(0, 0, 0, 0.14)",
@@ -140,7 +140,7 @@ export const theme = createTheme({
           minHeight: 48,
         },
         contained: {
-          boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px rgba(0, 0, 0, 0.15)",
+          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.5), 0px 1px 3px rgba(212, 175, 55, 0.2)",
         },
       },
     },
@@ -148,7 +148,8 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px rgba(0, 0, 0, 0.15)",
+          boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.5), 0px 1px 3px rgba(212, 175, 55, 0.08)",
+          border: "1px solid rgba(212, 175, 55, 0.15)",
         },
       },
     },
@@ -175,16 +176,17 @@ export const theme = createTheme({
     MuiBottomNavigation: {
       styleOverrides: {
         root: {
-          backgroundColor: "#FFFBFE",
-          borderTop: "1px solid rgba(0,0,0,0.08)",
+          backgroundColor: "#0a0a0a",
+          borderTop: "1px solid rgba(212, 175, 55, 0.2)",
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#6750A4",
-          boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
+          backgroundColor: "#0a0a0a",
+          borderBottom: "1px solid rgba(212, 175, 55, 0.25)",
+          boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.5)",
         },
       },
     },

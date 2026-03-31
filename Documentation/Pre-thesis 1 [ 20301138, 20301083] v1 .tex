@@ -344,7 +344,9 @@ We would like to express our sincere gratitude to our supervisor, Mr.\ Annajiat 
 
 The convergence of blockchain technology, decentralized finance, and artificial intelligence presents new opportunities to address longstanding inefficiencies in global development finance. This project, the Crypto World Bank, explores how a decentralized lending platform with a multi-tier institutional structure can improve transparency, reduce settlement friction, and expand access to credit in underserved markets. The complete source code, smart contracts, and supplementary documentation for this project are available in our \href{https://github.com/Yuvraajrahman/Cryto-World-Bank}{GitHub repository}.
 
-We position blockchain in this context as a coordination technology that provides shared state visibility, tamper-evident audit trails, and programmable process enforcement across multiple institutions. The platform further addresses governance design, security controls, and regulatory considerations through a phased deployment pathway involving academic validation and regulatory sandbox pilots. By integrating a four-tier institutional hierarchy with transparent ledger infrastructure and data-driven risk analytics, the Crypto World Bank explores a hybrid architecture for institutional decentralized finance that targets improved operational efficiency and expanded access to credit in emerging markets.
+Cross-border finance remains constrained by slow correspondent-banking settlement, fragmented ledger visibility, and high transfer costs. International remittances reached approximately \$860~billion annually in 2024, yet \$48--56~billion is still lost to transfer fees~[26]. At the same time, approximately 1.4~billion adults remain unbanked globally~[14], and the financing gap for micro, small, and medium enterprises exceeds \$4.5~trillion~[20]. In parallel, decentralized finance has shown that lending logic can be automated transparently on blockchain infrastructure, but leading protocols continue to employ flat, pool-based architectures that do not model real-world institutional hierarchies or the directional capital flows observed in development finance.
+
+We position blockchain in this context as a coordination technology that provides shared state visibility, tamper-evident audit trails, and programmable process enforcement across multiple institutions. The platform further addresses governance design, security controls, and regulatory considerations through a phased deployment pathway involving academic validation and regulatory sandbox pilots. By integrating a four-tier institutional hierarchy with transparent ledger infrastructure and a lightweight AI-assisted monitoring layer, the Crypto World Bank explores a hybrid architecture for institutional decentralized finance that targets improved operational efficiency and expanded access to credit in emerging markets.
 
 \section{Background}
 
@@ -356,7 +358,7 @@ The DeFi ecosystem has demonstrated that smart contract platforms can automate l
 
 \section{Rationale of the Study}
 
-This study is motivated by the convergence of three factors: (1)~the persistent inefficiencies in traditional development finance that limit transparency and settlement speed; (2)~the gap between DeFi's technical capabilities and its failure to address multi-tier institutional lending use cases; and (3)~the opportunity to combine blockchain's auditability with AI/ML security analytics to improve both operational efficiency and decision quality. By designing a prototype that bridges these domains, we aim to demonstrate a viable path toward transparent, programmable, and AI-augmented lending for underserved populations.
+This study is motivated by the convergence of three factors: (1)~the persistent inefficiencies in traditional development finance that limit transparency and settlement speed; (2)~the gap between DeFi's technical capabilities and its failure to address multi-tier institutional lending use cases; and (3)~the opportunity to combine blockchain's auditability with lightweight analytics and monitoring support to improve operational oversight. By designing a prototype that bridges these domains, we aim to demonstrate a viable path toward transparent, programmable, and institutionally meaningful lending for underserved populations.
 
 \section{Problem Statement}
 
@@ -387,10 +389,21 @@ The objectives of this project are:
 
 \begin{enumerate}[noitemsep]
 \item To design and implement a four-tier lending architecture (World Bank $\to$ National Bank $\to$ Local Bank $\to$ Borrower) on an EVM-compatible blockchain that preserves institutional hierarchy while enabling shared ledger visibility.
-\item To integrate off-chain AI/ML security analytics---including fraud detection (Random Forest), anomaly identification (Isolation Forest), and explainable risk assessment (SHAP)---to augment human credit governance.
+\item To explore a lightweight off-chain analytics support layer---including fraud monitoring, anomaly identification, and explainable review support---to augment human credit governance.
 \item To demonstrate transparent, programmable lending workflows with configurable borrowing limits, installment schedules, and role-based access control enforced by smart contracts.
 \item To validate the prototype on public testnets (Polygon, Ethereum Sepolia) with functional verification of hierarchical controls, transparency properties, and operational workflows.
 \item To document governance design, security controls, regulatory considerations, and a phased deployment pathway for academic validation and potential regulatory sandbox pilots.
+\end{enumerate}
+
+\section{Research Questions}
+
+The study is guided by the following research questions:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{RQ1:} Can a hierarchical blockchain-based lending architecture model the real-world capital flow structure of development finance more faithfully than existing flat DeFi lending protocols?
+\item \textbf{RQ2:} Can on-chain transparency, programmable reserve controls, and role-based governance reduce settlement opacity and coordination friction across multiple institutional tiers?
+\item \textbf{RQ3:} Can a lightweight off-chain analytics layer provide practical and auditable support for fraud monitoring and lending oversight in such a system?
+\item \textbf{RQ4:} Is the proposed architecture technically and operationally feasible on current public test networks while remaining relevant to real-world institutional and financial-inclusion use cases?
 \end{enumerate}
 
 \section{Blockchain Justification}
@@ -1275,6 +1288,20 @@ Key parameters of our Agile implementation:
 \item \textbf{Sprint Review and Retrospective:} 30 minutes each at sprint end
 \end{itemize}
 
+\section{Planned AI/ML Support}
+
+For pre-thesis~1, the AI/ML component is treated as a supporting layer rather than the central contribution of the project. Its purpose is to show how fraud monitoring, anomaly detection, and explainable decision support can be integrated into the lending workflow without making the current paper depend on a completed data-science pipeline.
+
+At this stage, the planned AI/ML scope is intentionally modest:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Fraud monitoring:} Random Forest is considered as a practical candidate model for transaction-risk screening.
+\item \textbf{Anomaly detection:} Isolation Forest is proposed for identifying unusual wallet behavior where labeled data may be limited.
+\item \textbf{Explainability:} SHAP-based feature attribution is retained so that flagged decisions remain interpretable to human reviewers.
+\end{itemize}
+
+Full dataset construction, extensive model benchmarking, and production-grade validation are reserved for later thesis stages and future work, since the primary contribution of this pre-thesis report is the hierarchical blockchain lending architecture rather than a completed machine-learning study.
+
 \vspace{8pt}
 \begin{tcolorbox}[
     colback=PrimaryBlue!5,
@@ -1531,7 +1558,7 @@ Frontend & React + TypeScript & Vue + TypeScript & Web3 ecosystem maturity \\
 Smart Contract & EVM (Solidity) & Solana (Rust) & Ecosystem size, free testnets \\
 \rowcolor{RowShade}
 UI Design & MUI (Material 3) & Tailwind CSS & Banking UI conventions \\
-Fraud Detection & Random Forest & XGBoost & SHAP compatibility, 94\%+ precision \\
+Fraud Detection & Random Forest & XGBoost & SHAP compatibility, implementation simplicity \\
 \rowcolor{RowShade}
 Anomaly Detection & Isolation Forest & Autoencoder & Unsupervised, no labeled data needed \\
 XAI Method & SHAP & LIME & Theoretical guarantees, regulatory fit \\
@@ -1570,7 +1597,7 @@ Our testing strategy covers unit, integration, and model evaluation layers:
 \begin{itemize}[noitemsep]
 \item \textbf{Smart contract unit tests:} 12+ test cases written in Hardhat covering reserve management, hierarchical registration, loan lifecycle, access control violations, and edge cases (zero-amount deposits, unauthorized operations).
 \item \textbf{Integration testing:} End-to-end workflow validation from wallet connection through loan request, approval, and installment repayment on testnet.
-\item \textbf{AI/ML model evaluation:} Precision, recall, F1-score, and AUC-ROC metrics for the Random Forest fraud classifier; contamination threshold tuning for Isolation Forest; SHAP value consistency checks.
+\item \textbf{AI/ML module verification:} Functional verification that the proposed fraud and anomaly-detection modules can be integrated with the backend workflow and produce interpretable outputs for review.
 \item \textbf{Frontend testing:} Manual UI testing across Chrome, Firefox, and mobile viewports for responsive layout verification.
 \end{itemize}
 
@@ -1927,7 +1954,7 @@ Beyond direct platform revenue, the Crypto World Bank creates broader economic v
 Phase 1: Validation & Competition submission (BCOLBD 2025); thesis publication; open-source release & Current \\
 Phase 2: Pilot & Regulatory sandbox application; institutional partnership; testnet-to-mainnet migration & 6--12 months \\
 \rowcolor{RowShade}
-Phase 3: Production & Multi-chain deployment; full AI/ML backend; governance token launch & 12--24 months \\
+Phase 3: Production & Multi-chain deployment; enhanced monitoring and analytics; governance token launch & 12--24 months \\
 \bottomrule
 \end{tabular}
 \end{moderntable}
@@ -1938,17 +1965,17 @@ Phase 3: Production & Multi-chain deployment; full AI/ML backend; governance tok
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
 
-The Crypto World Bank addresses a \textbf{complex, multi-party coordination and trust problem} in hierarchical development finance by leveraging the unique properties of blockchain technology: immutability, programmable enforcement, and cryptographic auditability. Our solution goes beyond existing DeFi lending protocols---which collectively manage over \$55~billion in TVL~[13] but universally employ flat, single-tier pool architectures---by introducing a four-tier institutional hierarchy with cross-tier, same-tier, and upward lending flows, AI/ML-augmented risk assessment, and a governance framework that addresses network membership, business operations, and technology infrastructure.
+The Crypto World Bank addresses a \textbf{complex, multi-party coordination and trust problem} in hierarchical development finance by leveraging the unique properties of blockchain technology: immutability, programmable enforcement, and cryptographic auditability. Our solution goes beyond existing DeFi lending protocols---which collectively manage over \$55~billion in TVL~[13] but universally employ flat, single-tier pool architectures---by introducing a four-tier institutional hierarchy with cross-tier, same-tier, and upward lending flows, together with a governance framework that addresses network membership, business operations, and technology infrastructure.
 
-The competitive landscape analysis of 20+ existing projects across DeFi lending, institutional credit, banking infrastructure, and financial inclusion confirms that no existing system combines hierarchical multi-tier lending, interbank lending mechanics, tiered borrower access, and integrated AI/ML security within a single decentralized architecture. The growing institutional adoption of blockchain---evidenced by the World Bank's FundsChain initiative~[39], JPMorgan Kinexys's multi-billion-dollar daily volumes~[40], and R3 Corda's \$17~billion in tokenized assets~[37]---validates both the technical feasibility and institutional demand for blockchain-based financial infrastructure. The Crypto World Bank extends this trajectory from settlement and fund tracking to a complete, transparent, hierarchical lending system.
+The competitive landscape analysis of 20+ existing projects across DeFi lending, institutional credit, banking infrastructure, and financial inclusion confirms that no existing system combines hierarchical multi-tier lending, interbank lending mechanics, and tiered borrower access within a single decentralized architecture. The growing institutional adoption of blockchain---evidenced by the World Bank's FundsChain initiative~[39], JPMorgan Kinexys's multi-billion-dollar daily volumes~[40], and R3 Corda's \$17~billion in tokenized assets~[37]---validates both the technical feasibility and institutional demand for blockchain-based financial infrastructure. The Crypto World Bank extends this trajectory from settlement and fund tracking to a complete, transparent, hierarchical lending system.
 
-The platform is positioned at the intersection of decentralized finance, institutional lending, financial inclusion, and applied AI security---a combination that is presently unaddressed in both the academic literature and the commercial blockchain landscape. With a working prototype, a defined market and partnership strategy, transparent risk assessment, and a phased go-to-market plan, the Crypto World Bank represents a viable and scalable contribution to the emerging field of blockchain-based development finance.
+The platform is positioned at the intersection of decentralized finance, institutional lending, and financial inclusion---a combination that is presently unaddressed in both the academic literature and the commercial blockchain landscape. With a working prototype, a defined market and partnership strategy, and a phased go-to-market plan, the Crypto World Bank represents a viable and scalable contribution to the emerging field of blockchain-based development finance.
 
 Future work will focus on the following directions:
 
 \begin{enumerate}[noitemsep]
 \item \textbf{Mainnet deployment and regulatory sandbox:} Migration from testnet to mainnet with real asset testing in regulatory sandbox environments (e.g., UK FCA Digital Securities Sandbox, Singapore MAS FinTech Regulatory Sandbox, Bangladesh Bank FinTech Regulatory Sandbox).
-\item \textbf{Expanded AI/ML capabilities:} Reinforcement learning for dynamic interest rate optimization across the tiered hierarchy; graph neural networks for detecting collusion patterns in cross-tier lending; on-chain credit scoring using behavioral analysis of repayment history, deposit patterns, wallet age, and transaction volume.
+\item \textbf{Expanded monitoring support:} More advanced risk-monitoring and anomaly-detection modules may be explored in later stages once the core lending workflow and blockchain architecture are fully stabilized.
 \item \textbf{Cross-chain interoperability:} Multi-network lending across Ethereum Layer~2 rollups (Arbitrum, Optimism, Base) and alternative EVM chains to serve different geographic markets with optimized gas costs and local regulatory compliance.
 \item \textbf{Formal security verification:} Comprehensive formal verification of all smart contract code using static analysis (Slither), symbolic execution (Mythril), and property-based formal verification (Certora), with particular attention to multi-tier lending invariants such as cascading reserve ratio maintenance and cross-tier interest rate bound enforcement.
 \item \textbf{Stablecoin integration and fiat on/off-ramps:} Support for established stablecoins (USDC, USDT, DAI) alongside the platform's native token, with fiat on/off-ramp integration through partnerships with licensed money transmitters or anchor networks similar to Stellar's MoneyGram integration~[44].

@@ -1325,10 +1325,6 @@ Full dataset construction, extensive model benchmarking, and production-grade va
         font=\small,
         inner sep=6pt,
     },
-    sprintlabel/.style={
-        font=\bfseries\small,
-        text=PrimaryBlue,
-    },
     arrowstyle/.style={
         ->,
         >=stealth,
@@ -1337,7 +1333,7 @@ Full dataset construction, extensive model benchmarking, and production-grade va
     }
 ]
 \node[sprint] (s1) at (0,0) {
-    {\sprintlabel SPRINT 1}\\
+    {\bfseries\small\color{PrimaryBlue} SPRINT 1}\\
     {\scriptsize Weeks 1--3}\\[3pt]
     \textbf{Foundation \&}\\
     \textbf{Core Banking}\\[2pt]
@@ -1350,7 +1346,7 @@ Full dataset construction, extensive model benchmarking, and production-grade va
 };
 
 \node[sprint] (s2) at (4.8,0) {
-    {\sprintlabel SPRINT 2}\\
+    {\bfseries\small\color{PrimaryBlue} SPRINT 2}\\
     {\scriptsize Weeks 4--6}\\[3pt]
     \textbf{Lending Features}\\
     \textbf{\& Communication}\\[2pt]
@@ -1363,7 +1359,7 @@ Full dataset construction, extensive model benchmarking, and production-grade va
 };
 
 \node[sprint] (s3) at (9.6,0) {
-    {\sprintlabel SPRINT 3}\\
+    {\bfseries\small\color{PrimaryBlue} SPRINT 3}\\
     {\scriptsize Weeks 7--8}\\[3pt]
     \textbf{AI/ML Security}\\
     \textbf{\& Polish}\\[2pt]

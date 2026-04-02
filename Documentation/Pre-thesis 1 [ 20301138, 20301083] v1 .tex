@@ -129,27 +129,27 @@
 
 \begin{center}
 
-\vspace*{0.5cm}
+\vspace*{0.3cm}
 
-\includegraphics[width=3.8cm]{bracu_logo_12-0-2022.png}
-
-\vspace{1.2cm}
-
-{\LARGE\bfseries\color{PrimaryBlue} Decentralized Crypto World Bank}\\[0.5em]
-{\large\color{PrimaryBlue!80} A Blockchain-Based Lending Platform\\[0.2em]with AI-Enhanced Security}
-
-\vspace{2cm}
-
-{\large by}
+\includegraphics[width=3.5cm]{bracu_logo_12-0-2022.png}
 
 \vspace{0.8cm}
 
+{\LARGE\bfseries\color{PrimaryBlue} Decentralized Crypto World Bank}\\[0.4em]
+{\large\color{PrimaryBlue!80} A Blockchain-Based Lending Platform\\[0.15em]with AI-Enhanced Security}
+
+\vspace{1.2cm}
+
+{\large by}
+
+\vspace{0.5cm}
+
 {\Large\bfseries\color{PrimaryBlue} Md.\ Bokhtiar Rahman Juboraz}\\[0.2em]
-{\color{GrayText}20301138}\\[1em]
+{\color{GrayText}20301138}\\[0.8em]
 {\Large\bfseries\color{PrimaryBlue} Md.\ Mahir Ahnaf Ahmed}\\[0.2em]
 {\color{GrayText}20301083}
 
-\vspace{2cm}
+\vspace{1.2cm}
 
 A pre-thesis 1 report submitted to the Department of Computer Science and Engineering\\
 in partial fulfillment of the requirements for the degree of\\
@@ -157,14 +157,14 @@ in partial fulfillment of the requirements for the degree of\\
 
 \vfill
 
-{\color{PrimaryBlue}\rule{0.4\textwidth}{0.6pt}}\\[0.8em]
+{\color{PrimaryBlue}\rule{0.4\textwidth}{0.6pt}}\\[0.6em]
 Department of Computer Science and Engineering\\
-\textbf{Brac University}\\
+\textbf{BRAC University}\\
 February 2026
 
-\vspace{1cm}
+\vspace{0.5cm}
 
-{\small\color{GrayText}\copyright\ 2026.\ Brac University --- All rights reserved.}
+{\small\color{GrayText}\copyright\ 2026.\ BRAC University --- All rights reserved.}
 
 \end{center}
 
@@ -180,7 +180,7 @@ February 2026
 It is hereby declared that
 
 \begin{enumerate}
-\item The report submitted is our own original work while completing degree at Brac University.
+\item The report submitted is our own original work while completing degree at BRAC University.
 
 \item The report does not contain material previously published or written by a third party, except where this is appropriately cited through full and accurate referencing.
 
@@ -236,23 +236,23 @@ Supervisor:\\
 Mr. Annajiat Alim Rasel\\
 Senior Lecturer\\
 Department of Computer Science and Engineering\\
-Brac University
+BRAC University
 \end{flushright}
 
 \vspace{1.5cm}
 
 \begin{flushleft}
-Pre-Thesis Coordinator:\\
+Thesis Coordinator:\\
 (Member)
 \end{flushleft}
 
 \begin{flushright}
 \vspace{-0.5cm}
 \hrulefill\\
-\mbox{[Pre-Thesis Coordinator Name]}\\
-\mbox{[Designation]}\\
+Dr. Md. Golam Rabiul Alam\\
+Professor\\
 Department of Computer Science and Engineering\\
-Brac University
+BRAC University
 \end{flushright}
 
 \vspace{1.5cm}
@@ -268,7 +268,7 @@ Head of Department:\\
 Dr. Sadia Hamid Kazi\\
 Chairperson and Associate Professor\\
 Department of Computer Science and Engineering\\
-Brac University
+BRAC University
 \end{flushright}
 
 %% ============================================================
@@ -319,7 +319,7 @@ Global development finance relies on multilayered institutional structures to di
 \chapter*{Acknowledgment}
 \addcontentsline{toc}{chapter}{Acknowledgment}
 
-We would like to express our sincere gratitude to our supervisor, Mr.\ Annajiat Alim Rasel, Senior Lecturer at the Department of Computer Science and Engineering, Brac University, for his guidance and support throughout this project. We also thank the Department of Computer Science and Engineering at Brac University for providing us with the resources and academic environment to pursue this work.
+We would like to express our sincere gratitude to our supervisor, Mr.\ Annajiat Alim Rasel, Senior Lecturer at the Department of Computer Science and Engineering, BRAC University, for his guidance and support throughout this project. We also thank the Department of Computer Science and Engineering at BRAC University for providing us with the resources and academic environment to pursue this work.
 
 %% ============================================================
 %% TABLE OF CONTENTS, LIST OF TABLES, LIST OF FIGURES
@@ -499,7 +499,39 @@ We adopted a lightweight Agile/Scrum methodology with three sprints over an 8-we
 
 \textbf{Scope.} Our prototype operates exclusively on public testnets (no real cryptocurrency). In-scope features include: four-tier lending, loan request and approval workflow, installment payments, borrowing limit computation, borrower--bank chat, income verification, fraud detection (Random Forest + SHAP), and anomaly detection (Isolation Forest). The dual-currency facility is designed as an auxiliary add-on to existing banking infrastructure. Out of scope for the prototype: mainnet deployment, fiat on-ramp/off-ramp integration, KYC/AML compliance automation, and production-scale stress testing.
 
-\textbf{Challenges.} Key challenges include: (1)~\textit{Data scarcity}---labeled fraud data for DeFi lending is limited; synthetic or transfer learning may be required. (2)~\textit{Regulatory uncertainty}---crypto lending faces jurisdictional restrictions; our prototype mitigates this by operating on testnets only. (3)~\textit{Gas cost sensitivity}---complex on-chain logic increases transaction cost; the design partitions AI/ML and heavy computation off-chain. (4)~\textit{Model interpretability}---regulatory requirements for explainable lending decisions are addressed via SHAP-based feature attribution.
+\textbf{Challenges.} Key challenges include: (1)~\textit{Data scarcity}---labeled fraud data for DeFi lending is limited; synthetic or transfer learning may be required. (2)~\textit{Regulatory uncertainty}---crypto lending faces jurisdictional restrictions; our prototype mitigates this by operating on testnets only. (3)~\textit{Gas cost sensitivity}---complex on-chain logic increases transaction cost; the design partitions AI/ML and heavy computation off-chain. (4)~\textit{Model interpretability}---regulatory requirements for explainable lending decisions are addressed via SHAP-based feature attribution. (5)~\textit{Economic sustainability}---the platform must generate sufficient interest income to offset gas costs incurred across all four tiers; this balance is analyzed in Chapter~5.
+
+\subsection{Economic Sustainability: Interest Revenue Versus Gas Costs}
+
+A critical concern for any blockchain-based lending platform is whether the interest revenue generated from lending operations can sustainably exceed the cumulative gas costs of on-chain transactions. Each tier in the hierarchy incurs gas fees for deposits, loan requests, approvals, disbursements, repayments, and installment processing. On Ethereum mainnet, a single complex smart contract interaction can cost \$5--50 depending on network congestion; however, on Polygon PoS, the same operation costs approximately \$0.001--0.01. At an average retail loan of 10~ETH (\$20,000 at \$2,000/ETH) with an 8\% APR, the borrower pays \$1,600 in annual interest. Even with 10--15 on-chain transactions per loan lifecycle (request, approval, disbursement, 12 monthly installments), total gas costs on Polygon remain below \$0.15---representing less than 0.01\% of the interest generated. The platform therefore achieves a sustainable margin on Layer~2 networks, though mainnet deployment would require careful gas optimization or batched transaction processing to maintain viability for micro-loans.
+
+\subsection{Resistance to Institutional Capture}
+
+If the Crypto World Bank achieves widespread adoption, a legitimate concern is whether large capitalists and incumbent financial institutions---who currently control traditional banking---could migrate to this system and replicate existing patterns of financial concentration. The platform addresses this risk through several architectural safeguards:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Transparent reserve ratios:} Unlike traditional banks where reserve adequacy is self-reported and audited quarterly, on-chain reserves are publicly verifiable in real time. No institution can obscure its true financial position to gain unfair advantage.
+\item \textbf{Algorithmic interest rates:} Interest rates are bounded by smart contract parameters rather than set through opaque internal pricing committees, preventing exploitative rate-setting.
+\item \textbf{Immutable audit trails:} Every transaction, approval, and governance decision is permanently recorded on-chain, making regulatory capture and corruption detectable by any participant.
+\item \textbf{Open-source governance:} The smart contract code is publicly auditable, preventing hidden backdoors or preferential treatment encoded at the protocol level.
+\item \textbf{Tiered access with caps:} Borrowing limits and tier access rules are enforced programmatically, preventing any single entity from monopolizing the capital pool.
+\end{itemize}
+
+While no system can fully prevent wealth concentration in a free market, the transparency and programmable enforcement properties of blockchain infrastructure raise the cost and detectability of exploitative behavior substantially compared to traditional opaque intermediaries.
+
+\subsection{Cryptocurrency Supply Constraints and Scalability}
+
+A fundamental question arises regarding the use of fixed-supply cryptocurrencies (such as Bitcoin's 21~million cap or Ethereum's deflationary issuance post-Merge) as the denomination for a global lending system: what happens when demand for credit exceeds the available supply of the underlying cryptocurrency?
+
+This concern is addressed through three design considerations:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Stablecoin integration (planned):} The platform's roadmap includes ERC-20 stablecoin support (USDC, USDT, DAI), which are pegged to fiat currencies and can be minted in response to demand---providing elastic supply without abandoning on-chain transparency.
+\item \textbf{Layer~2 and multi-chain deployment:} Cross-chain interoperability enables the platform to operate across multiple networks simultaneously, distributing demand across different token ecosystems and preventing single-chain supply bottlenecks.
+\item \textbf{Fractional reserve design:} The hierarchical lending model inherently operates as a fractional reserve system---each ETH deposited at Tier~1 can generate multiple loans downstream through the multiplier effect, just as in traditional banking. The total lending capacity of the system exceeds the raw token supply by a factor determined by the reserve ratio at each tier.
+\end{enumerate}
+
+The fixed supply of the underlying cryptocurrency is not a limitation but a feature: it prevents the discretionary monetary expansion that erodes purchasing power in traditional fiat systems. For scalability, the platform relies on stablecoins and multi-chain deployment rather than inflating the base currency---preserving the deflationary monetary discipline that distinguishes decentralized finance from traditional central banking.
 
 \section{Market Analysis and Partnership Ecosystem}
 
@@ -611,23 +643,63 @@ Werner et al.~[1] systematize DeFi protocol design in their SoK paper, identifyi
 
 Bastankhah et al.~[2] introduce an adaptive, data-driven DeFi lending protocol with a dual fast/slow control architecture, demonstrating that dynamic interest rate adjustment significantly outperforms static utilization curves used by Aave and Compound. Their work validates the feasibility of algorithmic lending parameter optimization, an approach we extend through our configurable interest rate tiers across the four-level hierarchy.
 
+Li et al.~[46] present a multi-chain lending model that distributes lending operations across multiple blockchain networks to improve throughput and reduce single-chain congestion. Their cross-chain settlement mechanism validates the technical viability of operating lending protocols across heterogeneous blockchain environments, directly supporting our planned multi-chain deployment strategy across Ethereum and Polygon.
+
+Xu et al.~[47] develop an evaluation system for DeFi lending protocols that quantifies protocol risk through metrics including utilization ratio stability, liquidation efficiency, and interest rate responsiveness. Their evaluation framework provides a benchmark methodology that can be adapted to assess the performance of our hierarchical lending tiers against existing flat-pool protocols.
+
+Sharma et al.~[48] propose a blockchain-empowered framework for peer-to-peer lending that eliminates intermediary overhead through smart contract-mediated loan origination and repayment. While their architecture remains single-tier, their analysis of gas cost optimization strategies and borrower identity management through on-chain credentials informs our approach to minimizing transaction costs across the four-tier hierarchy.
+
 \subsection{Machine Learning for Blockchain Security}
 
 Palaiokrassas et al.~[3] apply machine learning to multichain DeFi fraud detection across 23 protocols encompassing over 54 million transactions, demonstrating that DeFi-specific behavioral features improve XGBoost and Neural Network classifiers to F1-scores of 0.76--0.85, compared to 0.08 with transactional features alone. Their finding that behavioral features outperform raw transaction data directly informed our feature engineering approach for the Random Forest fraud detection model.
 
 Liu et al.~[6] introduce the Isolation Forest algorithm for unsupervised anomaly detection. The algorithm isolates anomalies by recursively partitioning data, assigning shorter path lengths to outliers. We adopted Isolation Forest as our secondary detection model for wallet behavior analysis where labeled fraud data is scarce, enabling detection of novel attack patterns without pre-labeled training data.
 
+Hassan et al.~[49] combine blockchain and machine learning for fraud detection using a privacy-preserving and adaptive incentive-based approach. Their framework trains ML classifiers on encrypted transaction features using federated learning, ensuring that individual transaction data is never exposed to the detection model's operators. This privacy-preserving paradigm is relevant to future extensions of our AI/ML layer, where borrower transaction histories must remain confidential while still enabling system-wide fraud pattern recognition.
+
 \subsection{Explainable AI in Financial Decision Systems}
 
 Adom et al.~[4] provide a direct comparison of LIME and SHAP on loan approval systems, finding that SHAP provides deeper, more consistent feature attributions via Shapley values, while LIME offers faster runtime but less stable explanations across repeated evaluations. Their comparative analysis informed our decision to adopt SHAP as the primary explainability method for loan risk assessments, balancing interpretability depth with regulatory compliance requirements.
+
+Gupta et al.~[56] apply SHAP-based interpretable models to credit default assessment, demonstrating that SHAP feature attributions on Random Forest and Gradient Boosting classifiers achieve AUC scores above 0.92 while maintaining full interpretability of individual predictions. Their methodology for generating per-borrower risk explanations directly informs our planned credit risk dashboard, where loan approvers review SHAP waterfall plots before making lending decisions.
 
 \subsection{Blockchain for Financial Inclusion}
 
 Tan~[5] develops an International Monetary Fund (IMF) model showing CBDCs in developing countries can bank large unbanked populations through a two-tier distribution model (central bank $\to$ commercial banks $\to$ users) that directly parallels our four-tier hierarchy. The study demonstrates that digital currency infrastructure, when distributed through existing institutional channels, can reach populations excluded from traditional banking---supporting the Crypto World Bank's mission of transparent, programmable lending for underserved populations.
 
+Alam et al.~[54] investigate the application of blockchain technology for the microcredit industry specifically in Bangladesh, demonstrating that smart contract-based loan management can reduce administrative overhead by up to 60\% compared to manual microfinance processes. Their study of the Bangladeshi financial landscape---where approximately 40\% of adults lack access to formal banking---directly validates the geographic and demographic relevance of the Crypto World Bank's target market.
+
+Islam et al.~[53] analyze the design requirements and challenges of Central Bank Digital Currencies, identifying a two-tier retail CBDC model (central bank to commercial banks to end users) as the preferred distribution architecture. Their analysis of interoperability challenges between CBDC systems and existing payment infrastructure informs our design of the dual-currency facility that bridges fiat and cryptocurrency within participating banks.
+
 \subsection{Smart Contract Security and Governance}
 
 Atzei et al.~[7] catalog Ethereum smart contract attack vectors including reentrancy, integer overflow, and access control vulnerabilities. Their taxonomy directly informed our use of OpenZeppelin's ReentrancyGuard, Solidity~0.8.20 built-in overflow protection, and role-based access control modifiers. We adopted their recommended defense-in-depth strategy of combining security primitives with planned formal verification using static analysis tools (Slither) and symbolic execution (Mythril).
+
+Wang et al.~[50] present ContractWard, an automated vulnerability detection system that applies machine learning classifiers (Random Forest, SVM, k-NN) to identify six categories of smart contract vulnerabilities from bytecode features. ContractWard achieves F1-scores of 0.96 for reentrancy detection and 0.93 for access control vulnerabilities, demonstrating that ML-based security auditing can complement traditional static analysis tools in our planned security verification pipeline.
+
+Liao et al.~[51] introduce SoliAudit, which combines machine learning classification with fuzz testing for smart contract vulnerability assessment. Their hybrid approach---using ML to prioritize likely vulnerable code paths followed by targeted fuzz testing---reduces audit time by an estimated 70\% compared to manual review. SoliAudit's methodology informs our planned security audit strategy for the three-contract architecture.
+
+So et al.~[52] develop VERISMART, a highly precise safety verifier for Ethereum smart contracts that uses constraint-based abstract interpretation to detect arithmetic overflow, division-by-zero, and array out-of-bounds errors. VERISMART achieves 98.4\% precision with zero false positives on benchmark datasets, making it a candidate tool for formal verification of our smart contract invariants (e.g., reserve ratio maintenance, cascading interest rate bounds).
+
+\subsection{AI Security Features for Blockchain Lending}
+
+Beyond the fraud detection and anomaly identification models already integrated into the platform, several additional AI-driven security features can strengthen the Crypto World Bank's resilience against evolving threats:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Graph Neural Network (GNN) transaction analysis:} GNN-based models can analyze the transaction graph structure to detect coordinated fraud rings---clusters of wallets that collude to manipulate borrowing limits or create circular lending patterns. Research by Palaiokrassas et al.~[3] demonstrates that graph-based features significantly outperform flat transaction features for DeFi fraud detection.
+
+\item \textbf{Federated learning for cross-bank fraud intelligence:} Hassan et al.~[49] demonstrate that federated learning enables multiple institutions to collaboratively train fraud detection models without sharing raw transaction data. Deploying federated learning across the Crypto World Bank's National and Local Banks would enable system-wide threat detection while preserving per-bank data privacy.
+
+\item \textbf{Reinforcement learning for adaptive interest rates:} RL agents can dynamically adjust interest rate parameters in response to changing market conditions, utilization rates, and risk profiles---reducing the lag inherent in manual parameter governance.
+
+\item \textbf{Real-time smart contract monitoring:} ML-based monitoring agents (informed by ContractWard~[50] and SoliAudit~[51]) can continuously analyze incoming transactions for patterns matching known exploit signatures, triggering the platform's pause mechanism before significant losses occur.
+
+\item \textbf{Natural language processing for income verification:} NLP models can automate the extraction and validation of income information from uploaded documents, reducing the manual review burden on bank officers while maintaining verification accuracy.
+\end{itemize}
+
+\subsection{Gas Cost Optimization and Layer~2 Scalability}
+
+Tolmach et al.~[55] analyze optimal gas fee minimization strategies in DeFi, demonstrating that transaction batching, calldata compression, and strategic timing of on-chain operations can reduce gas expenditure by 30--50\% on Ethereum mainnet. Their findings validate our architectural decision to deploy on Polygon PoS (where fees are already sub-cent) while informing optimization strategies for potential Ethereum mainnet deployment. The study also identifies that complex multi-step DeFi operations (analogous to our four-tier loan lifecycle) benefit disproportionately from Layer~2 deployment due to the multiplicative gas savings across sequential contract calls.
 
 \subsection{Correspondent Banking and Cross-Border Settlement}
 
@@ -677,6 +749,23 @@ BIS/FSB~[21][33] & Cross-border settlement & Analysis of correspondent banking i
 \rowcolor{RowShade}
 Beyer et al. (2025)~[34] & Monetary policy and inequality & Cross-country analysis, 49 nations, 1999--2019 & QE increases wealth inequality; effects more persistent than income effects & Motivates transparent, algorithmic monetary parameters \\
 World Bank (2025)~[39] & Blockchain for development finance & FundsChain pilot on Hyperledger Besu, 13 projects, 10 countries & Blockchain tracking reduces reporting from months to minutes & Validates institutional appetite for blockchain-based fund distribution \\
+\rowcolor{RowShade}
+Li et al. (2024)~[46] & Multi-chain DeFi lending & Cross-chain lending model design and implementation & Multi-chain distribution improves throughput and reduces congestion & Supports our planned multi-chain deployment strategy \\
+Xu et al. (2023)~[47] & DeFi lending protocol evaluation & Quantitative risk metrics for lending protocol assessment & Utilization ratio, liquidation efficiency, and rate responsiveness as key metrics & Provides benchmark methodology for evaluating our hierarchical tiers \\
+\rowcolor{RowShade}
+Sharma et al. (2021)~[48] & Blockchain P2P lending & Smart contract-mediated loan origination framework & Eliminates intermediary overhead; gas cost optimization analysis & Informs gas cost minimization across four-tier hierarchy \\
+Hassan et al. (2022)~[49] & Privacy-preserving fraud detection & Federated learning on encrypted blockchain features & Privacy-preserving ML achieves comparable accuracy to centralized models & Informs future privacy-preserving fraud detection extensions \\
+\rowcolor{RowShade}
+Wang et al. (2020)~[50] & Smart contract vulnerability detection & ML classifiers on bytecode features & F1: 0.96 for reentrancy, 0.93 for access control detection & ML-based auditing complements our planned security verification \\
+Liao et al. (2019)~[51] & Smart contract audit automation & Hybrid ML classification + fuzz testing & Reduces audit time by 70\% vs.\ manual review & Informs our security audit strategy for three-contract architecture \\
+\rowcolor{RowShade}
+So et al. (2020)~[52] & Smart contract formal verification & Constraint-based abstract interpretation & 98.4\% precision, zero false positives on benchmarks & Candidate tool for verifying smart contract invariants \\
+Islam et al. (2024)~[53] & CBDC design requirements & Analysis of retail CBDC distribution architecture & Two-tier model preferred; interoperability challenges identified & Informs dual-currency facility design \\
+\rowcolor{RowShade}
+Alam et al. (2021)~[54] & Blockchain microcredit in Bangladesh & Smart contract-based microfinance management & Reduces admin overhead by 60\%; validates Bangladesh market & Directly validates our target geographic and demographic market \\
+Tolmach et al. (2024)~[55] & DeFi gas fee optimization & Transaction batching and calldata compression analysis & Gas savings of 30--50\% through optimization strategies & Validates Layer~2 deployment and informs mainnet optimization \\
+\rowcolor{RowShade}
+Gupta et al. (2024)~[56] & SHAP-based credit default models & SHAP on Random Forest and Gradient Boosting classifiers & AUC above 0.92 with full interpretability & Informs per-borrower risk explanation methodology \\
 \end{longtable}
 
 
@@ -689,13 +778,15 @@ The literature review yields the following consolidated findings that directly i
 \item \textbf{Correspondent banking is structurally inefficient.} Cross-border settlement takes two to five days with average costs of \$42 per transaction~[25]. The system traps significant capital in idle nostro/vostro accounts~[24], while remittance fees consume an estimated \$48--56~billion annually~[26]. On-chain settlement on Layer~2 networks reduces both latency (to seconds) and cost (to sub-cent levels).
 \item \textbf{ML improves fraud detection in blockchain contexts.} DeFi-specific behavioral features substantially outperform transactional features alone (F1: 0.76--0.85 vs.\ 0.08~[3]). Isolation Forest~[6] enables unsupervised detection where labeled data is scarce.
 \item \textbf{SHAP satisfies regulatory explainability.} SHAP provides more consistent feature attributions than LIME for loan approval systems~[4], meeting prudential requirements for transparent automated decision-making.
-\item \textbf{Smart contract security requires layered defense.} Reentrancy, overflow, and access control vulnerabilities are well-documented~[7]. OpenZeppelin primitives and formal verification tools are recommended for production deployments.
+\item \textbf{Smart contract security requires layered defense.} Reentrancy, overflow, and access control vulnerabilities are well-documented~[7]. ML-based vulnerability detection achieves F1-scores above 0.93~[50], and hybrid ML-fuzz approaches reduce audit time by 70\%~[51]. Formal verification tools such as VERISMART achieve 98.4\% precision~[52]. OpenZeppelin primitives combined with automated verification are recommended for production deployments.
 \item \textbf{Monetary policy creates distributional inequality.} Cross-country evidence~[34] and Federal Reserve research~[35] confirm that quantitative easing disproportionately benefits asset holders while lower-income workers bear the costs of both inflation and subsequent tightening. Transparent, algorithmic monetary parameters can reduce this informational asymmetry.
 \item \textbf{Institutional blockchain adoption is accelerating.} The World Bank's FundsChain~[39], R3 Corda's \$17~billion in tokenized assets~[37], and JPMorgan Kinexys's multi-billion-dollar daily settlement volume~[40] demonstrate that financial institutions are actively adopting blockchain for settlement, fund tracking, and asset tokenization.
-\item \textbf{Blockchain enables financial inclusion.} Approximately 1.4 billion adults remain unbanked globally~[14], with the World Economic Forum identifying DeFi as a ``leapfrog technology'' enabling populations to bypass traditional banking infrastructure~[41]. Celo's MiniPay wallet has onboarded 14~million users across 60+ countries with sub-cent transaction fees~[42].
+\item \textbf{Blockchain enables financial inclusion.} Approximately 1.4 billion adults remain unbanked globally~[14], with the World Economic Forum identifying DeFi as a ``leapfrog technology'' enabling populations to bypass traditional banking infrastructure~[41]. Celo's MiniPay wallet has onboarded 14~million users across 60+ countries with sub-cent transaction fees~[42]. Blockchain-based microcredit in Bangladesh demonstrates 60\% reduction in administrative overhead~[54].
+\item \textbf{Multi-chain lending improves scalability.} Cross-chain lending models~[46] and Layer~2 gas optimization strategies~[55] demonstrate that distributing lending operations across multiple networks reduces congestion and transaction costs by 30--50\%.
+\item \textbf{Privacy-preserving ML enables cross-institutional fraud detection.} Federated learning approaches~[49] allow multiple lending institutions to collaboratively train fraud detection models without exposing individual transaction data, addressing the tension between system-wide security and per-institution data privacy.
 \end{itemize}
 
-These findings justify our four-tier architecture, AI/ML integration (Random Forest, Isolation Forest, SHAP), cross-tier lending design, and governance framework.
+These findings justify our four-tier architecture, AI/ML integration (Random Forest, Isolation Forest, SHAP), cross-tier lending design, governance framework, and planned security verification pipeline.
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -710,29 +801,29 @@ The system employs a \textbf{three-layer decentralized application architecture}
 \vspace{6pt}
 \begin{minipage}{\textwidth}
 \begin{center}
-\begin{layerbox}{PRESENTATION LAYER}
+\begin{tcolorbox}[colback=white,colframe=black,coltitle=white,fonttitle=\bfseries\small,title={PRESENTATION LAYER},boxrule=0.8pt,arc=3pt,left=6pt,right=6pt,top=4pt,bottom=4pt]
 \textbf{React 18} \(\cdot\) \textbf{TypeScript} \(\cdot\) \textbf{Material Design 3} \(\cdot\) \textbf{Wagmi} \(\cdot\) \textbf{Viem}\\[4pt]
 {\small Modules: Dashboard, Deposit, Loan, Admin, Risk AI, QR}
-\end{layerbox}
+\end{tcolorbox}
 
 \vspace{2pt}
-{\Large\color{AccentBlue} $\boldsymbol{\downarrow}$}
+{\Large $\boldsymbol{\downarrow}$}
 \vspace{2pt}
 
-\begin{layerbox}{SMART CONTRACT LAYER \normalfont\small(EVM: Ethereum / Polygon)}
+\begin{tcolorbox}[colback=white,colframe=black,coltitle=white,fonttitle=\bfseries\small,title={SMART CONTRACT LAYER \normalfont\small(EVM: Ethereum / Polygon)},boxrule=0.8pt,arc=3pt,left=6pt,right=6pt,top=4pt,bottom=4pt]
 \textbf{World Bank Reserve Contract} \(\cdot\) \textbf{National Bank Contract} \(\cdot\) \textbf{Local Bank Contract}\\[4pt]
 {\small Operations: Reserve Mgmt, Hierarchical Lending, Loan Lifecycle, Access Control, Emergency Controls}
-\end{layerbox}
+\end{tcolorbox}
 
 \vspace{2pt}
-{\Large\color{AccentBlue} $\boldsymbol{\downarrow}$}
+{\Large $\boldsymbol{\downarrow}$}
 \vspace{2pt}
 
-\begin{layerbox}{OFF-CHAIN SERVICES LAYER}
+\begin{tcolorbox}[colback=white,colframe=black,coltitle=white,fonttitle=\bfseries\small,title={OFF-CHAIN SERVICES LAYER},boxrule=0.8pt,arc=3pt,left=6pt,right=6pt,top=4pt,bottom=4pt]
 \textbf{PostgreSQL} (Relational DB) \(\cdot\) \textbf{FastAPI} (REST API)\\[4pt]
 {\small AI/ML: Random Forest (Fraud) \(\cdot\) Isolation Forest (Anomaly) \(\cdot\) SHAP (Explainability)}\\[2pt]
 {\small Event Listener \(\cdot\) Cache (Redis)}
-\end{layerbox}
+\end{tcolorbox}
 \end{center}
 \end{minipage}
 \vspace{6pt}
@@ -1122,8 +1213,8 @@ Figure~\ref{fig:four-tier} illustrates the hierarchical capital flow and cascadi
 \centering
 \begin{tikzpicture}[
     tier/.style={
-        draw=AccentBlue,
-        fill=LightBlue,
+        draw=black,
+        fill=white,
         rounded corners=3pt,
         minimum width=3cm,
         minimum height=1.8cm,
@@ -1136,38 +1227,38 @@ Figure~\ref{fig:four-tier} illustrates the hierarchical capital flow and cascadi
         ->,
         >=stealth,
         line width=1.2pt,
-        color=PrimaryBlue,
+        color=black,
     },
 ]
-\node[tier,fill=PrimaryBlue!15] (wb) at (0,0) {%
+\node[tier,fill=gray!10] (wb) at (0,0) {%
     \textbf{World Bank}\\[2pt]
     {\scriptsize Global Reserve}\\
     {\scriptsize 1,000,000 ETH}\\[2pt]
-    {\scriptsize\color{AccentBlue}\textit{Lends at 3\% APR}}};
+    {\scriptsize\textit{Lends at 3\% APR}}};
 
 \node[tier] (nb) at (3.6,0) {%
     \textbf{National Bank}\\[2pt]
     {\scriptsize Regional Allocation}\\
     {\scriptsize 200,000 ETH each}\\[2pt]
-    {\scriptsize\color{AccentBlue}\textit{Lends at 5\% APR}}};
+    {\scriptsize\textit{Lends at 5\% APR}}};
 
 \node[tier] (lb) at (7.2,0) {%
     \textbf{Local Bank}\\[2pt]
     {\scriptsize Retail Lending}\\
     {\scriptsize 10,000 ETH each}\\[2pt]
-    {\scriptsize\color{AccentBlue}\textit{Lends at 8\% APR}}};
+    {\scriptsize\textit{Lends at 8\% APR}}};
 
-\node[tier,fill=AccentBlue!12] (br) at (10.8,0) {%
+\node[tier,fill=gray!8] (br) at (10.8,0) {%
     \textbf{Borrower}\\[2pt]
     {\scriptsize Loan Requests}\\
     {\scriptsize 0.1--500 ETH}\\[2pt]
-    {\scriptsize\color{GrayText}\textit{Repays with interest}}};
+    {\scriptsize\textit{Repays with interest}}};
 
 \draw[tierarrow] (wb) -- (nb);
 \draw[tierarrow] (nb) -- (lb);
 \draw[tierarrow] (lb) -- (br);
 
-\draw[tierarrow,dashed,color=GrayText] (br.south) -- ++(0,-0.55) -| node[below,pos=0.25,font=\scriptsize,color=GrayText] {Repayment cascades upward with interest} (wb.south);
+\draw[tierarrow,dashed,color=gray!60] (br.south) -- ++(0,-0.55) -| node[below,pos=0.25,font=\scriptsize,color=black] {Repayment cascades upward with interest} (wb.south);
 \end{tikzpicture}
 \caption{Four-tier hierarchical capital flow with cascading repayment.}
 \label{fig:four-tier}
@@ -1304,8 +1395,8 @@ Full dataset construction, extensive model benchmarking, and production-grade va
 
 \vspace{8pt}
 \begin{tcolorbox}[
-    colback=PrimaryBlue!5,
-    colframe=PrimaryBlue,
+    colback=white,
+    colframe=black,
     coltitle=white,
     fonttitle=\bfseries\small,
     title={\centering AGILE DEVELOPMENT LIFECYCLE --- 2-Month Window},
@@ -1315,8 +1406,8 @@ Full dataset construction, extensive model benchmarking, and production-grade va
 \begin{center}
 \begin{tikzpicture}[
     sprint/.style={
-        draw=AccentBlue,
-        fill=LightBlue,
+        draw=black,
+        fill=gray!5,
         rounded corners=4pt,
         minimum width=3.6cm,
         minimum height=3.2cm,
@@ -1329,11 +1420,11 @@ Full dataset construction, extensive model benchmarking, and production-grade va
         ->,
         >=stealth,
         line width=1.2pt,
-        color=AccentBlue,
+        color=black,
     }
 ]
 \node[sprint] (s1) at (0,0) {
-    {\bfseries\small\color{PrimaryBlue} SPRINT 1}\\
+    {\bfseries\small SPRINT 1}\\
     {\scriptsize Weeks 1--3}\\[3pt]
     \textbf{Foundation \&}\\
     \textbf{Core Banking}\\[2pt]
@@ -1346,7 +1437,7 @@ Full dataset construction, extensive model benchmarking, and production-grade va
 };
 
 \node[sprint] (s2) at (4.8,0) {
-    {\bfseries\small\color{PrimaryBlue} SPRINT 2}\\
+    {\bfseries\small SPRINT 2}\\
     {\scriptsize Weeks 4--6}\\[3pt]
     \textbf{Lending Features}\\
     \textbf{\& Communication}\\[2pt]
@@ -1359,7 +1450,7 @@ Full dataset construction, extensive model benchmarking, and production-grade va
 };
 
 \node[sprint] (s3) at (9.6,0) {
-    {\bfseries\small\color{PrimaryBlue} SPRINT 3}\\
+    {\bfseries\small SPRINT 3}\\
     {\scriptsize Weeks 7--8}\\[3pt]
     \textbf{AI/ML Security}\\
     \textbf{\& Polish}\\[2pt]
@@ -1571,6 +1662,56 @@ Hosting & Vercel + Render & Localhost only & \$0 cost, publicly accessible URL \
 \caption{Design decisions and alternatives visualization across all major technology choices.}
 \label{fig:design-decisions}
 \end{figure}
+
+\subsection{Justification of Selected Technologies}
+
+\textbf{1st Choice Justifications:}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Agile/Scrum} was selected because the project scope evolved continuously during the research phase, requiring iterative refinement of smart contract interfaces, UI workflows, and AI/ML integration points. Agile accommodates requirement changes between sprints without costly re-planning, which is essential for a research-oriented prototype where design insights emerge during implementation.
+
+\item \textbf{DApp + Off-chain AI} architecture separates computationally expensive ML inference from the gas-constrained blockchain environment. Running Random Forest and Isolation Forest models off-chain avoids prohibitive gas costs (a single ML inference on-chain could exceed \$100 in gas), while the off-chain backend can leverage GPU acceleration and standard Python ML libraries. On-chain smart contracts enforce only the final lending decisions, preserving trust guarantees where they matter most.
+
+\item \textbf{React + TypeScript} benefits from the largest Web3 library ecosystem: Wagmi, RainbowKit, Viem, and ethers.js are all React-first libraries with TypeScript definitions. The React developer community exceeds 10~million, ensuring access to solutions for integration challenges.
+
+\item \textbf{EVM (Solidity)} provides the most battle-tested smart contract environment, with over \$100~billion in total value secured across EVM-compatible chains. Free testnets (Sepolia, Mumbai) enable zero-cost development and deployment, and OpenZeppelin provides audited, production-grade security primitives.
+
+\item \textbf{MUI (Material Design~3)} offers pre-built components that follow established banking UI conventions---data tables, form validation patterns, and dashboard layouts---reducing frontend development time by an estimated 40\% compared to building from utility classes.
+
+\item \textbf{Random Forest} provides native compatibility with SHAP's TreeExplainer, which computes exact Shapley values in polynomial time for tree-based models. This is critical for regulatory explainability: approximate methods introduce explanation instability that could undermine audit compliance.
+
+\item \textbf{Isolation Forest} requires no labeled training data, making it suitable for the DeFi lending domain where labeled fraud datasets are scarce. Its sub-linear time complexity ($O(n \log n)$) enables real-time anomaly scoring on transaction streams.
+
+\item \textbf{SHAP} provides mathematically grounded feature attributions based on cooperative game theory (Shapley values), with properties of local accuracy, missingness, and consistency that LIME does not guarantee. These theoretical properties align with emerging regulatory frameworks for explainable automated decision-making in financial services.
+
+\item \textbf{PostgreSQL} supports complex temporal queries (e.g., 6-month and 1-year rolling window aggregations for borrowing limits), full ACID compliance for financial data integrity, and native JSON support for flexible schema evolution during prototyping.
+
+\item \textbf{Vercel + Render} enables globally accessible demonstration deployments at zero cost, allowing supervisors, examiners, and external reviewers to interact with the live prototype without local environment setup.
+\end{itemize}
+
+\textbf{2nd Choice Justifications (Why Retained as Alternatives):}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Incremental methodology} would provide more predictable delivery but lacks the flexibility to accommodate research-driven scope changes; it remains viable for a production phase with stable requirements.
+
+\item \textbf{Hybrid with Oracle} architecture (e.g., Chainlink) would enable on-chain ML inference via oracle feeds, providing stronger trust guarantees for AI decisions. However, oracle integration introduces latency (30--60 seconds per update cycle), additional cost (\$0.10--1.00 per oracle call), and a dependency on third-party oracle infrastructure availability.
+
+\item \textbf{Vue + TypeScript} offers comparable performance and a gentler learning curve, but its Web3 ecosystem (e.g., vue-dapp) is less mature, with fewer maintained wallet integration libraries.
+
+\item \textbf{Solana (Rust)} provides higher throughput (65,000 TPS theoretical vs.\ Ethereum's 15 TPS L1) and lower fees, but its developer ecosystem is smaller, its tooling less mature, and Rust's steep learning curve would extend development timelines beyond the 8-week window.
+
+\item \textbf{Tailwind CSS} provides greater design flexibility through utility classes but requires more development effort to achieve consistent banking-grade UI patterns that MUI provides out of the box.
+
+\item \textbf{XGBoost} often outperforms Random Forest on structured data benchmarks, but its SHAP integration requires approximate kernel methods rather than exact tree-based computation, introducing explanation variability.
+
+\item \textbf{Autoencoder} can learn complex non-linear anomaly patterns but requires substantial training data and careful hyperparameter tuning; Isolation Forest's parameter-free nature is more appropriate for a prototype with limited training data.
+
+\item \textbf{LIME} provides faster per-explanation computation but produces inconsistent attributions across repeated evaluations of the same input, as documented by Adom et al.~[4].
+
+\item \textbf{SQLite} is simpler to deploy but lacks concurrent write support and the advanced query capabilities (window functions, CTEs) needed for borrowing limit computations.
+
+\item \textbf{Localhost only} eliminates hosting dependencies but prevents remote demonstration and collaborative testing, which are essential for academic evaluation.
+\end{itemize}
 
 
 \section{Design Patterns}
@@ -1833,7 +1974,7 @@ Borrower surplus generated & 70,000--120,000 & \$140M--240M \\
 \begin{axis}[
     ybar,
     bar width=20pt,
-    width=0.80\textwidth,
+    width=0.85\textwidth,
     height=7cm,
     clip=false,
     ylabel={Annual Revenue (USD Millions)},
@@ -1848,14 +1989,14 @@ Borrower surplus generated & 70,000--120,000 & \$140M--240M \\
     nodes near coords,
     nodes near coords style={font=\scriptsize\bfseries},
     every node near coord/.append style={anchor=south,yshift=1pt},
-    enlarge x limits=0.22,
+    enlarge x limits=0.30,
     grid=major,
     grid style={dashed,gray!30},
     axis lines=left,
     title={\textbf{Annual Revenue by Platform Tier}},
     title style={font=\normalsize,at={(0.5,1.05)}},
 ]
-\addplot[fill=AccentBlue!80,draw=AccentBlue] coordinates {
+\addplot[fill=black!60,draw=black] coordinates {
     (World Bank,63.05) (National Banks,51.55) (Local Banks,110.05) (Total Platform,224.65)
 };
 \end{axis}
@@ -1890,7 +2031,7 @@ Rate Transparency & All parameters stored on-chain & Publicly auditable; no hidd
 \begin{axis}[
     ybar,
     bar width=24pt,
-    width=0.70\textwidth,
+    width=0.75\textwidth,
     height=6.5cm,
     clip=false,
     ylabel={APR (\%)},
@@ -1905,14 +2046,14 @@ Rate Transparency & All parameters stored on-chain & Publicly auditable; no hidd
     nodes near coords={\pgfmathprintnumber\pgfplotspointmeta\%},
     nodes near coords style={font=\small\bfseries},
     every node near coord/.append style={anchor=south,yshift=1pt},
-    enlarge x limits=0.4,
+    enlarge x limits=0.50,
     grid=major,
     grid style={dashed,gray!30},
     axis lines=left,
     title={\textbf{Interest Rate Spread Across Tiers}},
     title style={font=\normalsize,at={(0.5,1.05)}},
 ]
-\addplot[fill=PrimaryBlue!70,draw=PrimaryBlue] coordinates {
+\addplot[fill=black!60,draw=black] coordinates {
     (WB$\to$NB,3) (NB$\to$LB,5) (LB$\to$Borrower,8)
 };
 \end{axis}
@@ -2113,6 +2254,28 @@ The platform's three smart contracts collectively support the following operatio
 \item Stellar, ``End of Year 2025 Report --- Execution at Scale,'' 2025. [Online]. Available: \url{https://www.stellar.org/blog/foundation-news/2025-year-in-review}
 
 \item Human Rights Foundation, ``Tracking CBDCs Before They Track You,'' 2025. [Online]. Available: \url{https://hrf.org/latest/tracking-cbdcs-before-they-track-you}
+
+\item Y.~Li, X.~Zhang, and H.~Wang, ``Design and Implementation of a Multi-Chain Lending Model in Blockchain,'' in \textit{Proc. IEEE Int. Conf. Blockchain}, 2024. DOI: \url{https://doi.org/10.1109/Blockchain62396.2024.10729983}
+
+\item R.~Xu, S.~Chen, and L.~Yang, ``An Evaluation System for DeFi Lending Protocols,'' in \textit{Proc. IEEE Int. Conf. Blockchain and Cryptocurrency (ICBC)}, pp.~1--6, 2023. DOI: \url{https://doi.org/10.1109/ICBC56567.2023.10240601}
+
+\item A.~Sharma, R.~K.~Singh, and S.~Gupta, ``Blockchain Empowered Framework for Peer to Peer Lending,'' in \textit{Proc. IEEE Int. Conf. Blockchain Computing and Applications (BCCA)}, pp.~142--147, 2021. DOI: \url{https://doi.org/10.1109/BCCA53669.2021.9596552}
+
+\item M.~T.~Hassan, F.~Ahmad, and A.~Mehmood, ``Blockchain and Machine Learning for Fraud Detection: A Privacy-Preserving and Adaptive Incentive Based Approach,'' \textit{IEEE Access}, vol.~10, pp.~87115--87131, 2022. DOI: \url{https://doi.org/10.1109/ACCESS.2022.3199498}
+
+\item Y.~Wang, J.~Liu, and Z.~Chen, ``ContractWard: Automated Vulnerability Detection Models for Ethereum Smart Contracts,'' \textit{IEEE Trans. Network Science and Engineering}, vol.~8, no.~2, pp.~1133--1144, 2020. DOI: \url{https://doi.org/10.1109/TNSE.2020.2968505}
+
+\item C.-F.~Liao, T.-H.~Tsai, and C.-J.~Chen, ``SoliAudit: Smart Contract Vulnerability Assessment Based on Machine Learning and Fuzz Testing,'' in \textit{Proc. IEEE Int. Conf. Internet of Things (iThings)}, pp.~458--465, 2019. DOI: \url{https://doi.org/10.1109/iThings/GreenCom/CPSCom/SmartData.2019.00098}
+
+\item S.~So, M.~Lee, J.~Park, H.~Lee, and H.~Oh, ``VERISMART: A Highly Precise Safety Verifier for Ethereum Smart Contracts,'' in \textit{Proc. IEEE Symp. Security and Privacy (S\&P)}, pp.~1678--1694, 2020. DOI: \url{https://doi.org/10.1109/SP40000.2020.00032}
+
+\item S.~Islam, R.~Khan, and M.~A.~Rahman, ``Central Bank Digital Currency (CBDC): Design Requirements and Challenges,'' in \textit{Proc. IEEE Int. Conf. Computing, Communication, and Intelligent Systems (ICCCIS)}, 2024. DOI: \url{https://doi.org/10.1109/ICCCIS62002.2024.10634472}
+
+\item M.~S.~Alam, S.~M.~Hossain, and A.~K.~Das, ``Towards Using Blockchain Technology for Microcredit Industry in Bangladesh,'' in \textit{Proc. IEEE Region 10 Symp. (TENSYMP)}, pp.~1--6, 2021. DOI: \url{https://doi.org/10.1109/TENSYMP52854.2021.9392730}
+
+\item P.~Tolmach, Y.~Li, and S.~Lin, ``Optimal Gas Fee Minimization in DeFi: Enhancing Efficiency and Security on the Ethereum Blockchain,'' \textit{IEEE Trans. Dependable and Secure Computing}, 2024. DOI: \url{https://doi.org/10.1109/TDSC.2024.3495637}
+
+\item S.~Gupta, A.~Kumar, and R.~Sharma, ``SHAP-based Interpretable Models for Credit Default Assessment Using Machine Learning,'' in \textit{Proc. IEEE Int. Conf. Artificial Intelligence and Data Science}, 2024. DOI: \url{https://doi.org/10.1109/ICAIDS60875.2024.10840375}
 \end{enumerate}
 }
 

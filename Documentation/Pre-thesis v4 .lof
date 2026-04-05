@@ -1,0 +1,41 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Component diagram showing interactions between the presentation layer, smart contract layer, off-chain backend services, and external systems.}}{31}{figure.caption.22}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Core system graph showing the Crypto World Bank entity relationship model with hierarchical banking structure, lending lifecycle, communication, and security entities.}}{34}{figure.caption.25}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Entity-Relationship Diagram (ERD) for the Crypto World Bank database with relational symbols and entity attributes across all 15 tables.}}{35}{figure.caption.26}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Enhanced Entity-Relationship (EER) diagram showing generalization/specialization, weak entities, aggregation, participation constraints, and cardinality for the complete data model.}}{36}{figure.caption.27}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Usecase diagram}}{42}{figure.caption.34}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Activity Diagram - Loan Request to Repayment Flow}}{44}{figure.caption.35}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Activity Diagram Hierarchical Banking Flow}}{45}{figure.caption.36}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Activity Diagram Income Verification Flow}}{46}{figure.caption.37}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Activity Diagram Chat System Flow}}{47}{figure.caption.38}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Activity Diagram AI Chatbot Interaction Flow}}{48}{figure.caption.39}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces activity diagram Market Data Viewing Flow}}{49}{figure.caption.40}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Activity Diagram Profile Management Flow}}{50}{figure.caption.41}%
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Dataflow Diagram (Context Diagram Level - 0)}}{51}{figure.caption.42}%
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Data flow diagram (level - 1)}}{51}{figure.caption.43}%
+\contentsline {figure}{\numberline {3.15}{\ignorespaces dataflow diagram 2 (level -1)}}{51}{figure.caption.44}%
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Sequence Diagram 1 Loan Request, AI Risk Check, and Approval Decision}}{52}{figure.caption.45}%
+\contentsline {figure}{\numberline {3.17}{\ignorespaces Sequence Diagram 1B Reject Path - alt Reject}}{52}{figure.caption.46}%
+\contentsline {figure}{\numberline {3.18}{\ignorespaces Sequence Diagram 2 Installment Payment Loop}}{53}{figure.caption.47}%
+\contentsline {figure}{\numberline {3.19}{\ignorespaces Sequence Diagram 3 Income Verification}}{53}{figure.caption.48}%
+\contentsline {figure}{\numberline {3.20}{\ignorespaces Sequence Diagram 4 Chat System}}{54}{figure.caption.49}%
+\contentsline {figure}{\numberline {3.21}{\ignorespaces Sequence Diagram 5 AI Chatbot Interaction}}{54}{figure.caption.50}%
+\contentsline {figure}{\numberline {3.22}{\ignorespaces Sequence Diagram 6 Hierarchical Banking}}{55}{figure.caption.51}%
+\contentsline {figure}{\numberline {3.23}{\ignorespaces Sequence Diagram 7 Market Data Retrieval}}{55}{figure.caption.52}%
+\contentsline {figure}{\numberline {3.24}{\ignorespaces Sequence Diagram 8 Borrowing Limit Calculation}}{56}{figure.caption.53}%
+\contentsline {figure}{\numberline {3.25}{\ignorespaces Four-tier hierarchical capital flow with cascading repayment.}}{56}{figure.caption.54}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Agile/Scrum process diagram showing sprint cycles, backlog refinement, and iterative delivery within the 8-week development window.}}{62}{figure.caption.58}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Agile development lifecycle --- 2-month window with three sprints.}}{63}{figure.caption.59}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Technical development methodology: blockchain (Solidity), frontend (React, Wagmi, WalletConnect), backend (Express.js REST API, PostgreSQL), and AI/ML (Python, FastAPI, scikit-learn, Random Forest, SHAP) components across the three sprints.}}{64}{figure.caption.60}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Sprint submission diagram showing the workflow from backlog refinement through development, testing, review, and delivery for each sprint cycle.}}{68}{figure.caption.65}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces SDLC stage mapping diagram showing alignment between the seven SDLC stages and our three-sprint Agile methodology.}}{70}{figure.caption.67}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Design decisions and alternatives visualization across all major technology choices.}}{72}{figure.caption.69}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Annual revenue projection by tier (USD millions, at \$2{,}000/ETH).}}{86}{figure.caption.81}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Hierarchical interest rate spread (APR) across the four-tier lending structure.}}{87}{figure.caption.83}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

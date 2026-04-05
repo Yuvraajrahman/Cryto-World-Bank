@@ -1,5 +1,8 @@
 \documentclass[12pt,a4paper]{report}
 
+% Default pdflatex PDF compression is zlib on streams; embedded PNGs stay lossless (not re-encoded as JPEG).
+% Turning compression off can produce multi-gigabyte files with no visible gain—avoid \pdfcompresslevel=0 here.
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -13,12 +16,8 @@
 \usepackage{graphicx}
 \usepackage{grffile}
 \graphicspath{{./}{Tables/}{Diagrams/}{Diagrams/CSE370/}{Diagrams/CSE471/}{Diagrams/CSE470/}}
-% Hint for bitmaps without explicit dimensions (PNG pixel box)
-\pdfimageresolution=600
-% Use the full text area (width and height) so raster tables/diagrams are as large as possible
-\newcommand{\ImageMaxFit}[1]{%
-  \includegraphics[width=\linewidth,height=\dimexpr\textheight-0.5\baselineskip\relax,keepaspectratio]{#1}%
-}
+% Bitmaps without embedded pHYs/DPI: high default so TeX’s implied size stays sharp when width/height are omitted elsewhere
+\pdfimageresolution=1200
 % Image-only table floats: caption text is in the PNG; keep counter for \ref{tab:...}
 \newcommand{\TableScreenshotEnd}[1][]{%
   \refstepcounter{table}%
@@ -44,9 +43,25 @@
     format=hang
 }
 
-% Constrain large/tall diagrams to a single page (image + caption)
+% PNGs are embedded at full file resolution; width/height only set how large the image is drawn (pdflatex).
+% Tables: cap box at 70\% of the one-page text area (30\% smaller than a full-area fit), centered in the float.
+% Figures/diagrams: maximize drawable area---minimal reserve for [H] float glue + one short \caption (increase if a caption wraps to the next page).
+\newlength{\ThesisTableImgReserve}
+\newlength{\ThesisFigImgReserve}
+\setlength{\ThesisTableImgReserve}{\dimexpr2\intextsep+0.75\baselineskip\relax}
+\setlength{\ThesisFigImgReserve}{\dimexpr2\intextsep+\abovecaptionskip+\belowcaptionskip+4\baselineskip\relax}
+\newcommand{\TableImageMaxFit}[1]{%
+  \includegraphics[
+    width=0.7\linewidth,
+    height=\dimexpr(\textheight-\ThesisTableImgReserve)*7/10\relax,
+    keepaspectratio
+  ]{#1}%
+}
+\newcommand{\FigureImageMaxFit}[1]{%
+  \includegraphics[width=\linewidth,height=\dimexpr\textheight-\ThesisFigImgReserve\relax,keepaspectratio]{#1}%
+}
 \newcommand{\OnePageDiagram}[2][]{%
-    \includegraphics[#1,width=\linewidth,height=\dimexpr\textheight-2\baselineskip\relax,keepaspectratio]{#2}%
+  \includegraphics[#1,width=\linewidth,height=\dimexpr\textheight-\ThesisFigImgReserve\relax,keepaspectratio]{#2}%
 }
 
 \usepackage[most]{tcolorbox}
@@ -487,7 +502,7 @@ Different borrower classes access different tiers based on loan size and organiz
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{1.1.png}
+\TableImageMaxFit{1.1.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -541,7 +556,7 @@ The fixed amount of the underlying cryptocurrency is not a weakness, but an oppo
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{1.2.png}
+\TableImageMaxFit{1.2.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -556,7 +571,7 @@ The Crypto World Bank targets the \textbf{retail customer segment} --- individua
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{1.3.png}
+\TableImageMaxFit{1.3.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -566,7 +581,7 @@ The Crypto World Bank targets the \textbf{retail customer segment} --- individua
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{1.4.png}
+\TableImageMaxFit{1.4.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -689,31 +704,31 @@ The most important reviewed works with their methodologies, key findings, and re
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{2.1.1.png}
+\TableImageMaxFit{2.1.1.png}
 \TableScreenshotEnd[tab:lit-summary]
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{2.1.2.png}
+\TableImageMaxFit{2.1.2.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{2.1.3.png}
+\TableImageMaxFit{2.1.3.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{2.1.4.png}
+\TableImageMaxFit{2.1.4.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{2.1.5.png}
+\TableImageMaxFit{2.1.5.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -781,7 +796,7 @@ Figure~\ref{fig:component-diagram} shows the component interactions across these
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Component Diagram.png}
+\FigureImageMaxFit{Component Diagram.png}
 \caption{Component diagram showing interactions between the presentation layer, smart contract layer, off-chain backend services, and external systems.}
 \label{fig:component-diagram}
 \end{figure}
@@ -790,13 +805,13 @@ Figure~\ref{fig:component-diagram} shows the component interactions across these
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.1.png}
+\TableImageMaxFit{3.1.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.1.2.png}
+\TableImageMaxFit{3.1.2.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -814,21 +829,21 @@ The relational database schema comprises 15 normalized entities in Third Normal 
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Core System Graph.png}
+\FigureImageMaxFit{Core System Graph.png}
 \caption{Core system graph showing the Crypto World Bank entity relationship model with hierarchical banking structure, lending lifecycle, communication, and security entities.}
 \label{fig:core-system-graph}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{ERD diagram database management.png}
+\FigureImageMaxFit{ERD diagram database management.png}
 \caption{Entity-Relationship Diagram (ERD) for the Crypto World Bank database with relational symbols and entity attributes across all 15 tables.}
 \label{fig:erd}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{EER Diagram - Full Model.png}
+\FigureImageMaxFit{EER Diagram - Full Model.png}
 \caption{Enhanced Entity-Relationship (EER) diagram showing generalization/specialization, weak entities, aggregation, participation constraints, and cardinality for the complete data model.}
 \label{fig:eer}
 \end{figure}
@@ -837,7 +852,7 @@ The relational database schema comprises 15 normalized entities in Third Normal 
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.2.png}
+\TableImageMaxFit{3.2.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -845,7 +860,7 @@ The relational database schema comprises 15 normalized entities in Third Normal 
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.3.png}
+\TableImageMaxFit{3.3.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -866,7 +881,7 @@ We use B-tree indexes (the default in PostgreSQL) for efficient retrieval on fre
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.4.png}
+\TableImageMaxFit{3.4.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -876,7 +891,7 @@ B-tree indexes are chosen for their efficiency with range queries (e.g., transac
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.5.png}
+\TableImageMaxFit{3.5.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -884,7 +899,7 @@ B-tree indexes are chosen for their efficiency with range queries (e.g., transac
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.6.png}
+\TableImageMaxFit{3.6.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -893,7 +908,7 @@ B-tree indexes are chosen for their efficiency with range queries (e.g., transac
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.7.png}
+\TableImageMaxFit{3.7.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -916,7 +931,7 @@ The system involves four primary actors---Borrower, Bank Approver, World Bank Ad
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Usecase diagram.png}
+\FigureImageMaxFit{Usecase diagram.png}
 \caption{Usecase diagram}
 \label{fig:usecase}
 \end{figure}
@@ -980,21 +995,21 @@ Figures~\ref{fig:dfd-context}--\ref{fig:dfd-level1b} present the data flow diagr
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Dataflow Diagram (Context Diagram Level - 0).png}
+\FigureImageMaxFit{Dataflow Diagram (Context Diagram Level - 0).png}
 \caption{Dataflow Diagram (Context Diagram Level - 0)}
 \label{fig:dfd-context}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Data flow diagram (level - 1).png}
+\FigureImageMaxFit{Data flow diagram (level - 1).png}
 \caption{Data flow diagram (level - 1)}
 \label{fig:dfd-level1a}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{dataflow diagram 2 (level -1).png}
+\FigureImageMaxFit{dataflow diagram 2 (level -1).png}
 \caption{dataflow diagram 2 (level -1)}
 \label{fig:dfd-level1b}
 \end{figure}
@@ -1005,63 +1020,63 @@ Figures~\ref{fig:seq-loan}--\ref{fig:seq-borrowlimit} present the sequence diagr
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 1 Loan Request, AI Risk Check, and Approval Decision.png}
+\FigureImageMaxFit{Sequence Diagram 1 Loan Request, AI Risk Check, and Approval Decision.png}
 \caption{Sequence Diagram 1 Loan Request, AI Risk Check, and Approval Decision}
 \label{fig:seq-loan}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 1B Reject Path - alt Reject.png}
+\FigureImageMaxFit{Sequence Diagram 1B Reject Path - alt Reject.png}
 \caption{Sequence Diagram 1B Reject Path - alt Reject}
 \label{fig:seq-reject}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 2 Installment Payment Loop.png}
+\FigureImageMaxFit{Sequence Diagram 2 Installment Payment Loop.png}
 \caption{Sequence Diagram 2 Installment Payment Loop}
 \label{fig:seq-installment}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 3 Income Verification.png}
+\FigureImageMaxFit{Sequence Diagram 3 Income Verification.png}
 \caption{Sequence Diagram 3 Income Verification}
 \label{fig:seq-income}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 4 Chat System.png}
+\FigureImageMaxFit{Sequence Diagram 4 Chat System.png}
 \caption{Sequence Diagram 4 Chat System}
 \label{fig:seq-chat}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 5 AI Chatbot Interaction.png}
+\FigureImageMaxFit{Sequence Diagram 5 AI Chatbot Interaction.png}
 \caption{Sequence Diagram 5 AI Chatbot Interaction}
 \label{fig:seq-aichatbot}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 6 Hierarchical Banking.png}
+\FigureImageMaxFit{Sequence Diagram 6 Hierarchical Banking.png}
 \caption{Sequence Diagram 6 Hierarchical Banking}
 \label{fig:seq-hierarchy}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 7 Market Data Retrieval.png}
+\FigureImageMaxFit{Sequence Diagram 7 Market Data Retrieval.png}
 \caption{Sequence Diagram 7 Market Data Retrieval}
 \label{fig:seq-marketdata}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sequence Diagram 8 Borrowing Limit Calculation.png}
+\FigureImageMaxFit{Sequence Diagram 8 Borrowing Limit Calculation.png}
 \caption{Sequence Diagram 8 Borrowing Limit Calculation}
 \label{fig:seq-borrowlimit}
 \end{figure}
@@ -1144,7 +1159,7 @@ The cryptocurrency exchange feature of Crypto World Bank is built upon the crypt
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.8.png}
+\TableImageMaxFit{3.8.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1152,7 +1167,7 @@ The cryptocurrency exchange feature of Crypto World Bank is built upon the crypt
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.9.png}
+\TableImageMaxFit{3.9.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1160,7 +1175,7 @@ The cryptocurrency exchange feature of Crypto World Bank is built upon the crypt
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{3.10.png}
+\TableImageMaxFit{3.10.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1194,7 +1209,7 @@ We adopted a \textbf{lightweight Agile/Scrum} methodology tailored for an academ
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Agile Process Diagram.png}
+\FigureImageMaxFit{Agile Process Diagram.png}
 \caption{Agile/Scrum process diagram showing sprint cycles, backlog refinement, and iterative delivery within the 8-week development window.}
 \label{fig:agile-process}
 \end{figure}
@@ -1224,13 +1239,13 @@ Building comprehensive datasets and preparing models for practical application w
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{4.2 agile window.png}
+\FigureImageMaxFit{4.2 agile window.png}
 \caption{Agile development lifecycle --- 2-month window with three sprints.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Methodology.png}
+\FigureImageMaxFit{Methodology.png}
 \caption{Technical development methodology: blockchain (Solidity), frontend (React, Wagmi, WalletConnect), backend (Express.js REST API, PostgreSQL), and AI/ML (Python, FastAPI, scikit-learn, Random Forest, SHAP) components across the three sprints.}
 \label{fig:methodology-technical}
 \end{figure}
@@ -1244,13 +1259,13 @@ Building comprehensive datasets and preparing models for practical application w
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{4.1.png}
+\TableImageMaxFit{4.1.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{4.2.png}
+\TableImageMaxFit{4.2.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1263,7 +1278,7 @@ Building comprehensive datasets and preparing models for practical application w
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{4.3.png}
+\TableImageMaxFit{4.3.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1274,7 +1289,7 @@ Building comprehensive datasets and preparing models for practical application w
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{4.4.png}
+\TableImageMaxFit{4.4.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1282,7 +1297,7 @@ Figure~\ref{fig:sprint-submission} shows the sprint submission workflow.
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Sprint submission Diagram.png}
+\FigureImageMaxFit{Sprint submission Diagram.png}
 \caption{Sprint submission diagram showing the workflow from backlog refinement through development, testing, review, and delivery for each sprint cycle.}
 \label{fig:sprint-submission}
 \end{figure}
@@ -1294,13 +1309,13 @@ We map our Agile sprints to the seven stages of the Software Development Life Cy
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{4.5.png}
+\TableImageMaxFit{4.5.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{SDLC stage mapping.png}
+\FigureImageMaxFit{SDLC stage mapping.png}
 \caption{SDLC stage mapping diagram showing alignment between the seven SDLC stages and our three-sprint Agile methodology.}
 \label{fig:sdlc-mapping}
 \end{figure}
@@ -1312,13 +1327,13 @@ For each major design decision, we evaluated alternatives and justified selectio
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{4.6.png}
+\TableImageMaxFit{4.6.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{figure}[H]
 \centering
-\ImageMaxFit{Design Decisions and Alternatives Considered.png}
+\FigureImageMaxFit{Design Decisions and Alternatives Considered.png}
 \caption{Design decisions and alternatives visualization across all major technology choices.}
 \label{fig:design-decisions}
 \end{figure}
@@ -1408,7 +1423,7 @@ We test in a few ways:
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.1.png}
+\TableImageMaxFit{5.1.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1423,7 +1438,7 @@ The Crypto World Bank targets the \textbf{retail customer segment}---individual 
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.2.png}
+\TableImageMaxFit{5.2.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1431,7 +1446,7 @@ The Crypto World Bank targets the \textbf{retail customer segment}---individual 
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.3.png}
+\TableImageMaxFit{5.3.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1442,19 +1457,19 @@ The Crypto World Bank operates at the intersection of four distinct competitor c
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.4.1.png}
+\TableImageMaxFit{5.4.1.png}
 \TableScreenshotEnd[tab:competitor-detailed]
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.4.2.png}
+\TableImageMaxFit{5.4.2.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.4.3.png}
+\TableImageMaxFit{5.4.3.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1472,7 +1487,7 @@ Upon reviewing various projects a common feature was identified: a lending mecha
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.5.png}
+\TableImageMaxFit{5.5.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1481,7 +1496,7 @@ Upon reviewing various projects a common feature was identified: a lending mecha
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.6.png}
+\TableImageMaxFit{5.6.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1490,7 +1505,7 @@ Upon reviewing various projects a common feature was identified: a lending mecha
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.7.png}
+\TableImageMaxFit{5.7.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1501,13 +1516,13 @@ The following projection models annual revenue potential at full deployment scal
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.8.png}
+\TableImageMaxFit{5.8.png}
 \TableScreenshotEnd
 \end{table}
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.9.png}
+\TableImageMaxFit{5.9.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1565,7 +1580,7 @@ The following projection models annual revenue potential at full deployment scal
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.10.png}
+\TableImageMaxFit{5.10.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1627,7 +1642,7 @@ Apart from revenue generated through platforms, various economic advantages are 
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{5.11.png}
+\TableImageMaxFit{5.11.png}
 \TableScreenshotEnd
 \end{table}
 
@@ -1686,7 +1701,7 @@ The future work will be directed towards the following directions:
 
 \begin{table}[H]
 \centering
-\ImageMaxFit{table A.1.png}
+\TableImageMaxFit{table A.1.png}
 \TableScreenshotEnd
 \end{table}
 

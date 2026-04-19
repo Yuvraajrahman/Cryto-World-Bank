@@ -1,0 +1,157 @@
+// Prisma schema for Crypto World Bank
+// Mirrors the 15-entity 3NF model described in Chapter 3 of the thesis,
+// trimmed to the core tables needed by the current prototype. Additional
+// entities (installments, transactions, shap_explanations, etc.) should be
+// added as the backend catches up with the lending lifecycle.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  NATIONAL_BANK_ADMIN
+  LOCAL_BANK_ADMIN
+  APPROVER
+  BORROWER
+}
+
+enum BankTier {
+  WORLD
+  NATIONAL
+  LOCAL
+}
+
+enum LoanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ACTIVE
+  REPAID
+  DEFAULTED
+}
+
+enum VerificationStatus {
+  UNSUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id          String   @id @default(cuid())
+  wallet      String   @unique
+  displayName String?
+  email       String?  @unique
+  role        UserRole @default(BORROWER)
+  bankId      String?
+  bank        Bank?    @relation(fields: [bankId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  incomeVerification IncomeVerification?
+  loans              Loan[]              @relation("BorrowerLoans")
+  messagesSent       ChatMessage[]       @relation("SentMessages")
+  messagesReceived   ChatMessage[]       @relation("ReceivedMessages")
+}
+
+model Bank {
+  id             String   @id @default(cuid())
+  tier           BankTier
+  name           String
+  walletAddress  String   @unique
+  jurisdiction   String?
+  parentBankId   String?
+  parentBank     Bank?    @relation("ParentChild", fields: [parentBankId], references: [id])
+  childBanks     Bank[]   @relation("ParentChild")
+  createdAt      DateTime @default(now())
+
+  users User[]
+  loans Loan[]
+}
+
+model Loan {
+  id              String     @id @default(cuid())
+  onChainId       String     @unique
+  borrowerId      String
+  borrower        User       @relation("BorrowerLoans", fields: [borrowerId], references: [id])
+  localBankId     String
+  localBank       Bank       @relation(fields: [localBankId], references: [id])
+  principalWei    String
+  aprBps          Int
+  termMonths      Int
+  purpose         String?
+  status          LoanStatus @default(PENDING)
+  riskScore       Float?
+  shapExplanation Json?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  installments Installment[]
+}
+
+model Installment {
+  id        String   @id @default(cuid())
+  loanId    String
+  loan      Loan     @relation(fields: [loanId], references: [id])
+  index     Int
+  amountWei String
+  dueDate   DateTime
+  paid      Boolean  @default(false)
+  paidAt    DateTime?
+  txHash    String?
+
+  @@unique([loanId, index])
+}
+
+model IncomeVerification {
+  id          String             @id @default(cuid())
+  userId      String             @unique
+  user        User               @relation(fields: [userId], references: [id])
+  documentUrl String?
+  monthlyUsd  Float?
+  status      VerificationStatus @default(UNSUBMITTED)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  notes       String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model ChatThread {
+  id        String        @id @default(cuid())
+  subject   String?
+  createdAt DateTime      @default(now())
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id         String     @id @default(cuid())
+  threadId   String
+  thread     ChatThread @relation(fields: [threadId], references: [id])
+  senderId   String
+  sender     User       @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User       @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  body       String
+  createdAt  DateTime   @default(now())
+}
+
+model OnChainEvent {
+  id        String   @id @default(cuid())
+  contract  String
+  eventName String
+  txHash    String
+  blockNum  Int
+  logIndex  Int
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@unique([txHash, logIndex])
+  @@index([contract, eventName])
+}

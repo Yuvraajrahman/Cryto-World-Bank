@@ -1,15 +1,42 @@
+# Dependencies
 node_modules/
-.env
-.env.local
+**/node_modules/
+
+# Builds & caches
+dist/
+build/
 artifacts/
 cache/
 coverage/
 coverage.json
-dist/
+typechain-types/
+
+# Environment
+.env
+.env.local
+.env.*.local
+**/.env
+!**/.env.example
+
+# OS / editor
 .DS_Store
 *.log
+.vscode/
+.idea/
+
+# Python virtualenvs
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Hardhat
 deployment-info.json
-frontend/dist/
-frontend/node_modules/
-ml-backend/venv/
-Previou plans/
+deployments/
+
+# Prisma
+prisma/*.db
+prisma/migrations/dev*
+
+# Temp
+*.tsbuildinfo

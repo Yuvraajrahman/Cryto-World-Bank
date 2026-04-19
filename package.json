@@ -1,31 +1,36 @@
 {
   "name": "crypto-world-bank",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
+  "description": "Decentralized Crypto World Bank — a four-tier blockchain lending platform",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test",
-    "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai",
+    "test:contracts": "hardhat test",
+    "node:chain": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
-    "deploy:uvicoin:mumbai": "hardhat run scripts/deploy-uvicoin.ts --network mumbai",
-    "deploy:uvicoin:sepolia": "hardhat run scripts/deploy-uvicoin.ts --network sepolia",
+    "deploy:amoy": "hardhat run scripts/deploy.ts --network amoy",
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
-    "dev": "concurrently \"npm run frontend:dev\" \"cd backend && npm run dev\""
+    "backend:dev": "cd backend && npm run dev",
+    "backend:build": "cd backend && npm run build",
+    "ml:dev": "cd ml-service && uvicorn app.main:app --reload --port 8000",
+    "dev": "concurrently -n frontend,backend -c blue,green \"npm run frontend:dev\" \"npm run backend:dev\""
   },
   "devDependencies": {
-    "concurrently": "^9.0.0",
-    "@nomicfoundation/hardhat-ethers": "^3.0.6",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@types/node": "^20.10.0",
-    "chai": "^4.3.10",
-    "ethers": "^6.13.0",
-    "hardhat": "^2.19.0",
-    "solidity-coverage": "^0.8.5",
-    "typescript": "^5.3.0"
+    "@types/node": "^20.11.0",
+    "chai": "^4.4.1",
+    "concurrently": "^9.0.1",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.2",
+    "hardhat": "^2.22.10",
+    "solidity-coverage": "^0.8.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.1",
-    "dotenv": "^16.3.1"
+    "@openzeppelin/contracts": "^5.0.2"
   }
 }

@@ -1,36 +1,49 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { theme } from "./theme/theme";
+import { BrowserRouter } from "react-router-dom";
 import { WagmiProvider } from "wagmi";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
-import { config } from "./config/wagmi";
-import { DemoModeProvider } from "./context/DemoModeContext";
-import "@rainbow-me/rainbowkit/styles.css";
-import "./index.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
+import { wagmiConfig } from "@/lib/wagmi";
+import { App } from "@/App";
 
-const queryClient = new QueryClient();
+import "@rainbow-me/rainbowkit/styles.css";
+import "@/styles/globals.css";
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
+});
+
+const rainbowTheme = darkTheme({
+  accentColor: "#d4af37",
+  accentColorForeground: "#0a0a0b",
+  borderRadius: "large",
+  fontStack: "system",
+  overlayBlur: "small",
+});
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider theme={darkTheme({
-            accentColor: "#D4AF37",
-            accentColorForeground: "#0a0a0a",
-            borderRadius: "medium",
-          })}>
-            <DemoModeProvider>
-              <App />
-            </DemoModeProvider>
-          </RainbowKitProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
-    </ThemeProvider>
-  </React.StrictMode>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={rainbowTheme} modalSize="compact" coolMode>
+          <BrowserRouter>
+            <App />
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                style: {
+                  background: "#101013",
+                  color: "#f3f3f3",
+                  border: "1px solid rgba(212,175,55,0.35)",
+                  boxShadow: "0 10px 40px -10px rgba(0,0,0,0.7)",
+                },
+              }}
+            />
+          </BrowserRouter>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  </React.StrictMode>,
 );

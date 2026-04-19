@@ -1,3 +1,0 @@
-     cd "C:\Users\yoyoy\Documents\Cryto-World-Bank\Documentation"
-     pdflatex --interaction=nonstopmode 'Pre-thesis 1 [ 20301138, 20301083] .tex'
-     pdflatex --interaction=nonstopmode 'Pre-thesis 1 [ 20301138, 20301083] .tex'

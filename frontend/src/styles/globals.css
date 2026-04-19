@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(212,175,55,0.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(212,175,55,0.05), transparent 60%),
+      #060606;
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: rgba(212, 175, 55, 0.35);
+    color: #fff;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2b31;
+    border-radius: 8px;
+    border: 2px solid #0a0a0b;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3b42;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-10;
+  }
+
+  .card {
+    @apply relative rounded-2xl border border-ink-600/70 bg-gradient-to-b from-ink-800/80 to-ink-900/90 backdrop-blur-sm shadow-card;
+  }
+
+  .card-gold {
+    @apply relative rounded-2xl border border-gold-700/40 bg-gradient-to-b from-ink-800/90 to-ink-900/95 shadow-gold-soft;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:border-gold-600/60 hover:shadow-gold-glow;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/50 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn text-ink-900 bg-gradient-to-b from-gold-300 via-gold-500 to-gold-600 border border-gold-700/50 shadow-gold-soft hover:brightness-110 hover:shadow-gold-glow active:brightness-95;
+  }
+
+  .btn-ghost {
+    @apply btn text-ink-100 border border-ink-500/70 bg-ink-800/60 hover:border-gold-600/60 hover:text-gold-300;
+  }
+
+  .btn-danger {
+    @apply btn text-red-50 border border-red-500/50 bg-red-900/40 hover:bg-red-800/60;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-ink-500/70 bg-ink-900/70 px-4 py-2.5 text-sm text-ink-100 placeholder:text-ink-300 focus:border-gold-600/70 focus:outline-none focus:ring-2 focus:ring-gold-500/20 transition-colors;
+  }
+
+  .label {
+    @apply block text-xs font-medium uppercase tracking-[0.14em] text-ink-200 mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-ink-500/80 bg-ink-800/70 px-2.5 py-0.5 text-xs font-medium text-ink-100;
+  }
+
+  .badge-gold {
+    @apply badge border-gold-700/50 bg-gold-900/30 text-gold-300;
+  }
+
+  .badge-green {
+    @apply badge border-emerald-700/50 bg-emerald-900/30 text-emerald-300;
+  }
+
+  .badge-red {
+    @apply badge border-red-700/50 bg-red-900/30 text-red-300;
+  }
+
+  .badge-blue {
+    @apply badge border-sky-700/50 bg-sky-900/30 text-sky-300;
+  }
+
+  .gold-text {
+    background: linear-gradient(135deg, #fff4c4 0%, #d4af37 40%, #a6801f 70%, #fff4c4 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 6s linear infinite;
+  }
+
+  .divider {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-gold-700/40 to-transparent;
+  }
+
+  .stat {
+    @apply flex flex-col gap-1 p-5 card;
+  }
+
+  .stat-label {
+    @apply text-xs uppercase tracking-[0.16em] text-ink-200;
+  }
+
+  .stat-value {
+    @apply font-display text-3xl font-semibold text-ink-100;
+  }
+
+  .hairline {
+    @apply border-t border-gold-700/20;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .bg-grid-gold {
+    background-image:
+      linear-gradient(rgba(212,175,55,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,175,55,0.07) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  }
+}

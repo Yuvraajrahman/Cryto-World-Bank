@@ -14,28 +14,82 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
-      name: "Ownable",
+      name: "AccessControl",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Ownable__factory>;
+    ): Promise<Contracts.AccessControl__factory>;
+    getContractFactory(
+      name: "IAccessControl",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IAccessControl__factory>;
+    getContractFactory(
+      name: "ERC165",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC165__factory>;
+    getContractFactory(
+      name: "IERC165",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC165__factory>;
+    getContractFactory(
+      name: "Pausable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Pausable__factory>;
     getContractFactory(
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuard__factory>;
+    getContractFactory(
+      name: "LocalBank",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.LocalBank__factory>;
+    getContractFactory(
+      name: "NationalBank",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.NationalBank__factory>;
     getContractFactory(
       name: "WorldBankReserve",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.WorldBankReserve__factory>;
 
     getContractAt(
-      name: "Ownable",
+      name: "AccessControl",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
-    ): Promise<Contracts.Ownable>;
+    ): Promise<Contracts.AccessControl>;
+    getContractAt(
+      name: "IAccessControl",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IAccessControl>;
+    getContractAt(
+      name: "ERC165",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC165>;
+    getContractAt(
+      name: "IERC165",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC165>;
+    getContractAt(
+      name: "Pausable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Pausable>;
     getContractAt(
       name: "ReentrancyGuard",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuard>;
+    getContractAt(
+      name: "LocalBank",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.LocalBank>;
+    getContractAt(
+      name: "NationalBank",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.NationalBank>;
     getContractAt(
       name: "WorldBankReserve",
       address: string | ethers.Addressable,
@@ -43,28 +97,82 @@ declare module "hardhat/types/runtime" {
     ): Promise<Contracts.WorldBankReserve>;
 
     deployContract(
-      name: "Ownable",
+      name: "AccessControl",
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Ownable>;
+    ): Promise<Contracts.AccessControl>;
+    deployContract(
+      name: "IAccessControl",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IAccessControl>;
+    deployContract(
+      name: "ERC165",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ERC165>;
+    deployContract(
+      name: "IERC165",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC165>;
+    deployContract(
+      name: "Pausable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Pausable>;
     deployContract(
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "LocalBank",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.LocalBank>;
+    deployContract(
+      name: "NationalBank",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.NationalBank>;
     deployContract(
       name: "WorldBankReserve",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.WorldBankReserve>;
 
     deployContract(
-      name: "Ownable",
+      name: "AccessControl",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Ownable>;
+    ): Promise<Contracts.AccessControl>;
+    deployContract(
+      name: "IAccessControl",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IAccessControl>;
+    deployContract(
+      name: "ERC165",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ERC165>;
+    deployContract(
+      name: "IERC165",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC165>;
+    deployContract(
+      name: "Pausable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Pausable>;
     deployContract(
       name: "ReentrancyGuard",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
+    deployContract(
+      name: "LocalBank",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.LocalBank>;
+    deployContract(
+      name: "NationalBank",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.NationalBank>;
     deployContract(
       name: "WorldBankReserve",
       args: any[],

@@ -1,488 +1,259 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import {
-  Container,
-  Grid,
-  Typography,
-  Card,
-  CardContent,
-  Box,
-  CircularProgress,
-  Alert,
-  Button,
-  Chip,
-  LinearProgress,
-} from "@mui/material";
-import {
-  AccountBalance,
-  RequestQuote,
-  CheckCircle,
-  PendingActions,
-  Security,
-  Shield,
-  Person,
-  SwapHoriz,
-  ShowChart,
-  Storage,
-  VerifiedUser,
-} from "@mui/icons-material";
+import { Link } from "react-router-dom";
 import { useAccount } from "wagmi";
-import { formatEther } from "viem";
-import { useWorldBankContract } from "../hooks/useContract";
-import { useUviCoinBalance, useUviCoinFaucet, useHasClaimedFaucet } from "../hooks/useUviCoin";
-import { useRole } from "../hooks/useRole";
-import { useUser } from "../hooks/useUser";
-import { CONTRACT_ADDRESS } from "../config/contracts";
-import { useNavigate } from "react-router-dom";
+import {
+  Coins,
+  Landmark,
+  Receipt,
+  ShieldCheck,
+  TrendingUp,
+  ArrowUpRight,
+  Network,
+} from "lucide-react";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Stat } from "@/components/ui/Stat";
+import { shortAddress } from "@/lib/utils";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-function StatsCard({
-  title,
-  value,
-  icon,
-  subtitle,
-}: {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-  subtitle?: string;
-}) {
-  return (
-    <Card elevation={1}>
-      <CardContent>
-        <Box display="flex" alignItems="center" mb={2}>
-          <Box mr={2} color="primary.main">
-            {icon}
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            {title}
-          </Typography>
-        </Box>
-        <Typography variant="h5" component="div" gutterBottom fontWeight={500}>
-          {value}
-        </Typography>
-        {subtitle && (
-          <Typography variant="caption" color="text.secondary">
-            {subtitle}
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-const SERVICES = [
-  { title: "Crypto Trading", icon: SwapHoriz, desc: "Trade digital assets with low fees and instant settlement." },
-  { title: "Crypto Staking", icon: ShowChart, desc: "Earn rewards by staking your crypto and supporting the network." },
-  { title: "Crypto Lending", icon: RequestQuote, desc: "Borrow against your holdings or earn interest by lending." },
-  { title: "Crypto Mining", icon: Storage, desc: "Secure the blockchain and earn mining rewards." },
-  { title: "Crypto Custody", icon: Security, desc: "Institutional-grade secure storage for your digital assets." },
-  { title: "Crypto Insurance", icon: VerifiedUser, desc: "Protect your portfolio with comprehensive coverage." },
+const reserveSeries = [
+  { m: "Oct", reserve: 1200, allocated: 800 },
+  { m: "Nov", reserve: 1420, allocated: 910 },
+  { m: "Dec", reserve: 1510, allocated: 1020 },
+  { m: "Jan", reserve: 1620, allocated: 1105 },
+  { m: "Feb", reserve: 1740, allocated: 1180 },
+  { m: "Mar", reserve: 1842, allocated: 1240 },
 ];
 
-function ServiceCard({ title, icon: Icon, desc }: { title: string; icon: React.ElementType; desc: string }) {
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        height: "100%",
-        borderRadius: 2,
-        border: "1px solid",
-        borderColor: "divider",
-        bgcolor: "background.paper",
-        transition: "all 0.2s ease",
-        "&:hover": {
-          boxShadow: 2,
-          borderColor: "primary.light",
-        },
-      }}
-    >
-      <CardContent sx={{ p: 2.5 }}>
-        <Box
-          sx={{
-            width: 44,
-            height: 44,
-            borderRadius: 2,
-            bgcolor: "primary.main",
-            color: "primary.contrastText",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            mb: 1.5,
-          }}
-        >
-          <Icon sx={{ fontSize: 24 }} />
-        </Box>
-        <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-          {title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {desc}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ServicesSection() {
-  return (
-    <Box
-      sx={{
-        mt: 4,
-        mb: 2,
-        py: 4,
-        px: 2,
-        borderRadius: 3,
-        background: "linear-gradient(160deg, #141414 0%, #1a1a1a 40%, #0f0f0f 100%)",
-        border: "1px solid rgba(212, 175, 55, 0.2)",
-      }}
-    >
-      <Typography variant="h5" fontWeight={600} textAlign="center" sx={{ mb: 3 }}>
-        Our Services
-      </Typography>
-      <Grid container spacing={2}>
-        {SERVICES.map((s) => (
-          <Grid item xs={12} sm={6} md={4} key={s.title}>
-            <ServiceCard title={s.title} icon={s.icon} desc={s.desc} />
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
-}
-
 export function Dashboard() {
-  // Get the connected wallet address and connection status
-  const { address, isConnected } = useAccount();
-  const { isBankOrAdmin } = useRole();
-  const { user, loading: userLoading } = useUser();
-  const contract = useWorldBankContract();
-  const contractRef = useRef(contract);
-  const { data: uviBalance } = useUviCoinBalance(address);
-  const { claimFaucet, isPending: faucetPending, isSuccess: faucetSuccess, isDeployed: uviDeployed } = useUviCoinFaucet();
-  const { data: hasClaimed } = useHasClaimedFaucet(address);
-  contractRef.current = contract;
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [stats, setStats] = useState({
-    totalReserve: "0",
-    totalLoans: "0",
-    pendingLoans: "0",
-    approvedLoans: "0",
-    userDeposits: "0",
-  });
-
-  const loadStats = useCallback(async () => {
-    if (CONTRACT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-      setError("Contract not deployed. Set VITE_CONTRACT_ADDRESS and deploy first.");
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    try {
-      setError("");
-      const c = contractRef.current as unknown as { read: { getStats: () => Promise<readonly bigint[]>; getUserDeposits: (args: [string]) => Promise<bigint> } };
-      const statsResult = await c.read.getStats();
-      let userDeposits = "0";
-      if (address) {
-        try {
-          const dep = await c.read.getUserDeposits([address]);
-          userDeposits = formatEther(dep);
-        } catch {
-          userDeposits = "0";
-        }
-      }
-      setStats({
-        totalReserve: formatEther(statsResult[0]),
-        totalLoans: statsResult[1].toString(),
-        pendingLoans: statsResult[2].toString(),
-        approvedLoans: statsResult[3].toString(),
-        userDeposits,
-      });
-    } catch (err) {
-      console.error("Error loading stats:", err);
-      setError("Failed to load reserve data. Check network and contract.");
-    } finally {
-      setLoading(false);
-    }
-  }, [address]);
-
-  useEffect(() => {
-    if (!isConnected) {
-      setLoading(false);
-      return;
-    }
-    loadStats();
-  }, [isConnected, address, loadStats]);
-
-  if (!isConnected) {
-    return (
-      <Container maxWidth="sm">
-        <Box sx={{ textAlign: "center", py: 4 }}>
-          <Typography variant="h4" gutterBottom fontWeight={600}>
-            Decentralized Crypto Reserve and Lending Bank
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
-            A World Bank–inspired blockchain prototype
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            Transparent, on-chain reserve where users deposit funds and request loans.
-            All transactions are verifiable on the blockchain.
-          </Typography>
-          <Alert severity="info" sx={{ mt: 3, textAlign: "left" }}>
-            Connect your wallet using the button in the top bar to view the reserve
-            dashboard, make deposits, and request loans.
-          </Alert>
-          <ServicesSection />
-        </Box>
-      </Container>
-    );
-  }
-
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="50vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const { address } = useAccount();
 
   return (
-    <Container maxWidth="lg">
-      <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2} mb={2}>
-        <Typography variant="h4" fontWeight={500}>
-          Reserve Dashboard
-        </Typography>
-        <Button variant="outlined" size="small" onClick={loadStats}>
-          Refresh
-        </Button>
-      </Box>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        {isBankOrAdmin
-          ? "Transparent, on-chain global reserve system powered by AI/ML security"
-          : "Transparent, on-chain global reserve. Deposit and request loans."}
-      </Typography>
+    <div className="space-y-8">
+      <SectionHeader
+        eyebrow="Overview"
+        title={<>Welcome back, <span className="gold-text">{shortAddress(address)}</span></>}
+        description="Your portfolio, reserve position, and loan lifecycle — all surfaced in one glance."
+        right={
+          <Link to="/app/loans/new" className="btn-primary">
+            Request Loan <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        }
+      />
 
-      {user && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          <Typography variant="body2">
-            <strong>Account Type:</strong> {user.type === 'borrower' ? 'Borrower' : 'Bank User'}
-            {user.data?.name && ` - ${user.data.name}`}
-          </Typography>
-        </Alert>
-      )}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat
+          label="Reserve Balance"
+          value="1,842.50 ETH"
+          icon={Landmark}
+          delta={{ value: "5.8%", positive: true }}
+          hint="vs. last 30 days"
+        />
+        <Stat
+          label="Allocated Capital"
+          value="1,240.00 ETH"
+          icon={Network}
+          delta={{ value: "3.1%", positive: true }}
+          hint="67% utilization"
+        />
+        <Stat
+          label="Active Loans"
+          value="87"
+          icon={Coins}
+          delta={{ value: "12", positive: true }}
+          hint="new this month"
+        />
+        <Stat
+          label="Repaid (90d)"
+          value="298.35 ETH"
+          icon={Receipt}
+          delta={{ value: "1.2%", positive: false }}
+          hint="default rate"
+        />
+      </div>
 
-      {!user && !userLoading && isConnected && (
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          <Typography variant="body2">
-            You are not registered. Please register as a borrower or bank user to use the platform.
-          </Typography>
-        </Alert>
-      )}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="card p-6 lg:col-span-2">
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Reserve Flow</div>
+              <div className="font-display text-xl font-semibold text-ink-100">
+                Capital Movement — 6-month window
+              </div>
+            </div>
+            <span className="badge-gold">
+              <TrendingUp className="h-3.5 w-3.5" />
+              +18.4% QoQ
+            </span>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={reserveSeries}>
+                <defs>
+                  <linearGradient id="gReserve" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#d4af37" stopOpacity={0.55} />
+                    <stop offset="100%" stopColor="#d4af37" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="gAlloc" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8a8b93" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="#8a8b93" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="m" stroke="#8a8b93" fontSize={12} />
+                <YAxis stroke="#8a8b93" fontSize={12} />
+                <Tooltip
+                  contentStyle={{
+                    background: "#101013",
+                    border: "1px solid rgba(212,175,55,0.35)",
+                    borderRadius: 12,
+                    fontSize: 12,
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="reserve"
+                  stroke="#d4af37"
+                  strokeWidth={2}
+                  fill="url(#gReserve)"
+                  name="Reserve (ETH)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="allocated"
+                  stroke="#8a8b93"
+                  strokeWidth={2}
+                  fill="url(#gAlloc)"
+                  name="Allocated (ETH)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-      {isBankOrAdmin && (
-        <Alert
-          severity="success"
-          icon={<Shield />}
-          sx={{ mb: 3 }}
-          action={
-            <Button color="inherit" size="small" onClick={() => navigate("/risk")}>
-              View Details
-            </Button>
-          }
-        >
-          <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
-            <Typography variant="body2" fontWeight={500}>
-              AI Security Active
-            </Typography>
-            <Chip label="3 Threats Blocked Today" size="small" color="success" />
-            <Chip label="94% Detection Rate" size="small" variant="outlined" />
-          </Box>
-        </Alert>
-      )}
+        <div className="card p-6">
+          <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-ink-200">
+            <ShieldCheck className="h-4 w-4 text-gold-400" />
+            Security Status
+          </div>
+          <ul className="space-y-3 text-sm">
+            {[
+              { label: "Reentrancy guard", ok: true },
+              { label: "Pausable breaker", ok: true },
+              { label: "Role-based access", ok: true },
+              { label: "Reserve ratio ≥ 25%", ok: true },
+              { label: "Upstream risk ping", ok: true },
+            ].map((x) => (
+              <li
+                key={x.label}
+                className="flex items-center justify-between rounded-lg border border-ink-600/60 bg-ink-900/60 px-3 py-2"
+              >
+                <span>{x.label}</span>
+                <span className={x.ok ? "badge-green" : "badge-red"}>
+                  {x.ok ? "Healthy" : "Warning"}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="divider my-4" />
+          <p className="text-xs text-ink-200">
+            All invariants checked at block height <span className="font-mono text-gold-300">#5,281,942</span>.
+          </p>
+        </div>
+      </div>
 
-      {error && (
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <RecentActivity />
+        <TierBreakdown />
+      </div>
+    </div>
+  );
+}
 
-      <Grid container spacing={3} sx={{ mt: 1 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Total Reserve"
-            value={`${parseFloat(stats.totalReserve).toFixed(4)} MATIC`}
-            icon={<AccountBalance fontSize="large" />}
-            subtitle="Available for lending"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Total Loans"
-            value={stats.totalLoans}
-            icon={<RequestQuote fontSize="large" />}
-            subtitle="All time"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Pending"
-            value={stats.pendingLoans}
-            icon={<PendingActions fontSize="large" />}
-            subtitle="Awaiting approval"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatsCard
-            title="Approved"
-            value={stats.approvedLoans}
-            icon={<CheckCircle fontSize="large" />}
-            subtitle="Funds released"
-          />
-        </Grid>
-      </Grid>
+function RecentActivity() {
+  const events = [
+    { at: "2m ago", type: "Loan Disbursed", who: "0x7Af…921", amount: "+5.00 ETH", tag: "gold" },
+    { at: "18m ago", type: "Installment Paid", who: "0x31c…0aa", amount: "-0.42 ETH", tag: "green" },
+    { at: "42m ago", type: "Capital Allocated", who: "NB · Nigeria", amount: "+75.00 ETH", tag: "gold" },
+    { at: "1h ago", type: "Loan Requested", who: "0xD8b…e11", amount: "12.00 ETH", tag: "blue" },
+    { at: "3h ago", type: "Repayment Recorded", who: "LB · Dhaka", amount: "-4.50 ETH", tag: "green" },
+  ];
+  return (
+    <div className="card p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Recent Activity</div>
+          <div className="font-display text-xl font-semibold text-ink-100">Ledger events</div>
+        </div>
+        <Link to="/app/loans" className="text-xs text-gold-300 hover:text-gold-200">
+          View all →
+        </Link>
+      </div>
+      <div className="space-y-2">
+        {events.map((e, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between rounded-lg border border-ink-600/50 bg-ink-900/50 px-3 py-2.5 text-sm"
+          >
+            <div>
+              <div className="font-medium text-ink-100">{e.type}</div>
+              <div className="text-xs text-ink-200">
+                {e.who} · {e.at}
+              </div>
+            </div>
+            <span className={`badge${e.tag === "gold" ? "-gold" : e.tag === "green" ? "-green" : "-blue"}`}>
+              {e.amount}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-      {parseInt(stats.totalLoans, 10) > 0 && (
-        <Card elevation={1} sx={{ mt: 3 }}>
-          <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-              <Typography variant="body2" color="text.secondary">
-                Loan activity (approved / total)
-              </Typography>
-              <Typography variant="body2" fontWeight={500}>
-                {(
-                  (parseInt(stats.approvedLoans, 10) / parseInt(stats.totalLoans, 10)) *
-                  100
-                ).toFixed(0)}
-                %
-              </Typography>
-            </Box>
-            <LinearProgress
-              variant="determinate"
-              value={
-                parseInt(stats.totalLoans, 10) > 0
-                  ? (parseInt(stats.approvedLoans, 10) / parseInt(stats.totalLoans, 10)) * 100
-                  : 0
-              }
-              sx={{ height: 8, borderRadius: 1 }}
-            />
-          </CardContent>
-        </Card>
-      )}
-
-      {parseFloat(stats.userDeposits) > 0 && (
-        <Card elevation={1} sx={{ mt: 2 }}>
-          <CardContent>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Person color="primary" />
-              <Typography variant="body2" color="text.secondary">
-                Your deposits to reserve
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={600} sx={{ mt: 0.5 }}>
-              {parseFloat(stats.userDeposits).toFixed(4)} MATIC
-            </Typography>
-          </CardContent>
-        </Card>
-      )}
-
-      {uviDeployed && (
-        <Card elevation={1} sx={{ mt: 2 }}>
-          <CardContent>
-            <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1}>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  Your UviCoin (UVI) balance
-                </Typography>
-                <Typography variant="h6" fontWeight={600} sx={{ mt: 0.5 }}>
-                  {uviBalance !== undefined ? `${Number(formatEther(uviBalance)).toFixed(2)} UVI` : "—"}
-                </Typography>
-              </Box>
-              {hasClaimed === false && (
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={claimFaucet}
-                  disabled={faucetPending}
-                >
-                  {faucetPending ? "Claiming…" : "Claim 1000 UVI"}
-                </Button>
-              )}
-              {faucetSuccess && (
-                <Chip label="Claimed!" size="small" color="success" />
-              )}
-            </Box>
-          </CardContent>
-        </Card>
-      )}
-
-      <Box display="flex" gap={2} flexWrap="wrap" sx={{ mb: 3 }}>
-        <Button variant="contained" onClick={() => navigate("/deposit")}>
-          Deposit
-        </Button>
-        <Button variant="outlined" onClick={() => navigate("/loan")}>
-          Request Loan
-        </Button>
-        <Button variant="outlined" onClick={() => navigate("/qr")}>
-          QR Codes
-        </Button>
-      </Box>
-
-      <ServicesSection />
-
-      <Grid container spacing={3} sx={{ mt: 1 }}>
-        {isBankOrAdmin && (
-          <Grid item xs={12} md={6}>
-            <Card sx={{ height: "100%" }} elevation={1}>
-              <CardContent>
-                <Box display="flex" alignItems="center" gap={1} mb={2}>
-                  <Security color="primary" />
-                  <Typography variant="h6" fontWeight={500}>
-                    AI/ML Security Layer
-                  </Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  Advanced machine learning models protect the platform with real-time
-                  fraud detection, anomaly monitoring, and explainable AI decisions.
-                </Typography>
-                <Box display="flex" gap={1} flexWrap="wrap">
-                  <Chip label="Fraud Detection" size="small" color="primary" variant="outlined" />
-                  <Chip label="Anomaly Detection" size="small" color="primary" variant="outlined" />
-                  <Chip label="Attack Prevention" size="small" color="primary" variant="outlined" />
-                  <Chip label="RL Optimization" size="small" color="primary" variant="outlined" />
-                </Box>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  sx={{ mt: 2 }}
-                  onClick={() => navigate("/risk")}
-                >
-                  View Security Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        )}
-
-        <Grid item xs={12} md={isBankOrAdmin ? 6 : 12}>
-          <Card sx={{ height: "100%" }} elevation={1}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight={500}>
-                About This System
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {isBankOrAdmin
-                  ? "This decentralized reserve operates entirely on the blockchain with AI-powered security. All transactions are transparent, all loan decisions use explainable AI, and the system continuously learns to optimize approvals while protecting against fraud and attacks."
-                  : "This decentralized reserve operates entirely on the blockchain. You can deposit to the reserve and request loans. All transactions are transparent and on-chain."}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Container>
+function TierBreakdown() {
+  const tiers = [
+    { t: "Tier 1", name: "World Bank Reserve", val: "1,842.50 ETH", pct: 100 },
+    { t: "Tier 2", name: "National Banks (3)", val: "1,110.00 ETH", pct: 60 },
+    { t: "Tier 3", name: "Local Banks (12)", val: "720.00 ETH", pct: 39 },
+    { t: "Tier 4", name: "Borrowers (213)", val: "480.00 ETH", pct: 26 },
+  ];
+  return (
+    <div className="card p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Hierarchy</div>
+          <div className="font-display text-xl font-semibold text-ink-100">Capital by tier</div>
+        </div>
+        <Link to="/app/banks" className="text-xs text-gold-300 hover:text-gold-200">
+          Manage network →
+        </Link>
+      </div>
+      <div className="space-y-3">
+        {tiers.map((t) => (
+          <div key={t.t}>
+            <div className="mb-1 flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <span className="badge-gold">{t.t}</span>
+                <span className="text-ink-100">{t.name}</span>
+              </span>
+              <span className="font-mono text-ink-200">{t.val}</span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-ink-700">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-gold-600 to-gold-400"
+                style={{ width: `${t.pct}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

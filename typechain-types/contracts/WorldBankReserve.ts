@@ -23,216 +23,242 @@ import type {
   TypedContractMethod,
 } from "../common";
 
-export declare namespace WorldBankReserve {
-  export type LoanStruct = {
-    id: BigNumberish;
-    borrower: AddressLike;
-    amount: BigNumberish;
-    purpose: string;
-    status: BigNumberish;
-    requestedAt: BigNumberish;
-    approvedAt: BigNumberish;
-  };
-
-  export type LoanStructOutput = [
-    id: bigint,
-    borrower: string,
-    amount: bigint,
-    purpose: string,
-    status: bigint,
-    requestedAt: bigint,
-    approvedAt: bigint
-  ] & {
-    id: bigint;
-    borrower: string;
-    amount: bigint;
-    purpose: string;
-    status: bigint;
-    requestedAt: bigint;
-    approvedAt: bigint;
-  };
-}
-
 export interface WorldBankReserveInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "approveLoan"
-      | "depositToReserve"
+      | "DEFAULT_ADMIN_ROLE"
+      | "GOVERNOR_ROLE"
+      | "NATIONAL_BANK_ROLE"
+      | "allocate"
+      | "deposit"
       | "emergencyWithdraw"
-      | "getLoan"
-      | "getPendingLoans"
-      | "getStats"
-      | "getTotalReserve"
-      | "getUserDeposits"
-      | "getUserLoans"
-      | "loanCounter"
-      | "loans"
-      | "owner"
+      | "getRoleAdmin"
+      | "grantRole"
+      | "hasRole"
+      | "lendingAprBps"
+      | "listNationalBanks"
+      | "nationalBanks"
       | "pause"
       | "paused"
-      | "rejectLoan"
-      | "renounceOwnership"
-      | "requestLoan"
-      | "totalReserve"
-      | "transferOwnership"
+      | "recordRepayment"
+      | "registerNationalBank"
+      | "renounceRole"
+      | "reserveBalance"
+      | "revokeNationalBank"
+      | "revokeRole"
+      | "setLendingApr"
+      | "supportsInterface"
+      | "systemStats"
+      | "totalAllocated"
+      | "totalDeposits"
+      | "totalRepaid"
       | "unpause"
-      | "userDeposits"
-      | "userLoans"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
-      | "LoanApproved"
-      | "LoanRejected"
-      | "LoanRequested"
-      | "OwnershipTransferred"
-      | "ReserveDeposited"
+      | "CapitalAllocated"
+      | "DepositReceived"
+      | "EmergencyWithdrawal"
+      | "LendingAprUpdated"
+      | "NationalBankRegistered"
+      | "NationalBankRevoked"
+      | "Paused"
+      | "RepaymentRecorded"
+      | "RoleAdminChanged"
+      | "RoleGranted"
+      | "RoleRevoked"
+      | "Unpaused"
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "approveLoan",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "depositToReserve",
+    functionFragment: "DEFAULT_ADMIN_ROLE",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "GOVERNOR_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "NATIONAL_BANK_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "allocate",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "deposit", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "emergencyWithdraw",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoleAdmin",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "grantRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hasRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lendingAprBps",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getLoan",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getPendingLoans",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "getStats", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "getTotalReserve",
+    functionFragment: "listNationalBanks",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getUserDeposits",
+    functionFragment: "nationalBanks",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(
-    functionFragment: "getUserLoans",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "loanCounter",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "loans", values: [BigNumberish]): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "rejectLoan",
+    functionFragment: "recordRepayment",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
+    functionFragment: "registerNationalBank",
+    values: [AddressLike, string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "renounceRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "reserveBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "requestLoan",
-    values: [BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "totalReserve",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
+    functionFragment: "revokeNationalBank",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setLendingApr",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "systemStats",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalAllocated",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalDeposits",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalRepaid",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "userDeposits",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "userLoans",
-    values: [AddressLike, BigNumberish]
-  ): string;
 
   decodeFunctionResult(
-    functionFragment: "approveLoan",
+    functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "depositToReserve",
+    functionFragment: "GOVERNOR_ROLE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "NATIONAL_BANK_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "allocate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "emergencyWithdraw",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getLoan", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getPendingLoans",
+    functionFragment: "getRoleAdmin",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getStats", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getTotalReserve",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getUserDeposits",
+    functionFragment: "lendingAprBps",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getUserLoans",
+    functionFragment: "listNationalBanks",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "loanCounter",
+    functionFragment: "nationalBanks",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "loans", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "rejectLoan", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "recordRepayment",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "requestLoan",
+    functionFragment: "registerNationalBank",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "totalReserve",
+    functionFragment: "renounceRole",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
+    functionFragment: "reserveBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "revokeNationalBank",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setLendingApr",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "systemStats",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalAllocated",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalDeposits",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalRepaid",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "userDeposits",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "userLoans", data: BytesLike): Result;
 }
 
-export namespace LoanApprovedEvent {
-  export type InputTuple = [
-    loanId: BigNumberish,
-    borrower: AddressLike,
-    amount: BigNumberish
-  ];
-  export type OutputTuple = [loanId: bigint, borrower: string, amount: bigint];
+export namespace CapitalAllocatedEvent {
+  export type InputTuple = [bank: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [bank: string, amount: bigint];
   export interface OutputObject {
-    loanId: bigint;
-    borrower: string;
+    bank: string;
     amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -241,12 +267,12 @@ export namespace LoanApprovedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace LoanRejectedEvent {
-  export type InputTuple = [loanId: BigNumberish, borrower: AddressLike];
-  export type OutputTuple = [loanId: bigint, borrower: string];
+export namespace DepositReceivedEvent {
+  export type InputTuple = [from: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [from: string, amount: bigint];
   export interface OutputObject {
-    loanId: bigint;
-    borrower: string;
+    from: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -254,24 +280,107 @@ export namespace LoanRejectedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace LoanRequestedEvent {
+export namespace EmergencyWithdrawalEvent {
+  export type InputTuple = [to: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [to: string, amount: bigint];
+  export interface OutputObject {
+    to: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace LendingAprUpdatedEvent {
+  export type InputTuple = [oldBps: BigNumberish, newBps: BigNumberish];
+  export type OutputTuple = [oldBps: bigint, newBps: bigint];
+  export interface OutputObject {
+    oldBps: bigint;
+    newBps: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace NationalBankRegisteredEvent {
   export type InputTuple = [
-    loanId: BigNumberish,
-    borrower: AddressLike,
-    amount: BigNumberish,
-    purpose: string
+    bank: AddressLike,
+    name: string,
+    jurisdiction: string
+  ];
+  export type OutputTuple = [bank: string, name: string, jurisdiction: string];
+  export interface OutputObject {
+    bank: string;
+    name: string;
+    jurisdiction: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace NationalBankRevokedEvent {
+  export type InputTuple = [bank: AddressLike];
+  export type OutputTuple = [bank: string];
+  export interface OutputObject {
+    bank: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RepaymentRecordedEvent {
+  export type InputTuple = [
+    bank: AddressLike,
+    principal: BigNumberish,
+    interest: BigNumberish
+  ];
+  export type OutputTuple = [bank: string, principal: bigint, interest: bigint];
+  export interface OutputObject {
+    bank: string;
+    principal: bigint;
+    interest: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleAdminChangedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    previousAdminRole: BytesLike,
+    newAdminRole: BytesLike
   ];
   export type OutputTuple = [
-    loanId: bigint,
-    borrower: string,
-    amount: bigint,
-    purpose: string
+    role: string,
+    previousAdminRole: string,
+    newAdminRole: string
   ];
   export interface OutputObject {
-    loanId: bigint;
-    borrower: string;
-    amount: bigint;
-    purpose: string;
+    role: string;
+    previousAdminRole: string;
+    newAdminRole: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -279,34 +388,47 @@ export namespace LoanRequestedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace OwnershipTransferredEvent {
-  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
-  export type OutputTuple = [previousOwner: string, newOwner: string];
-  export interface OutputObject {
-    previousOwner: string;
-    newOwner: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace ReserveDepositedEvent {
+export namespace RoleGrantedEvent {
   export type InputTuple = [
-    depositor: AddressLike,
-    amount: BigNumberish,
-    timestamp: BigNumberish
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
   ];
-  export type OutputTuple = [
-    depositor: string,
-    amount: bigint,
-    timestamp: bigint
-  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
   export interface OutputObject {
-    depositor: string;
-    amount: bigint;
-    timestamp: bigint;
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleRevokedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace UnpausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -357,168 +479,198 @@ export interface WorldBankReserve extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  approveLoan: TypedContractMethod<
-    [loanId: BigNumberish],
+  DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
+
+  GOVERNOR_ROLE: TypedContractMethod<[], [string], "view">;
+
+  NATIONAL_BANK_ROLE: TypedContractMethod<[], [string], "view">;
+
+  allocate: TypedContractMethod<
+    [bank: AddressLike, amount: BigNumberish],
     [void],
     "nonpayable"
   >;
 
-  depositToReserve: TypedContractMethod<[], [void], "payable">;
+  deposit: TypedContractMethod<[], [void], "payable">;
 
-  emergencyWithdraw: TypedContractMethod<[], [void], "nonpayable">;
+  emergencyWithdraw: TypedContractMethod<
+    [to: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
-  getLoan: TypedContractMethod<
-    [loanId: BigNumberish],
-    [WorldBankReserve.LoanStructOutput],
+  getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
+
+  grantRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  hasRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
     "view"
   >;
 
-  getPendingLoans: TypedContractMethod<
-    [],
-    [WorldBankReserve.LoanStructOutput[]],
-    "view"
-  >;
+  lendingAprBps: TypedContractMethod<[], [bigint], "view">;
 
-  getStats: TypedContractMethod<
-    [],
+  listNationalBanks: TypedContractMethod<[], [string[]], "view">;
+
+  nationalBanks: TypedContractMethod<
+    [arg0: AddressLike],
     [
-      [bigint, bigint, bigint, bigint] & {
-        _totalReserve: bigint;
-        _totalLoans: bigint;
-        _pendingLoans: bigint;
-        _approvedLoans: bigint;
+      [boolean, string, string, bigint, bigint, bigint] & {
+        registered: boolean;
+        name: string;
+        jurisdiction: string;
+        allocated: bigint;
+        outstanding: bigint;
+        repaid: bigint;
       }
     ],
     "view"
   >;
-
-  getTotalReserve: TypedContractMethod<[], [bigint], "view">;
-
-  getUserDeposits: TypedContractMethod<[user: AddressLike], [bigint], "view">;
-
-  getUserLoans: TypedContractMethod<[user: AddressLike], [bigint[]], "view">;
-
-  loanCounter: TypedContractMethod<[], [bigint], "view">;
-
-  loans: TypedContractMethod<
-    [arg0: BigNumberish],
-    [
-      [bigint, string, bigint, string, bigint, bigint, bigint] & {
-        id: bigint;
-        borrower: string;
-        amount: bigint;
-        purpose: string;
-        status: bigint;
-        requestedAt: bigint;
-        approvedAt: bigint;
-      }
-    ],
-    "view"
-  >;
-
-  owner: TypedContractMethod<[], [string], "view">;
 
   pause: TypedContractMethod<[], [void], "nonpayable">;
 
   paused: TypedContractMethod<[], [boolean], "view">;
 
-  rejectLoan: TypedContractMethod<[loanId: BigNumberish], [void], "nonpayable">;
+  recordRepayment: TypedContractMethod<
+    [principal: BigNumberish],
+    [void],
+    "payable"
+  >;
 
-  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
-
-  requestLoan: TypedContractMethod<
-    [amount: BigNumberish, purpose: string],
+  registerNationalBank: TypedContractMethod<
+    [bank: AddressLike, name: string, jurisdiction: string],
     [void],
     "nonpayable"
   >;
 
-  totalReserve: TypedContractMethod<[], [bigint], "view">;
-
-  transferOwnership: TypedContractMethod<
-    [newOwner: AddressLike],
+  renounceRole: TypedContractMethod<
+    [role: BytesLike, callerConfirmation: AddressLike],
     [void],
     "nonpayable"
   >;
 
-  unpause: TypedContractMethod<[], [void], "nonpayable">;
+  reserveBalance: TypedContractMethod<[], [bigint], "view">;
 
-  userDeposits: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  revokeNationalBank: TypedContractMethod<
+    [bank: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
-  userLoans: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [bigint],
+  revokeRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  setLendingApr: TypedContractMethod<
+    [newBps: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  supportsInterface: TypedContractMethod<
+    [interfaceId: BytesLike],
+    [boolean],
     "view"
   >;
+
+  systemStats: TypedContractMethod<
+    [],
+    [
+      [bigint, bigint, bigint, bigint, bigint] & {
+        balance: bigint;
+        deposits: bigint;
+        allocated: bigint;
+        repaid: bigint;
+        bankCount: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  totalAllocated: TypedContractMethod<[], [bigint], "view">;
+
+  totalDeposits: TypedContractMethod<[], [bigint], "view">;
+
+  totalRepaid: TypedContractMethod<[], [bigint], "view">;
+
+  unpause: TypedContractMethod<[], [void], "nonpayable">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "approveLoan"
-  ): TypedContractMethod<[loanId: BigNumberish], [void], "nonpayable">;
+    nameOrSignature: "DEFAULT_ADMIN_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "depositToReserve"
+    nameOrSignature: "GOVERNOR_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "NATIONAL_BANK_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "allocate"
+  ): TypedContractMethod<
+    [bank: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "deposit"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "emergencyWithdraw"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "getLoan"
   ): TypedContractMethod<
-    [loanId: BigNumberish],
-    [WorldBankReserve.LoanStructOutput],
+    [to: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "getRoleAdmin"
+  ): TypedContractMethod<[role: BytesLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "grantRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "hasRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
     "view"
   >;
   getFunction(
-    nameOrSignature: "getPendingLoans"
-  ): TypedContractMethod<[], [WorldBankReserve.LoanStructOutput[]], "view">;
+    nameOrSignature: "lendingAprBps"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "getStats"
+    nameOrSignature: "listNationalBanks"
+  ): TypedContractMethod<[], [string[]], "view">;
+  getFunction(
+    nameOrSignature: "nationalBanks"
   ): TypedContractMethod<
-    [],
+    [arg0: AddressLike],
     [
-      [bigint, bigint, bigint, bigint] & {
-        _totalReserve: bigint;
-        _totalLoans: bigint;
-        _pendingLoans: bigint;
-        _approvedLoans: bigint;
+      [boolean, string, string, bigint, bigint, bigint] & {
+        registered: boolean;
+        name: string;
+        jurisdiction: string;
+        allocated: bigint;
+        outstanding: bigint;
+        repaid: bigint;
       }
     ],
     "view"
   >;
-  getFunction(
-    nameOrSignature: "getTotalReserve"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getUserDeposits"
-  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getUserLoans"
-  ): TypedContractMethod<[user: AddressLike], [bigint[]], "view">;
-  getFunction(
-    nameOrSignature: "loanCounter"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "loans"
-  ): TypedContractMethod<
-    [arg0: BigNumberish],
-    [
-      [bigint, string, bigint, string, bigint, bigint, bigint] & {
-        id: bigint;
-        borrower: string;
-        amount: bigint;
-        purpose: string;
-        status: bigint;
-        requestedAt: bigint;
-        approvedAt: bigint;
-      }
-    ],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "owner"
-  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "pause"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -526,128 +678,285 @@ export interface WorldBankReserve extends BaseContract {
     nameOrSignature: "paused"
   ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
-    nameOrSignature: "rejectLoan"
-  ): TypedContractMethod<[loanId: BigNumberish], [void], "nonpayable">;
+    nameOrSignature: "recordRepayment"
+  ): TypedContractMethod<[principal: BigNumberish], [void], "payable">;
   getFunction(
-    nameOrSignature: "renounceOwnership"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "requestLoan"
+    nameOrSignature: "registerNationalBank"
   ): TypedContractMethod<
-    [amount: BigNumberish, purpose: string],
+    [bank: AddressLike, name: string, jurisdiction: string],
     [void],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "totalReserve"
+    nameOrSignature: "renounceRole"
+  ): TypedContractMethod<
+    [role: BytesLike, callerConfirmation: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "reserveBalance"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "transferOwnership"
-  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    nameOrSignature: "revokeNationalBank"
+  ): TypedContractMethod<[bank: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "revokeRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setLendingApr"
+  ): TypedContractMethod<[newBps: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "supportsInterface"
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "systemStats"
+  ): TypedContractMethod<
+    [],
+    [
+      [bigint, bigint, bigint, bigint, bigint] & {
+        balance: bigint;
+        deposits: bigint;
+        allocated: bigint;
+        repaid: bigint;
+        bankCount: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "totalAllocated"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "totalDeposits"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "totalRepaid"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "unpause"
   ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "userDeposits"
-  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "userLoans"
-  ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [bigint],
-    "view"
-  >;
 
   getEvent(
-    key: "LoanApproved"
+    key: "CapitalAllocated"
   ): TypedContractEvent<
-    LoanApprovedEvent.InputTuple,
-    LoanApprovedEvent.OutputTuple,
-    LoanApprovedEvent.OutputObject
+    CapitalAllocatedEvent.InputTuple,
+    CapitalAllocatedEvent.OutputTuple,
+    CapitalAllocatedEvent.OutputObject
   >;
   getEvent(
-    key: "LoanRejected"
+    key: "DepositReceived"
   ): TypedContractEvent<
-    LoanRejectedEvent.InputTuple,
-    LoanRejectedEvent.OutputTuple,
-    LoanRejectedEvent.OutputObject
+    DepositReceivedEvent.InputTuple,
+    DepositReceivedEvent.OutputTuple,
+    DepositReceivedEvent.OutputObject
   >;
   getEvent(
-    key: "LoanRequested"
+    key: "EmergencyWithdrawal"
   ): TypedContractEvent<
-    LoanRequestedEvent.InputTuple,
-    LoanRequestedEvent.OutputTuple,
-    LoanRequestedEvent.OutputObject
+    EmergencyWithdrawalEvent.InputTuple,
+    EmergencyWithdrawalEvent.OutputTuple,
+    EmergencyWithdrawalEvent.OutputObject
   >;
   getEvent(
-    key: "OwnershipTransferred"
+    key: "LendingAprUpdated"
   ): TypedContractEvent<
-    OwnershipTransferredEvent.InputTuple,
-    OwnershipTransferredEvent.OutputTuple,
-    OwnershipTransferredEvent.OutputObject
+    LendingAprUpdatedEvent.InputTuple,
+    LendingAprUpdatedEvent.OutputTuple,
+    LendingAprUpdatedEvent.OutputObject
   >;
   getEvent(
-    key: "ReserveDeposited"
+    key: "NationalBankRegistered"
   ): TypedContractEvent<
-    ReserveDepositedEvent.InputTuple,
-    ReserveDepositedEvent.OutputTuple,
-    ReserveDepositedEvent.OutputObject
+    NationalBankRegisteredEvent.InputTuple,
+    NationalBankRegisteredEvent.OutputTuple,
+    NationalBankRegisteredEvent.OutputObject
+  >;
+  getEvent(
+    key: "NationalBankRevoked"
+  ): TypedContractEvent<
+    NationalBankRevokedEvent.InputTuple,
+    NationalBankRevokedEvent.OutputTuple,
+    NationalBankRevokedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Paused"
+  ): TypedContractEvent<
+    PausedEvent.InputTuple,
+    PausedEvent.OutputTuple,
+    PausedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RepaymentRecorded"
+  ): TypedContractEvent<
+    RepaymentRecordedEvent.InputTuple,
+    RepaymentRecordedEvent.OutputTuple,
+    RepaymentRecordedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleAdminChanged"
+  ): TypedContractEvent<
+    RoleAdminChangedEvent.InputTuple,
+    RoleAdminChangedEvent.OutputTuple,
+    RoleAdminChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleGranted"
+  ): TypedContractEvent<
+    RoleGrantedEvent.InputTuple,
+    RoleGrantedEvent.OutputTuple,
+    RoleGrantedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleRevoked"
+  ): TypedContractEvent<
+    RoleRevokedEvent.InputTuple,
+    RoleRevokedEvent.OutputTuple,
+    RoleRevokedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Unpaused"
+  ): TypedContractEvent<
+    UnpausedEvent.InputTuple,
+    UnpausedEvent.OutputTuple,
+    UnpausedEvent.OutputObject
   >;
 
   filters: {
-    "LoanApproved(uint256,address,uint256)": TypedContractEvent<
-      LoanApprovedEvent.InputTuple,
-      LoanApprovedEvent.OutputTuple,
-      LoanApprovedEvent.OutputObject
+    "CapitalAllocated(address,uint256)": TypedContractEvent<
+      CapitalAllocatedEvent.InputTuple,
+      CapitalAllocatedEvent.OutputTuple,
+      CapitalAllocatedEvent.OutputObject
     >;
-    LoanApproved: TypedContractEvent<
-      LoanApprovedEvent.InputTuple,
-      LoanApprovedEvent.OutputTuple,
-      LoanApprovedEvent.OutputObject
-    >;
-
-    "LoanRejected(uint256,address)": TypedContractEvent<
-      LoanRejectedEvent.InputTuple,
-      LoanRejectedEvent.OutputTuple,
-      LoanRejectedEvent.OutputObject
-    >;
-    LoanRejected: TypedContractEvent<
-      LoanRejectedEvent.InputTuple,
-      LoanRejectedEvent.OutputTuple,
-      LoanRejectedEvent.OutputObject
+    CapitalAllocated: TypedContractEvent<
+      CapitalAllocatedEvent.InputTuple,
+      CapitalAllocatedEvent.OutputTuple,
+      CapitalAllocatedEvent.OutputObject
     >;
 
-    "LoanRequested(uint256,address,uint256,string)": TypedContractEvent<
-      LoanRequestedEvent.InputTuple,
-      LoanRequestedEvent.OutputTuple,
-      LoanRequestedEvent.OutputObject
+    "DepositReceived(address,uint256)": TypedContractEvent<
+      DepositReceivedEvent.InputTuple,
+      DepositReceivedEvent.OutputTuple,
+      DepositReceivedEvent.OutputObject
     >;
-    LoanRequested: TypedContractEvent<
-      LoanRequestedEvent.InputTuple,
-      LoanRequestedEvent.OutputTuple,
-      LoanRequestedEvent.OutputObject
-    >;
-
-    "OwnershipTransferred(address,address)": TypedContractEvent<
-      OwnershipTransferredEvent.InputTuple,
-      OwnershipTransferredEvent.OutputTuple,
-      OwnershipTransferredEvent.OutputObject
-    >;
-    OwnershipTransferred: TypedContractEvent<
-      OwnershipTransferredEvent.InputTuple,
-      OwnershipTransferredEvent.OutputTuple,
-      OwnershipTransferredEvent.OutputObject
+    DepositReceived: TypedContractEvent<
+      DepositReceivedEvent.InputTuple,
+      DepositReceivedEvent.OutputTuple,
+      DepositReceivedEvent.OutputObject
     >;
 
-    "ReserveDeposited(address,uint256,uint256)": TypedContractEvent<
-      ReserveDepositedEvent.InputTuple,
-      ReserveDepositedEvent.OutputTuple,
-      ReserveDepositedEvent.OutputObject
+    "EmergencyWithdrawal(address,uint256)": TypedContractEvent<
+      EmergencyWithdrawalEvent.InputTuple,
+      EmergencyWithdrawalEvent.OutputTuple,
+      EmergencyWithdrawalEvent.OutputObject
     >;
-    ReserveDeposited: TypedContractEvent<
-      ReserveDepositedEvent.InputTuple,
-      ReserveDepositedEvent.OutputTuple,
-      ReserveDepositedEvent.OutputObject
+    EmergencyWithdrawal: TypedContractEvent<
+      EmergencyWithdrawalEvent.InputTuple,
+      EmergencyWithdrawalEvent.OutputTuple,
+      EmergencyWithdrawalEvent.OutputObject
+    >;
+
+    "LendingAprUpdated(uint256,uint256)": TypedContractEvent<
+      LendingAprUpdatedEvent.InputTuple,
+      LendingAprUpdatedEvent.OutputTuple,
+      LendingAprUpdatedEvent.OutputObject
+    >;
+    LendingAprUpdated: TypedContractEvent<
+      LendingAprUpdatedEvent.InputTuple,
+      LendingAprUpdatedEvent.OutputTuple,
+      LendingAprUpdatedEvent.OutputObject
+    >;
+
+    "NationalBankRegistered(address,string,string)": TypedContractEvent<
+      NationalBankRegisteredEvent.InputTuple,
+      NationalBankRegisteredEvent.OutputTuple,
+      NationalBankRegisteredEvent.OutputObject
+    >;
+    NationalBankRegistered: TypedContractEvent<
+      NationalBankRegisteredEvent.InputTuple,
+      NationalBankRegisteredEvent.OutputTuple,
+      NationalBankRegisteredEvent.OutputObject
+    >;
+
+    "NationalBankRevoked(address)": TypedContractEvent<
+      NationalBankRevokedEvent.InputTuple,
+      NationalBankRevokedEvent.OutputTuple,
+      NationalBankRevokedEvent.OutputObject
+    >;
+    NationalBankRevoked: TypedContractEvent<
+      NationalBankRevokedEvent.InputTuple,
+      NationalBankRevokedEvent.OutputTuple,
+      NationalBankRevokedEvent.OutputObject
+    >;
+
+    "Paused(address)": TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
+    >;
+    Paused: TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
+    >;
+
+    "RepaymentRecorded(address,uint256,uint256)": TypedContractEvent<
+      RepaymentRecordedEvent.InputTuple,
+      RepaymentRecordedEvent.OutputTuple,
+      RepaymentRecordedEvent.OutputObject
+    >;
+    RepaymentRecorded: TypedContractEvent<
+      RepaymentRecordedEvent.InputTuple,
+      RepaymentRecordedEvent.OutputTuple,
+      RepaymentRecordedEvent.OutputObject
+    >;
+
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+    RoleAdminChanged: TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+
+    "RoleGranted(bytes32,address,address)": TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+    RoleGranted: TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+
+    "RoleRevoked(bytes32,address,address)": TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+    RoleRevoked: TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+
+    "Unpaused(address)": TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
+    Unpaused: TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
     >;
   };
 }

@@ -12,6 +12,8 @@ import { Profile } from "@/pages/Profile";
 import { RiskConsole } from "@/pages/RiskConsole";
 import { Admin } from "@/pages/Admin";
 import { Banks } from "@/pages/Banks";
+import { Approvals } from "@/pages/Approvals";
+import { AIAssistant } from "@/pages/AIAssistant";
 import { NotFound } from "@/pages/NotFound";
 
 export function App() {
@@ -29,6 +31,8 @@ export function App() {
         <Route path="/app/installments" element={<Installments />} />
         <Route path="/app/market" element={<Market />} />
         <Route path="/app/chat" element={<Chat />} />
+        <Route path="/app/assistant" element={<AIAssistant />} />
+        <Route path="/app/approvals" element={<Approvals />} />
         <Route path="/app/profile" element={<Profile />} />
         <Route path="/app/risk" element={<RiskConsole />} />
         <Route path="/app/admin" element={<Admin />} />

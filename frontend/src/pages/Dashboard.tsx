@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAccount } from "wagmi";
 import {
@@ -21,6 +22,31 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  api,
+  BankDTO,
+  LoanDTO,
+  ProfileResponse,
+  TransactionDTO,
+} from "@/lib/api";
+import { useSession } from "@/lib/store";
+import { MarketDataChart } from "@/components/market/MarketDataChart";
+
+interface BankStats {
+  totalDeposits: number;
+  totalAllocated: number;
+  totalLent: number;
+  totalRepaid: number;
+  activeLoans: number;
+  borrowerCount: number;
+  tiers: { world: number; national: number; local: number };
+}
+
+interface BanksResponse {
+  worldBank: BankDTO | null;
+  nationalBanks: BankDTO[];
+  localBanks: BankDTO[];
+}
 
 const reserveSeries = [
   { m: "Oct", reserve: 1200, allocated: 800 },
@@ -33,48 +59,97 @@ const reserveSeries = [
 
 export function Dashboard() {
   const { address } = useAccount();
+  const user = useSession((s) => s.user);
+
+  const [stats, setStats] = useState<BankStats | null>(null);
+  const [banks, setBanks] = useState<BanksResponse | null>(null);
+  const [profile, setProfile] = useState<ProfileResponse | null>(null);
+  const [myLoans, setMyLoans] = useState<LoanDTO[]>([]);
+
+  async function load() {
+    const [s, b, p, loans] = await Promise.all([
+      api.get<BankStats>("/api/banks/stats").catch(() => null),
+      api.get<BanksResponse>("/api/banks").catch(() => null),
+      api.get<ProfileResponse>("/api/profile").catch(() => null),
+      user?.role === "BORROWER"
+        ? api
+            .get<{ loans: LoanDTO[] }>("/api/loans/mine")
+            .then((r) => r.loans)
+            .catch(() => [])
+        : Promise.resolve([] as LoanDTO[]),
+    ]);
+    setStats(s);
+    setBanks(b);
+    setProfile(p);
+    setMyLoans(loans);
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  const world = banks?.worldBank;
+  const reserve = world?.reserve ?? 0;
+  const allocated = world?.totalAllocated ?? 0;
+  const utilizationPct = stats
+    ? Math.round(
+        (stats.totalLent / Math.max(1, stats.totalLent + reserve)) * 100,
+      )
+    : 0;
+
+  const recentTx = profile?.transactions ?? [];
 
   return (
     <div className="space-y-8">
       <SectionHeader
         eyebrow="Overview"
-        title={<>Welcome back, <span className="gold-text">{shortAddress(address)}</span></>}
+        title={
+          <>
+            Welcome back,{" "}
+            <span className="gold-text">
+              {user?.displayName ?? shortAddress(address)}
+            </span>
+          </>
+        }
         description="Your portfolio, reserve position, and loan lifecycle — all surfaced in one glance."
         right={
-          <Link to="/app/loans/new" className="btn-primary">
-            Request Loan <ArrowUpRight className="h-4 w-4" />
-          </Link>
+          user?.role === "BORROWER" ? (
+            <Link to="/app/loans/new" className="btn-primary">
+              Request Loan <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          ) : (
+            <Link to="/app/approvals" className="btn-primary">
+              Open queue <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          )
         }
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
           label="Reserve Balance"
-          value="1,842.50 ETH"
+          value={`${reserve.toFixed(2)} ETH`}
           icon={Landmark}
-          delta={{ value: "5.8%", positive: true }}
-          hint="vs. last 30 days"
+          hint={world ? world.name : "World reserve"}
         />
         <Stat
           label="Allocated Capital"
-          value="1,240.00 ETH"
+          value={`${allocated.toFixed(2)} ETH`}
           icon={Network}
-          delta={{ value: "3.1%", positive: true }}
-          hint="67% utilization"
+          hint={`${stats?.tiers.national ?? 0} national · ${stats?.tiers.local ?? 0} local`}
         />
         <Stat
           label="Active Loans"
-          value="87"
+          value={String(stats?.activeLoans ?? 0)}
           icon={Coins}
-          delta={{ value: "12", positive: true }}
-          hint="new this month"
+          hint={`${stats?.borrowerCount ?? 0} borrowers onboarded`}
         />
         <Stat
-          label="Repaid (90d)"
-          value="298.35 ETH"
+          label="Lifetime Repaid"
+          value={`${(stats?.totalRepaid ?? 0).toFixed(2)} ETH`}
           icon={Receipt}
-          delta={{ value: "1.2%", positive: false }}
-          hint="default rate"
+          hint={`${utilizationPct}% utilization`}
         />
       </div>
 
@@ -82,7 +157,9 @@ export function Dashboard() {
         <div className="card p-6 lg:col-span-2">
           <div className="mb-4 flex items-end justify-between">
             <div>
-              <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Reserve Flow</div>
+              <div className="text-xs uppercase tracking-[0.22em] text-ink-200">
+                Reserve Flow
+              </div>
               <div className="font-display text-xl font-semibold text-ink-100">
                 Capital Movement — 6-month window
               </div>
@@ -147,7 +224,7 @@ export function Dashboard() {
               { label: "Reentrancy guard", ok: true },
               { label: "Pausable breaker", ok: true },
               { label: "Role-based access", ok: true },
-              { label: "Reserve ratio ≥ 25%", ok: true },
+              { label: "Reserve ratio ≥ 25%", ok: reserve > 0 },
               { label: "Upstream risk ping", ok: true },
             ].map((x) => (
               <li
@@ -163,39 +240,82 @@ export function Dashboard() {
           </ul>
           <div className="divider my-4" />
           <p className="text-xs text-ink-200">
-            All invariants checked at block height <span className="font-mono text-gold-300">#5,281,942</span>.
+            {user?.role === "BORROWER" && profile?.limits
+              ? `Your 6-month remaining limit: ${profile.limits.sixMonth.remaining.toFixed(
+                  2,
+                )} ETH`
+              : "All invariants checked at current snapshot."}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <RecentActivity />
-        <TierBreakdown />
+        <RecentActivity tx={recentTx} loans={myLoans} />
+        <TierBreakdown banks={banks} stats={stats} />
       </div>
+
+      <MarketDataChart initialCoin="ethereum" initialDays={30} compact />
     </div>
   );
 }
 
-function RecentActivity() {
-  const events = [
-    { at: "2m ago", type: "Loan Disbursed", who: "0x7Af…921", amount: "+5.00 ETH", tag: "gold" },
-    { at: "18m ago", type: "Installment Paid", who: "0x31c…0aa", amount: "-0.42 ETH", tag: "green" },
-    { at: "42m ago", type: "Capital Allocated", who: "NB · Nigeria", amount: "+75.00 ETH", tag: "gold" },
-    { at: "1h ago", type: "Loan Requested", who: "0xD8b…e11", amount: "12.00 ETH", tag: "blue" },
-    { at: "3h ago", type: "Repayment Recorded", who: "LB · Dhaka", amount: "-4.50 ETH", tag: "green" },
-  ];
+function RecentActivity({
+  tx,
+  loans,
+}: {
+  tx: TransactionDTO[];
+  loans: LoanDTO[];
+}) {
+  const events = useMemo(() => {
+    const rows: Array<{ at: string; type: string; who: string; amount: string; tag: string }> = [];
+    for (const t of tx.slice(0, 5)) {
+      rows.push({
+        at: new Date(t.at).toLocaleString(),
+        type: t.type.replace(/_/g, " "),
+        who: t.loanId ? `Loan ${t.loanId.split("_").pop()?.slice(0, 6)}` : "ledger",
+        amount:
+          (t.type === "INSTALLMENT_PAID" || t.type === "LOAN_REPAID" ? "-" : "+") +
+          t.amount.toFixed(4) +
+          " ETH",
+        tag:
+          t.type === "INSTALLMENT_PAID" || t.type === "LOAN_REPAID" ? "green" : "gold",
+      });
+    }
+    for (const l of loans.slice(0, 3)) {
+      rows.push({
+        at: new Date(l.createdAt).toLocaleString(),
+        type: `Loan ${l.status}`,
+        who: l.purpose.slice(0, 40),
+        amount: `${l.amount.toFixed(2)} ETH`,
+        tag: l.status === "REJECTED" || l.status === "DEFAULTED" ? "red" : "blue",
+      });
+    }
+    return rows
+      .sort((a, b) => (a.at < b.at ? 1 : -1))
+      .slice(0, 6);
+  }, [tx, loans]);
+
   return (
     <div className="card p-6">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Recent Activity</div>
-          <div className="font-display text-xl font-semibold text-ink-100">Ledger events</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-ink-200">
+            Recent Activity
+          </div>
+          <div className="font-display text-xl font-semibold text-ink-100">
+            Ledger events
+          </div>
         </div>
         <Link to="/app/loans" className="text-xs text-gold-300 hover:text-gold-200">
           View all →
         </Link>
       </div>
       <div className="space-y-2">
+        {events.length === 0 ? (
+          <div className="py-6 text-center text-xs text-ink-200">
+            Activity will appear here as you lend, borrow, or repay.
+          </div>
+        ) : null}
         {events.map((e, i) => (
           <div
             key={i}
@@ -207,7 +327,17 @@ function RecentActivity() {
                 {e.who} · {e.at}
               </div>
             </div>
-            <span className={`badge${e.tag === "gold" ? "-gold" : e.tag === "green" ? "-green" : "-blue"}`}>
+            <span
+              className={`badge${
+                e.tag === "gold"
+                  ? "-gold"
+                  : e.tag === "green"
+                    ? "-green"
+                    : e.tag === "red"
+                      ? "-red"
+                      : "-blue"
+              }`}
+            >
               {e.amount}
             </span>
           </div>
@@ -217,19 +347,62 @@ function RecentActivity() {
   );
 }
 
-function TierBreakdown() {
+function TierBreakdown({
+  banks,
+  stats,
+}: {
+  banks: BanksResponse | null;
+  stats: BankStats | null;
+}) {
+  const world = banks?.worldBank;
+  const nationalTotal =
+    banks?.nationalBanks.reduce((a, b) => a + b.reserve + b.totalLent, 0) ?? 0;
+  const localTotal =
+    banks?.localBanks.reduce((a, b) => a + b.reserve + b.totalLent, 0) ?? 0;
+  const borrowerTotal = stats?.totalLent ?? 0;
+
+  const max = Math.max(
+    1,
+    (world?.reserve ?? 0) + (world?.totalAllocated ?? 0),
+  );
+
   const tiers = [
-    { t: "Tier 1", name: "World Bank Reserve", val: "1,842.50 ETH", pct: 100 },
-    { t: "Tier 2", name: "National Banks (3)", val: "1,110.00 ETH", pct: 60 },
-    { t: "Tier 3", name: "Local Banks (12)", val: "720.00 ETH", pct: 39 },
-    { t: "Tier 4", name: "Borrowers (213)", val: "480.00 ETH", pct: 26 },
+    {
+      t: "Tier 1",
+      name: world ? world.name : "World Reserve",
+      val: `${((world?.reserve ?? 0) + (world?.totalAllocated ?? 0)).toFixed(2)} ETH`,
+      pct: 100,
+    },
+    {
+      t: "Tier 2",
+      name: `National Banks (${banks?.nationalBanks.length ?? 0})`,
+      val: `${nationalTotal.toFixed(2)} ETH`,
+      pct: Math.round((nationalTotal / max) * 100),
+    },
+    {
+      t: "Tier 3",
+      name: `Local Banks (${banks?.localBanks.length ?? 0})`,
+      val: `${localTotal.toFixed(2)} ETH`,
+      pct: Math.round((localTotal / max) * 100),
+    },
+    {
+      t: "Tier 4",
+      name: `Borrowers (${stats?.borrowerCount ?? 0})`,
+      val: `${borrowerTotal.toFixed(2)} ETH`,
+      pct: Math.round((borrowerTotal / max) * 100),
+    },
   ];
+
   return (
     <div className="card p-6">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Hierarchy</div>
-          <div className="font-display text-xl font-semibold text-ink-100">Capital by tier</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-ink-200">
+            Hierarchy
+          </div>
+          <div className="font-display text-xl font-semibold text-ink-100">
+            Capital by tier
+          </div>
         </div>
         <Link to="/app/banks" className="text-xs text-gold-300 hover:text-gold-200">
           Manage network →
@@ -248,7 +421,7 @@ function TierBreakdown() {
             <div className="h-1.5 overflow-hidden rounded-full bg-ink-700">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-gold-600 to-gold-400"
-                style={{ width: `${t.pct}%` }}
+                style={{ width: `${Math.min(100, t.pct)}%` }}
               />
             </div>
           </div>

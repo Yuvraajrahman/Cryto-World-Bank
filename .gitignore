@@ -38,5 +38,13 @@ deployments/
 prisma/*.db
 prisma/migrations/dev*
 
+# Backend persistence snapshots (prototype's JSON-file DB)
+backend/.data/
+**/.data/state.json
+
 # Temp
 *.tsbuildinfo
+
+# Documentation (archived / previous plans)
+Documentation/Previou\ plans/
+

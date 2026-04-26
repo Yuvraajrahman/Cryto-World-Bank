@@ -7,6 +7,29 @@ export interface AuthedRequest extends Request {
   user?: User;
 }
 
+export const optionalAuth: RequestHandler = (req, _res, next) => {
+  const header = req.headers.authorization ?? "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!token) {
+    next();
+    return;
+  }
+  try {
+    const payload = jwt.verify(token, config.jwtSecret) as {
+      sub: string;
+      wallet: string;
+      role: UserRole;
+    };
+    const user = findUserById(payload.sub);
+    if (user) {
+      (req as AuthedRequest).user = user;
+    }
+  } catch {
+    // ignore invalid tokens for optional auth
+  }
+  next();
+};
+
 export const requireAuth: RequestHandler = (req, res, next) => {
   const header = req.headers.authorization ?? "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";

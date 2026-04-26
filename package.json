@@ -15,7 +15,7 @@
     "backend:dev": "cd backend && npm run dev",
     "backend:build": "cd backend && npm run build",
     "ml:dev": "cd ml-service && uvicorn app.main:app --reload --port 8000",
-    "dev": "concurrently -n frontend,backend -c blue,green \"npm run frontend:dev\" \"npm run backend:dev\""
+    "dev": "sh -c 'for p in 4000 5173 5174; do lsof -ti :$p | xargs kill -9 2>/dev/null || true; done; concurrently -n frontend,backend -c blue,green \"npm run frontend:dev\" \"npm run backend:dev\"'"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",

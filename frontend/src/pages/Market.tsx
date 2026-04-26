@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { MarketDataChart, MARKET_COINS } from "@/components/market/MarketDataChart";
 import { Globe2, LineChart as LineChartIcon, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
@@ -44,9 +44,17 @@ export function Market() {
   const [summary, setSummary] = useState<SummaryResponse | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inFlight = useRef(false);
 
   async function load() {
+    if (inFlight.current) return;
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+      return;
+    }
+    inFlight.current = true;
     setLoading(true);
+    setError(null);
     try {
       const ids = MARKET_COINS.map((c) => c.id).join(",");
       const [p, s] = await Promise.all([
@@ -56,15 +64,32 @@ export function Market() {
       setPrices(p);
       setSummary(s);
       setUpdatedAt(new Date());
+    } catch (e: unknown) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Market API unreachable. Is the backend running on :4000 (and Vite proxying /api)?",
+      );
     } finally {
       setLoading(false);
+      inFlight.current = false;
     }
   }
 
   useEffect(() => {
-    load();
-    const i = setInterval(load, 60_000);
-    return () => clearInterval(i);
+    void load();
+    const i = setInterval(() => void load(), 60_000);
+    const onVis = () => {
+      if (document.visibilityState === "visible") void load();
+    };
+    const onOnline = () => void load();
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("online", onOnline);
+    return () => {
+      clearInterval(i);
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("online", onOnline);
+    };
   }, []);
 
   const summaryPositive = (summary?.change24hPct ?? 0) >= 0;
@@ -78,15 +103,37 @@ export function Market() {
         right={
           <>
             <span className="text-xs text-ink-200">
-              {updatedAt ? `Updated ${updatedAt.toLocaleTimeString()}` : "Loading…"}
+              {loading
+                ? "Loading…"
+                : updatedAt
+                  ? `Updated ${updatedAt.toLocaleTimeString()}`
+                  : error
+                    ? "Not updated"
+                    : "—"}
             </span>
-            <button className="btn-ghost" onClick={load} disabled={loading}>
+            <button
+              className="btn-ghost"
+              type="button"
+              onClick={() => void load()}
+              disabled={loading}
+            >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               Refresh
             </button>
           </>
         }
       />
+
+      {error ? (
+        <div className="card border border-amber-700/50 bg-amber-500/10 p-4 text-sm text-amber-100">
+          <div className="mb-1 font-semibold">Market data connection issue</div>
+          <div className="text-amber-100/90">{error}</div>
+          <div className="mt-2 text-xs text-amber-100/80">
+            This page polls the local API. If the backend is down or the dev proxy is stale, refresh after restarting{" "}
+            <span className="font-mono">npm run dev</span>.
+          </div>
+        </div>
+      ) : null}
 
       {summary ? (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

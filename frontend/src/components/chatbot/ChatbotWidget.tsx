@@ -1,24 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Bot, Send, Sparkles, X, MessageSquare } from "lucide-react";
-import { Link } from "react-router-dom";
-import { api } from "@/lib/api";
-
-interface ChatbotReply {
-  reply: string;
-  intent: string;
-  confidence: number;
-  actions: Array<{ label: string; href: string }>;
-  suggestions: string[];
-  model: string;
-}
+import { Link, useLocation } from "react-router-dom";
+import { useSession } from "@/lib/store";
+import { streamChat, type StreamChatMessage } from "@/lib/aiStream";
+import { getFeatureKeyFromPath, getRecommendedPrompts } from "@/lib/assistantPrompts";
+import { MarkdownMessage } from "@/components/chatbot/MarkdownMessage";
 
 interface Msg {
   id: string;
   role: "user" | "bot";
   body: string;
-  actions?: Array<{ label: string; href: string }>;
-  suggestions?: string[];
-  meta?: { intent: string; confidence: number };
+  meta?: { model?: string };
 }
 
 function uuid(): string {
@@ -26,38 +18,27 @@ function uuid(): string {
 }
 
 export function ChatbotWidget() {
+  const { pathname } = useLocation();
+  const role = useSession((s) => s.role);
+  const user = useSession((s) => s.user);
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [draft, setDraft] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open || messages.length > 0) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const r = await api.get<{ greeting: string; suggestions: string[] }>(
-          "/api/chatbot/welcome",
-        );
-        if (cancelled) return;
-        setMessages([{ id: uuid(), role: "bot", body: r.greeting, suggestions: r.suggestions }]);
-        setSuggestions(r.suggestions);
-      } catch {
-        setMessages([
-          {
-            id: uuid(),
-            role: "bot",
-            body: "Hi! I'm your Crypto World Bank assistant. Ask me about limits, installments, or the bank network.",
-          },
-        ]);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [open, messages.length]);
+    const name = user?.displayName?.split(" ")?.[0] ?? "there";
+    setMessages([
+      {
+        id: uuid(),
+        role: "bot",
+        body: `Hi ${name}! Ask me about this page, or tap a suggested question.`,
+      },
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, messages.length, user?.displayName]);
 
   useEffect(() => {
     scrollerRef.current?.scrollTo({
@@ -66,38 +47,78 @@ export function ChatbotWidget() {
     });
   }, [messages, pending]);
 
+  const featureKey = getFeatureKeyFromPath(pathname);
+  const suggestions = getRecommendedPrompts(featureKey, role).slice(0, 3);
+
+  function toStreamMessages(list: Msg[]): StreamChatMessage[] {
+    return list.map((m) => ({
+      role: m.role === "user" ? "user" : "assistant",
+      content: m.body,
+    }));
+  }
+
   async function send(text?: string) {
     const body = (text ?? draft).trim();
     if (!body || pending) return;
     setDraft("");
-    setMessages((m) => [...m, { id: uuid(), role: "user", body }]);
+    const botId = uuid();
+    setMessages((m) => [
+      ...m,
+      { id: uuid(), role: "user", body },
+      { id: botId, role: "bot", body: "", meta: { model: "…" } },
+    ]);
     setPending(true);
     try {
-      const r = await api.post<ChatbotReply>("/api/chatbot/message", { message: body });
-      setMessages((m) => [
-        ...m,
-        {
-          id: uuid(),
-          role: "bot",
-          body: r.reply,
-          actions: r.actions,
-          suggestions: r.suggestions,
-          meta: { intent: r.intent, confidence: r.confidence },
-        },
+      const snapshot = toStreamMessages([
+        ...messages,
+        { id: uuid(), role: "user", body },
       ]);
-      setSuggestions(r.suggestions ?? []);
+
+      const meta = await streamChat({
+        messages: snapshot,
+        featureKey,
+        route: pathname,
+        roleHint: role,
+        onMeta: (m) => {
+          setMessages((prev) =>
+            prev.map((x) => (x.id === botId ? { ...x, meta: { model: m.model } } : x)),
+          );
+        },
+        onToken: (tok) => {
+          setMessages((prev) =>
+            prev.map((x) => (x.id === botId ? { ...x, body: x.body + tok } : x)),
+          );
+        },
+        onError: (msg) => {
+          setMessages((prev) =>
+            prev.map((x) =>
+              x.id === botId
+                ? { ...x, body: x.body || `Sorry, I hit an error: ${msg}` }
+                : x,
+            ),
+          );
+        },
+      });
+
+      if (meta.model) {
+        setMessages((prev) =>
+          prev.map((x) => (x.id === botId ? { ...x, meta: { model: meta.model } } : x)),
+        );
+      }
     } catch (err: unknown) {
-      setMessages((m) => [
-        ...m,
-        {
-          id: uuid(),
-          role: "bot",
-          body:
-            err instanceof Error
-              ? `Sorry, I hit an error: ${err.message}`
-              : "Sorry, I hit an error.",
-        },
-      ]);
+      setMessages((prev) =>
+        prev.map((x) =>
+          x.id === botId
+            ? {
+                ...x,
+                body:
+                  err instanceof Error
+                    ? `Sorry, I hit an error: ${err.message}`
+                    : "Sorry, I hit an error.",
+              }
+            : x,
+        ),
+      );
     } finally {
       setPending(false);
     }
@@ -125,7 +146,7 @@ export function ChatbotWidget() {
                   CWB Assistant
                 </div>
                 <div className="text-[10px] uppercase tracking-[0.22em] text-gold-300">
-                  Rules-v0 · Sprint 3 ML swap-in ready
+                  Local model · streaming
                 </div>
               </div>
             </div>
@@ -150,21 +171,12 @@ export function ChatbotWidget() {
                       : "border border-ink-600/60 bg-ink-900/60 text-ink-100"
                   }`}
                 >
-                  <div className="whitespace-pre-line">{m.body}</div>
-                  {m.actions && m.actions.length > 0 ? (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {m.actions.map((a) => (
-                        <Link
-                          key={a.href}
-                          to={a.href}
-                          onClick={() => setOpen(false)}
-                          className="rounded-full border border-gold-700/40 bg-gold-900/20 px-2 py-0.5 text-[11px] text-gold-200 hover:bg-gold-900/40"
-                        >
-                          {a.label} →
-                        </Link>
-                      ))}
+                  {m.role === "bot" && m.meta?.model ? (
+                    <div className="mb-0.5 text-[10px] uppercase tracking-[0.22em] text-gold-300">
+                      {m.meta.model}
                     </div>
                   ) : null}
+                  <MarkdownMessage text={m.body} />
                 </div>
               </div>
             ))}
@@ -183,7 +195,7 @@ export function ChatbotWidget() {
 
           {suggestions.length > 0 ? (
             <div className="flex flex-wrap gap-1.5 border-t border-ink-700/60 bg-ink-900/40 px-3 py-2">
-              {suggestions.slice(0, 3).map((s) => (
+              {suggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}

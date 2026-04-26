@@ -40,12 +40,12 @@ export function Logo({ className, size = 32 }: { className?: string; size?: numb
 export function Wordmark({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center gap-2.5 select-none", className)}>
-      <Logo size={28} />
+      <Logo size={34} />
       <div className="flex flex-col leading-none">
-        <span className="font-display text-lg font-semibold tracking-wide gold-text">
+        <span className="font-display text-xl font-semibold tracking-wide gold-text">
           Crypto World Bank
         </span>
-        <span className="text-[10px] uppercase tracking-[0.25em] text-ink-200">
+        <span className="text-[11px] uppercase tracking-[0.25em] text-ink-200">
           Decentralized · Reserve
         </span>
       </div>

@@ -12,6 +12,7 @@ import { chatRouter } from "./routes/chat";
 import { chatbotRouter } from "./routes/chatbot";
 import { incomeRouter } from "./routes/income";
 import { riskRouter } from "./routes/risk";
+import { aiRouter } from "./routes/ai";
 import { errorHandler } from "./middleware/error";
 
 // Builds the Express app without binding a port. index.ts wraps it in
@@ -23,7 +24,36 @@ export function createApp(): Express {
   app.use(helmet());
   app.use(
     cors({
-      origin: config.corsOrigin.split(","),
+      origin: (origin, callback) => {
+        // No Origin header: server-to-server / curl / some tooling
+        if (!origin) {
+          callback(null, true);
+          return;
+        }
+
+        if (process.env.NODE_ENV === "production") {
+          const allowed = config.corsOrigin.split(",").map((s) => s.trim());
+          if (allowed.includes(origin)) {
+            callback(null, true);
+            return;
+          }
+          callback(new Error("Not allowed by CORS"));
+          return;
+        }
+
+        // Dev: allow Vite on any localhost port (5173, 5174, etc.)
+        try {
+          const u = new URL(origin);
+          if (u.hostname === "localhost" || u.hostname === "127.0.0.1") {
+            callback(null, true);
+            return;
+          }
+        } catch {
+          /* fall through */
+        }
+        const allowed = config.corsOrigin.split(",").map((s) => s.trim());
+        callback(null, allowed.includes(origin));
+      },
       credentials: true,
     }),
   );
@@ -57,6 +87,7 @@ export function createApp(): Express {
   app.use("/api/profile", profileRouter);
   app.use("/api/chat", chatRouter);
   app.use("/api/chatbot", chatbotRouter);
+  app.use("/api/ai", aiRouter);
   app.use("/api/income", incomeRouter);
   app.use("/api/risk", riskRouter);
 

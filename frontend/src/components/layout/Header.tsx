@@ -25,14 +25,14 @@ export function PublicHeader() {
             <a
               key={l.to}
               href={l.to}
-              className="text-sm text-ink-200 transition-colors hover:text-gold-300"
+              className="text-base text-ink-200 transition-colors hover:text-gold-300"
             >
               {l.label}
             </a>
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <span className="hidden items-center gap-1.5 text-xs text-ink-200 sm:inline-flex">
+          <span className="hidden items-center gap-1.5 text-sm text-ink-200 sm:inline-flex">
             <ShieldCheck className="h-3.5 w-3.5 text-gold-400" />
             Testnet · Audited primitives
           </span>
@@ -74,7 +74,7 @@ export function AppHeader() {
                 to={l.to}
                 end={l.to === "/app/dashboard"}
                 className={({ isActive }) =>
-                  `rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                  `rounded-lg px-3 py-1.5 text-base transition-colors ${
                     isActive ? "text-gold-300" : "text-ink-200 hover:text-gold-300"
                   }`
                 }
@@ -88,7 +88,7 @@ export function AppHeader() {
         <div className="flex items-center gap-3">
           {token && user ? (
             <>
-              <span className="hidden rounded-lg border border-ink-600/60 bg-ink-900/60 px-3 py-1.5 text-xs text-ink-200 sm:inline-flex">
+              <span className="hidden rounded-lg border border-ink-600/60 bg-ink-900/60 px-3 py-1.5 text-sm text-ink-200 sm:inline-flex">
                 <span className="mr-2 text-gold-300">{user.displayName}</span>
                 <span className="font-mono">{shortAddress(user.wallet, 4)}</span>
               </span>

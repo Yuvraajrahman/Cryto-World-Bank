@@ -1699,6 +1699,118 @@ The future work will be directed towards the following directions:
 
 \chapter{Technology Stack}
 
+\section{In-product assistant: local large language model (LLM) integration (prototype)}
+
+\paragraph{Purpose.}
+The web application includes a streaming chat assistant to help users understand platform concepts (e.g., the four-tier capital hierarchy), screen-specific workflows, and navigation. During local development, the assistant is served by a \textbf{local OpenAI-compatible inference server} (LM Studio) running a quantized Gemma-family model, while the public browser traffic is still routed through the project API to keep keys off the client and to centralize request shaping (system prompts, optional authenticated user context, and error handling).
+
+\paragraph{Model and runtime (local development).}
+The inference endpoint follows the \textbf{OpenAI Chat Completions} contract (\texttt{/v1/chat/completions}) with \texttt{stream: true}, proxied from the project backend to a local service such as \texttt{http://127.0.0.1:1234}. The served checkpoint is configured as a Gemma-4 E4B variant (e.g., \texttt{google/gemma-4-e4b}) in GGUF form with a practical quantization (e.g., \texttt{Q4\_K\_M}) for a laptop-friendly footprint (on the order of single-digit GBs). The exact quantization label and on-disk name are a deployment artifact; what matters for integration is the \textbf{API model identifier} exposed by the local server and referenced by the backend configuration (environment-driven).
+
+\paragraph{End-to-end behavior.}
+The user interface assembles a short transcript (user/assistant messages) and posts it to the backend streaming route. The backend prepends a \textbf{system message} with platform + screen ``feature'' context, optionally enriched by user role when a valid session token is present. The backend then opens a streaming request to the local model server, converts upstream token events into \textbf{server-sent events (SSE)} for the browser, and the UI incrementally appends text. The message renderer uses Markdown (including GitHub-flavored extensions), math (KaTeX) for \texttt{\$\$...\$\$} blocks, and line-break rules appropriate for chat transcripts.
+
+\paragraph{Security and limitations (prototype stance).}
+The assistant is a \textbf{read-only product guide}: it is not an authoritative source of on-chain truth and it does not sign transactions. Hallucination risk exists; production hardening would add retrieval of verified platform facts and stronger safety policies. The implementation prioritizes \textbf{developer ergonomics} (local model, same-machine loop) over maximum isolation boundaries.
+
+\paragraph{Architecture diagram (Mermaid).}
+Mermaid is convenient for version-control-friendly diagrams, but a typical \texttt{pdflatex} build does not render Mermaid natively. Figure~\ref{fig:local-llm-mermaid} therefore includes the Mermaid \emph{source} for reproducibility, while Figure~\ref{fig:local-llm-tikz} provides an equivalent, PDF-safe TikZ view for the report compilation pipeline used here.
+
+\begin{figure}[H]
+\centering
+\begin{tcolorbox}[colback=LightBlue,colframe=PrimaryBlue!35!white,boxrule=0.8pt,arc=3pt,left=4pt,right=4pt,top=4pt,bottom=4pt]
+\small
+\begin{verbatim}
+flowchart TB
+  subgraph UI["Web UI (Vite + React)"]
+    L["Landing assistant (public)"]
+    A["In-app: floating widget + /app/assistant page"]
+    R["Message rendering: Markdown + math (KaTeX) + line breaks"]
+    Q["Feature-aware quick prompts: route -> featureKey -> suggestions"]
+  end
+
+  subgraph DEV["Vite dev proxy (local only)"]
+    P["/api -> http://127.0.0.1:4000 (same origin in the browser)"]
+  end
+
+  subgraph API["CWB API (Express)"]
+    S["POST /api/ai/chat/stream (SSE)"]
+    OA["optionalAuth: if Authorization Bearer -> session user/role (else anonymous)"]
+    SP["Assemble: system instructions + (optional) user context + chat transcript + featureKey/route"]
+  end
+
+  subgraph LLM["Local inference (LM Studio)"]
+    O["OpenAI-compatible server: http://127.0.0.1:1234"]
+    C["POST /v1/chat/completions (stream=true)"]
+  end
+
+  Q --> L
+  Q --> A
+  L --> R
+  A --> R
+
+  L -->|fetch: POST /api/ai/chat/stream| P
+  A -->|fetch: POST /api/ai/chat/stream| P
+  P --> S
+  S --> OA
+  OA --> SP
+  SP -->|upstream: streaming chat completions| O
+  O --> C
+  C -- "server emits token deltas (stream)" --> SP
+  SP -- "SSE to browser: event token/meta/done" --> P
+  P -- "incremental text + replace loading bubble" --> R
+\end{verbatim}
+\end{tcolorbox}
+\caption{Mermaid source for the local LLM chatbot integration (browser $\rightarrow$ API $\rightarrow$ local OpenAI-compatible model server, streaming).}
+\label{fig:local-llm-mermaid}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  node distance=8mm and 10mm,
+  box/.style={draw=PrimaryBlue!70, rounded corners=3pt, align=left, inner sep=6pt, fill=LightBlue},
+  server/.style={draw=GreenAccent!70!black, rounded corners=3pt, align=left, inner sep=6pt, fill=RowShade},
+  smalllabel/.style={font=\scriptsize, inner sep=1pt, fill=white, draw=none},
+  -{Stealth[length=2.2mm]}
+]
+
+\node[box, text width=0.44\linewidth] (ui) {%
+  \textbf{Web UI (Vite + React)}\\
+  \textbullet\ Landing assistant (public)\\
+  \textbullet\ In-app assistant widget + full page (\texttt{/app/assistant})
+};
+
+\node[box, text width=0.40\linewidth, right=6mm of ui] (api) {%
+  \textbf{CWB API (Express)}\\
+  \texttt{POST /api/ai/chat/stream} (SSE)\\
+  \textbullet\ \textbf{optionalAuth:} accept JWT if present\\
+  \textbullet\ \textbf{Prompt shaping:} system + feature context
+};
+
+\node[server, text width=0.40\linewidth, below=12mm of api, anchor=north] (lm) {%
+  \textbf{Local inference (LM Studio)}\\
+  \texttt{http://127.0.0.1:1234}\\
+  \texttt{POST /v1/chat/completions} (stream)\\
+  \textbullet\ OpenAI-compatible chat schema
+};
+
+\draw[->] (ui.east) -- node[smalllabel, pos=0.5, sloped, above=1pt] {HTTP: transcript + feature context} (api.west);
+\draw[->] (api.south) -- node[smalllabel, pos=0.5, right=1pt] {upstream: chat completions} (lm.north);
+\draw[->, Stealth-Stealth] (lm.west) .. controls +(-0.6,0) and +(-0.6,0) .. node[smalllabel, pos=0.5, left=1pt] {SSE: tokens + metadata} (ui.west);
+
+\end{tikzpicture}
+\caption{Local LLM assistant data flow: browser UI streams from the CWB API, which proxies to a local OpenAI-compatible model server. The path is the same in principle for both landing and in-app UIs, with optional user context when authenticated.}
+\label{fig:local-llm-tikz}
+\end{figure}
+
+\paragraph{Implementation analysis (brief).}
+The integration is successful for the project prototype because it reuses a stable transport shape (chat-completions with streaming) and isolates the model vendor behind a single API route, allowing the user interface to remain a thin client. The main practical engineering challenges in local development were: (1) \textbf{process/port hygiene} to keep the API bound to a predictable port, (2) \textbf{CORS and same-origin} considerations when the UI and API run on different localhost ports, mitigated with a Vite dev proxy to \texttt{/api} and with permissive dev CORS policy on the API, and (3) \textbf{RPC provider selection} for wallet reads in the browser, where some public endpoints may fail browser CORS; pinning explicit public RPC endpoints avoids noisy failures unrelated to the chat feature.
+
+\paragraph{Relationship to the earlier rule-based assistant (legacy).}
+The repository also retains early keyword-routed \texttt{/api/chatbot} handlers used for initial prototyping; the LLM path is additive. This separation prevents regressions in deterministic demo endpoints while the conversational assistant evolves.
+
 \begin{table}[H]
 \centering
 \TableImageMaxFit{table A.1.png}

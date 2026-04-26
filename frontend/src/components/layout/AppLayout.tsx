@@ -43,7 +43,7 @@ export function AppLayout() {
           </div>
         </main>
       </div>
-      {authed && user ? <ChatbotWidget /> : null}
+      {authed ? <ChatbotWidget /> : null}
     </div>
   );
 }

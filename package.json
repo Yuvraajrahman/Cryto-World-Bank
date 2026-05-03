@@ -32,5 +32,21 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yuvraajrahman/Cryto-World-Bank.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Yuvraajrahman/Cryto-World-Bank/issues"
+  },
+  "homepage": "https://github.com/Yuvraajrahman/Cryto-World-Bank#readme"
 }

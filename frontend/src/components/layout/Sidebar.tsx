@@ -13,6 +13,7 @@ import {
   LineChart,
   Inbox,
   Bot,
+  Globe2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession, Role } from "@/lib/store";
@@ -37,6 +38,7 @@ const nav: NavItem[] = [
   { to: "/app/dashboard", label: "Overview", icon: LayoutDashboard, roles: ALL },
   { to: "/app/reserve", label: "World Reserve", icon: Landmark, roles: ALL },
   { to: "/app/banks", label: "Bank Network", icon: Network, roles: ALL },
+  { to: "/app/simulation", label: "Global simulation", icon: Globe2, roles: ALL },
   {
     to: "/app/loans",
     label: "My Loans",

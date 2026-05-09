@@ -14,6 +14,7 @@ import { Admin } from "@/pages/Admin";
 import { Banks } from "@/pages/Banks";
 import { Approvals } from "@/pages/Approvals";
 import { AIAssistant } from "@/pages/AIAssistant";
+import { Simulation } from "@/pages/Simulation";
 import { NotFound } from "@/pages/NotFound";
 
 export function App() {
@@ -26,6 +27,7 @@ export function App() {
         <Route path="/app/dashboard" element={<Dashboard />} />
         <Route path="/app/reserve" element={<Reserve />} />
         <Route path="/app/banks" element={<Banks />} />
+        <Route path="/app/simulation" element={<Simulation />} />
         <Route path="/app/loans" element={<Loans />} />
         <Route path="/app/loans/new" element={<RequestLoan />} />
         <Route path="/app/installments" element={<Installments />} />

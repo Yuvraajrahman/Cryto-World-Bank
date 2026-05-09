@@ -1,0 +1,43 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Component diagram showing interactions between the presentation layer, smart contract layer, off-chain backend services, and external systems.}}{38}{figure.caption.45}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Core system graph showing the Crypto World Bank entity relationship model with hierarchical banking structure, lending lifecycle, communication, and security entities.}}{41}{figure.caption.50}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Entity-Relationship Diagram (ERD) for the Crypto World Bank database with relational symbols and entity attributes across all 15 tables.}}{42}{figure.caption.51}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Enhanced Entity-Relationship (EER) diagram showing generalization/specialization, weak entities, aggregation, participation constraints, and cardinality for the complete data model.}}{43}{figure.caption.52}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Use case diagram for the Crypto World Bank platform, showing interactions among four primary actors (World Bank Admin, National Bank, Local Bank Approver, Borrower) across 29 identified use cases, including registration, loan request, approval workflow, and repayment.}}{52}{figure.caption.67}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Activity Diagram - Loan Request to Repayment Flow}}{53}{figure.caption.68}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Activity diagram illustrating the hierarchical capital flow from the World Bank Reserve through National Bank to Local Bank tiers, including reserve ratio checks and loan disbursement decision points.}}{54}{figure.caption.69}%
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Activity Diagram Income Verification Flow}}{55}{figure.caption.70}%
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Activity Diagram Chat System Flow}}{56}{figure.caption.71}%
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Activity Diagram AI Chatbot Interaction Flow}}{57}{figure.caption.72}%
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Activity diagram showing the market data viewing flow, in which authenticated users fetch live cryptocurrency price feeds via the off-chain API layer before interacting with loan sizing interfaces.}}{58}{figure.caption.73}%
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Activity Diagram Profile Management Flow}}{59}{figure.caption.74}%
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Dataflow Diagram (Context Diagram Level - 0)}}{60}{figure.caption.75}%
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Level-1 data flow diagram decomposing the core lending subsystem, showing input/output data flows among borrowers, approvers, the smart contract layer, the PostgreSQL database, and the AI/ML monitoring service.}}{60}{figure.caption.76}%
+\contentsline {figure}{\numberline {3.15}{\ignorespaces Level-1 data flow diagram (continued) covering the deposit mobilization, interbank lending, and FX conversion subsystems, with data stores for on-chain state and off-chain analytics.}}{60}{figure.caption.77}%
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Sequence Diagram 1 Loan Request, AI Risk Check, and Approval Decision}}{61}{figure.caption.78}%
+\contentsline {figure}{\numberline {3.17}{\ignorespaces Sequence Diagram 1B Reject Path - alt Reject}}{61}{figure.caption.79}%
+\contentsline {figure}{\numberline {3.18}{\ignorespaces Sequence Diagram 2 Installment Payment Loop}}{62}{figure.caption.80}%
+\contentsline {figure}{\numberline {3.19}{\ignorespaces Sequence Diagram 3 Income Verification}}{62}{figure.caption.81}%
+\contentsline {figure}{\numberline {3.20}{\ignorespaces Sequence Diagram 4 Chat System}}{63}{figure.caption.82}%
+\contentsline {figure}{\numberline {3.21}{\ignorespaces Sequence Diagram 5 AI Chatbot Interaction}}{63}{figure.caption.83}%
+\contentsline {figure}{\numberline {3.22}{\ignorespaces Sequence Diagram 6 Hierarchical Banking}}{64}{figure.caption.84}%
+\contentsline {figure}{\numberline {3.23}{\ignorespaces Sequence Diagram 7 Market Data Retrieval}}{64}{figure.caption.85}%
+\contentsline {figure}{\numberline {3.24}{\ignorespaces Sequence Diagram 8 Borrowing Limit Calculation}}{65}{figure.caption.86}%
+\contentsline {figure}{\numberline {3.25}{\ignorespaces Four-tier hierarchical capital flow with cascading repayment.}}{65}{figure.caption.87}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Agile/Scrum process diagram showing sprint cycles, backlog refinement, and iterative delivery within the 8-week development window.}}{75}{figure.caption.95}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Agile development lifecycle --- 2-month window with three sprints.}}{77}{figure.caption.97}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Technical development methodology: blockchain (Solidity), frontend (React, Wagmi, WalletConnect), backend (Express.js REST API, PostgreSQL), and AI/ML (Python, FastAPI, scikit-learn, Random Forest, SHAP) components across the three sprints.}}{77}{figure.caption.98}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Sprint submission diagram showing the workflow from backlog refinement through development, testing, review, and delivery for each sprint cycle.}}{81}{figure.caption.107}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces SDLC stage mapping diagram showing alignment between the seven SDLC stages and our three-sprint Agile methodology.}}{83}{figure.caption.110}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Design decisions and alternatives visualization across all major technology choices.}}{84}{figure.caption.113}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Annual revenue projection by tier (USD millions, at \$2{,}500/ETH conservative mid-point).}}{101}{figure.caption.137}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Hierarchical interest rate spread (APR) across the four-tier lending structure.}}{102}{figure.caption.140}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Compact Mermaid source for the local LLM path (full detail: optionalAuth, featureKey prompts, and upstream URL live in the project repository).}}{112}{figure.caption.148}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Local LLM assistant data flow: browser UI streams from the CWB API, which proxies to a local OpenAI-compatible model server. The path is the same in principle for both landing and in-app UIs, with optional user context when authenticated.}}{112}{figure.caption.149}%
+\addvspace {10\p@ }

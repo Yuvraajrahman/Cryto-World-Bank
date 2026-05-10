@@ -1,0 +1,74 @@
+# # This is an example configuration file
+# # To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+# name: Example Config
+# version: 1.0.0
+# schema: v1
+
+# # Define which models can be used
+# # https://docs.continue.dev/customization/models
+# models:
+#   - name: my gpt-5
+#     provider: openai
+#     model: gpt-5
+#     apiKey: YOUR_OPENAI_API_KEY_HERE
+#   - uses: ollama/qwen2.5-coder-7b
+#   - uses: anthropic/claude-4-sonnet
+#     with:
+#       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+# # MCP Servers that Continue can access
+# # https://docs.continue.dev/customization/mcp-tools
+# mcpServers:
+#   - uses: anthropic/memory-mcp
+
+
+
+
+
+
+
+
+# GEMMA: 
+
+
+# name: Local LM Studio
+# version: 1.0.0
+# schema: v1
+
+# models:
+#   - name: Gemma Local
+#     provider: openai
+#     model: google/gemma-4-e4b
+#     apiBase: http://127.0.0.1:1234/v1
+#     apiKey: lm-studio
+
+# tabAutocompleteModel:
+#   name: Gemma Local
+#   provider: openai
+#   model: google/gemma-4-e4b
+#   apiBase: http://127.0.0.1:1234/v1
+#   apiKey: lm-studio
+
+
+# qwen 
+
+
+
+name: Local LM Studio
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Qwen Local
+    provider: openai
+    model: qwen/qwen3.6-35b-a3b
+    apiBase: http://127.0.0.1:1234/v1
+    apiKey: lm-studio
+
+tabAutocompleteModel:
+  name: Qwen Local
+  provider: openai
+  model: qwen/qwen3.6-35b-a3b
+  apiBase: http://127.0.0.1:1234/v1
+  apiKey: lm-studio

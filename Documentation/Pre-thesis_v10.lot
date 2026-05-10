@@ -58,36 +58,36 @@
 \contentsline {table}{\numberline {4.11}{\ignorespaces Design decisions and alternatives considered.}}{84}{table.caption.111}%
 \contentsline {table}{\numberline {4.12}Software Testing Strategy: Acceptance Criteria Across Four Test Layers}{84}{section*.112}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Market segments with supporting data.}}{89}{table.caption.114}%
-\contentsline {table}{\numberline {5.2}Market Sizing: DeFi Lending TVL, Remittances, and MSME Financing Gap}{89}{section*.115}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces Target customer segment profile.}}{90}{table.caption.116}%
-\contentsline {table}{\numberline {5.4}Target Customer Segment: Retail Borrower Profile and Product Fit}{90}{section*.117}%
-\contentsline {table}{\numberline {5.5}{\ignorespaces Partner categories and roles.}}{91}{table.caption.118}%
-\contentsline {table}{\numberline {5.6}Partner Ecosystem: Integration Partners and External Dependencies (Chapter 5)}{91}{section*.119}%
-\contentsline {table}{\numberline {5.7}{\ignorespaces Detailed competitive landscape analysis (Part 1).}}{92}{table.caption.120}%
-\contentsline {table}{\numberline {5.8}Competitive Landscape (Part 1): DeFi Lending and Payment Rail Protocols}{92}{section*.121}%
-\contentsline {table}{\numberline {5.9}{\ignorespaces Detailed competitive landscape analysis (Part 2).}}{93}{table.caption.122}%
-\contentsline {table}{\numberline {5.10}Competitive Landscape (Part 2): Inclusion Wallets and Institutional Blockchain Systems}{93}{section*.123}%
-\contentsline {table}{\numberline {5.11}{\ignorespaces Detailed competitive landscape analysis (Part 3): multi-tier capital flow as differentiating feature.}}{94}{table.caption.124}%
-\contentsline {table}{\numberline {5.12}Competitive Landscape (Part 3): Multi-Tier Capital Flow as Differentiating Feature}{94}{section*.125}%
-\contentsline {table}{\numberline {5.13}{\ignorespaces Risk taxonomy and mitigation.}}{95}{table.caption.126}%
-\contentsline {table}{\numberline {5.14}Risk Taxonomy: Technical, Financial, Regulatory, and Operational Risk Categories}{95}{section*.127}%
-\contentsline {table}{\numberline {5.15}{\ignorespaces Technical feasibility assessment.}}{96}{table.caption.128}%
-\contentsline {table}{\numberline {5.16}Technical Feasibility Assessment: Infrastructure Readiness and Ecosystem Maturity}{96}{section*.129}%
-\contentsline {table}{\numberline {5.17}{\ignorespaces Economic feasibility --- zero-cost prototype.}}{97}{table.caption.130}%
-\contentsline {table}{\numberline {5.18}Economic Feasibility: Cost Drivers vs.~Revenue Potential on Layer-2 Networks}{97}{section*.131}%
-\contentsline {table}{\numberline {5.19}{\ignorespaces Revenue projection assumptions.}}{98}{table.caption.132}%
-\contentsline {table}{\numberline {5.20}Revenue Projection by Tier (Base Case, USD Millions)}{98}{section*.133}%
-\contentsline {table}{\numberline {5.21}{\ignorespaces System-wide annual revenue summary.}}{98}{table.caption.134}%
-\contentsline {table}{\numberline {5.22}Revenue Projection Assumptions and Sensitivity Inputs}{98}{section*.135}%
-\contentsline {table}{\numberline {5.23}{\ignorespaces Default rate sensitivity scenarios with economic basis.}}{100}{table.caption.136}%
-\contentsline {table}{\numberline {5.24}{\ignorespaces Interest rate parameters.}}{101}{table.caption.138}%
-\contentsline {table}{\numberline {5.25}Tiered Interest Rate Parameters: APR Spreads Across the Four-Tier Hierarchy}{101}{section*.139}%
-\contentsline {table}{\numberline {5.26}{\ignorespaces Go-to-market phases.}}{103}{table.caption.141}%
-\contentsline {table}{\numberline {5.27}Value Proposition and Go-to-Market: User Benefits Mapped to Platform Features}{103}{section*.142}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Market segments with supporting data.}}{90}{table.caption.114}%
+\contentsline {table}{\numberline {5.2}Market Sizing: DeFi Lending TVL, Remittances, and MSME Financing Gap}{90}{section*.115}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Target customer segment profile.}}{91}{table.caption.116}%
+\contentsline {table}{\numberline {5.4}Target Customer Segment: Retail Borrower Profile and Product Fit}{91}{section*.117}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Partner categories and roles.}}{92}{table.caption.118}%
+\contentsline {table}{\numberline {5.6}Partner Ecosystem: Integration Partners and External Dependencies (Chapter 5)}{92}{section*.119}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Detailed competitive landscape analysis (Part 1).}}{93}{table.caption.120}%
+\contentsline {table}{\numberline {5.8}Competitive Landscape (Part 1): DeFi Lending and Payment Rail Protocols}{93}{section*.121}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces Detailed competitive landscape analysis (Part 2).}}{94}{table.caption.122}%
+\contentsline {table}{\numberline {5.10}Competitive Landscape (Part 2): Inclusion Wallets and Institutional Blockchain Systems}{94}{section*.123}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces Detailed competitive landscape analysis (Part 3): multi-tier capital flow as differentiating feature.}}{95}{table.caption.124}%
+\contentsline {table}{\numberline {5.12}Competitive Landscape (Part 3): Multi-Tier Capital Flow as Differentiating Feature}{95}{section*.125}%
+\contentsline {table}{\numberline {5.13}{\ignorespaces Risk taxonomy and mitigation.}}{96}{table.caption.126}%
+\contentsline {table}{\numberline {5.14}Risk Taxonomy: Technical, Financial, Regulatory, and Operational Risk Categories}{96}{section*.127}%
+\contentsline {table}{\numberline {5.15}{\ignorespaces Technical feasibility assessment.}}{97}{table.caption.128}%
+\contentsline {table}{\numberline {5.16}Technical Feasibility Assessment: Infrastructure Readiness and Ecosystem Maturity}{97}{section*.129}%
+\contentsline {table}{\numberline {5.17}{\ignorespaces Economic feasibility --- zero-cost prototype.}}{98}{table.caption.130}%
+\contentsline {table}{\numberline {5.18}Economic Feasibility: Cost Drivers vs.~Revenue Potential on Layer-2 Networks}{98}{section*.131}%
+\contentsline {table}{\numberline {5.19}{\ignorespaces Revenue projection assumptions.}}{99}{table.caption.132}%
+\contentsline {table}{\numberline {5.20}Revenue Projection by Tier (Base Case, USD Millions)}{99}{section*.133}%
+\contentsline {table}{\numberline {5.21}{\ignorespaces System-wide annual revenue summary.}}{99}{table.caption.134}%
+\contentsline {table}{\numberline {5.22}Revenue Projection Assumptions and Sensitivity Inputs}{99}{section*.135}%
+\contentsline {table}{\numberline {5.23}{\ignorespaces Default rate sensitivity scenarios with economic basis.}}{101}{table.caption.136}%
+\contentsline {table}{\numberline {5.24}{\ignorespaces Interest rate parameters.}}{102}{table.caption.138}%
+\contentsline {table}{\numberline {5.25}Tiered Interest Rate Parameters: APR Spreads Across the Four-Tier Hierarchy}{102}{section*.139}%
+\contentsline {table}{\numberline {5.26}{\ignorespaces Go-to-market phases.}}{104}{table.caption.141}%
+\contentsline {table}{\numberline {5.27}Value Proposition and Go-to-Market: User Benefits Mapped to Platform Features}{104}{section*.142}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces Technology stack summary.}}{113}{table.caption.152}%
-\contentsline {table}{\numberline {A.2}Local LLM Assistant Integration: Components, Configuration, and Prototype Stance}{113}{section*.153}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces Technology stack summary.}}{114}{table.caption.152}%
+\contentsline {table}{\numberline {A.2}Local LLM Assistant Integration: Components, Configuration, and Prototype Stance}{114}{section*.153}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {B.1}{\ignorespaces Deployed smart contract addresses, Polygon Amoy testnet (as of pre-thesis submission).}}{115}{table.caption.156}%
+\contentsline {table}{\numberline {B.1}{\ignorespaces Deployed smart contract addresses, Polygon Amoy testnet (as of pre-thesis submission).}}{116}{table.caption.156}%

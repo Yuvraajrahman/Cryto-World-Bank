@@ -1,0 +1,48 @@
+% Auto-generated TikZ from mermaid-src/dfd-level1-part1.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, node distance=0.7cm and 1.0cm]
+  \node[cwb box, align=center] (Borrower) at (0.0,0.0) {Borrower};
+  \node[cwb box, align=center] (P1) at (2.8,0.0) {1.0 Process Loan Request};
+  \node[cwb box, align=center] (P2) at (0.0,-1.4) {2.0 Manage Loan Lifecycle};
+  \node[cwb box, align=center] (P3) at (2.8,-1.4) {3.0 AI/ML Risk Assessment};
+  \node[cwb box, align=center] (P4) at (0.0,-2.8) {4.0 Execute Blockchain Transaction};
+  \node[cwb box, align=center] (D11) at (2.8,-2.8) {(D11: INSTALLMENT)};
+  \node[cwb box, align=center] (BankApprover) at (0.0,-4.199999999999999) {Bank Approver};
+  \node[cwb box, align=center] (P5) at (2.8,-4.199999999999999) {5.0 Synchronize Event Data};
+  \node[cwb box, align=center] (D1) at (0.0,-5.6) {(D1: LOAN\_REQUEST)};
+  \node[cwb box, align=center] (D2) at (2.8,-5.6) {(D2: TRANSACTION)};
+  \node[cwb box, align=center] (D3) at (0.0,-7.0) {(D3: AI\_ML\_SECURITY\_LOG)};
+  \node[cwb box, align=center] (P6) at (2.8,-7.0) {6.0 Calculate Borrowing Limits};
+  \node[cwb box, align=center] (D4) at (0.0,-8.399999999999999) {(D4: BORROWING\_LIMIT)};
+  \node[cwb box, align=center] (CoinGeckoAPI) at (2.8,-8.399999999999999) {CoinGecko API};
+  \node[cwb box, align=center] (P7) at (0.0,-9.799999999999999) {7.0 Fetch \&amp; Cache Market Data};
+  \node[cwb box, align=center] (D10) at (2.8,-9.799999999999999) {(D10: MARKET\_DATA)};
+  \node[cwb box wb, align=center] (WorldBankAdmin) at (0.0,-11.2) {World Bank Admin};
+  \node[cwb box, align=center] (P8) at (2.8,-11.2) {8.0 Manage Bank Hierarchy \&amp; System Controls};
+  \node[cwb box, align=center] (NationalBank) at (0.0,-12.6) {National Bank};
+  \node[cwb box, align=center] (D5) at (2.8,-12.6) {(D5: BORROWER)};
+  \draw[cwb arr] (Borrower) -- node[midway,font=\tiny,align=center] {Amount, Purpose,\\\\Wallet Address} (P1);
+  \draw[cwb arr] (P1) -- node[midway,font=\tiny,align=center] {Loan Data} (P2);
+  \draw[cwb arr] (P2) -- node[midway,font=\tiny,align=center] {Validation Result} (P1);
+  \draw[cwb arr] (P2) -- node[midway,font=\tiny,align=center] {Risk Query} (P3);
+  \draw[cwb arr] (P3) -- node[midway,font=\tiny,align=center] {Risk Score +\\\\SHAP Features} (P2);
+  \draw[cwb arr] (P1) -- node[midway,font=\tiny,align=center] {Signed Transaction} (P4);
+  \draw[cwb arr] (P2) -- node[midway,font=\tiny,align=center] {Installment Data} (D11);
+  \draw[cwb arr] (P2) -- node[midway,font=\tiny,align=center] {Pending Loans +\\\\Risk Scores} (BankApprover);
+  \draw[cwb arr] (BankApprover) -- node[midway,font=\tiny,align=center] {Approval/Rejection} (P4);
+  \draw[cwb arr] (P4) -- node[midway,font=\tiny,align=center] {Transaction Events} (P5);
+  \draw[cwb arr] (P5) -- node[midway,font=\tiny,align=center] {Loan Record} (D1);
+  \draw[cwb arr] (P5) -- node[midway,font=\tiny,align=center] {Transaction Log} (D2);
+  \draw[cwb arr] (P5) -- node[midway,font=\tiny,align=center] {Security Log} (D3);
+  \draw[cwb arr] (P5) -- (P6);
+  \draw[cwb arr] (P6) -- node[midway,font=\tiny,align=center] {Limit Data} (D4);
+  \draw[cwb arr] (D4) -- node[midway,font=\tiny,align=center] {History Data} (P6);
+  \draw[cwb arr] (CoinGeckoAPI) -- node[midway,font=\tiny,align=center] {Price Data} (P7);
+  \draw[cwb arr] (P7) -- node[midway,font=\tiny,align=center] {Market Prices} (Borrower);
+  \draw[cwb arr] (P7) -- node[midway,font=\tiny,align=center] {Cached Price Data} (D10);
+  \draw[cwb arr] (WorldBankAdmin) -- node[midway,font=\tiny,align=center] {Register Banks, Lend,\\\\Pause/Unpause} (P8);
+  \draw[cwb arr] (NationalBank) -- node[midway,font=\tiny,align=center] {Register Local,\\\\Borrow, Lend} (P8);
+  \draw[cwb arr dash] (D1) -- node[midway,font=\tiny,align=center] {loan context} (P2);
+  \draw[cwb arr dash] (D5) -- node[midway,font=\tiny,align=center] {borrower identity} (P1);
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant B as Borrower
+    participant F as Frontend
+    participant WS as WebSocket
+    participant API as FastAPI
+    participant DB as PostgreSQL
+    participant BA as BankApprover
+
+    B->>F: 1. Open loan details → Click Chat
+    F->>API: 2. GET /chat/history (loan_request_id)
+    API->>DB: 3. Query CHAT_MESSAGE WHERE loan_request_id ORDER BY sent_at
+    DB-->>API: 4. Return messages
+    API-->>F: 5. Return formatted chat history
+    F-->>B: 6. Display chat window with history
+
+    B->>F: 7. Type message
+    F->>WS: 8. Emit typing event
+    WS->>BA: 9. Forward typing indicator
+
+    B->>F: 10. Send message
+    F->>API: 11. POST /chat/send (loan_request_id, sender_id, message)
+    API->>DB: 12. INSERT INTO CHAT_MESSAGE
+    DB-->>API: 13. Confirm insert
+    API->>WS: 14. Emit new_message event
+    WS->>BA: 15. Deliver real-time notification
+    API-->>F: 16. Return success
+
+    BA->>F: 17. View notification → Open chat
+    BA->>F: 18. Read message
+    F->>API: 19. PATCH /chat/read (message_id)
+    API->>DB: 20. UPDATE CHAT_MESSAGE SET is_read = true

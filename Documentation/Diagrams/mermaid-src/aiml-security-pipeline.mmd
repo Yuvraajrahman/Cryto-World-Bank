@@ -1,0 +1,22 @@
+graph LR
+    TX["On-Chain Tx"] -->|"Event"| EL["Event Listener"]
+    EL --> FE["Feature Engineering\n50+ features"]
+    FE --> RF["Random Forest\nFraud F1 0.76-0.85"]
+    FE --> IF["Isolation Forest\nAnomaly detect"]
+    RF --> SHAP["SHAP Explain"]
+    IF --> SHAP
+    SHAP --> SCORE["Risk Score 0-100"]
+    SCORE -->|"under 30"| APPROVE["Auto-Approve"]
+    SCORE -->|"30-70"| REVIEW["Human Review"]
+    SCORE -->|"over 70"| FLAG["Auto-Flag"]
+    APPROVE --> SC["Smart Contract"]
+    REVIEW --> SC
+    style TX fill:#DBEAFE,stroke:#3B82F6
+    style RF fill:#4ADE80,stroke:#16A34A,color:#000
+    style IF fill:#FBBF24,stroke:#D97706,color:#000
+    style SHAP fill:#A78BFA,stroke:#7C3AED,color:#fff
+    style SCORE fill:#1E3A8A,color:#fff,stroke-width:2px
+    style APPROVE fill:#DCFCE7,stroke:#16A34A
+    style REVIEW fill:#FEF3C7,stroke:#D97706
+    style FLAG fill:#FEE2E2,stroke:#DC2626
+    style SC fill:#2563EB,color:#fff

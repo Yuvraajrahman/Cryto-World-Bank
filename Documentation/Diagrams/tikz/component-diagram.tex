@@ -1,0 +1,48 @@
+% Auto-generated TikZ from mermaid-src/component-diagram.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, node distance=0.7cm and 1.0cm]
+  \node[cwb box, align=center] (WBReserve) at (0.0,0.0) {WorldBankReserve\\\\<i>IReserve</i>};
+  \node[cwb box, align=center] (NatBankC) at (2.8,0.0) {NationalBank\\\\<i>INationalBank</i>};
+  \node[cwb box, align=center] (LocBankC) at (0.0,-1.4) {LocalBank\\\\<i>ILocalBank</i>};
+  \node[cwb box, align=center] (WBReserveOps) at (2.8,-1.4) {depositToReserve( )\\\\registerNatBank( )\\\\lendToNatBank( )\\\\pause( ) / unpause( )\\\\emergencyWithdraw( )};
+  \node[cwb box, align=center] (NatBankOps) at (0.0,-2.8) {registerLocalBank( )\\\\borrowFromWB( )\\\\lendToLocalBank( )};
+  \node[cwb box, align=center] (LocBankOps) at (2.8,-2.8) {requestLoan( )\\\\approveLoan( )\\\\rejectLoan( )\\\\payInstallment( )\\\\setApprover( )};
+  \node[cwb box, align=center] (OZ) at (0.0,-4.199999999999999) {OpenZeppelin\\\\ReentrancyGuard\\\\Ownable};
+  \node[cwb box, align=center] (FastAPI) at (2.8,-4.199999999999999) {FastAPI\\\\<i>ILoanAPI · IUserAPI · IRiskAPI</i>};
+  \node[cwb box, align=center] (Postgres) at (0.0,-5.6) {PostgreSQL\\\\<i>IDataStore</i>\\\\15 tables};
+  \node[cwb box, align=center] (Redis) at (2.8,-5.6) {Redis Cache\\\\<i>ICacheService</i>};
+  \node[cwb box, align=center] (AIML) at (0.0,-7.0) {AI/ML Engine\\\\<i>IMLService</i>\\\\Random Forest\\\\Isolation Forest\\\\SHAP};
+  \node[cwb box, align=center] (ChatbotSvc) at (2.8,-7.0) {Chatbot Service\\\\<i>IChatbotService</i>};
+  \node[cwb box, align=center] (IncomeSvc) at (0.0,-8.399999999999999) {Income Proof\\\\<i>IIncomeService</i>};
+  \node[cwb box, align=center] (FileStor) at (2.8,-8.399999999999999) {File Storage\\\\<i>IFileStore</i>};
+  \node[cwb box, align=center] (EventLsnr) at (0.0,-9.799999999999999) {Event Listener\\\\<i>IEventSync</i>};
+  \node[cwb box, align=center] (Dashboard) at (2.8,-9.799999999999999) {Dashboard\\\\<i>IDashboard</i>};
+  \node[cwb box, align=center] (LoanModule) at (0.0,-11.2) {Loan Module\\\\<i>ILoanService</i>};
+  \node[cwb box, align=center] (AdminPanel) at (2.8,-11.2) {Admin Panel\\\\<i>IAdminService</i>};
+  \node[cwb box, align=center] (RiskDash) at (0.0,-12.6) {Risk Dashboard\\\\<i>IRiskService</i>};
+  \node[cwb box, align=center] (ProfileMod) at (2.8,-12.6) {Profile Module\\\\<i>IProfileService</i>};
+  \draw[cwb arr] (WBReserve) -- node[midway,font=\tiny,align=center] {lends to} (NatBankC);
+  \draw[cwb arr] (NatBankC) -- node[midway,font=\tiny,align=center] {lends to} (LocBankC);
+  \draw[cwb arr] (WBReserve) -- node[midway,font=\tiny,align=center] {implements} (WBReserveOps);
+  \draw[cwb arr] (NatBankC) -- node[midway,font=\tiny,align=center] {implements} (NatBankOps);
+  \draw[cwb arr] (LocBankC) -- node[midway,font=\tiny,align=center] {implements} (LocBankOps);
+  \draw[cwb arr] (FastAPI) -- (Postgres);
+  \draw[cwb arr] (FastAPI) -- (Redis);
+  \draw[cwb arr] (FastAPI) -- (AIML);
+  \draw[cwb arr] (FastAPI) -- (ChatbotSvc);
+  \draw[cwb arr] (FastAPI) -- (IncomeSvc);
+  \draw[cwb arr] (IncomeSvc) -- (FileStor);
+  \draw[cwb arr] (EventLsnr) -- (Postgres);
+  \draw[cwb arr] (LoanModule) -- node[midway,font=\tiny,align=center] {REST} (FastAPI);
+  \draw[cwb arr] (AdminPanel) -- node[midway,font=\tiny,align=center] {REST} (FastAPI);
+  \draw[cwb arr] (RiskDash) -- node[midway,font=\tiny,align=center] {REST} (FastAPI);
+  \draw[cwb arr] (ProfileMod) -- node[midway,font=\tiny,align=center] {REST} (FastAPI);
+  \draw[cwb arr] (ChatbotUI) -- node[midway,font=\tiny,align=center] {REST} (FastAPI);
+  \draw[cwb arr] (ChatModule) -- node[midway,font=\tiny,align=center] {ws://} (WSSvc);
+  \draw[cwb arr] (MarketMod) -- node[midway,font=\tiny,align=center] {cached} (Redis);
+  \draw[cwb arr] (WalletProv) -- node[midway,font=\tiny,align=center] {connect} (MetaMask);
+  \draw[cwb arr] (WalletProv) -- node[midway,font=\tiny,align=center] {RPC} (Alchemy);
+  \draw[cwb arr] (EventLsnr) -- node[midway,font=\tiny,align=center] {events} (Alchemy);
+  \draw[cwb arr] (Redis) -- node[midway,font=\tiny,align=center] {price feed} (CoinGecko);
+\end{tikzpicture}
+\end{center}

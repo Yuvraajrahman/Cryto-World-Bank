@@ -1,0 +1,37 @@
+% Auto-generated TikZ sequence from sequence-chat-system.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hB) at (0,0) {Borrower};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hF) at (2,0) {Frontend};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hWS) at (4,0) {WebSocket};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hAPI) at (6,0) {FastAPI};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hDB) at (8,0) {PostgreSQL};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \node[font=\scriptsize\bfseries] (hBA) at (10,0) {BankApprover};
+  \draw[dashed,gray!60] (10,-0.35) -- (10,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {1. Open loan details → Click Chat} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {2. GET /chat/history (loan\_request\_id)} (6,-1.7);
+  \draw[cwb arr] (6,-2.4) -- node[above,font=\tiny,align=center] {3. Query CHAT\_MESSAGE WHERE loan\_request\_id ORDER BY sent\_at} (8,-2.4);
+  \draw[cwb arr dash] (8,-3.0999999999999996) -- node[above,font=\tiny,align=center] {4. Return messages} (6,-3.0999999999999996);
+  \draw[cwb arr dash] (6,-3.8) -- node[above,font=\tiny,align=center] {5. Return formatted chat history} (2,-3.8);
+  \draw[cwb arr dash] (2,-4.5) -- node[above,font=\tiny,align=center] {6. Display chat window with history} (0,-4.5);
+  \draw[cwb arr] (0,-5.2) -- node[above,font=\tiny,align=center] {7. Type message} (2,-5.2);
+  \draw[cwb arr] (2,-5.9) -- node[above,font=\tiny,align=center] {8. Emit typing event} (4,-5.9);
+  \draw[cwb arr] (4,-6.6000000000000005) -- node[above,font=\tiny,align=center] {9. Forward typing indicator} (10,-6.6000000000000005);
+  \draw[cwb arr] (0,-7.300000000000001) -- node[above,font=\tiny,align=center] {10. Send message} (2,-7.300000000000001);
+  \draw[cwb arr] (2,-8.0) -- node[above,font=\tiny,align=center] {11. POST /chat/send (loan\_request\_id, sender\_id, message)} (6,-8.0);
+  \draw[cwb arr] (6,-8.7) -- node[above,font=\tiny,align=center] {12. INSERT INTO CHAT\_MESSAGE} (8,-8.7);
+  \draw[cwb arr dash] (8,-9.399999999999999) -- node[above,font=\tiny,align=center] {13. Confirm insert} (6,-9.399999999999999);
+  \draw[cwb arr] (6,-10.099999999999998) -- node[above,font=\tiny,align=center] {14. Emit new\_message event} (4,-10.099999999999998);
+  \draw[cwb arr] (4,-10.799999999999997) -- node[above,font=\tiny,align=center] {15. Deliver real-time notification} (10,-10.799999999999997);
+  \draw[cwb arr dash] (6,-11.499999999999996) -- node[above,font=\tiny,align=center] {16. Return success} (2,-11.499999999999996);
+  \draw[cwb arr] (10,-12.199999999999996) -- node[above,font=\tiny,align=center] {17. View notification → Open chat} (2,-12.199999999999996);
+  \draw[cwb arr] (10,-12.899999999999995) -- node[above,font=\tiny,align=center] {18. Read message} (2,-12.899999999999995);
+  \draw[cwb arr] (2,-13.599999999999994) -- node[above,font=\tiny,align=center] {19. PATCH /chat/read (message\_id)} (6,-13.599999999999994);
+  \draw[cwb arr] (6,-14.299999999999994) -- node[above,font=\tiny,align=center] {20. UPDATE CHAT\_MESSAGE SET is\_read = true} (8,-14.299999999999994);
+\end{tikzpicture}
+\end{center}

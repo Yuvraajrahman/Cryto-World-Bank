@@ -1,0 +1,20 @@
+flowchart TB
+    A([START]) --> B[Open chatbot]
+    B --> C[Load user context]
+    C --> D[Welcome message]
+    D --> E[User question]
+    E --> F[NLP: intent + entities]
+    F --> G{Intent?}
+    G -->|limit| H[Query limits]
+    G -->|payment| I[Query installments]
+    G -->|bank| J[Query bank info]
+    G -->|other| K[FAQ / support]
+    H --> L[Format reply]
+    I --> L
+    J --> L
+    K --> L
+    L --> M[Log interaction]
+    M --> N[Show reply]
+    N --> P{More?}
+    P -->|Yes| E
+    P -->|No| END1([END])

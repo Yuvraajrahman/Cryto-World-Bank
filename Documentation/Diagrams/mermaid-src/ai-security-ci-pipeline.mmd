@@ -1,0 +1,7 @@
+flowchart LR
+  GIT[Git commit] --> SL[Slither static analysis]
+  SL --> REP[Vulnerability report]
+  REP --> RAG[Update RAG corpus]
+  RAG --> LLM[9B security advisory]
+  DEV[Developer] --> LLM
+  style SL fill:#1E3A8A,color:#fff

@@ -1,0 +1,42 @@
+graph TB
+    WB["WORLD BANK\nGlobal Reserve"]
+    NB1["National Bank A"]
+    NB2["National Bank B"]
+    NB3["National Bank C"]
+    LB1["Local Bank 1"]
+    LB2["Local Bank 2"]
+    LB3["Local Bank 3"]
+    LB4["Local Bank 4"]
+    U1["Individual\n0.01-10 ETH"]
+    U2["SME\n1-100 ETH"]
+    U3["Corporate\n50-10K ETH"]
+    U4["Institutional\n1000+ ETH"]
+    WB ==>|"3 pct Down"| NB1
+    WB ==>|"3 pct Down"| NB2
+    WB ==>|"3 pct Down"| NB3
+    NB1 ==>|"5 pct"| LB1
+    NB1 ==>|"5 pct"| LB2
+    NB2 ==>|"5 pct"| LB3
+    NB3 ==>|"5 pct"| LB4
+    LB1 ==>|"8 pct"| U1
+    LB1 ==>|"8 pct"| U2
+    LB3 ==>|"8 pct"| U2
+    LB2 -.->|"Surplus up"| NB1
+    NB3 -.->|"Surplus up"| WB
+    NB1 <-..->|"Interbank"| NB2
+    NB2 <-..->|"Interbank"| NB3
+    LB1 <-..->|"Peer pool"| LB2
+    NB2 ==>|"Direct"| U3
+    WB ==>|"Direct"| U4
+    style WB fill:#1E3A8A,color:#fff,stroke-width:3px
+    style NB1 fill:#1D4ED8,color:#fff
+    style NB2 fill:#1D4ED8,color:#fff
+    style NB3 fill:#1D4ED8,color:#fff
+    style LB1 fill:#3B82F6,color:#fff
+    style LB2 fill:#3B82F6,color:#fff
+    style LB3 fill:#3B82F6,color:#fff
+    style LB4 fill:#3B82F6,color:#fff
+    style U1 fill:#DBEAFE,stroke:#3B82F6
+    style U2 fill:#DBEAFE,stroke:#3B82F6
+    style U3 fill:#DBEAFE,stroke:#3B82F6
+    style U4 fill:#DBEAFE,stroke:#3B82F6

@@ -1,0 +1,12 @@
+graph TD
+    WB["WORLD BANK\nTier 1"] --- T1["Institutional / Sovereign\n1000+ ETH"]
+    NB["NATIONAL BANKS\nTier 2"] --- T2["Large Corporate\n50-10000 ETH"]
+    LB["LOCAL BANKS\nTier 3"] --- T3["Individual and SME\n0.01-100 ETH"]
+    T1 -.->|"may also use"| NB
+    T2 -.->|"may also use"| LB
+    style WB fill:#1E3A8A,color:#fff,stroke-width:3px
+    style NB fill:#2563EB,color:#fff,stroke-width:2px
+    style LB fill:#3B82F6,color:#fff,stroke-width:2px
+    style T1 fill:#EDE9FE,stroke:#7C3AED,stroke-width:2px
+    style T2 fill:#FEF3C7,stroke:#D97706,stroke-width:2px
+    style T3 fill:#DCFCE7,stroke:#16A34A,stroke-width:2px

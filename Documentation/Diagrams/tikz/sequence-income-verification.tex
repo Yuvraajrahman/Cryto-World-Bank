@@ -1,0 +1,43 @@
+% Auto-generated TikZ sequence from sequence-income-verification.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hB) at (0,0) {Borrower};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hF) at (2,0) {Frontend};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hAPI) at (4,0) {FastAPI};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hDB) at (6,0) {PostgreSQL};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hFS) at (8,0) {FileStorage};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \node[font=\scriptsize\bfseries] (hBA) at (10,0) {BankApprover};
+  \draw[dashed,gray!60] (10,-0.35) -- (10,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {1. Open Income Verification page} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {2. GET /income-proof/status (borrower\_id)} (4,-1.7);
+  \draw[cwb arr] (4,-2.4) -- node[above,font=\tiny,align=center] {3. Query INCOME\_PROOF table} (6,-2.4);
+  \draw[cwb arr dash] (6,-3.0999999999999996) -- node[above,font=\tiny,align=center] {4. Return status (or empty)} (4,-3.0999999999999996);
+  \draw[cwb arr dash] (4,-3.8) -- node[above,font=\tiny,align=center] {5. Return verification status} (2,-3.8);
+  \draw[cwb arr dash] (2,-4.5) -- node[above,font=\tiny,align=center] {6. Show upload form (if no verified proof exists)} (0,-4.5);
+  \draw[cwb arr] (0,-5.2) -- node[above,font=\tiny,align=center] {7. Select file + Upload} (2,-5.2);
+  \draw[cwb arr] (2,-5.9) -- node[above,font=\tiny,align=center] {9. POST /income-proof/upload (file, borrower\_id)} (4,-5.9);
+  \draw[cwb arr] (4,-6.6000000000000005) -- node[above,font=\tiny,align=center] {11. Store encrypted file} (8,-6.6000000000000005);
+  \draw[cwb arr dash] (8,-7.300000000000001) -- node[above,font=\tiny,align=center] {12. Return file\_path} (4,-7.300000000000001);
+  \draw[cwb arr] (4,-8.0) -- node[above,font=\tiny,align=center] {13. INSERT INTO INCOME\_PROOF (status = pending)} (6,-8.0);
+  \draw[cwb arr dash] (6,-8.7) -- node[above,font=\tiny,align=center] {14. Confirm insert} (4,-8.7);
+  \draw[cwb arr dash] (4,-9.399999999999999) -- node[above,font=\tiny,align=center] {15. Return success} (2,-9.399999999999999);
+  \draw[cwb arr dash] (2,-10.099999999999998) -- node[above,font=\tiny,align=center] {16. Show Pending Review status} (0,-10.099999999999998);
+  \draw[cwb arr] (10,-10.799999999999997) -- node[above,font=\tiny,align=center] {17. View pending income proofs} (2,-10.799999999999997);
+  \draw[cwb arr] (2,-11.499999999999996) -- node[above,font=\tiny,align=center] {18. GET /income-proofs/pending} (4,-11.499999999999996);
+  \draw[cwb arr] (4,-12.199999999999996) -- node[above,font=\tiny,align=center] {19. Query pending INCOME\_PROOF records} (6,-12.199999999999996);
+  \draw[cwb arr dash] (6,-12.899999999999995) -- node[above,font=\tiny,align=center] {20. Return pending proofs} (4,-12.899999999999995);
+  \draw[cwb arr dash] (4,-13.599999999999994) -- node[above,font=\tiny,align=center] {21. Return proofs list} (2,-13.599999999999994);
+  \draw[cwb arr] (2,-14.299999999999994) -- node[above,font=\tiny,align=center] {22. Display proofs for review} (10,-14.299999999999994);
+  \draw[cwb arr] (10,-14.999999999999993) -- node[above,font=\tiny,align=center] {23. Approve/Reject with notes} (2,-14.999999999999993);
+  \draw[cwb arr] (2,-15.699999999999992) -- node[above,font=\tiny,align=center] {24. PATCH /income-proof/id (status, notes)} (4,-15.699999999999992);
+  \draw[cwb arr] (4,-16.39999999999999) -- node[above,font=\tiny,align=center] {25. UPDATE INCOME\_PROOF SET status, reviewed\_by, reviewed\_at} (6,-16.39999999999999);
+  \draw[cwb arr dash] (6,-17.09999999999999) -- node[above,font=\tiny,align=center] {26. Confirm update} (4,-17.09999999999999);
+  \draw[cwb arr dash] (4,-17.79999999999999) -- node[above,font=\tiny,align=center] {27. Return updated status} (2,-17.79999999999999);
+  \draw[cwb arr] (2,-18.49999999999999) -- node[above,font=\tiny,align=center] {28. Show confirmation} (10,-18.49999999999999);
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,23 @@
+flowchart TB
+    A([START]) --> B[Login to DApp]
+    B --> C{First borrower?}
+    C -->|No| E[Proof on file]
+    C -->|Yes| D[Upload proof prompt]
+    D --> F[Select file]
+    F --> G[Validate type and size]
+    G --> H{Valid?}
+    H -->|No| J[Error message]
+    J --> F
+    H -->|Yes| I[Store PENDING]
+    subgraph APPROVER[Approver]
+        L[View pending proofs]
+        L --> M[Review document]
+        M --> N{Decision?}
+        N -->|Reject| O[REJECTED + notify]
+        O --> END1([END])
+        N -->|Approve| P[APPROVED + notify]
+    end
+    I --> L
+    P --> Q[Open loan page]
+    E --> Q
+    Q --> END2([END])

@@ -1,0 +1,43 @@
+% Auto-generated TikZ from mermaid-src/dfd-level1-part2.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, node distance=0.7cm and 1.0cm]
+  \node[cwb box, align=center] (Borrower) at (0.0,0.0) {Borrower};
+  \node[cwb box, align=center] (P9) at (2.8,0.0) {9.0 Process Income Verification};
+  \node[cwb box, align=center] (D7) at (0.0,-1.4) {(D7: INCOME\_PROOF)};
+  \node[cwb box, align=center] (D5) at (2.8,-1.4) {(D5: BORROWER)};
+  \node[cwb box, align=center] (BankApprover) at (0.0,-2.8) {Bank Approver};
+  \node[cwb box, align=center] (P10) at (2.8,-2.8) {10.0 Manage Chat Communication};
+  \node[cwb box, align=center] (D6) at (0.0,-4.199999999999999) {(D6: CHAT\_MESSAGE)};
+  \node[cwb box, align=center] (D1) at (2.8,-4.199999999999999) {(D1: LOAN\_REQUEST)};
+  \node[cwb box, align=center] (P11) at (0.0,-5.6) {11.0 AI Chatbot Service};
+  \node[cwb box, align=center] (D8) at (2.8,-5.6) {(D8: AI\_CHATBOT\_LOG)};
+  \node[cwb box, align=center] (D4) at (0.0,-7.0) {(D4: BORROWING\_LIMIT)};
+  \node[cwb box, align=center] (P12) at (2.8,-7.0) {12.0 Manage User Profiles};
+  \node[cwb box, align=center] (D9) at (0.0,-8.399999999999999) {(D9: PROFILE\_SETTINGS)};
+  \draw[cwb arr] (Borrower) -- node[midway,font=\tiny,align=center] {Income Proof Documents} (P9);
+  \draw[cwb arr] (P9) -- node[midway,font=\tiny,align=center] {Verification Status} (Borrower);
+  \draw[cwb arr] (P9) -- node[midway,font=\tiny,align=center] {Hashed Document} (D7);
+  \draw[cwb arr] (D7) -- node[midway,font=\tiny,align=center] {Proof Status} (P9);
+  \draw[cwb arr] (P9) -- node[midway,font=\tiny,align=center] {Borrower Proof Link} (D5);
+  \draw[cwb arr] (BankApprover) -- node[midway,font=\tiny,align=center] {Review Income Proofs} (P9);
+  \draw[cwb arr] (P9) -- node[midway,font=\tiny,align=center] {Pending Proofs} (BankApprover);
+  \draw[cwb arr] (Borrower) -- node[midway,font=\tiny,align=center] {Send Message} (P10);
+  \draw[cwb arr] (P10) -- node[midway,font=\tiny,align=center] {Receive Message,\\\\Read Status} (Borrower);
+  \draw[cwb arr] (P10) -- node[midway,font=\tiny,align=center] {Store Message} (D6);
+  \draw[cwb arr] (D6) -- node[midway,font=\tiny,align=center] {Read Messages} (P10);
+  \draw[cwb arr] (P10) -- node[midway,font=\tiny,align=center] {Loan Context Query} (D1);
+  \draw[cwb arr] (Borrower) -- node[midway,font=\tiny,align=center] {Chatbot Questions} (P11);
+  \draw[cwb arr] (P11) -- node[midway,font=\tiny,align=center] {AI Responses} (Borrower);
+  \draw[cwb arr] (P11) -- node[midway,font=\tiny,align=center] {Interaction Log} (D8);
+  \draw[cwb arr] (D8) -- node[midway,font=\tiny,align=center] {Read Log History} (P11);
+  \draw[cwb arr] (P11) -- node[midway,font=\tiny,align=center] {Limit Query} (D4);
+  \draw[cwb arr] (P11) -- node[midway,font=\tiny,align=center] {Loan Data Query} (D1);
+  \draw[cwb arr] (Borrower) -- node[midway,font=\tiny,align=center] {Profile Updates} (P12);
+  \draw[cwb arr] (P12) -- node[midway,font=\tiny,align=center] {Profile Data,\\\\Preferences} (Borrower);
+  \draw[cwb arr] (P12) -- node[midway,font=\tiny,align=center] {Settings Data} (D9);
+  \draw[cwb arr] (D9) -- node[midway,font=\tiny,align=center] {Read Settings} (P12);
+  \draw[cwb arr] (P12) -- node[midway,font=\tiny,align=center] {Profile Link} (D5);
+  \draw[cwb arr] (BankApprover) -- node[midway,font=\tiny,align=center] {Profile Updates} (P12);
+  \draw[cwb arr] (P12) -- node[midway,font=\tiny,align=center] {Profile Data} (BankApprover);
+\end{tikzpicture}
+\end{center}

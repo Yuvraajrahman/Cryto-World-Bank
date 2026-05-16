@@ -1,0 +1,49 @@
+flowchart TB
+    A([START]) --> B[Open DApp]
+    B --> C[Connect wallet]
+    C --> D{Connected?}
+    D -->|No| F[Show error]
+    F --> END1([END])
+    D -->|Yes| E[Read address and role]
+    E --> G[Loan page: amount and purpose]
+    G --> H{First loan?}
+    H -->|Yes| I[Upload income proof]
+    I --> J{Proof OK?}
+    J -->|No| L[Reject: no proof]
+    L --> END2([END])
+    H -->|No| K[Check borrowing limit]
+    J -->|Yes| K
+    K --> M{Within limit?}
+    M -->|No| O[Reject: over limit]
+    O --> END3([END])
+    M -->|Yes| N[Build requestLoan tx]
+    N --> P[MetaMask: confirm]
+    P --> Q{Confirmed?}
+    Q -->|No| S[Cancelled]
+    S --> END4([END])
+    Q -->|Yes| R[Broadcast to Polygon]
+    R --> T[Contract validates\nand emits event]
+    T --> U{Tx OK?}
+    U -->|No| V[Show tx error]
+    V --> END5([END])
+    U -->|Yes| W[Show success + hash]
+    W --> X[Listener: DB + AI risk]
+    subgraph APPROVER[Approver]
+        Y[View pending + risk]
+        Y --> Z{Approve?}
+        Z -->|Reject| AA[rejectLoan + notify]
+        AA --> END6([END])
+        Z -->|Yes| AB[approveLoan]
+        AB --> AC[Transfer funds\nEmit LoanApproved]
+    end
+    X --> Y
+    AC --> AD{Amount >= 100 ETH?}
+    AD -->|Yes| AE[Plan installments]
+    AD -->|No| AF[Single due date]
+    AE --> AG[Funds to borrower\nUpdate limits]
+    AF --> AG
+    AG --> AH{Due?}
+    AH -->|Yes| AI[payInstallment]
+    AI --> AH
+    AH -->|All paid| AJ[Loan complete]
+    AJ --> END7([END])

@@ -1,0 +1,15 @@
+% Shared TikZ styles for Crypto World Bank v13 (vector figures, no PNG)
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
+
+\tikzset{
+  cwb/.style={font=\small},
+  cwb box/.style={
+    draw=PrimaryBlue!70, fill=PrimaryBlue!12, rounded corners=2pt,
+    align=center, inner sep=4pt, minimum width=2.0cm, minimum height=0.7cm, font=\scriptsize
+  },
+  cwb box wb/.style={cwb box, fill=PrimaryBlue!85, text=white, font=\scriptsize\bfseries},
+  cwb box accent/.style={cwb box, fill=AccentBlue!25},
+  cwb box planned/.style={cwb box, dashed, fill=white},
+  cwb arr/.style={-{Stealth[length=2mm]}, line width=0.6pt, draw=gray!70},
+  cwb arr dash/.style={cwb arr, dashed},
+}

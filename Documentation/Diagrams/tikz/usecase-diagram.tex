@@ -1,0 +1,55 @@
+% Auto-generated TikZ from mermaid-src/usecase-diagram.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, node distance=0.7cm and 1.0cm]
+  \node[cwb box, align=center] (UC04) at (0.0,0.0) {Request loan};
+  \node[cwb box, align=center] (UC04a) at (2.8,0.0) {Check limit};
+  \node[cwb box, align=center] (UC04b) at (5.6,0.0) {Upload proof};
+  \node[cwb box, align=center] (UC07) at (8.399999999999999,0.0) {Review loan};
+  \node[cwb box, align=center] (UC07a) at (0.0,-1.4) {Fraud scores};
+  \node[cwb box, align=center] (UC07b) at (2.8,-1.4) {XAI view};
+  \node[cwb box, align=center] (UC15) at (5.6,-1.4) {Chat bank};
+  \node[cwb box, align=center] (UC16) at (8.399999999999999,-1.4) {Chat borrower};
+  \node[cwb box, align=center] (UC17) at (0.0,-2.8) {AI chatbot};
+  \node[cwb box, align=center] (UC17a) at (2.8,-2.8) {Query loan};
+  \node[cwb box, align=center] (UC01) at (5.6,-2.8) {Connect wallet};
+  \node[cwb box, align=center] (UC06) at (8.399999999999999,-2.8) {Pay installment};
+  \node[cwb box, align=center] (UC11) at (0.0,-4.199999999999999) {Deposit reserve};
+  \node[cwb box, align=center] (UC12) at (2.8,-4.199999999999999) {View limit};
+  \node[cwb box, align=center] (UC08) at (5.6,-4.199999999999999) {Approve loan};
+  \node[cwb box, align=center] (UC09) at (8.399999999999999,-4.199999999999999) {Reject loan};
+  \node[cwb box, align=center] (UC10) at (0.0,-5.6) {Review proof};
+  \node[cwb box, align=center] (UC28) at (2.8,-5.6) {Lend to local bank};
+  \node[cwb box, align=center] (UC27) at (5.6,-5.6) {Borrow from WB};
+  \node[cwb box, align=center] (Borrower) at (8.399999999999999,-5.6) {Borrower};
+  \draw[cwb arr dash] (UC04) -- node[midway,font=\tiny,align=center] {include} (UC04a);
+  \draw[cwb arr dash] (UC04) -- node[midway,font=\tiny,align=center] {include} (UC04b);
+  \draw[cwb arr dash] (UC07) -- node[midway,font=\tiny,align=center] {include} (UC07a);
+  \draw[cwb arr dash] (UC07) -- node[midway,font=\tiny,align=center] {include} (UC07b);
+  \draw[cwb arr dash] (UC15) -- node[midway,font=\tiny,align=center] {extend} (UC16);
+  \draw[cwb arr dash] (UC17) -- node[midway,font=\tiny,align=center] {include} (UC17a);
+  \draw[cwb arr dash] (UC04) -- node[midway,font=\tiny,align=center] {include} (UC01);
+  \draw[cwb arr dash] (UC06) -- node[midway,font=\tiny,align=center] {include} (UC01);
+  \draw[cwb arr dash] (UC11) -- node[midway,font=\tiny,align=center] {include} (UC01);
+  \draw[cwb arr dash] (UC15) -- node[midway,font=\tiny,align=center] {include} (UC01);
+  \draw[cwb arr dash] (UC17) -- node[midway,font=\tiny,align=center] {include} (UC01);
+  \draw[cwb arr dash] (UC06) -- node[midway,font=\tiny,align=center] {include} (UC12);
+  \draw[cwb arr dash] (UC08) -- node[midway,font=\tiny,align=center] {include} (UC07);
+  \draw[cwb arr dash] (UC09) -- node[midway,font=\tiny,align=center] {include} (UC07);
+  \draw[cwb arr dash] (UC08) -- node[midway,font=\tiny,align=center] {include} (UC10);
+  \draw[cwb arr dash] (UC28) -- node[midway,font=\tiny,align=center] {include} (UC27);
+  \draw[cwb arr] (Borrower) -- (UC01);
+  \draw[cwb arr] (Borrower) -- (UC02);
+  \draw[cwb arr] (Borrower) -- (UC03);
+  \draw[cwb arr] (Borrower) -- (UC04);
+  \draw[cwb arr] (Borrower) -- (UC05);
+  \draw[cwb arr] (Borrower) -- (UC06);
+  \draw[cwb arr] (Borrower) -- (UC11);
+  \draw[cwb arr] (Borrower) -- (UC12);
+  \draw[cwb arr] (Borrower) -- (UC13);
+  \draw[cwb arr] (Borrower) -- (UC14);
+  \draw[cwb arr] (Borrower) -- (UC15);
+  \draw[cwb arr] (Borrower) -- (UC17);
+  \draw[cwb arr] (Approver) -- (UC01);
+  \draw[cwb arr] (Approver) -- (UC02);
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,22 @@
+% Auto-generated TikZ sequence from sequence-reject-path.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hAU) at (0,0) {Approver UI};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hAW) at (2,0) {Approver Wallet};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hLB) at (4,0) {LocalBank.sol};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hPP) at (6,0) {Polygon PoS};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hBA) at (8,0) {Backend API};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \node[font=\scriptsize\bfseries] (hFB) at (10,0) {Frontend / Borrower};
+  \draw[dashed,gray!60] (10,-0.35) -- (10,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {36b. Click Reject — enter reason: High fraud risk} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {rejectLoan(5, High fraud risk)} (4,-1.7);
+  \draw[cwb arr] (4,-2.4) -- node[above,font=\tiny,align=center] {42b. emit LoanRejected(5, borrower, 50, High fraud risk)} (6,-2.4);
+  \draw[cwb arr] (6,-3.0999999999999996) -- node[above,font=\tiny,align=center] {43b. Event listener detects event} (8,-3.0999999999999996);
+  \draw[cwb arr] (8,-3.8) -- node[above,font=\tiny,align=center] {45b. Push notification} (10,-3.8);
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,38 @@
+sequenceDiagram
+    participant B as Borrower
+    participant F as Frontend
+    participant API as FastAPI
+    participant RC as RedisCache
+    participant DB as PostgreSQL
+    participant CG as CoinGeckoAPI
+
+    B->>F: 1. Navigate to Market Data dashboard
+    F->>API: 2. GET /market-data/prices (crypto_ids)
+    API->>RC: 3. Check cache (key: market_prices_crypto_id)
+
+    alt Cache Hit
+        RC-->>API: 4a. Return cached data
+    else Cache Miss
+        API->>CG: 4b. GET /simple/price?ids=...&vs_currencies=usd
+        CG-->>API: 5b. Return price data
+        API->>RC: 6b. SET cache (TTL: 5 min)
+        API->>DB: 7b. INSERT/UPDATE MARKET_DATA
+    end
+
+    API-->>F: 8. Return price data
+    F-->>B: 9. Render price cards
+
+    B->>F: 10. Select crypto for historical chart
+    F->>API: 11. GET /market-data/history (crypto_id, range)
+    API->>DB: 12. Query MARKET_DATA WHERE crypto_id AND date range
+    DB-->>API: 13. Return historical data
+    API-->>F: 14. Return data points
+    Note over F: 15. Render Chart.js line chart\n(tooltips, time range)
+    F-->>B: 16. Display interactive chart
+
+    loop Auto-refresh every 5 minutes
+        F->>API: 17. GET /market-data/prices (polling)
+        Note over API: Cache / fetch cycle repeats as above
+        API-->>F: 18. Return updated prices
+        F-->>B: 19. Re-render price cards
+    end

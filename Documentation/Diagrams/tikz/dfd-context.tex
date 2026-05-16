@@ -1,0 +1,21 @@
+% Auto-generated TikZ from mermaid-src/dfd-context.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, node distance=0.7cm and 1.0cm]
+  \node[cwb box, align=center] (Borrower) at (0.0,0.0) {Borrower};
+  \node[cwb box, align=center] (System) at (2.8,0.0) {CRYPTO WORLD BANK SYSTEM};
+  \node[cwb box, align=center] (Polygon) at (0.0,-1.4) {Polygon Blockchain Network};
+  \node[cwb box, align=center] (BankApprover) at (2.8,-1.4) {Bank Approver};
+  \node[cwb box wb, align=center] (WorldBankAdmin) at (0.0,-2.8) {World Bank Admin};
+  \node[cwb box, align=center] (NationalBank) at (2.8,-2.8) {National Bank};
+  \node[cwb box, align=center] (CoinGecko) at (0.0,-4.199999999999999) {CoinGecko API (Market Data)};
+  \draw[cwb arr] (Borrower) -- node[midway,font=\tiny,align=center] {Loan Request, Deposit,\\\\Installment Payment} (System);
+  \draw[cwb arr] (System) -- node[midway,font=\tiny,align=center] {Loan Status, Funds,\\\\Borrowing Limit, Market Data} (Borrower);
+  \draw[cwb arr] (System) -- node[midway,font=\tiny,align=center] {Signed Transactions} (Polygon);
+  \draw[cwb arr] (Polygon) -- node[midway,font=\tiny,align=center] {Confirmed Events} (System);
+  \draw[cwb arr] (System) -- node[midway,font=\tiny,align=center] {Approve/Reject, Risk Scores,\\\\Loan Portfolio} (BankApprover);
+  \draw[cwb arr] (BankApprover) -- node[midway,font=\tiny,align=center] {Pending Loans,\\\\AI Recommendations} (System);
+  \draw[cwb arr] (WorldBankAdmin) -- node[midway,font=\tiny,align=center] {Register Banks, Lend to\\\\National Banks, System Controls} (System);
+  \draw[cwb arr] (NationalBank) -- node[midway,font=\tiny,align=center] {Register Local Banks,\\\\Borrow/Lend} (System);
+  \draw[cwb arr] (CoinGecko) -- node[midway,font=\tiny,align=center] {Market Price Data} (System);
+\end{tikzpicture}
+\end{center}

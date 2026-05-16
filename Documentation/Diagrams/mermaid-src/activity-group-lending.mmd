@@ -1,0 +1,8 @@
+flowchart TD
+  A[Form group 3-20 borrowers] --> B[Pool collateral]
+  B --> C[Multi-sig consent]
+  C --> D[Submit group loan]
+  D --> E{All members current?}
+  E -->|Yes| F[Escalate to approver]
+  E -->|No| G[Claim shared collateral planned]
+  style G stroke-dasharray:5 5

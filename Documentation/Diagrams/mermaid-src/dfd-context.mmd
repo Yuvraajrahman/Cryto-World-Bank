@@ -1,0 +1,22 @@
+flowchart TD
+    Borrower[Borrower]
+    BankApprover[Bank Approver]
+    WorldBankAdmin[World Bank Admin]
+    NationalBank[National Bank]
+    Polygon[Polygon Blockchain Network]
+    CoinGecko["CoinGecko API (Market Data)"]
+    System("CRYPTO WORLD BANK SYSTEM")
+
+    Borrower -->|"Loan Request, Deposit,\nInstallment Payment"| System
+    System -->|"Loan Status, Funds,\nBorrowing Limit, Market Data"| Borrower
+
+    System -->|"Signed Transactions"| Polygon
+    Polygon -->|"Confirmed Events"| System
+
+    System -->|"Approve/Reject, Risk Scores,\nLoan Portfolio"| BankApprover
+    BankApprover -->|"Pending Loans,\nAI Recommendations"| System
+
+    WorldBankAdmin <-->|"Register Banks, Lend to\nNational Banks, System Controls"| System
+    NationalBank <-->|"Register Local Banks,\nBorrow/Lend"| System
+
+    CoinGecko -->|"Market Price Data"| System

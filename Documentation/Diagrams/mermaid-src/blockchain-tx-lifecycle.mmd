@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant B as Borrower
+  participant LB as Local Bank
+  participant SC as LoanController
+  participant O as Oracle
+  participant AI as CWB-AI-9B
+  B->>SC: requestLoan
+  SC->>O: riskScoreRequest
+  O->>AI: features plus context
+  AI-->>O: tabular score plus narrative
+  O-->>SC: updateRiskScore
+  LB->>SC: approveLoan
+  B->>SC: repayInstallment

@@ -1,0 +1,26 @@
+flowchart TB
+    subgraph SENDER[Sender]
+        A([START]) --> B[Open loan chat]
+        B --> C[GET chat history]
+        C --> F{History?}
+        F -->|Yes| G[Show messages]
+        F -->|No| H[Empty chat]
+        G --> I[Type message]
+        H --> I
+        I --> J[Send]
+        J --> K{Valid?}
+        K -->|No| L[Validation error]
+        L --> I
+        K -->|Yes| M[POST message]
+        M --> N[Save DB]
+        N --> O[Update UI]
+        O --> P[Notify receiver]
+    end
+    subgraph RECEIVER[Receiver]
+        Q[Open chat]
+        Q --> R[Load messages]
+        R --> S[Show message]
+        S --> T[Mark read]
+        T --> END1([END])
+    end
+    P --> Q

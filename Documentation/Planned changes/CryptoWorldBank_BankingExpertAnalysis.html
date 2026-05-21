@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banking Expert Analysis — Crypto World Bank</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f7f4ee;
+    --cream: #ede9df;
+    --gold: #b8860b;
+    --gold-light: #e8d5a0;
+    --red: #8b1a1a;
+    --green: #1a4a2e;
+    --blue: #1a2c4a;
+    --mid: #6b6256;
+    --rule: #c9bfa8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  /* HEADER */
+  .masthead {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 56px 0 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .masthead::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(255,255,255,0.03) 48px, rgba(255,255,255,0.03) 49px);
+  }
+  .masthead-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+    opacity: 0.9;
+  }
+  .masthead h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    color: var(--paper);
+    max-width: 800px;
+    margin: 0 auto 18px;
+  }
+  .masthead h1 em {
+    color: var(--gold-light);
+    font-style: italic;
+  }
+  .masthead-sub {
+    font-size: 15px;
+    color: rgba(247,244,238,0.6);
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+  }
+  .masthead-rule {
+    width: 60px; height: 2px;
+    background: var(--gold);
+    margin: 24px auto 0;
+  }
+
+  /* AUTHOR CARD */
+  .expert-card {
+    max-width: 820px;
+    margin: 40px auto;
+    padding: 0 24px;
+  }
+  .author-box {
+    border: 1.5px solid var(--rule);
+    background: var(--cream);
+    padding: 24px 28px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .author-monogram {
+    width: 56px; height: 56px;
+    background: var(--ink);
+    color: var(--gold-light);
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .author-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .author-text p {
+    font-size: 13.5px;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+
+  /* MAIN LAYOUT */
+  .main-wrap {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+  }
+  .section:first-child { border-top: none; margin-top: 32px; }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 3.5vw, 30px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+  h2 .accent { color: var(--gold); }
+
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 700;
+    margin: 32px 0 10px;
+    color: var(--ink);
+  }
+
+  p { margin-bottom: 16px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* VERDICT BANNER */
+  .verdict {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 28px 32px;
+    margin: 32px 0;
+    position: relative;
+  }
+  .verdict::before {
+    content: '"';
+    font-family: 'Playfair Display', serif;
+    font-size: 120px;
+    line-height: 0;
+    position: absolute;
+    top: 52px; left: 18px;
+    color: var(--gold);
+    opacity: 0.3;
+  }
+  .verdict p {
+    font-size: 18px;
+    font-style: italic;
+    line-height: 1.65;
+    padding-left: 28px;
+  }
+  .verdict-cite {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold-light);
+    margin-top: 10px;
+    padding-left: 28px;
+    letter-spacing: 1px;
+  }
+
+  /* RATING MATRIX */
+  .rating-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  @media (max-width: 600px) { .rating-grid { grid-template-columns: 1fr; } }
+
+  .rating-item {
+    border: 1px solid var(--rule);
+    padding: 14px 16px;
+    background: white;
+  }
+  .rating-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 6px;
+  }
+  .rating-bar-wrap {
+    height: 6px;
+    background: var(--cream);
+    margin: 8px 0 6px;
+    position: relative;
+  }
+  .rating-bar {
+    height: 100%;
+    background: var(--gold);
+  }
+  .rating-bar.red { background: var(--red); }
+  .rating-bar.green { background: var(--green); }
+  .rating-bar.blue { background: var(--blue); }
+  .rating-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--ink);
+  }
+  .rating-note {
+    font-size: 12.5px;
+    color: var(--mid);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-left: 4px solid var(--gold);
+    background: var(--cream);
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .callout.red { border-color: var(--red); }
+  .callout.green { border-color: var(--green); }
+  .callout.blue { border-color: var(--blue); }
+  .callout-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .callout.red .callout-title { color: var(--red); }
+  .callout.green .callout-title { color: var(--green); }
+  .callout.blue .callout-title { color: var(--blue); }
+  .callout.gold .callout-title { color: var(--gold); }
+
+  /* NUMBERED FINDINGS */
+  .findings-list {
+    counter-reset: finding;
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+  }
+  .findings-list li {
+    counter-increment: finding;
+    padding: 20px 0 20px 64px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  .findings-list li:last-child { border-bottom: none; }
+  .findings-list li::before {
+    content: counter(finding, decimal-leading-zero);
+    position: absolute;
+    left: 0; top: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--rule);
+    line-height: 1;
+  }
+  .findings-list li strong {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14.5px;
+  }
+  .data-table thead th {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+  .data-table tbody tr:nth-child(odd) { background: white; }
+  .data-table tbody tr:nth-child(even) { background: var(--cream); }
+  .data-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  .data-table td:first-child { font-weight: 600; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+  .badge-miss { background: #fde8e8; color: var(--red); }
+  .badge-partial { background: #fff3cd; color: #7a5800; }
+  .badge-present { background: #e6f4ea; color: var(--green); }
+
+  /* PRIORITY ADDITIONS */
+  .priority-card {
+    border: 1px solid var(--rule);
+    background: white;
+    padding: 22px 26px;
+    margin: 16px 0;
+    position: relative;
+  }
+  .priority-num {
+    position: absolute;
+    top: -1px; right: -1px;
+    background: var(--ink);
+    color: var(--gold-light);
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 900;
+    padding: 4px 12px;
+    font-style: italic;
+  }
+  .priority-card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-right: 48px;
+  }
+  .priority-card p { font-size: 15px; margin-bottom: 8px; }
+  .priority-card ul { padding-left: 20px; font-size: 15px; }
+  .priority-card li { margin-bottom: 4px; }
+
+  /* FINAL SCORECARD */
+  .scorecard {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 36px 40px;
+    margin: 40px 0;
+  }
+  .scorecard h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--gold-light);
+    margin-bottom: 24px;
+    padding: 0;
+  }
+  .score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 15px;
+  }
+  .score-row:last-child { border-bottom: none; }
+  .score-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--gold-light);
+  }
+
+  /* PRINT NICETIES */
+  @media print {
+    body { background: white; font-size: 14px; }
+    .masthead { background: white; color: black; border-bottom: 2px solid black; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-tag">Confidential Expert Review · Banking Systems Analysis</div>
+  <h1>Crypto World Bank:<br><em>A Banking Expert's Full Assessment</em></h1>
+  <div class="masthead-sub">Pre-thesis v13 — Blockchain-Based Hierarchical Banking Platform</div>
+  <div class="masthead-rule"></div>
+</div>
+
+<!-- EXPERT CARD -->
+<div class="expert-card">
+  <div class="author-box">
+    <div class="author-monogram">BE</div>
+    <div class="author-text">
+      <h3>Reviewer Profile</h3>
+      <p>PhD in Banking &amp; Finance · Owner, Multinational Bank (Traditional + Crypto) · 20+ years studying global banking failures and successes · Active in DeFi institutional research · Reviewed 1,000+ banking case studies across 40+ countries</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SECTION 1 ═══════════════════════════ -->
+<div class="main-wrap">
+
+<div class="section">
+  <div class="section-label">§ 01 — Overall Verdict</div>
+  <h2>A Genuinely <span class="accent">Ambitious</span> Architecture — But Banking is Only Half Built</h2>
+
+  <div class="verdict">
+    <p>This is one of the most intellectually serious student blockchain projects I have reviewed. The four-tier hierarchical lending model is conceptually correct, the problem statement is well-grounded in real development finance literature, and the ambition to replace the broken correspondent banking chain is legitimate. However, from a pure banking standpoint, this paper has designed a <em>lending platform</em> that wears the name of a bank. A complete bank is far more than a lending hierarchy. The paper covers roughly 35–40% of what a real multi-tier banking system must do. The remaining 60–65% — monetary policy tools, deposit insurance, central bank functions, capital adequacy frameworks, wealth management, custodial services, and crisis management — is either absent or mentioned in one or two lines and deferred to "future work."</p>
+    <div class="verdict-cite">— Banking Expert Review, May 2026</div>
+  </div>
+
+  <div class="rating-grid">
+    <div class="rating-item">
+      <div class="rating-label">Lending Architecture</div>
+      <div class="rating-score">9 / 10</div>
+      <div class="rating-bar-wrap"><div class="rating-bar green" style="width:90%"></div></div>
+      <div class="rating-note">Four-tier hierarchy is genuinely novel and well-specified</div>
+    </div>
+    <div class="rating-item">
+      <div class="rating-label">Central Bank Functions</div>
+      <div class="rating-score">2 / 10</div>
+      <div class="rating-bar-wrap"><div class="rating-bar red" style="width:20%"></div></div>
+      <div class="rating-note">Monetary policy, OMO, lender of last resort — all absent</div>
+    </div>
+    <div class="rating-item">
+      <div class="rating-label">Commercial Bank Functions</div>
+      <div class="rating-score">5 / 10</div>
+      <div class="rating-bar-wrap"><div class="rating-bar" style="width:50%"></div></div>
+      <div class="rating-note">Savings &amp; transactional accounts specified but not built</div>
+    </div>
+    <div class="rating-item">
+      <div class="rating-label">Risk &amp; Capital Framework</div>
+      <div class="rating-score">3 / 10</div>
+      <div class="rating-bar-wrap"><div class="rating-bar red" style="width:30%"></div></div>
+      <div class="rating-note">No Basel III, no CAMELS, no stress testing framework</div>
+    </div>
+    <div class="rating-item">
+      <div class="rating-label">Regulatory Depth</div>
+      <div class="rating-score">4 / 10</div>
+      <div class="rating-bar-wrap"><div class="rating-bar" style="width:40%"></div></div>
+      <div class="rating-note">KYC/ZKP designed; AML, FATF, Basel crypto rules shallow</div>
+    </div>
+    <div class="rating-item">
+      <div class="rating-label">Research Paper Quality</div>
+      <div class="rating-score">7 / 10</div>
+      <div class="rating-bar-wrap"><div class="rating-bar blue" style="width:70%"></div></div>
+      <div class="rating-note">Strong citations, clear structure, good literature review</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════ SECTION 2 ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 02 — Banking Functions Audit</div>
+  <h2>What Is Present, What Is Missing, <span class="accent">What Must Be Added</span></h2>
+
+  <p>A fully functional bank — at any tier — performs a canonical set of functions that banking regulators worldwide expect. The table below maps every major banking function against what the paper covers. This is the core of the banking analysis.</p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Banking Function</th>
+        <th>Tier It Belongs To</th>
+        <th>Paper Status</th>
+        <th>Expert Verdict</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- CENTRAL BANK FUNCTIONS -->
+      <tr>
+        <td>Currency / Money Issuance</td>
+        <td>Tier 1 (Central Bank)</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>The World Bank tier has no money-creation or stablecoin-issuance mechanism. A real central bank issues money. The paper uses ETH/MATIC as proxy — this is a design limitation that must be addressed explicitly.</td>
+      </tr>
+      <tr>
+        <td>Monetary Policy Tools (OMO, Discount Rate, Reserve Requirements)</td>
+        <td>Tier 1</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>No open market operations, no programmable discount rate adjustments, no reserve requirement governance. The BIS Innovation Hub (2025) has already built a prototype for smart-contract-based OMO. This paper's Tier 1 needs this discussion.</td>
+      </tr>
+      <tr>
+        <td>Lender of Last Resort (LoLR) Facility</td>
+        <td>Tier 1</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>Critically absent. What happens when a Tier 2 National Bank faces a liquidity crisis? There is no emergency lending facility, no Bagehot doctrine equivalent, no programmatic crisis response. This is not a minor gap — it is the foundational stability mechanism of every central bank since 1873.</td>
+      </tr>
+      <tr>
+        <td>Deposit Insurance / Depositor Protection</td>
+        <td>Tier 1 / Tier 3</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>The paper mentions an "insurance fund" as a revenue allocation target but never designs it as an actual depositor protection scheme. Unlike a traditional bank hack, DeFi has no FDIC, no government insurance. This must be architecturally specified.</td>
+      </tr>
+      <tr>
+        <td>Deposit Mobilisation (Savings Accounts, Fixed Deposits)</td>
+        <td>Tier 3 (Local Bank)</td>
+        <td><span class="badge badge-partial">Designed Only</span></td>
+        <td>Well-specified in the banking product suite section. The algorithmic yield model (utilisation-linked) is sound. However, the critical asset-liability management (ALM) mechanism to prevent duration mismatches is only mentioned in one sentence and needs a full section.</td>
+      </tr>
+      <tr>
+        <td>Transactional / Checking Accounts</td>
+        <td>Tier 3</td>
+        <td><span class="badge badge-partial">Designed Only</span></td>
+        <td>Architecturally defined, not implemented. Acceptable for pre-thesis, but the paper should discuss float management, overdraft facilities, and payment instruction processing more deeply.</td>
+      </tr>
+      <tr>
+        <td>Interbank Lending (Same-tier)</td>
+        <td>Tier 2 / Tier 3</td>
+        <td><span class="badge badge-partial">Designed Only</span></td>
+        <td>Good conceptual design. The SOFR analogy is appropriate. However, there is no discussion of how the InterBankLendingPool rate is governed during stress — this is where real interbank markets seize up (see 2008, 2023 US banking mini-crisis).</td>
+      </tr>
+      <tr>
+        <td>Credit Allocation (Hierarchical Lending)</td>
+        <td>All Tiers</td>
+        <td><span class="badge badge-present">Present (Partial)</span></td>
+        <td>The paper's strongest section. Four-tier architecture, tiered borrower access, and installment lending are well-designed. The only gap is that Tier 2 and Tier 3 contracts are scaffolded, not implemented.</td>
+      </tr>
+      <tr>
+        <td>Group / Solidarity Lending (Microfinance)</td>
+        <td>Tier 3</td>
+        <td><span class="badge badge-partial">Designed Only</span></td>
+        <td>Excellent conceptual design, best-in-class for a DeFi paper. On-chain mutual liability enforcement is genuinely novel. Needs more detail on group dissolution, partial default recovery, and the cultural/trust mechanics that make Grameen Bank work.</td>
+      </tr>
+      <tr>
+        <td>Foreign Exchange &amp; Multi-Currency Operations</td>
+        <td>All Tiers</td>
+        <td><span class="badge badge-partial">Designed Only</span></td>
+        <td>Oracle-priced FX conversion is sound. However, the paper lacks a discussion of FX hedging instruments (forwards, swaps), currency risk limits per tier, and how the platform manages the mismatch between ETH-denominated reserves and local-currency borrower needs.</td>
+      </tr>
+      <tr>
+        <td>Trade Finance (Letters of Credit, Guarantees)</td>
+        <td>Tier 2 / Tier 3</td>
+        <td><span class="badge badge-partial">Planned Only</span></td>
+        <td>One paragraph. For a "World Bank" this is an enormous function. Trade finance is the lifeblood of SME growth in developing economies. Should be elevated from "planned extension" to a full architecture section.</td>
+      </tr>
+      <tr>
+        <td>Capital Adequacy (Basel III)</td>
+        <td>All Tiers</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>No mention of Tier 1 Capital, CET1 ratios, Risk-Weighted Assets (RWA), or the BCBS 2025 rules for crypto asset exposures. For a paper claiming to be a banking platform, this is a significant academic gap.</td>
+      </tr>
+      <tr>
+        <td>Stress Testing &amp; Scenario Analysis</td>
+        <td>Tier 1 / Tier 2</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>There is a default rate sensitivity table with 3 scenarios. That is not stress testing. A proper stress test models correlated crypto price shocks, liquidity spirals, contagion across tiers, and recovery time. This is expected in any serious banking research paper.</td>
+      </tr>
+      <tr>
+        <td>CAMELS / Bank Health Rating System</td>
+        <td>Tier 1 (Regulator Function)</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>Capital adequacy, Asset quality, Management quality, Earnings, Liquidity, Sensitivity to market risk — none of these rating dimensions are modelled. The paper needs an on-chain health score system for Tier 2 and Tier 3 banks.</td>
+      </tr>
+      <tr>
+        <td>Wealth Management &amp; Investment Services</td>
+        <td>Tier 2 / Tier 3</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>No asset management, no custody services for institutional deposits, no tokenised treasury product. Given that tokenised US Treasuries are a $3B+ market in 2025 (as per GDF/Deloitte report), this is a missed opportunity.</td>
+      </tr>
+      <tr>
+        <td>Correspondent Banking &amp; Cross-Border Settlement</td>
+        <td>Tier 1 / Tier 2</td>
+        <td><span class="badge badge-partial">Partial</span></td>
+        <td>The problem is well-articulated (nostro/vostro trapped capital, SWIFT delays). The solution is implicit (on-chain atomic settlement). But the paper never explicitly models a correspondent relationship replacement — no SWIFT comparison protocol, no FIN message equivalent.</td>
+      </tr>
+      <tr>
+        <td>Asset-Liability Management (ALM)</td>
+        <td>All Tiers</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>One sentence mentions "planned asset-liability monitoring." ALM is the foundation of bank stability — matching duration of assets (loans) to liabilities (deposits) prevents bank runs. Silicon Valley Bank failed in 2023 because of ALM failure. This paper proposes the same risk exposure without a mitigation framework.</td>
+      </tr>
+      <tr>
+        <td>Consumer Protection &amp; Fair Lending</td>
+        <td>Tier 3</td>
+        <td><span class="badge badge-miss">Missing</span></td>
+        <td>No discussion of rate caps (usury laws vary by jurisdiction), no cooling-off periods, no dispute resolution mechanism, no borrower recourse for AI-driven lending rejections. This is a glaring gap for a platform targeting vulnerable populations.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════ SECTION 3 ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 03 — Critical Flaws (Banking Perspective)</div>
+  <h2>What <span class="accent">Must Be Fixed</span> — Non-Negotiable Issues</h2>
+
+  <ol class="findings-list">
+
+    <li>
+      <strong>The "World Bank" Tier Has No Central Bank Powers</strong>
+      The paper's Tier 1 is named the "World Bank" but functions as nothing more than a capital reserve pool. A real central bank (which Tier 1 is attempting to model) has three core powers: (1) money creation / monetary policy, (2) lender of last resort, and (3) systemic stability oversight. None of these three exist in the architecture. The paper should either honestly rename Tier 1 as a "Global Liquidity Reserve" — which is accurate — or it must design these central bank functions. The BIS Innovation Hub's Project Meridian (2025) has already demonstrated that smart contracts can execute OMO-style operations. That work should be cited and referenced.
+    </li>
+
+    <li>
+      <strong>No Deposit Insurance = No Real Bank</strong>
+      Every country that operates a banking system has a deposit guarantee scheme. The US has FDIC (insures up to $250,000). The EU has Directive 2014/49/EU (€100,000 guarantee). Bangladesh Bank has its own depositor protection framework. A platform targeting 1.4 billion unbanked people must address the fundamental question: what happens to a depositor's money when a Local Bank smart contract is exploited, when a key is compromised, or when a governance attack drains reserves? The paper mentions an "insurance fund" as a revenue allocation line item but never designs it as a protection mechanism. This needs a full dedicated section with actuarial modeling of coverage ratios and trigger conditions.
+    </li>
+
+    <li>
+      <strong>Asset-Liability Management (ALM) Is Dangerously Underspecified</strong>
+      The paper proposes that fixed-term deposits "fund" installment loans, explicitly claiming this eliminates duration mismatches. But it never proves it. SVB failed in 2023 with $212 billion in assets precisely because of a duration mismatch between long-dated bond assets and short-tenor deposit liabilities. The paper needs to model: what is the loan duration distribution, what is the deposit maturity profile, and what on-chain mechanism ensures they are matched? Without this, the "self-regulating capital cycle" claim is unsubstantiated.
+    </li>
+
+    <li>
+      <strong>No Basel III / Capital Adequacy Framework</strong>
+      The Basel Committee's 2025 rules on crypto asset exposures (effective January 2025) require banks holding crypto to maintain specific capital ratios. The BCBS framework classifies crypto into Group 1 (tokenised traditional assets) and Group 2 (unbacked crypto like ETH) with different capital requirements. The paper uses ETH as the primary currency, which would fall under Group 2 — requiring 1:1 capital backing under Basel rules. None of this is discussed. For a paper proposing a banking platform, the absence of Basel III is a fundamental academic gap.
+    </li>
+
+    <li>
+      <strong>Interest Rate Model Is Too Simple for a Banking Platform</strong>
+      The paper uses fixed-tier APRs: 3% (WB→NB), 5% (NB→LB), 8% (LB→Borrower). Real banking interest rates are dynamic and respond to monetary conditions. The kinked interest rate model is mentioned (Section 3.6 in the paper) but only in the context of on-chain implementation — not in the context of real-world rate calibration. There is no discussion of how the system responds to: (a) a global crypto market crash reducing ETH value 50%, (b) a sudden surge in default rates beyond the break-even threshold, or (c) a liquidity crunch at Tier 2 where no surplus NB exists to lend to. The interest rate model needs scenario-based governance responses.
+    </li>
+
+    <li>
+      <strong>The Revenue Projection Is Disconnected From Real Banking Economics</strong>
+      The $224M projected annual revenue assumes a flat 8% retail APR, 3% default rate, and $2B lending volume. This is optimistic even for an established microfinance institution. Grameen Bank took 48 years to reach 96.29% recovery rates. The paper acknowledges this in a footnote but then uses the optimistic scenario as the base case for all projections. A credible banking feasibility study would use the stress scenario as the base and show the optimistic as an upside. The World Bank's own impact assessments use this convention.
+    </li>
+
+    <li>
+      <strong>No Bank Run / Liquidity Crisis Protocol</strong>
+      What happens when 30% of depositors simultaneously want to withdraw? There is a "pause/unpause mechanism" mentioned for emergency response, but pausing withdrawals is itself a crisis trigger — it is what Silicon Valley Bank and FTX customers experienced just before collapse. The paper needs a formal bank run prevention mechanism: tiered withdrawal limits, time-locked large withdrawals, emergency liquidity lines from the InterBankLendingPool, and a clear crisis communication protocol. This is not an edge case — it is the fundamental test of any banking institution's design.
+    </li>
+
+  </ol>
+</div>
+
+
+<!-- ═══════════════════════════════════════ SECTION 4 ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 04 — What Should Be Added to the Paper</div>
+  <h2>Priority <span class="accent">Additions</span> to Elevate Research Quality</h2>
+
+  <div class="priority-card">
+    <div class="priority-num">P1</div>
+    <h4>Full Central Bank Function Specification for Tier 1</h4>
+    <p>Add a dedicated subsection titled "Tier 1 as a Programmable Monetary Authority" covering:</p>
+    <ul>
+      <li><strong>Discount Rate Governance:</strong> A governance-controlled parameter that sets the minimum lending rate from Tier 1 to Tier 2. When the system is overlent, the discount rate rises, discouraging further borrowing. Smart contract parameter governed by multi-sig.</li>
+      <li><strong>Reserve Ratio Tool:</strong> Dynamic reserve requirements — the Tier 1 contract can raise or lower the minimum reserve ratio across all Tier 2 institutions via governance vote. This is the on-chain equivalent of the Fed's reserve requirement adjustments.</li>
+      <li><strong>Open Market Operations (Conceptual):</strong> The BIS Innovation Hub (2025) demonstrated that smart contracts can simulate OMO — the Tier 1 reserve can "buy" distressed assets from Tier 2 banks (tokenised loan portfolios) to inject liquidity. Even a conceptual design of this would make the paper significantly more rigorous.</li>
+      <li><strong>Citation to add:</strong> BIS Innovation Hub Project Meridian (May 2025) — blockchain-based monetary policy prototype.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P2</div>
+    <h4>Deposit Insurance Fund — Full Architecture</h4>
+    <p>Design a proper InsuranceFund contract with:</p>
+    <ul>
+      <li><strong>Coverage Limit:</strong> Define a per-depositor maximum insured amount (e.g., equivalent of $10,000 USDC for retail). This creates a tiered protection analogous to FDIC.</li>
+      <li><strong>Premium Calculation:</strong> Insurance premiums paid by Local Banks based on their risk profile (default rate, reserve ratio, transaction anomalies). Higher-risk banks pay more. This creates a market incentive for prudent banking behaviour.</li>
+      <li><strong>Claims Process:</strong> Smart contract specifies trigger conditions (reserve ratio drops below X%, governance declaration of bank insolvency), automatic payout flow, and recovery mechanism from defaulted collateral.</li>
+      <li><strong>Actuarial Sufficiency Model:</strong> Show mathematically that premium income covers expected claims under the base (8%) and stress (15%) default scenarios from Table 5.5.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P3</div>
+    <h4>Basel III Crypto-Asset Capital Adequacy Chapter</h4>
+    <p>Add a chapter section mapping the platform to BCBS SCO60 (the Basel framework for crypto assets, effective January 2025):</p>
+    <ul>
+      <li>Classify ETH holdings as Group 2a assets (unbacked crypto) — requiring 1,250% risk weight under Basel III. This is a prohibitive capital requirement that makes ETH-native banking academically questionable at scale. This supports the paper's own argument for stablecoin migration.</li>
+      <li>Classify USDC/USDT holdings as potential Group 1b (stablecoins meeting specific criteria) — much lower risk weight. This gives Basel III as a structural reason to prioritise stablecoin adoption, not just a user protection argument.</li>
+      <li>Show minimum CET1 (Common Equity Tier 1) requirements the platform would face as a regulated institution, and how the reserve pool addresses them.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P4</div>
+    <h4>CAMELS-Inspired On-Chain Bank Health Score</h4>
+    <p>Design an on-chain CAMELS equivalent for Tier 2 and Tier 3 banks. This would be a novel contribution:</p>
+    <ul>
+      <li><strong>C — Capital:</strong> Reserve ratio as a percentage of risk-weighted loan portfolio.</li>
+      <li><strong>A — Asset Quality:</strong> Non-performing loan ratio (loans in DEFAULT state / total active loans).</li>
+      <li><strong>M — Management:</strong> Governance participation rate, approval timeliness score, dispute resolution rate.</li>
+      <li><strong>E — Earnings:</strong> Net interest margin, fee income per active loan, cost-to-income ratio.</li>
+      <li><strong>L — Liquidity:</strong> Liquid assets / 30-day expected outflows (on-chain LCR equivalent).</li>
+      <li><strong>S — Sensitivity:</strong> Correlation of portfolio defaults with ETH price volatility.</li>
+    </ul>
+    <p>This is computed on-chain and published via smart contract events. Tier 1 uses it to determine inter-tier lending eligibility and rates. This alone would be a publishable research contribution.</p>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P5</div>
+    <h4>Asset-Liability Management (ALM) Framework</h4>
+    <p>Add a quantitative ALM section showing:</p>
+    <ul>
+      <li>Duration gap analysis: if deposits have average maturity of 90 days and loans have average maturity of 12 months, the gap is 9 months — a classic bank run risk.</li>
+      <li>How fixed-term deposit product design closes this gap: 180-day deposits fund 6-month loan tranches.</li>
+      <li>A Liquidity Coverage Ratio (LCR) equivalent: the platform should hold high-quality liquid assets (stablecoins, short-term treasury tokens) equal to 30 days of expected net outflows.</li>
+      <li>Net Stable Funding Ratio (NSFR): a 1-year horizon measure ensuring stable funding sources match illiquid assets.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P6</div>
+    <h4>Bank Run Prevention &amp; Crisis Management Protocol</h4>
+    <ul>
+      <li><strong>Tiered Withdrawal Limits:</strong> Small withdrawals (&lt;0.1 ETH equivalent) always permitted. Medium withdrawals (0.1–10 ETH) subject to 24-hour delay. Large withdrawals (&gt;10 ETH) require governance approval or 72-hour timelock.</li>
+      <li><strong>Emergency Liquidity Line:</strong> Tier 1 can open an emergency discount window to any Tier 2/3 bank facing a liquidity crisis — lending at penalty rate against loan portfolio collateral, analogous to the Fed's primary credit facility.</li>
+      <li><strong>Contagion Circuit Breaker:</strong> If a Local Bank's reserve ratio drops below 5% AND withdrawal requests exceed 20% of deposits in 24 hours, Tier 1 governance automatically freezes that bank's lending and triggers an emergency capital injection assessment.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P7</div>
+    <h4>Trade Finance — Elevated from Footnote to Full Architecture</h4>
+    <p>Trade finance represents $18 trillion annually (ICC 2024). For a "World Bank" targeting developing economies, this is not optional:</p>
+    <ul>
+      <li><strong>Letter of Credit (LC) Smart Contract:</strong> Buyer's Tier 3 bank locks payment in escrow. Oracle verifies shipping document hash (via trusted trade finance data provider). Payment released automatically on document verification. This is fully implementable in Solidity.</li>
+      <li><strong>Guarantee Instrument:</strong> A Tier 2 bank issues a programmable guarantee to a counterparty's bank, with automatic claim settlement on proven non-performance.</li>
+      <li><strong>Supply Chain Finance:</strong> Tier 3 bank can extend working capital to suppliers against confirmed purchase orders from creditworthy buyers — the blockchain audit trail makes this uniquely verifiable.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P8</div>
+    <h4>Tokenised Real-World Asset (RWA) Integration</h4>
+    <p>The paper mentions "tokenized collateral instruments" in one line. In 2025, tokenised RWAs are a $15+ billion market (BlackRock BUIDL fund alone is $2.5B). This is directly relevant to a banking platform:</p>
+    <ul>
+      <li>Allow Tier 2 banks to hold tokenised government bonds (e.g., tokenised T-bills via BlackRock BUIDL, Franklin OnChain US Government Money Fund) as high-quality liquid assets in their reserve portfolio.</li>
+      <li>This bridges the paper's gap between idle ETH reserves and productive interest-bearing assets — exactly how real banks invest excess reserves in short-term government securities.</li>
+      <li>Basel III Group 1a classification (tokenised traditional assets) gives a regulatory path with favourable capital treatment.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P9</div>
+    <h4>Consumer Protection &amp; Responsible Banking Framework</h4>
+    <p>For a platform targeting the bottom billion, this is both ethically essential and academically expected:</p>
+    <ul>
+      <li><strong>Rate Caps by Jurisdiction:</strong> The governance module should allow jurisdiction-specific interest rate caps — Bangladesh Bank, for instance, caps microcredit at 24% APR. The platform's governance must be able to encode local rate limits.</li>
+      <li><strong>Explainable Rejection Notices:</strong> When the AI/ML layer rejects a loan, the borrower must receive an on-chain SHAP explanation in plain language. This is an EU AI Act requirement (Article 86) and a basic fairness principle.</li>
+      <li><strong>Cooling-Off Period:</strong> Large loans above a threshold should have a 48-hour acceptance window during which the borrower can review and cancel without penalty. This mirrors responsible lending regulation globally.</li>
+      <li><strong>Grievance Mechanism:</strong> A structured on-chain dispute resolution pathway for rejected applications, wrongful defaults, and fee disputes. A DAO-based arbitration panel with rotating jurisdiction-aware arbitrators.</li>
+    </ul>
+  </div>
+
+  <div class="priority-card">
+    <div class="priority-num">P10</div>
+    <h4>Wealth Management &amp; Custodial Services for Tier 2</h4>
+    <p>National Banks in real banking systems don't just lend — they manage assets, offer custody, and provide institutional investment services:</p>
+    <ul>
+      <li><strong>Institutional Yield Account:</strong> Tier 2 banks can place excess reserves in a tokenised money market fund product (USDC deposited into an on-chain yield protocol like Aave's USDC market or a tokenised T-bill wrapper), earning yield on idle capital while maintaining liquidity.</li>
+      <li><strong>Custodial Service for Sovereign Wealth:</strong> Tier 1 and Tier 2 can offer custody of digital assets for institutional participants — government agencies, NGOs, development funds. This is where JPMorgan's Kinexys and Citi Token Services are operating today.</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════ SECTION 5 ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 05 — Structural Improvements</div>
+  <h2>Paper Structure &amp; Academic <span class="accent">Quality</span> Improvements</h2>
+
+  <div class="callout gold">
+    <div class="callout-title">What Already Works Well</div>
+    <p>The paper has excellent citations from real banking institutions (BIS, World Bank, IFC, IMF). The problem statement is grounded in concrete data ($860B remittances, $4.5T SME financing gap, 1.4B unbanked). The four-tier architecture is conceptually sound and genuinely novel. The literature review is comprehensive. The threat model table is well-structured.</p>
+  </div>
+
+  <h3>Structural Changes Recommended</h3>
+
+  <div class="callout red">
+    <div class="callout-title">Remove or Rebuild</div>
+    <p><strong>The Revenue Projection section (Chapter 5)</strong> as currently written presents optimistic numbers as near-certain outcomes. It projects $224M annual revenue without adequately accounting for: platform adoption risk (no users at launch), regulatory shutdown risk, crypto market volatility impact on ETH-denominated revenues, competition from JPMorgan Kinexys and R3 Corda which already process billions daily. Either reframe this as "maximum theoretical revenue under full deployment assumptions" or replace with a more conservative IRR/NPV model with three proper scenarios. The current presentation weakens the paper's credibility.</p>
+  </div>
+
+  <div class="callout blue">
+    <div class="callout-title">Chapter Restructuring Suggestion</div>
+    <p>The paper currently buries the "Banking Product Suite" inside Chapter 3 (System Architecture). From a banking perspective, this should be elevated to its own chapter titled <em>"Banking Function Architecture"</em> that precedes the technical architecture. Banks are defined by their functions, not their technology. Lead with what the bank does, then explain the technology that enables it. The current structure is engineer-first, banking-second.</p>
+  </div>
+
+  <div class="callout green">
+    <div class="callout-title">Add These Sections</div>
+    <p><strong>1. A "Banking Regulatory Landscape" section</strong> mapping the platform against Bangladesh Bank Fintech sandbox rules, BIS crypto banking principles, and FATF Travel Rule compliance — these are specifically relevant to a BRAC University project deploying in Bangladesh.</p>
+    <p><strong>2. A "Comparative Banking Architecture" table</strong> comparing the platform feature-by-feature against: JPMorgan Kinexys, HSBC Orion (tokenised deposits), Goldfinch, Maple Finance, and a traditional World Bank development loan structure. This would be a powerful research contribution.</p>
+    <p><strong>3. An "On-Chain Banking Metrics Dashboard" section</strong> specifying exactly what real-time data the Tier 1 World Bank publishes — reserve ratios, NPL rates, active loan counts by tier, system-wide utilisation rate. Make the "transparency" claim concrete.</p>
+  </div>
+
+  <h3>Specific Content Gaps to Fill</h3>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Gap</th>
+        <th>Where to Add</th>
+        <th>Recommended Content</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>No fractional reserve banking analysis</td>
+        <td>Chapter 1 or 3</td>
+        <td>Discuss whether the platform operates on fractional reserve principles or 100% reserve (full-backing). This determines the money multiplier effect and systemic risk profile.</td>
+      </tr>
+      <tr>
+        <td>No mention of payment network interoperability</td>
+        <td>Chapter 3</td>
+        <td>How does the platform interact with SWIFT, ISO 20022 (global banking messaging standard), or existing RTGS systems? JPMorgan Kinexys connects to these. The platform needs a bridge strategy.</td>
+      </tr>
+      <tr>
+        <td>Stablecoin governance not designed</td>
+        <td>Chapter 3</td>
+        <td>If USDC is used, Circle's redemption risk and regulatory risk need to be addressed. If a platform-native stablecoin is issued in future, the collateral model and redemption mechanism must be pre-specified.</td>
+      </tr>
+      <tr>
+        <td>No discussion of systemic risk / contagion</td>
+        <td>Chapter 5</td>
+        <td>If one National Bank fails, how does it not cascade to Local Banks beneath it? Model the contagion path and the firewall mechanisms. Cite the BIS's work on network contagion in banking systems.</td>
+      </tr>
+      <tr>
+        <td>Credit scoring methodology underspecified</td>
+        <td>Chapter 3</td>
+        <td>The on-chain credit history model is mentioned but the scoring algorithm is not defined. What variables enter the score? How is it normalised across users with no prior history? How is it updated after defaults? This is a bankable research contribution if fully specified.</td>
+      </tr>
+      <tr>
+        <td>No discussion of financial crime beyond AML</td>
+        <td>Chapter 3 / Appendix</td>
+        <td>Sanctions screening (OFAC), politically exposed persons (PEP) screening, and beneficial ownership verification are all required for any real bank. The ZKP KYC design should address these specific compliance categories.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════ SECTION 6 ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 06 — What Makes This Paper Genuinely Valuable</div>
+  <h2>Strengths Worth <span class="accent">Defending</span> and Amplifying</h2>
+
+  <div class="callout green">
+    <div class="callout-title">Genuine Research Contributions — Defend These</div>
+    <p>From a banking expert's perspective, these four elements are genuinely novel and would be publishable with proper extension:</p>
+    <ul style="margin-top: 8px; padding-left: 20px; font-size: 15px;">
+      <li style="margin-bottom: 6px;"><strong>On-chain solidarity group lending with mutual liability enforcement</strong> — No existing DeFi protocol does this. The Grameen/BRAC model on a blockchain is a genuine first. Extend this into a full mini-paper worth.</li>
+      <li style="margin-bottom: 6px;"><strong>Four-tier hierarchical DeFi architecture</strong> — The World Bank → National Bank → Local Bank → Borrower chain is conceptually correct and novel. Every existing DeFi protocol is flat-pool. This is the right idea.</li>
+      <li style="margin-bottom: 6px;"><strong>Multi-directional capital flows</strong> — Upward repatriation of surplus capital, same-tier interbank lending, and cross-tier flows in a DeFi context is genuinely novel modelling.</li>
+      <li style="margin-bottom: 6px;"><strong>Oracle-mediated AI/ML with SHAP explainability</strong> — Bridging off-chain ML to on-chain credit decisions with an auditability layer is a real architectural pattern with practical value.</li>
+    </ul>
+  </div>
+
+  <h3>From a Banker's Eye: The Insight That Should Be the Paper's Core Claim</h3>
+  <p>The most important banking insight buried in this paper is this: <em>the correspondent banking system's inefficiency is not a technology problem — it is a trust and coordination problem between institutions with competing interests.</em> Blockchain solves the coordination problem, not the technology problem. This insight is stated once in the introduction and then forgotten. It should be the paper's organizing thesis, running through every section. Every design decision — the four-tier hierarchy, the on-chain audit trail, the programmable reserve ratios — should be explicitly linked back to solving this specific coordination failure. That framing would make this a much stronger academic paper.</p>
+</div>
+
+
+<!-- ═══════════════════════════════════════ SECTION 7 ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 07 — Final Scorecard</div>
+  <h2>Expert <span class="accent">Summary</span> Assessment</h2>
+
+  <div class="scorecard">
+    <h3>Banking Expert Final Scorecard</h3>
+    <div class="score-row">
+      <span>Core Lending Architecture (Four-Tier Model)</span>
+      <span class="score-val">9/10</span>
+    </div>
+    <div class="score-row">
+      <span>Central Bank / Monetary Authority Functions</span>
+      <span class="score-val">2/10</span>
+    </div>
+    <div class="score-row">
+      <span>Commercial Bank Functions (Deposits, Payments, FX)</span>
+      <span class="score-val">5/10</span>
+    </div>
+    <div class="score-row">
+      <span>Development Bank / Microfinance Functions</span>
+      <span class="score-val">7/10</span>
+    </div>
+    <div class="score-row">
+      <span>Capital Adequacy &amp; Risk Framework (Basel III)</span>
+      <span class="score-val">1/10</span>
+    </div>
+    <div class="score-row">
+      <span>Consumer &amp; Depositor Protection</span>
+      <span class="score-val">2/10</span>
+    </div>
+    <div class="score-row">
+      <span>Crisis Management &amp; Stability Mechanisms</span>
+      <span class="score-val">2/10</span>
+    </div>
+    <div class="score-row">
+      <span>Regulatory Compliance Framework</span>
+      <span class="score-val">4/10</span>
+    </div>
+    <div class="score-row">
+      <span>Research Paper Quality &amp; Academic Rigour</span>
+      <span class="score-val">7/10</span>
+    </div>
+    <div class="score-row" style="border-top: 1px solid rgba(184,134,11,0.4); padding-top: 16px; margin-top: 6px;">
+      <span style="color: var(--gold-light); font-family: 'Playfair Display', serif; font-style: italic; font-size: 17px;">Overall Banking Completeness</span>
+      <span class="score-val" style="font-size: 28px;">4.3/10</span>
+    </div>
+    <p style="font-size: 13px; color: rgba(247,244,238,0.5); margin-top: 20px; font-style: italic;">Score reflects banking function completeness against a full-spectrum institutional banking platform benchmark. The lending architecture alone would score 9/10 — the deficit is entirely in central bank functions, capital framework, and depositor protection.</p>
+  </div>
+
+  <div class="callout">
+    <div class="callout-title">Bottom Line — What to Do Next</div>
+    <p>This paper is an excellent first pass at a genuinely important problem. The lending architecture is strong. The research ambition is high. To become a truly valuable research contribution, the final thesis must: (1) fully specify the InsuranceFund, (2) add the Basel III crypto capital adequacy analysis, (3) design the CAMELS-equivalent on-chain health score, (4) add a bank run and crisis protocol, and (5) elevate trade finance from a footnote to a first-class feature. With these additions, this becomes a paper that a central bank innovation lab or development finance institution would want to read. Without them, it remains a very capable DeFi lending protocol with an ambitious name.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SECTION 8 ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 08 — Cross-Lending &amp; Capital Flow Systems</div>
+  <h2>Can Lower Banks, Rich Users &amp; Investors <span class="accent">Fund Upward</span>? A Deep Analysis</h2>
+
+  <p>You are asking a fundamental question that real-world banking has wrestled with for centuries: <em>can capital flow upward — from individuals to banks, from lower-tier banks to higher-tier banks, from retail investors to a central reserve?</em> The answer is <strong>yes, absolutely — and it already happens in traditional finance</strong>. The question for the Crypto World Bank is <em>which mechanisms are best suited to a blockchain architecture</em>, and which approaches carry risks that must be designed around.</p>
+
+  <div class="verdict">
+    <p>In traditional banking, every deposit a customer makes is effectively the customer <em>lending money</em> to their bank. Every government bond a retail investor buys is funding the sovereign. Every interbank overnight loan is one bank capitalising another. The upward and cross-tier capital flow is not novel — what is novel is doing it <em>programmatically, transparently, and without intermediaries</em> on a blockchain. The Crypto World Bank's architecture is actually well-positioned to implement this — if done correctly.</p>
+    <div class="verdict-cite">— Banking Expert Analysis on Cross-Tier Capital Flows</div>
+  </div>
+
+  <h3>How Cross-Tier &amp; Upward Capital Flow Works in Real Banking</h3>
+  <p>Before designing the blockchain equivalent, understand what already exists in traditional finance — because each of these has a direct on-chain analogue:</p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Traditional Mechanism</th>
+        <th>Who Funds Whom</th>
+        <th>Real-World Example</th>
+        <th>Blockchain Equivalent</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Retail Deposits</td>
+        <td>Individuals → Local Bank</td>
+        <td>Savings account at BRAC Bank, Grameen Bank</td>
+        <td>SavingsVault contract — already designed in the paper</td>
+      </tr>
+      <tr>
+        <td>Interbank Overnight Lending</td>
+        <td>Surplus Bank → Deficit Bank (same tier)</td>
+        <td>Fed Funds Market, SOFR repo market ($4.5T/day)</td>
+        <td>InterBankLendingPool — designed but not built in paper</td>
+      </tr>
+      <tr>
+        <td>Standing Deposit Facility</td>
+        <td>Commercial Bank → Central Bank (upward)</td>
+        <td>ECB Standing Deposit Facility, Fed IORB</td>
+        <td>Upward surplus repatriation — designed in paper, Section 1.7</td>
+      </tr>
+      <tr>
+        <td>Retail Government Bonds</td>
+        <td>Individuals → Sovereign / Central Reserve</td>
+        <td>US I-Bonds, India RBI Retail Direct, Thailand blockchain bonds (2020)</td>
+        <td>Tier 1 Reserve Bonds — <strong>not in paper, must be added</strong></td>
+      </tr>
+      <tr>
+        <td>Correspondent Bank Placements</td>
+        <td>Smaller Bank → Larger Bank (upward)</td>
+        <td>Community bank places excess with JPMorgan</td>
+        <td>Cross-tier surplus deposit — designed conceptually, not built</td>
+      </tr>
+      <tr>
+        <td>Tokenised Treasury Products</td>
+        <td>Any Investor → Reserve Pool</td>
+        <td>BlackRock BUIDL ($2.8B), Franklin OnChain ($600M)</td>
+        <td>Tier 1 Tokenised Reserve Notes — <strong>not in paper</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>The 6 Cross-Lending Mechanisms — Feasibility &amp; Design</h3>
+
+  <!-- MECHANISM 1 -->
+  <div class="priority-card">
+    <div class="priority-num">M1</div>
+    <h4>Same-Tier Interbank Lending Pool (Horizontal Flow) — ✅ Implement This</h4>
+    <p><strong>What it is:</strong> National Bank A has surplus reserves. National Bank B has a liquidity shortfall. They lend to each other for a short term at a floating rate, exactly like the fed funds market or SOFR repo market.</p>
+    <p><strong>Is it a good idea?</strong> <strong>Yes — this is the most important and most immediately implementable mechanism.</strong> It prevents liquidity crises at the national bank tier without requiring Tier 1 to intervene constantly.</p>
+    <p><strong>How to implement on-chain:</strong></p>
+    <ul>
+      <li><strong>InterBankLendingPool contract</strong> at each tier (NB-level and LB-level) acts as a shared liquidity hub. Surplus banks deposit into the pool. Deficit banks borrow from it.</li>
+      <li><strong>Rate mechanism:</strong> Use a utilisation-based floating rate exactly like Aave's kinked interest rate model. At low utilisation, rate is low (encouraging borrowing). At high utilisation (&gt;80%), rate spikes to discourage over-drawing and encourage new deposits.</li>
+      <li><strong>Collateral:</strong> Borrowing bank's on-chain reserve ratio acts as implicit collateral. If a bank's reserve ratio is below a threshold, it is ineligible to borrow from the pool.</li>
+      <li><strong>Real precedent:</strong> The interbank lending market is where banks lend funds to one another, with most loans being overnight or one week or less, made at the interbank rate. A sharp decline in transaction volume in this market was a major contributing factor to the collapse of several financial institutions during the 2008 financial crisis — the on-chain pool prevents this by making liquidity continuously visible.</li>
+      <li><strong>Risk to manage:</strong> The 2008 Global Financial Crisis demonstrated the risks of unsecured short-term interbank lending — when the borrower defaults there is no collateral to fall back on, and if lenders become worried, funding can dry up suddenly. Solution: require partial collateralisation (50% of borrowed amount locked as reserve-backed tokens) and impose position limits per borrowing bank.</li>
+    </ul>
+  </div>
+
+  <!-- MECHANISM 2 -->
+  <div class="priority-card">
+    <div class="priority-num">M2</div>
+    <h4>Upward Surplus Repatriation — Standing Deposit to Tier 1 (Vertical Flow Up) — ✅ Implement This</h4>
+    <p><strong>What it is:</strong> When a Tier 3 Local Bank or Tier 2 National Bank accumulates reserves beyond its minimum reserve ratio, it can deposit the surplus upward to the next tier — earning a deposit yield, and simultaneously strengthening the higher tier's capital base.</p>
+    <p><strong>Is it a good idea?</strong> <strong>Yes — this mirrors the ECB's Standing Deposit Facility and the Fed's Interest on Reserve Balances (IORB).</strong> It is the most natural way to recycle excess capital in a hierarchical system.</p>
+    <p><strong>How to implement on-chain:</strong></p>
+    <ul>
+      <li><strong>SurplusDepositFacility contract</strong> at Tier 1 and Tier 2: lower-tier banks call <code>depositSurplus(amount)</code> and receive a time-locked yield-bearing receipt token. Yield rate is governance-controlled, set below the downward lending rate to preserve the interest spread.</li>
+      <li><strong>Rate logic:</strong> Upward deposit yield (e.g. 1.5%) &lt; same-tier interbank rate (e.g. 2.5%) &lt; downward lending rate (e.g. 3–8%). This creates a natural term structure that incentivises banks to prefer active lending over passive parking.</li>
+      <li><strong>Withdrawal:</strong> Deposits held for a minimum term (e.g. 7 days) can be withdrawn freely; shorter withdrawal triggers a penalty fee that discourages hot-money behaviour and gives the reserve tier stability.</li>
+    </ul>
+  </div>
+
+  <!-- MECHANISM 3 -->
+  <div class="priority-card">
+    <div class="priority-num">M3</div>
+    <h4>Retail Investors Funding the World Bank Reserve — Tier 1 Reserve Bonds — ✅ Highly Recommended Addition</h4>
+    <p><strong>What it is:</strong> Rich individuals, retail investors, NGOs, development funds, and even small savers can <em>directly purchase tokenised bonds issued by the Tier 1 World Bank Reserve</em> — earning a fixed yield, and directly capitalising the global reserve that funds the entire hierarchy below.</p>
+    <p><strong>Is it a good idea?</strong> <strong>Yes — this is one of the most powerful additions you can make to the paper, and it is happening in real life right now.</strong> Retail investors' holdings of sovereign debt have increased from 5% to 11% between 2021 and 2024, with countries like Kenya implementing government bond subscription platforms via mobile phones, and Thailand launching blockchain-based government savings bonds in 2020. The Crypto World Bank is perfectly positioned to replicate this on a global scale.</p>
+    <p><strong>How to implement on-chain:</strong></p>
+    <ul>
+      <li><strong>CWBReserveBond contract (ERC-1155 multi-token):</strong> Tier 1 issues fixed-term bonds in denominations as small as $1 USDC (fractionalised). Each bond is a token with a maturity date, fixed APY (e.g. 4%), and automatic redemption on expiry.</li>
+      <li><strong>Tranche structure:</strong> 3-month bonds (4% APY), 12-month bonds (5.5% APY), 36-month bonds (7% APY). Longer lock-up → higher yield, giving the reserve stable long-term capital.</li>
+      <li><strong>Who can buy:</strong> Any KYC-verified wallet (ZKP KYC already designed in the paper) across the globe, regardless of tier membership. A farmer in Bangladesh can buy a $5 World Bank bond and earn yield while simultaneously capitalising the lending system.</li>
+      <li><strong>Secondary market:</strong> Bond tokens are tradeable on-chain via an AMM (Curve-style stable pool or Pendle-style yield-token market), giving investors liquidity without forcing the reserve to redeem early.</li>
+      <li><strong>Real precedent:</strong> BlackRock's BUIDL fund reached $2.8B AUM in tokenised US treasuries. Tokenised treasury bills allow for DeFi yield integration and can be used as collateral in protocols. The CWB Reserve Bond is the development-finance equivalent of this instrument.</li>
+    </ul>
+    <p><strong>This is the answer to the paper's "bootstrap funding problem."</strong> Instead of relying on 3-of-5 multisig founding deposits, the reserve is capitalised by a global retail investor base — democratising development finance exactly as the paper's mission statement promises.</p>
+  </div>
+
+  <!-- MECHANISM 4 -->
+  <div class="priority-card">
+    <div class="priority-num">M4</div>
+    <h4>High-Net-Worth / Institutional Direct Lending to Tier 1 — Governance Token Bond — ✅ Recommend with Caution</h4>
+    <p><strong>What it is:</strong> Very wealthy individuals or institutions (e.g., a sovereign wealth fund, a large NGO, a crypto-native family office) can make large capital placements directly into the Tier 1 Reserve in exchange for governance tokens and yield rights — essentially becoming founding "member states" of the World Bank.</p>
+    <p><strong>Is it a good idea?</strong> <strong>Yes, with safeguards.</strong> This mirrors how the real World Bank was capitalised by 44 member-state subscriptions in 1944. The risk is governance capture — if one whale controls a large governance stake, they can manipulate reserve allocation. Mitigation: quadratic voting (vote weight = square root of tokens held, not linear), plus a hard cap of 10% governance power per single entity.</p>
+    <p><strong>How to implement:</strong></p>
+    <ul>
+      <li>Large investors subscribe to a <strong>FoundingStake contract</strong> that issues time-locked governance tokens (vesting over 3 years) and yield-bearing receipt tokens.</li>
+      <li>Governance tokens grant voting rights over reserve parameters but never over individual lending decisions (preventing interference in retail borrower outcomes).</li>
+      <li>Protocol-Owned Liquidity (POL) model from Olympus DAO: the protocol sells discounted governance tokens to large investors in exchange for ETH/USDC deposited directly into the Tier 1 Reserve. The reserve owns its own liquidity rather than renting it from yield farmers who can withdraw at will.</li>
+    </ul>
+  </div>
+
+  <!-- MECHANISM 5 -->
+  <div class="priority-card">
+    <div class="priority-num">M5</div>
+    <h4>Cross-Bank Lending — Local Bank Lends to Another Local Bank in a Different Country — ✅ Implement (Cross-Jurisdiction Pool)</h4>
+    <p><strong>What it is:</strong> A Local Bank in Bangladesh has excess USDC. A Local Bank in Nigeria has high loan demand but insufficient capital. They should be able to lend to each other without going through Tier 1.</p>
+    <p><strong>Is it a good idea?</strong> <strong>Yes — but this needs a shared cross-jurisdiction liquidity pool with careful risk controls.</strong> This is actually more efficient than forcing the Bangladesh surplus to flow up to Tier 2 (National Bank) and then back down to the Nigerian National Bank and then to the Nigerian Local Bank. Direct cross-bank lending cuts 4 hops to 1.</p>
+    <p><strong>How to implement:</strong></p>
+    <ul>
+      <li><strong>GlobalInterBankPool contract</strong> at Tier 3 level: any registered Local Bank can deposit surplus into this pool and any Local Bank with a sufficient credit rating (CAMELS score above threshold) can borrow from it.</li>
+      <li><strong>Currency risk:</strong> Pool operates in USDC only (no ETH), eliminating FX risk between the lending and borrowing bank. The borrowing bank converts USDC to local-stablecoin equivalent if needed.</li>
+      <li><strong>Credit limit:</strong> Each Local Bank's maximum borrow from the GlobalInterBankPool is capped at 20% of its own deposit base, preventing over-reliance on the pool and preserving individual bank accountability.</li>
+      <li><strong>This dramatically improves capital efficiency</strong> — idle surplus in one geography funds active loan demand in another, without the capital sitting uninvested in transit through Tier 1 and Tier 2.</li>
+    </ul>
+  </div>
+
+  <!-- MECHANISM 6 -->
+  <div class="priority-card">
+    <div class="priority-num">M6</div>
+    <h4>Retail Borrowers Becoming Micro-Lenders — Peer Liquidity Contribution — ⚠️ Handle With Care</h4>
+    <p><strong>What it is:</strong> A borrower who has successfully repaid their loan and built an on-chain credit history can optionally become a micro-lender — depositing small amounts into the Local Bank's lending pool and earning yield on those deposits, effectively recycling repaid loan capital back into new loans.</p>
+    <p><strong>Is it a good idea?</strong> <strong>Yes, but only after full loan repayment and only at the Local Bank tier.</strong> This is exactly how Grameen Bank's group lending model evolved — successful borrowers become group leaders and later deposit agents. It deepens financial inclusion because the same person who was excluded from banking as a borrower becomes a capital provider.</p>
+    <p><strong>How to implement:</strong></p>
+    <ul>
+      <li>After a borrower's loan is fully repaid (status = COMPLETED), their account is automatically eligible to deposit into the <strong>RetailLiquidityPool</strong> at their Local Bank.</li>
+      <li>Minimum deposit: as low as $1 USDC equivalent (the paper's sub-cent gas costs on Polygon make this viable).</li>
+      <li>Yield: borrower-turned-lender earns 50–70% of the deposit yield that institutional depositors earn (discounted because of lower deposit size and higher management overhead).</li>
+      <li>This creates a powerful <strong>flywheel</strong>: borrowers repay → become depositors → new loans funded → more borrowers repay → pool grows. This is the closed-loop capital cycle the paper claims to have but doesn't fully specify.</li>
+    </ul>
+  </div>
+
+  <!-- MECHANISM 7 - BAD IDEA -->
+  <div class="priority-card" style="border-color: var(--red);">
+    <div class="priority-num" style="background: var(--red);">⚠</div>
+    <h4>Retail Users Directly Investing in the World Bank "Currency" / Token — ❌ Dangerous — Redesign</h4>
+    <p><strong>What it is:</strong> The idea of retail users buying a "CWB coin" or "World Bank currency" that appreciates in value as the platform grows — essentially a speculative investment in the platform's success.</p>
+    <p><strong>Is it a good idea?</strong> <strong>No — this is the Terra/LUNA failure path.</strong> Algorithmic stablecoin / governance token schemes that retail users treat as investments have catastrophically failed: Terra/LUNA ($40B wiped in May 2022), Basis Cash, Iron Finance. If the "currency" is a governance token with no intrinsic cash flow backing, it will be treated as a speculative asset whose price collapses when confidence drops — triggering a death spiral that also collapses the lending system it was supposed to fund.</p>
+    <p><strong>Better alternative — the Reserve Bond (M3 above):</strong> Instead of a speculative token, issue fixed-term bonds with contractual yield. The investor's return comes from real interest income (loan repayments flowing up the hierarchy), not from token price appreciation. This gives retail investors genuine yield with bounded risk, and gives the reserve stable, predictable capital — not hot-money speculative inflows that can evaporate overnight.</p>
+    <p><strong>If a governance token is still desired</strong> (for voting rights): separate the governance token from the investment product completely. Governance tokens are distributed to banks and validated participants, not sold to retail investors. Retail investors buy bonds. This is exactly how the real World Bank works — member states have voting shares (governance), but the World Bank raises capital by issuing bonds to investors, not by selling voting rights.</p>
+  </div>
+
+  <h3>Recommended Architecture: The Full Cross-Flow Map</h3>
+
+  <div class="callout green">
+    <div class="callout-title">The Complete Capital Flow Picture — What the Paper Should Show</div>
+    <p>The Crypto World Bank should operate with <strong>six distinct capital flow directions</strong>, all managed by smart contracts:</p>
+    <ul style="margin-top: 10px; padding-left: 20px; font-size: 15px; line-height: 2;">
+      <li><strong>↓ Downward:</strong> World Bank Reserve → National Banks → Local Banks → Borrowers (already designed)</li>
+      <li><strong>↑ Upward (Banks):</strong> Surplus Local Banks → National Bank SurplusDepositFacility → World Bank Reserve (designed, needs implementation)</li>
+      <li><strong>↑ Upward (Retail):</strong> Individuals / Rich Investors → CWBReserveBond → Tier 1 Reserve (new — M3)</li>
+      <li><strong>↔ Horizontal (National):</strong> National Bank A ↔ National Bank B via NB InterBankLendingPool (designed, needs implementation)</li>
+      <li><strong>↔ Horizontal (Local):</strong> Local Bank A ↔ Local Bank B (any country) via GlobalInterBankPool (new — M5)</li>
+      <li><strong>↑ Micro (Retail):</strong> Repaid borrowers → RetailLiquidityPool at Local Bank (new — M6)</li>
+    </ul>
+    <p style="margin-top: 12px;">Together, these six flows create a <strong>fully closed-loop capital system</strong> where money is never idle for long — it is always either earning yield in a deposit facility or being deployed as a loan somewhere in the hierarchy. This is what makes a bank genuinely capital-efficient.</p>
+  </div>
+
+  <h3>Implementation Priority Order</h3>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Mechanism</th>
+        <th>Complexity</th>
+        <th>Impact</th>
+        <th>Recommendation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>M1 — Same-tier InterBankLendingPool</td>
+        <td>Medium (AMM curve already in paper)</td>
+        <td>High — prevents liquidity crises</td>
+        <td><span class="badge badge-present">Build in Thesis Phase</span></td>
+      </tr>
+      <tr>
+        <td>M2 — Upward Surplus Deposit (Banks → Tier 1)</td>
+        <td>Low (simple deposit vault)</td>
+        <td>High — recycles idle capital</td>
+        <td><span class="badge badge-present">Build in Thesis Phase</span></td>
+      </tr>
+      <tr>
+        <td>M3 — Retail Reserve Bonds (Individuals → Tier 1)</td>
+        <td>Medium (ERC-1155 + yield accrual)</td>
+        <td>Very High — solves bootstrap problem</td>
+        <td><span class="badge badge-present">Specify in Paper, Build Later</span></td>
+      </tr>
+      <tr>
+        <td>M4 — Institutional Governance Bond</td>
+        <td>Medium (governance token vesting)</td>
+        <td>High — large capital injection</td>
+        <td><span class="badge badge-partial">Specify with Governance Guards</span></td>
+      </tr>
+      <tr>
+        <td>M5 — Cross-Jurisdiction Local Bank Pool</td>
+        <td>Low-Medium (extends M1 globally)</td>
+        <td>High — capital efficiency across geographies</td>
+        <td><span class="badge badge-partial">Specify in Paper, Build Later</span></td>
+      </tr>
+      <tr>
+        <td>M6 — Repaid Borrowers as Micro-Lenders</td>
+        <td>Low (deposit eligibility flag)</td>
+        <td>Medium-High — financial inclusion flywheel</td>
+        <td><span class="badge badge-present">Specify in Paper, Build Later</span></td>
+      </tr>
+      <tr>
+        <td>❌ Speculative CWB Currency Token</td>
+        <td>Low (easy to build, catastrophic to operate)</td>
+        <td>Negative — systemic collapse risk</td>
+        <td><span class="badge badge-miss">Do Not Build</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════════════════════════ REFERENCES ═══════════════════════════ -->
+<div class="section">
+  <div class="section-label">§ 09 — References &amp; Sources</div>
+  <h2>Research <span class="accent">References</span> Cited in This Analysis</h2>
+  <p style="font-size: 14px; color: var(--mid); margin-bottom: 28px;">All sources used in the preparation of this banking expert analysis. Sources are organised by topic area. Links open in a new tab.</p>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">I. Central Banking &amp; Monetary Policy</h3>
+  <ol class="ref-list">
+    <li><a href="https://www.federalreserve.gov/monetarypolicy/fomc.htm" target="_blank">Federal Reserve — Federal Open Market Committee (FOMC) &amp; Monetary Policy Tools</a><br><span>Tools of monetary policy: open market operations, discount rate, reserve requirements.</span></li>
+    <li><a href="https://www.newyorkfed.org/markets/domestic-market-operations/monetary-policy-implementation" target="_blank">Federal Reserve Bank of New York — Monetary Policy Implementation</a><br><span>SOFR, repo markets, open market desk operations, balance sheet management.</span></li>
+    <li><a href="https://cointelegraph.com/explained/how-central-banks-are-testing-blockchain-based-monetary-policy" target="_blank">CoinTelegraph (May 2025) — How Central Banks Are Testing Blockchain-Based Monetary Policy</a><br><span>BIS Innovation Hub prototype for smart-contract OMO, repo, emergency lending facility.</span></li>
+    <li><a href="https://www.elibrary.imf.org/view/journals/063/2025/011/article-A001-en.xml" target="_blank">IMF FinTech Notes Vol. 2025/011 — Central Bank Exploration of Tokenized Reserves</a><br><span>Tokenised reserves, collateralised monetary operations, lender of last resort via DLT.</span></li>
+    <li><a href="https://www.ecb.europa.eu/press/key/date/2024/html/ecb.sp240209~d481464c19.en.html" target="_blank">ECB (February 2024) — Modernising Finance: The Role of Central Bank Money</a><br><span>T+0/T+1 settlement, smart contracts for central bank operations, digital euro project status.</span></li>
+    <li><a href="https://www.sciencedirect.com/topics/economics-econometrics-and-finance/lender-of-last-resort" target="_blank">ScienceDirect — Lender of Last Resort: Theory and Mechanism</a><br><span>Bagehot doctrine, discount window, CAMELS-triggered secondary credit.</span></li>
+    <li><a href="https://www.dallasfed.org/news/speeches/logan/2025/lkl250925" target="_blank">Dallas Fed President Logan (September 2025) — The Case for Modernising the FOMC's Operating Target Rate</a><br><span>SOFR replacing fed funds, repo market dominance, fragility of unsecured interbank lending.</span></li>
+  </ol>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">II. Interbank &amp; Cross-Tier Lending</h3>
+  <ol class="ref-list" start="8">
+    <li><a href="https://en.wikipedia.org/wiki/Interbank_lending_market" target="_blank">Wikipedia — Interbank Lending Market: Mechanics &amp; History</a><br><span>Overnight lending, eurodollar market, reserve requirements, 2008 crisis impact.</span></li>
+    <li><a href="https://www.newyorkfed.org/research/staff_reports/sr620.html" target="_blank">NY Fed Staff Report — Trading Partners in the Interbank Lending Market</a><br><span>Concentrated borrowing relationships, shock insulation, price formation in fed funds.</span></li>
+    <li><a href="https://www.dallasfed.org/news/speeches/logan/2025/lkl251031" target="_blank">Dallas Fed (October 2025) — Ample Liquidity for a Safe and Efficient Banking System</a><br><span>Post-GFC unsecured interbank risk, FHLB arbitrage, fragility of fed funds market.</span></li>
+    <li><a href="https://www.cmegroup.com/articles/2025/is-the-sofr-benchmark-becoming-more-volatile.html" target="_blank">CME Group (2025) — Is the SOFR Benchmark Becoming More Volatile?</a><br><span>SOFR vs EFFR spread volatility, repo market stress signals, September 2025 spike.</span></li>
+  </ol>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">III. Capital Adequacy &amp; Regulatory Framework</h3>
+  <ol class="ref-list" start="12">
+    <li><a href="https://pixelplex.io/blog/basel-iii-requirements/" target="_blank">PixelPlex — Basel III Requirements for Banks and Crypto Assets (2025)</a><br><span>BCBS SCO60 implementation, Group 1/Group 2 crypto classification, 1,250% risk weight for unbacked crypto.</span></li>
+    <li><a href="https://www.pwc.com/us/en/industries/financial-services/library/basel-iii-and-banking.html" target="_blank">PwC — Basel III Endgame: The Next Generation of Capital Requirements</a><br><span>Stress testing frameworks, LCR, NSFR, CET1 requirements, counterparty risk limits.</span></li>
+    <li><a href="https://www.sullcrom.com/insights/memo/2026/March/Banking-Agencies-Release-Basel-III-GSIB-Surcharge-Revised-Standardized-Approach-Proposals" target="_blank">Sullivan &amp; Cromwell (March 2026) — Basel III &amp; G-SIB Surcharge Revised Proposals</a><br><span>Latest US Basel III implementation status, stress test capital buffer rules, CET1 adjustments.</span></li>
+    <li><a href="https://analystprep.com/cfa-level-2/the-camels-approach/" target="_blank">AnalystPrep — The CAMELS Rating System (CFA Level II)</a><br><span>Capital adequacy, Asset quality, Management, Earnings, Liquidity, Sensitivity — six-factor framework.</span></li>
+    <li><a href="https://www.fdic.gov/news/speeches/2024/spmar1124.html" target="_blank">FDIC Vice Chairman Hill (March 2024) — Banking's Next Chapter: Tokenization and Crypto Issues</a><br><span>Deposit insurance, discount window access, CAMELS downgrade triggers, crypto banking regulation.</span></li>
+  </ol>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">IV. DeFi, Institutional Finance &amp; Blockchain Banking</h3>
+  <ol class="ref-list" start="17">
+    <li><a href="https://www.sygnum.com/blog/2025/05/30/institutional-defi-in-2025-the-disconnect-between-infrastructure-and-allocation/" target="_blank">Sygnum Bank (May 2025) — Institutional DeFi in 2025: The Disconnect Between Infrastructure and Allocation</a><br><span>Permissioned lending pools, KYC frameworks, RWA tokenisation, institutional custody gaps.</span></li>
+    <li><a href="https://www.jpmorgan.com/kinexys/documents/Institutional-DeFi-The-Next-Generation-of-Finance.pdf" target="_blank">JPMorgan Kinexys / Oliver Wyman — Institutional DeFi: The Next Generation of Finance</a><br><span>Institutional-grade DeFi architecture, compliance, custody, treasury management.</span></li>
+    <li><a href="https://corporates.db.com/files/documents/publications/DB-Northern-Trust-Institutional-DeFi-WP-18pp-Weblegal-updated.pdf" target="_blank">Deutsche Bank / Northern Trust — The Road to Institutional DeFi</a><br><span>Regulated custody, on-chain settlement, institutional asset servicing on blockchain.</span></li>
+    <li><a href="https://wifpr.wharton.upenn.edu/wp-content/uploads/2025/10/WIFPR-DeFi-Vs-TradFi-Park.pdf" target="_blank">Wharton WIFPR (2025) — DeFi vs TradFi: Institutions and Industrial Organization</a><br><span>Self-custody, open access, regulatory challenges, TradFi-DeFi integration pathways.</span></li>
+    <li><a href="https://home.treasury.gov/system/files/136/DeFi-Risk-Full-Review.pdf" target="_blank">US Treasury — Illicit Finance Risk Assessment of Decentralized Finance</a><br><span>AML/CFT gaps in DeFi, FATF standards, BSA applicability, disintermediation vulnerabilities.</span></li>
+    <li><a href="https://www.neosofttech.com/blogs/defi-blockchain-financial-services/" target="_blank">Neosoft (March 2025) — The Future of DeFi: How Blockchain is Transforming Financial Services</a><br><span>DeFi 2.0 innovations, cross-chain interoperability, decentralised insurance, protocol-owned liquidity.</span></li>
+    <li><a href="https://www.researchgate.net/publication/384590636_Blockchain_and_decentralized_finance_DEFI_Disrupting_traditional_banking_and_financial_systems" target="_blank">ResearchGate (2024) — Blockchain and DeFi: Disrupting Traditional Banking and Financial Systems</a><br><span>Core banking functions, DeFi comparison, systemic risk, traditional vs decentralised intermediation.</span></li>
+    <li><a href="https://financialit.net/news/blockchain/next-phase-institutional-defi-xrpl-credit-compliance-and-confidentiality" target="_blank">Financial IT (September 2025) — The Next Phase of Institutional DeFi on XRPL</a><br><span>Fixed-term uncollateralised loans on-ledger, tri-party custody, institutional lending protocol design.</span></li>
+  </ol>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">V. Tokenisation, RWAs &amp; Sovereign Bonds</h3>
+  <ol class="ref-list" start="25">
+    <li><a href="https://medium.com/@innocentnweke/tokenized-securities-how-blockchains-have-transformed-stocks-bonds-and-treasuries-c62feb4dbc61" target="_blank">Medium (December 2025) — Tokenized Securities: How Blockchains Have Transformed Stocks, Bonds, and Treasuries</a><br><span>BlackRock BUIDL ($2.8B), Franklin OnChain, OUSG, tokenised treasuries as DeFi collateral.</span></li>
+    <li><a href="https://www.oecd.org/en/blogs/2025/05/retail-investors-and-sovereign-debt-why-now-and-what-next.html" target="_blank">OECD (May 2025) — Retail Investors and Sovereign Debt: Why Now and What Next?</a><br><span>Retail sovereign bond programmes, mobile platforms, blockchain bonds (Thailand 2020), India RBI Retail Direct.</span></li>
+    <li><a href="https://www.oecd.org/content/dam/oecd/en/publications/reports/2025/01/sovereign-retail-debt-programmes-and-instruments_91c0e630/e2a782d0-en.pdf" target="_blank">OECD (January 2025) — Sovereign Retail Debt Programmes and Instruments</a><br><span>Who participates, programme structures, patriotic bonds, retail investor motivations.</span></li>
+    <li><a href="https://www.oecd.org/en/publications/global-debt-report-2026_e9d80efd-en/full-report/the-investor-base-for-government-and-corporate-bond-markets_e68b90b3.html" target="_blank">OECD Global Debt Report 2026 — The Investor Base for Government and Corporate Bond Markets</a><br><span>Retail investors growing from 5% to 11% of sovereign bond holdings; central bank withdrawal from bond markets.</span></li>
+    <li><a href="https://egeyag.medium.com/on-chain-government-bonds-how-blockchain-is-transforming-sovereign-debt-markets-d5197f23a6fc" target="_blank">Medium (April 2025) — On-Chain Government Bonds: How Blockchain is Transforming Sovereign Debt Markets</a><br><span>Technical design, smart contract bond lifecycle, secondary market liquidity, transparency benefits.</span></li>
+    <li><a href="https://www.iosco.org/library/pubdocs/pdf/IOSCOPD809.pdf" target="_blank">IOSCO (November 2025) — Tokenization of Financial Assets</a><br><span>SDX tokenised bonds, DvP settlement, UBS digital bonds, Franklin OnChain government fund structure.</span></li>
+    <li><a href="https://arxiv.org/abs/2512.16080" target="_blank">ArXiv (December 2025) — BondMM-A: Decentralised Fixed-Income Lending AMM for Arbitrary Maturities</a><br><span>Mathematical design of on-chain bond AMM, fixed-income DeFi, maturity-varying liquidity curves.</span></li>
+  </ol>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">VI. DeFi Mechanics &amp; AMM Design</h3>
+  <ol class="ref-list" start="32">
+    <li><a href="https://chain.link/article/what-is-liquidity-pool" target="_blank">Chainlink — What Is a Liquidity Pool? DeFi Markets Explained</a><br><span>AMM model, LP tokens, incentive alignment, utilisation-based pricing.</span></li>
+    <li><a href="https://fibo-crypto.fr/en/blog/liquidity-pools-defi/" target="_blank">Fibo (February 2026) — Liquidity Pools Explained: How DeFi Pools Work in 2025</a><br><span>Constant product formula, specialised AMM curves, RWA integration, impermanent loss.</span></li>
+    <li><a href="https://arxiv.org/pdf/2103.12732" target="_blank">ArXiv — SoK: Decentralised Exchanges with AMM Protocols</a><br><span>Conservation functions, bonding curves, formal AMM analysis, reserve quantities.</span></li>
+    <li><a href="https://www.dlnews.com/research/internal/state-of-defi-2025/" target="_blank">DL News — State of DeFi 2025</a><br><span>Hybrid AMM/orderbook designs, cross-margin, institutional-grade DeFi infrastructure trends.</span></li>
+    <li><a href="https://www.coinspeaker.com/guides/best-yield-farming-crypto/" target="_blank">CoinSpeaker — Best Yield Farming Crypto 2026</a><br><span>Pendle V2 ($8.27B TVL), yield tokenisation, Curve stablecoin pools, fixed-income DeFi.</span></li>
+  </ol>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">VII. BIS, IMF &amp; Multilateral Research</h3>
+  <ol class="ref-list" start="37">
+    <li><a href="https://www.bis.org/publ/arpdf/ar2025e3.pdf" target="_blank">BIS Annual Economic Report 2025 — The Next-Generation Monetary and Financial System</a><br><span>Two-tier banking system, RTGS elasticity, integrity requirements, CBDC architecture.</span></li>
+    <li><a href="https://www.imf.org/-/media/Files/Publications/FTN063/2024/English/FTNEA2024007.ashx" target="_blank">IMF FinTech Note 2024/007 — Implications of Central Bank Digital Currencies</a><br><span>Tiered CBDC limits, digital euro preparation phase, holding limits calibration.</span></li>
+    <li><a href="https://www.cigionline.org/static/documents/DADW_Kalash_3.pdf" target="_blank">CIGI Paper No. 322 (June 2025) — How Central Banks Are Shaping the Future of Finance</a><br><span>CBDC developments, Project mBridge, cross-border CBDC settlement, fraud detection ML.</span></li>
+    <li><a href="https://arxiv.org/pdf/2603.01803" target="_blank">ArXiv (2026) — Tokens All the Way Down: A Money View of Decentralized Finance</a><br><span>Hierarchical DeFi as layered credit chains, TVL-based fragility, systemic liquidity risks.</span></li>
+  </ol>
+
+  <h3 style="font-size: 16px; margin-top: 28px; margin-bottom: 14px;">VIII. Wealth Management &amp; Institutional Trends</h3>
+  <ol class="ref-list" start="41">
+    <li><a href="https://www.oliverwyman.com/our-expertise/insights/2025/dec/wealth-management-trends-2026.html" target="_blank">Oliver Wyman (December 2025) — 10 Wealth Management Trends for 2026</a><br><span>On-chain cash management, TradFi-DeFi hybrid wallets, tokenised cash sleeves, custody fee models.</span></li>
+    <li><a href="https://www.gdf.io/wp-content/uploads/2020/12/23.7.25_GDFDACxTokenizationReport_FINAL.pdf" target="_blank">GDF / Deloitte / Zodia (July 2025) — Building the Institutional Tokenisation Infrastructure</a><br><span>Tokenised RWA institutional use cases, TMMF funds, US Treasury tokenisation leaders.</span></li>
+  </ol>
+</div>
+
+
+<!-- FOOTER -->
+<div style="border-top: 2px solid var(--ink); padding-top: 28px; margin-top: 60px; font-size: 13px; color: var(--mid); text-align: center; line-height: 2;">
+  <span style="font-family: 'IBM Plex Mono', monospace; letter-spacing: 2px; text-transform: uppercase; font-size: 11px;">Banking Expert Analysis</span><br>
+  <span style="font-style: italic;">Crypto World Bank Pre-Thesis v13 · May 2026 · For Academic Use Only</span><br>
+  <span>42 references · 8 topic areas · Sections §01–§09</span>
+</div>
+
+</div><!-- .main-wrap -->
+
+<style>
+/* Reference list styling */
+.ref-list {
+  padding-left: 22px;
+  margin: 0 0 8px;
+}
+.ref-list li {
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.ref-list li a {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--blue);
+}
+.ref-list li a:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.ref-list li span {
+  display: block;
+  color: var(--mid);
+  font-size: 13px;
+  font-style: italic;
+  margin-top: 2px;
+}
+</style>
+
+</body>
+</html>

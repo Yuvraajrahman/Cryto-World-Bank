@@ -1,0 +1,20 @@
+---
+title: Transaction State Machine (Loan Lifecycle)
+---
+stateDiagram-v2
+    [*] --> DRAFT
+    DRAFT --> PENDING_KYC : Borrower submits
+    PENDING_KYC --> REJECTED : KYC fails
+    PENDING_KYC --> PENDING_LIMIT : KYC ok
+    PENDING_LIMIT --> REJECTED : borrowing-limit fail
+    PENDING_LIMIT --> PENDING_SCORE : limit ok
+    PENDING_SCORE --> PENDING_APPROVAL : ML committed
+    PENDING_APPROVAL --> REJECTED : approver rejects
+    PENDING_APPROVAL --> ACTIVE : approver approves + reveal
+    ACTIVE --> ACTIVE : processInstallment(N)
+    ACTIVE --> DEFAULTED : missed beyond grace
+    DEFAULTED --> LIQUIDATED : LiquidationEngine seizes
+    DEFAULTED --> ACTIVE : cure within window
+    ACTIVE --> CLOSED : final installment paid
+    LIQUIDATED --> CLOSED : recovery distributed
+    CLOSED --> [*]

@@ -1,0 +1,18 @@
+---
+title: Local LLM Assistant — Compact Request Path
+---
+flowchart TB
+    classDef node fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    UI["Web UI<br/>landing + in-app<br/>(Vite + React)"]:::node
+    P["Vite dev proxy<br/>/api → :4000"]:::node
+    S["CWB API<br/>POST /api/ai/chat/stream (SSE)"]:::node
+    L["LM Studio<br/>/v1/chat/completions (stream)"]:::node
+    R["Message rendering<br/>Markdown · math · GFM"]:::node
+
+    UI -->|"browser fetch"| P
+    P --> S
+    S -->|"upstream"| L
+    L -->|"token deltas"| S
+    S -->|"SSE: token + meta + done"| P
+    P -->|"incremental text"| R

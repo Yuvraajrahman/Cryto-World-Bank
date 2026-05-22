@@ -1,0 +1,18 @@
+---
+title: Real-Time Dashboard and Runtime Monitoring Pipeline
+---
+flowchart LR
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef view  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    SC["Smart contracts<br/>emit typed events"]:::chain --> GRP["The Graph subgraph<br/>(indexer)"]:::step
+    SC --> TEN["Tenderly<br/>(runtime alerts)"]:::step
+    GRP --> WS["WebSocket server<br/>(Node 20)"]:::step
+    TEN -. "incident webhook" .-> OPS["Ops runbook +<br/>function pause"]:::store
+    WS --> CACHE[("Redis cache<br/>(latest snapshot)")]:::store
+    CACHE --> DASH["React dashboard<br/>(charts + alerts)"]:::view
+    DASH --> REG["Read-only regulator view"]:::view
+    GRP --> ANL["Anomaly detector<br/>(Isolation Forest)"]:::step
+    ANL -. "alert" .-> OPS

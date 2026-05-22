@@ -1,0 +1,26 @@
+---
+title: Blockchain and Application Stack
+---
+flowchart TB
+    classDef layer fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef node  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph L5[" L5 Presentation "]
+        FE["React 18 + Vite, MetaMask, ethers v6"]:::node
+    end
+    subgraph L4[" L4 API & Services "]
+        API["Express / Node 20 · FastAPI · WebSocket<br/>EIP-712 auth · JWT · rate-limit"]:::node
+    end
+    subgraph L3[" L3 Data "]
+        DB["PostgreSQL 16 (3NF, 15+ tables) · Redis 7 · IPFS doc store"]:::node
+    end
+    subgraph L2[" L2 Smart-Contract Platform "]
+        SC["Solidity 0.8.20 · OpenZeppelin v5 · UUPS · TimelockController · RBAC · ReentrancyGuard"]:::node
+    end
+    subgraph L1[" L1 Settlement / Network "]
+        NET["Polygon PoS (retail) · Ethereum Sepolia (institutional)<br/>Chainlink CCIP bridge · The Graph indexer · Tenderly monitor"]:::node
+    end
+
+    L5 --> L4 --> L3 --> L2 --> L1
+
+    class L1,L2,L3,L4,L5 layer

@@ -1,0 +1,136 @@
+---
+title: ERD - Extended Banking Products and Multi-Entity Operations (v15)
+---
+erDiagram
+    BORROWER ||--o{ SAVINGS_ACCOUNT : owns
+    BORROWER ||--o{ FIXED_DEPOSIT : owns
+    BORROWER ||--o{ CURRENT_ACCOUNT : owns
+    LOCAL_BANK ||--o{ LOAN_GROUP : hosts
+    LOAN_GROUP ||--o{ GROUP_MEMBER : "has"
+    BORROWER ||--o{ GROUP_MEMBER : "is"
+    LOCAL_BANK ||--o{ INSURANCE_FUND : maintains
+
+    LOCAL_BANK ||--o{ INTERBANK_LOAN : "lender / borrower"
+    NATIONAL_BANK ||--o{ INTERBANK_LOAN : "lender / borrower"
+    LOCAL_BANK ||--o{ UPWARD_DEPOSIT : "depositor"
+    NATIONAL_BANK ||--o{ UPWARD_DEPOSIT : "depositor"
+
+    NATIONAL_BANK ||--o{ SYNDICATE : "lead-arranges"
+    SYNDICATE ||--o{ SYNDICATE_MEMBER : "has"
+    LOCAL_BANK ||--o{ SYNDICATE_MEMBER : "subscribes"
+    SYNDICATE ||--o| LOAN : funds
+
+    LOCAL_BANK ||--o{ TRANCHED_POOL : operates
+    TRANCHED_POOL ||--o{ LOAN : funds
+
+    NATIONAL_BANK ||--o{ TREASURY_SWAP : executes
+    LOCAL_BANK ||--o{ TREASURY_SWAP : executes
+
+    NATIONAL_BANK ||--o{ NETTING_BATCH : coordinates
+    NETTING_BATCH ||--o{ NETTING_ENTRY : contains
+    LOCAL_BANK  ||--o{ NETTING_ENTRY : settles
+
+    SAVINGS_ACCOUNT {
+        bigint account_id PK
+        bigint borrower_id FK
+        numeric balance
+        numeric yield_bps
+        timestamp opened_at
+    }
+    FIXED_DEPOSIT {
+        bigint deposit_id PK
+        bigint borrower_id FK
+        numeric principal
+        int term_days
+        numeric apy_bps
+        date maturity
+    }
+    CURRENT_ACCOUNT {
+        bigint account_id PK
+        bigint borrower_id FK
+        numeric balance
+    }
+    LOAN_GROUP {
+        bigint group_id PK
+        bigint local_bank_id FK
+        int member_count
+        numeric shared_collateral
+        string status
+    }
+    GROUP_MEMBER {
+        bigint group_id FK
+        bigint borrower_id FK
+        numeric share
+        string consent_sig
+    }
+    INSURANCE_FUND {
+        bigint fund_id PK
+        bigint local_bank_id FK
+        numeric balance
+        numeric premium_bps
+    }
+    INTERBANK_LOAN {
+        bigint loan_id PK
+        int    tier
+        bigint lender_bank_id FK
+        bigint borrower_bank_id FK
+        numeric principal
+        int    maturity_code
+        numeric rate_bps
+        string status
+        timestamp settled_at
+    }
+    UPWARD_DEPOSIT {
+        bigint deposit_id PK
+        bigint depositing_bank_id FK
+        bigint parent_bank_id FK
+        numeric principal
+        numeric yield_owed
+        timestamp created_at
+    }
+    SYNDICATE {
+        bigint syndicate_id PK
+        bigint lead_arranger_id FK
+        bigint borrower_id
+        numeric total_amount
+        string  doc_hash
+        string  status
+    }
+    SYNDICATE_MEMBER {
+        bigint syndicate_id FK
+        bigint lender_bank_id FK
+        numeric commitment
+        int     share_bps
+        timestamp confirmed_at
+    }
+    TRANCHED_POOL {
+        bigint pool_id PK
+        bigint local_bank_id FK
+        numeric senior_principal
+        numeric junior_principal
+        int    subordination_bps
+        string status
+    }
+    TREASURY_SWAP {
+        bigint swap_id PK
+        bigint bank_id FK
+        string asset_from
+        string asset_to
+        numeric amount_from
+        numeric amount_to
+        numeric oracle_reading
+        int spread_bps
+    }
+    NETTING_BATCH {
+        bigint batch_id PK
+        int    tier
+        bigint coordinator_id
+        string batch_root
+        timestamp settled_at
+    }
+    NETTING_ENTRY {
+        bigint batch_id FK
+        bigint src_bank_id FK
+        bigint dst_bank_id FK
+        numeric net_amount
+    }

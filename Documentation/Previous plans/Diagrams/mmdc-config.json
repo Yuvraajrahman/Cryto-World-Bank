@@ -1,0 +1,7 @@
+{
+  "theme": "default",
+  "themeCSS": ".label { font-family: 'Inter', Helvetica, Arial, sans-serif; }",
+  "deterministicIds": true,
+  "sequence": { "actorMargin": 60, "boxMargin": 10, "messageMargin": 35 },
+  "flowchart": { "curve": "basis", "htmlLabels": true, "useMaxWidth": true }
+}

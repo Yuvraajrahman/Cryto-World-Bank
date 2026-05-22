@@ -1,0 +1,31 @@
+---
+title: Smart-Contract Security Controls - UUPS, TimeLock, EIP-712, Granular Pause
+---
+flowchart TB
+    classDef ctl    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef step   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef actor  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef state  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph A[" (a) UUPS upgrade path "]
+        direction TB
+        U1["Proposer (Safe 3-of-5)"]:::actor --> U2["upgradeTo(newImpl)<br/>onlyRole(WB_ADMIN)"]:::step
+        U2 --> U3["TimeLock 24–48 h"]:::state
+        U3 --> U4["Implementation contract<br/>holds _authorizeUpgrade"]:::ctl
+        U4 --> U5["State preserved · proxy<br/>now delegates to newImpl"]:::state
+    end
+
+    subgraph B[" (b) EIP-712 sign-in "]
+        direction TB
+        E1["Client builds<br/>typed-data v4 payload"]:::step --> E2["Wallet signs<br/>(domain · types · message)"]:::actor
+        E2 --> E3["API verifies sig<br/>(recoverAddress)"]:::ctl
+        E3 --> E4["Issue short-lived JWT<br/>(15 min) + refresh"]:::ctl
+    end
+
+    subgraph C[" (c) Granular per-function pause "]
+        direction TB
+        P1["WB Admin"]:::actor --> P2["pauseFunction(LOAN_DISBURSEMENT)"]:::step
+        P2 --> P3["mapping(bytes32 ⇒ bool) functionPaused"]:::ctl
+        P3 -. "DEPOSITS, WITHDRAWALS remain live" .-> P4["Other functions<br/>continue normally"]:::state
+        P2 --> P5["emit FunctionPaused(actor, ts)<br/>· indexed by The Graph"]:::ctl
+    end

@@ -39,11 +39,24 @@ export function AppLayout() {
         <Sidebar />
         <main className="flex-1 bg-grid-gold/10">
           <div className="container-page py-8 sm:py-10">
-            {authed && user ? <Outlet /> : <WalletGate />}
+            {!authed ? (
+              <div className="mb-6 rounded-xl border border-gold-700/30 bg-gold-900/10 p-4">
+                <div className="text-xs font-medium uppercase tracking-[0.22em] text-gold-300">
+                  Limited access
+                </div>
+                <div className="mt-1 text-sm text-ink-100">
+                  Connect a wallet or use Demo sign-in to unlock all features.
+                </div>
+                <div className="mt-3">
+                  <WalletGate />
+                </div>
+              </div>
+            ) : null}
+            <Outlet />
           </div>
         </main>
       </div>
-      {authed && user ? <ChatbotWidget /> : null}
+      {authed ? <ChatbotWidget /> : null}
     </div>
   );
 }

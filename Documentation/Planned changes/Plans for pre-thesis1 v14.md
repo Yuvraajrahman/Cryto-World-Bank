@@ -1,0 +1,152 @@
+Banking system improvemnt suggestions: 
+
+  
+  
+  
+**1 — Critical gaps to fix before final thesis**
+
+Without these, the paper cannot be called a banking system
+
+**CriticalReplace ETH-denominated loans with stablecoin-first design**
+
+The paper's entire financial inclusion argument targets retail borrowers in Bangladesh and similar economies. A borrower who takes a loan in ETH faces catastrophic real-debt doubling if ETH drops 50% — which it did in May 2021 and again in 2022. USDC/USDT must be the primary loan denomination for retail tiers. The paper mentions this in future work but it needs to be elevated to a design requirement now. The EU MiCA framework (fully in effect from Dec 2024) also requires 1:1 reserve backing for any e-money token, which shapes how stablecoin integration must be structured. The US GENIUS Act (signed July 2025) adds a separate federal framework. These regulatory anchors should appear in the paper as justification for the stablecoin architecture choice.
+
+*Sources: Scorechain MiCA analysis (2025); DL News State of DeFi 2025 — stablecoins at $305B market cap*
+
+**CriticalAdd a liquidation contract with on-chain enforcement**
+
+The Health Factor formula (F.7) is listed in the paper but nothing triggers it. When HF drops below 1.0, the current system has no automated response — a human approver would have to notice and act. This is not a bank; it is a ledger. A real lending system needs a LiquidationEngine contract that monitors health factors, accepts liquidation calls from any participant, rewards the caller with a bonus (typically 5-8% of seized collateral, as Aave uses), and updates the borrower's on-chain credit record. This is a standard DeFi primitive and its absence is a significant credibility gap.
+
+*Sources: Aave v3 documentation; Gudgeon et al. (2020) on DeFi liquidation mechanics — already cited in paper*
+
+**CriticalBuild the SavingsVault and complete deposit mobilization**
+
+A bank is fundamentally a deposit institution. The paper claims a "closed-loop sustainable model" where depositor capital funds lending, but the SavingsVault is listed as "planned." Without it, the platform is a credit-only protocol with no retail deposit function — closer to Maple Finance than to a bank. The final thesis must implement the SavingsVault with: variable APY tied to pool utilization (the kinked rate model already specified), on-chain accrual tracking, and withdrawal with reserve-ratio gating. Fixed deposits (FixedDeposit contract) should follow, as they provide the duration-matched liabilities needed to safely fund installment loans.
+
+*Sources: Bangladesh microfinance data (BRAC 2025: 92% of clients report income increase) validates the retail deposit model*
+
+**CriticalWire the ML pipeline into actual loan decisions**
+
+The Random Forest fraud detector and SHAP explainer are described as "built, not integrated." This means the AI contribution exists only on paper. The final thesis must demonstrate: (1) a loan application event triggers the FastAPI ML service, (2) the service returns a risk score via the commit-reveal oracle pattern already designed, (3) the LoanController contract reads the score and applies a threshold (e.g., score > 0.75 → manual review required), and (4) the SHAP explanation is stored off-chain and linked to the loan record by hash. Without this integration, the AI contribution reduces to a standalone notebook, not a banking system feature.
+
+*Sources: Palaiokrassas et al. (2023) — already cited; confirms behavioral features are the signal, not raw transactions*
+
+**2 — Novel research contributions to add**
+
+These would distinguish the paper in the academic literature
+
+**NovelUpgrade fraud detection to Graph Neural Networks (GNNs)**
+
+The paper's current Random Forest model treats each transaction independently. But DeFi fraud — particularly coordinated borrowing rings, sybil attacks, and flash-loan manipulation — is relational: it appears in the graph of wallet interactions, not in individual transaction features. Recent literature (Cheng et al., 2024; Wang et al., 2025) shows GNNs consistently outperform flat ML on blockchain fraud, achieving over 70% detection of illicit transactions with under 1% false positives on the Elliptic dataset. Adding even a baseline GNN comparison (e.g., GraphSAGE on a synthetic transaction graph) as an ablation study would make the AI/ML contribution significantly more publishable. The paper already cites Palaiokrassas et al. (2023) which uses behavioral features — GNNs are the natural extension.
+
+*Sources: Cheng et al. arXiv 2411.05815 (Nov 2024); DeFiGuard GNN paper arXiv 2406.11157; Wang & Wang SAGE Journals (2025)*
+
+**NovelIntegrate zkAML — ZKP-based AML compliance, not just KYC**
+
+The paper's ZKP design covers KYC (proving identity without revealing it). But AML — proving that a wallet is not on a sanctions list, has not transacted with flagged addresses, and meets transaction velocity limits — is a separate compliance requirement. The zkAML paper (IACR ePrint 2025/465) demonstrates a zk-SNARK approach achieving 55 TPS on public networks with 226ms proof generation. Adding this as a second ZKP circuit alongside the KYC verifier would make the compliance architecture substantially more complete, and would be a genuine research contribution. The paper could position the two circuits as a unified "compliance gateway" that any borrower must pass before accessing regulated operations.
+
+*Sources: zkAML paper IACR 2025/465; Decker SSRN 5170329 — ZKP-based KYC reduces exposed user data by 97%*
+
+**NovelAdd federated learning as the multi-bank fraud intelligence layer**
+
+The paper mentions federated learning (FL) in the literature review and future work but does not include it in the design. Given the four-tier architecture — where National Banks and Local Banks are independent entities who should not share raw transaction data — FL is not just a nice extension; it is architecturally appropriate. Each Local Bank trains a local fraud detection model on its own borrower data; parameter updates are aggregated at the National Bank level via FedAvg; no raw records leave the bank. The PrivChain-AI paper (Nature Scientific Reports, 2025) demonstrates this exact pattern with 94.7% fraud detection accuracy. Including even a design specification for this federated layer would fill the paper's biggest AI gap and connect directly to the four-tier governance structure.
+
+*Sources: PrivChain-AI Nature Scientific Reports (Dec 2025); Abbassi et al. Springer (2025); FED-SPFD MDPI Risks (Oct 2025)*
+
+**NovelDesign a formal specification using Certora for reserve invariants**
+
+The Certora Prover went open-source in 2025 and has secured over $100 billion in TVL across Aave, MakerDAO, Uniswap, and others. The paper currently plans "formal verification" in future work. Elevating this to an actual CVL (Certora Verification Language) specification — even for two invariants: (1) the total reserve never drops below minimum ratio, and (2) allocatedTo[nationalBank] never exceeds totalReserve — would produce a mathematically proven security guarantee that no existing DeFi academic paper from an undergraduate institution has achieved. This is a realistic goal because the WorldBankReserve contract is already implemented and relatively small.
+
+*Sources: Certora open-source release blog (2025); arxiv 2307.02325 — only formal tool that verified a real-world Solidity contract*
+
+**NovelPosition against mBridge and Project Agora as a complementary architecture**
+
+The BIS mBridge project (China, Hong Kong, Thailand, UAE, Saudi Arabia) reached Minimum Viable Product stage in mid-2024 and settled real-value cross-border CBDC transactions. Project Agora (BIS + seven central banks) explores tokenized bank deposits on a unified ledger. Neither builds a lending hierarchy — they are settlement rails. The Crypto World Bank paper should explicitly position itself as the lending layer that could run on top of such settlement infrastructure. This reframes the paper from "an alternative to traditional banking" to "a composable lending protocol compatible with emerging institutional CBDC infrastructure" — a much more defensible and publishable claim.
+
+*Sources: BIS mBridge brochure; IMF CBDC survey 2025 — 94% of central banks engaged in CBDC research*
+
+**3 — Paper quality and academic rigor improvements**
+
+Changes that raise the paper to publication standard
+
+**Paper qualityAdd a Bangladesh regulatory reality section**
+
+The paper targets Bangladesh as its primary market but never addresses Bangladesh Bank's actual stance. As of 2025: crypto remains effectively illegal for retail use; the central bank launched a CBDC feasibility study in 2022 with a pilot in 2024 but no further developments by 2025; and a regulatory sandbox for fintech exists in early form (the Regulatory FinTech Facilitation Office) but has not yet licensed crypto lending. The paper should explicitly state what the minimum regulatory compliance pathway looks like for Bangladesh: the platform should position itself for the sandbox, not for immediate mainnet. The Bangladesh Bank FE Circular No. 06 (January 2025) on electronic LC communication and the Payment and Settlement System Act 2024 are the relevant regulatory anchors.
+
+*Sources: [ainvest.com](http://ainvest.com) Bangladesh crypto analysis (Apr 2025); Financial Express Bangladesh blockchain trade finance (May 2026)*
+
+**Paper qualityConduct a systematic literature review using PRISMA methodology**
+
+The ScienceDirect systematic review of blockchain in banking (2025) evaluated 38 peer-reviewed studies using PRISMA 2020 methodology and found "consistent gains in transaction speed, reconciliation accuracy, and auditability." The Crypto World Bank's literature review is thorough but narrative — it reads papers and summarizes them individually. Restructuring the review section using a PRISMA-style evidence synthesis (inclusion/exclusion criteria, search protocol, evidence table) would immediately raise the paper to the standard expected for journal submission. The review already has the materials; it needs a methodological frame.
+
+*Sources: ScienceDirect systematic review (Dec 2025) — PRISMA on 38 blockchain banking studies; MDPI Electronics FL-blockchain PRISMA (Dec 2024) — 1585 studies*
+
+**Paper qualityBenchmark the LLM assistant design against FinLLM literature**
+
+The paper's CWB-AI-9B section describes a QLoRA-fine-tuned assistant for borrower chat, security advisory, and risk explanation. The LLM-in-finance literature (2025) has benchmarks: Morgan Stanley's GPT assistant cut equity analysis time by 50%; McKinsey estimates LLMs can reduce back-office costs by 40%; and fine-tuned financial LLMs require RLHF from domain experts to avoid regulatory hallucination. The paper should cite this body of work and specify: (1) what evaluation dataset will be used for the chat/RAG tasks, (2) how regulatory hallucination will be detected and handled, and (3) whether the model will be red-teamed for adversarial financial prompts — a specific risk identified in the 2025 LLM financial vulnerability literature.
+
+*Sources: LTIMindtree LLM fine-tuning guide (Jun 2025); [aveni.ai](http://aveni.ai) LLM training playbook (Jul 2025); arxiv 2509.10546 LLM vulnerability in finance*
+
+**Paper qualityAdd an agent-based simulation for the economic feasibility model**
+
+The revenue projection of $224.6M assumes 1 World Bank, 5 National Banks, and 50 Local Banks operating at near-full capacity. This is a single-point estimate with no adoption curve, no time dimension, and no stress testing. A simple agent-based simulation — even built in Python using Mesa or NetLogo — that models depositor and borrower arrival rates, default contagion across tiers, and reserve ratio dynamics under a 30% simultaneous withdrawal scenario would transform the feasibility chapter from speculative to empirically grounded. This is directly cited as future work in the paper already; moving it to the methodology would significantly strengthen the research.
+
+*Sources: Institutional DeFi Sygnum Bank analysis (Feb 2026) — no large institutional allocators until legal risks resolved; validates simulation-first approach*
+
+**Paper qualityAdd MiCA and GENIUS Act compliance analysis**
+
+The paper's governance chapter addresses regulatory sandboxes but not specific enacted legislation. MiCA (fully in effect Dec 2024) classifies the Crypto World Bank's stablecoin-based loans as likely involving E-Money Tokens, requiring 1:1 reserve backing, authorization before public offering, and regular audits — requirements the paper's InsuranceFund and reserve contracts must be designed to satisfy. The US GENIUS Act (July 2025) creates the first federal payment stablecoin framework. Adding a one-page compliance mapping table — which MiCA articles apply, which design choices satisfy them, and which require future work — would make this paper immediately relevant to European and American institutional readers and evaluators.
+
+*Sources: Scorechain MiCA stablecoin analysis (2025); dotfile MiCA compliance guide (Oct 2025); GENIUS Act (July 2025)*
+
+**Paper qualityCite the Sygnum Bank institutional DeFi gap analysis and position directly**
+
+Sygnum Bank's February 2026 report "Institutional DeFi in 2025 — the disconnect between infrastructure and allocation" documents exactly the gap the paper is trying to fill: protocols work technically, but no large institutional allocator will participate until legal and regulatory risks are resolved. The paper should cite this analysis explicitly and use it to sharpen its contribution: the Crypto World Bank is not just technically novel — it is an attempt to resolve the specific governance and compliance gap that Sygnum identifies as the barrier to institutional DeFi adoption. This grounds the paper in current industry discourse rather than purely academic literature.
+
+*Sources: Sygnum Bank Institutional DeFi 2025 report (Feb 2026)*
+
+**4 — Technical architecture upgrades**
+
+Engineering improvements that increase security and realism
+
+**StrongImplement Foundry invariant testing alongside Hardhat unit tests**
+
+The paper uses Hardhat for 12+ unit tests. Foundry's invariant testing (fuzz testing with stateful exploration) automatically discovers edge cases that unit tests miss — exactly the category of bug that caused the $180M smart contract loss in March 2023. For the WorldBankReserve contract, writing three invariant assertions — (1) reserve ratio always ≥ minimum, (2) sum of all allocations ≤ totalReserve, (3) only NATIONAL_BANK_ROLE addresses can call recordRepayment — and running Foundry's fuzzer for 10,000 runs would provide substantially stronger security evidence than 12 hand-written unit tests. Foundry's 2025 enhanced differential fuzzing against mainnet forks is particularly powerful for this.
+
+*Sources: Certora blog on formal verification (2025); Medium Solodit checklist Solidity security guide (Jun 2025)*
+
+**StrongAdd a Decentralized Identity (DID) layer using W3C standards**
+
+The paper's identity system currently combines wallet addresses (on-chain) with off-chain document verification. A cleaner architecture would use W3C Decentralized Identifiers (DIDs) as the linking layer — the user's DID is anchored on-chain, their KYC credential is issued by the off-chain provider as a Verifiable Credential (VC), and the ZKP circuit proves possession of a valid VC without revealing the DID or the credential content. This aligns with the Piper et al. (2025) TU Berlin paper already cited, and with the Self-Sovereign Identity (SSI) framework it uses. Adding W3C DID terminology would also make the paper immediately relevant to the growing DID standards community and compatible with EBSI (European Blockchain Services Infrastructure).
+
+*Sources: Piper et al. arXiv 2510.05807 — already cited in paper; uses SSI + ZKP + ABAC framework*
+
+**StrongSpecify a concrete cross-chain bridge architecture for multi-chain deployment**
+
+The paper's multi-chain deployment plan (Polygon + Ethereum Sepolia) mentions portability but not cross-chain state consistency. If a borrower has an active loan on Polygon and attempts to open a second loan by routing through Ethereum, the hierarchical controls could be bypassed. The paper needs to specify: (1) whether loan state is replicated across chains or confined to one chain per borrower, (2) which bridge protocol is used (LayerZero, Axelar, or CCIP are the 2025 leaders for EVM cross-chain messaging), and (3) what the security assumptions of the chosen bridge are. Bridge hacks were the largest category of crypto loss in 2022-2024; omitting bridge architecture from a multi-chain banking paper is a significant gap.
+
+*Sources: Blockchain in Financial Services Statistics 2025 — blockchain gateways handle 27% of cross-border payment volume*
+
+**StrongAdd an on-chain credit passport standard**
+
+The paper mentions "portable on-chain credit history" in future work. This should be elevated to a contribution: a minimal ERC standard (similar to ERC-721 but non-transferable, a "soulbound token" or SBT) that encodes a borrower's repayment record in a format readable by any compatible lending protocol. A borrower who has successfully repaid three loans on the Crypto World Bank could present this credential to any other platform that adopts the standard — solving the cold-start problem for new borrowers and enabling progressive lending. Vitalik Buterin's Soulbound Token paper (2022) provides the theoretical foundation. Specifying the schema and mint/update/attest functions of this SBT contract in an appendix would be a genuinely original technical contribution.
+
+*Sources: Buterin et al. (2022) Soulbound Tokens; MicroSave Consulting (Dec 2025) — Bangladesh shifting to performance-based credit identity*
+
+**5 — Social impact and market grounding improvements**
+
+Connects the technical paper to real-world impact evidence
+
+**StrongAnchor the microfinance model in 2025 Bangladesh data**
+
+Bangladesh Bank's Special Publication SP2025-02 (June 2025) reports that female-to-male account parity was achieved by March 2025 (49%/49%), and female-owned deposit accounts grew from 33.4M in 2019 to 55.3M in 2024. BRAC's 2025 data shows 89% of loans to women, 92% reporting household income increases. These figures are more current and specific than the 2021 Global Findex data the paper currently uses for the "1.4 billion unbanked" claim. Updating the paper's financial inclusion statistics with 2025 Bangladesh-specific data, and using them to justify the solidarity group lending design specifically for women-led borrower groups, would make the social impact argument substantially more concrete.
+
+*Sources: Bangladesh Bank SP2025-02 (Jun 2025); BRAC Microfinance 2025 annual data; NUS Economics Society microfinance analysis (May 2025)*
+
+**StrongAddress the over-indebtedness risk in group lending explicitly**
+
+The NUS Economics Society analysis (May 2025) and broader microfinance literature document that one of Grameen Bank's persistent problems is over-indebtedness — borrowers taking loans from multiple MFIs simultaneously, inflating their apparent repayment capacity. Bangladesh has 724 licensed MFIs serving 41.56 million accounts. The paper's group lending design should specify: (1) a cap on simultaneous active group loans per wallet address, (2) a cross-platform debt disclosure mechanism (possibly using the on-chain credit passport SBT), and (3) a cooling-off period between loan cycles. Not addressing over-indebtedness in a paper that explicitly references Grameen and BRAC is a social responsibility gap that reviewers will notice.
+
+*Sources: NUS Economics Society Bangladesh microfinance analysis (May 2025); IJAR microfinance report (Mar 2025) — 1.42-4.7% delinquency by Feb 2025*  
+  
+  

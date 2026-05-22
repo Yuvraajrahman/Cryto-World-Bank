@@ -1,0 +1,41 @@
+---
+title: Onboarding and Identity Activity Flows - (a) Income Verification, (b) Profile Management, (c) Tiered KYC Ladder
+---
+flowchart TB
+    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef finish fill:#FFFFFF,stroke:#1F1F1F,stroke-width:2px,color:#111111
+
+    subgraph A[" (a) Income verification "]
+        direction TB
+        A1((Start)):::start --> A2["Borrower uploads<br/>income document"]:::act
+        A2 --> A3["Hash to IPFS<br/>+ store doc_hash"]:::act
+        A3 --> A4{Method:<br/>bank API or manual?}:::dec
+        A4 -- Bank API --> A5["Open-Banking pull<br/>(read-only consent)"]:::act
+        A4 -- Manual --> A6["Officer review<br/>(LB Operator)"]:::act
+        A5 --> A7["Store INCOME_PROOF<br/>(method, verified_at)"]:::act
+        A6 --> A7
+        A7 --> A8{Score ≥<br/>threshold?}:::dec
+        A8 -- No --> A9["Flag for re-submission"]:::act --> AE((End)):::finish
+        A8 -- Yes --> A10["Mark verified +<br/>bump SBT.credit_score"]:::act --> AE
+    end
+
+    subgraph B[" (b) Profile management "]
+        direction TB
+        B1((Start)):::start --> B2["User opens profile"]:::act
+        B2 --> B3{Action?}:::dec
+        B3 -- Update --> B4["Sign EIP-712 typed-data"]:::act
+        B3 -- Read --> B5["Render dashboard"]:::act --> BE((End)):::finish
+        B4 --> B6["API verifies sig +<br/>persists row in users"]:::act
+        B6 --> B7["Emit ProfileUpdated event"]:::act --> BE
+    end
+
+    subgraph C[" (c) Tiered, risk-based KYC ladder "]
+        direction TB
+        C1((Start)):::start --> CL1["L1 — zkKYC<br/>(loans ≤ 0.5 ETH)"]:::act
+        CL1 --> CL2["L2 — phone + ID hash<br/>(≤ 5 ETH)"]:::act
+        CL2 --> CL3["L3 — full KYC + selfie<br/>(≤ 50 ETH)"]:::act
+        CL3 --> CL4["L4 — entity docs +<br/>source-of-funds (>50 ETH)"]:::act
+        CL4 --> CE((End)):::finish
+    end

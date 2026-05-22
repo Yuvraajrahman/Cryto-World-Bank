@@ -1,0 +1,62 @@
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces Banking capability matrix: functions, tiers, modules, and prototype status}}{12}{table.caption.28}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Borrower tier access rules.}}{15}{table.caption.33}%
+\contentsline {table}{\numberline {1.3}{\ignorespaces Market segments.}}{19}{table.caption.35}%
+\contentsline {table}{\numberline {1.4}{\ignorespaces Target customer segment profile.}}{20}{table.caption.36}%
+\contentsline {table}{\numberline {1.5}{\ignorespaces Partner categories and roles.}}{21}{table.caption.37}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Literature review summary (Part A): DeFi lending, fraud detection, and XAI.}}{30}{table.caption.41}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Literature review summary (Part B): DeFi protocol systematisation and adaptive lending.}}{31}{table.caption.42}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Literature review summary (Part C): blockchain P2P lending, privacy-preserving ML, and smart contract auditing.}}{32}{table.caption.43}%
+\contentsline {table}{\numberline {2.4}{\ignorespaces Literature review summary (Part D): CBDC design, cross-border settlement, and multi-chain DeFi.}}{33}{table.caption.44}%
+\contentsline {table}{\numberline {2.5}{\ignorespaces Literature review summary (Part E): multi-chain DeFi, smart microfinance, gas optimisation, and SHAP-based credit models.}}{34}{table.caption.45}%
+\contentsline {table}{\numberline {2.6}{\ignorespaces Comparative protocol analysis: existing DeFi lending protocols vs.\ the Crypto World Bank (CWB). {\normalfont \textcolor {green!55!black}{$\text {$\mathsurround \z@ \mathchar "458$}$}{} = implemented/present; \textcolor {orange!85!black}{$\triangleright $}{} = designed/partial; \textcolor {blue!75!black}{$\circ $}{} = planned; \textcolor {red!75!black}{$\times $}{} = absent.}}}{35}{table.caption.46}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Prototype scope: feature implementation status as of pre-thesis submission. \textcolor {green!55!black}{$\text {$\mathsurround \z@ \mathchar "458$}$}{} = Implemented and testnet-verified; \textcolor {orange!85!black}{$\triangleright $}{} = Designed or partially scaffolded; \textcolor {blue!75!black}{$\circ $}{} = Planned for final thesis phase.}}{38}{table.caption.47}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Blockchain platform selection criteria and justification.}}{41}{table.caption.50}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces Blockchain platform selection (continued): operational and deployment factors.}}{41}{table.caption.51}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces ERD notation (IE Crow's Foot and keys)}}{45}{table.caption.54}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces Planned extended banking entities (final thesis; Table~\ref {tab:banking-matrix})}}{45}{table.caption.55}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Database entity summary (15 entities).}}{47}{table.caption.57}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces EER constructs applied: specialisation, hierarchy, and constraints.}}{48}{table.caption.58}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Indexing strategy: B-tree indexes for time-window and high-frequency queries.}}{49}{table.caption.59}%
+\contentsline {table}{\numberline {3.9}{\ignorespaces Representative functional dependencies.}}{50}{table.caption.60}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Relational integrity constraints.}}{50}{table.caption.61}%
+\contentsline {table}{\numberline {3.11}{\ignorespaces Data partitioning between on-chain and off-chain storage.}}{51}{table.caption.62}%
+\contentsline {table}{\numberline {3.12}{\ignorespaces Extended banking use cases (planned; full crypto-bank scope)}}{55}{table.caption.66}%
+\contentsline {table}{\numberline {3.13}{\ignorespaces Network membership governance.}}{67}{table.caption.91}%
+\contentsline {table}{\numberline {3.14}{\ignorespaces Business network governance.}}{68}{table.caption.92}%
+\contentsline {table}{\numberline {3.15}{\ignorespaces Technology infrastructure governance.}}{68}{table.caption.93}%
+\contentsline {table}{\numberline {3.16}{\ignorespaces Threat model and security controls mapping}}{70}{table.caption.94}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Planned base models for unified intelligent services (design specification)}}{73}{table.caption.96}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces AI task specification and authoritative components (Table~\ref {tab:banking-matrix}, risk and ancillary rows)}}{73}{table.caption.97}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Planned training dataset composition (targets for Pre-thesis 2)}}{75}{table.caption.100}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Planned QLoRA hyperparameters (initial design; subject to VRAM profiling)}}{76}{table.caption.102}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Planned evaluation metrics (targets recorded after first training run)}}{76}{table.caption.103}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Sprint 1 backlog: smart contract development (21 pts).}}{78}{table.caption.109}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Sprint 1 backlog: frontend foundation (13 pts) and database schema (8 pts).}}{78}{table.caption.110}%
+\contentsline {table}{\numberline {4.8}{\ignorespaces Sprint 2 backlog: lending and communication features (50 pts).}}{79}{table.caption.111}%
+\contentsline {table}{\numberline {4.9}{\ignorespaces Sprint 3 backlog: AI/ML security and polish (38 pts).}}{79}{table.caption.112}%
+\contentsline {table}{\numberline {4.10}{\ignorespaces SDLC stage mapping.}}{82}{table.caption.114}%
+\contentsline {table}{\numberline {4.11}{\ignorespaces Design decisions and alternatives considered.}}{84}{table.caption.116}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Market segments with supporting data.}}{90}{table.caption.118}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Target customer segment profile.}}{91}{table.caption.120}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Partner categories and roles.}}{92}{table.caption.121}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Detailed competitive landscape analysis (Part 1).}}{93}{table.caption.122}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Detailed competitive landscape analysis (Part 2).}}{94}{table.caption.123}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Detailed competitive landscape analysis (Part 3): multi-tier capital flow as differentiating feature.}}{95}{table.caption.124}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Risk taxonomy and mitigation.}}{97}{table.caption.128}%
+\contentsline {table}{\numberline {5.8}{\ignorespaces Technical feasibility assessment.}}{98}{table.caption.129}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces Economic feasibility --- zero-cost prototype.}}{99}{table.caption.130}%
+\contentsline {table}{\numberline {5.10}{\ignorespaces Revenue projection assumptions.}}{100}{table.caption.131}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces System-wide annual revenue summary.}}{101}{table.caption.132}%
+\contentsline {table}{\numberline {5.12}{\ignorespaces Default rate sensitivity scenarios with economic basis.}}{102}{table.caption.133}%
+\contentsline {table}{\numberline {5.13}{\ignorespaces Interest rate parameters.}}{104}{table.caption.135}%
+\contentsline {table}{\numberline {5.14}{\ignorespaces Go-to-market phases.}}{106}{table.caption.138}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {A.1}{\ignorespaces Technology stack summary.}}{115}{table.caption.149}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {B.1}{\ignorespaces Deployed smart contract addresses, Polygon Amoy testnet (as of pre-thesis submission).}}{117}{table.caption.152}%

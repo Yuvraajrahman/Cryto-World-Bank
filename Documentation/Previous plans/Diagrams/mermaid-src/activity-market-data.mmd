@@ -1,0 +1,18 @@
+flowchart TB
+    A([START]) --> B[Open dashboard]
+    B --> C[Select loan]
+    C --> D[Get crypto id]
+    D --> E{Cache fresh?}
+    E -->|Yes| J[Draw chart]
+    E -->|No| F[CoinGecko API]
+    F --> G{OK?}
+    G -->|Yes| H[Update cache]
+    G -->|No| I[Use stale cache]
+    H --> J
+    I --> J
+    J --> K[Show price stats]
+    K --> L[Poll every 5 min]
+    L --> M{Still on page?}
+    M -->|Yes| E
+    M -->|No| N[Stop timer]
+    N --> END1([END])

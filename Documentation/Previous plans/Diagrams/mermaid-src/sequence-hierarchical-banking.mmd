@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant WBA as WorldBankAdmin
+    participant F as Frontend
+    participant WBR as WBReserve.sol
+    participant BC as Blockchain
+    participant NB as NationalBank
+    participant NBS as NationalBank.sol
+    participant LBk as LocalBank
+    participant LBS as LocalBank.sol
+    participant Br as Borrower
+
+    WBA->>F: 1. Deposit funds to reserve
+    F->>WBR: 2. deposit() with value: amount
+    WBR->>BC: 3. Record transaction
+    BC-->>WBR: 4. Confirm
+
+    NB->>F: 5. Request loan from World Bank
+    F->>WBR: 6. requestLoan(amount)
+    Note over WBR: 7. Check available reserve
+
+    WBA->>F: 8. Approve NB loan
+    F->>WBR: 9. approveLoan(nb_address, amount)
+    WBR->>BC: 10. Transfer funds to NB contract
+    BC->>NBS: 11. Receive funds
+
+    LBk->>F: 12. Request loan from National Bank
+    F->>NBS: 13. requestLoan(amount)
+    NB->>F: 14. Approve LB loan
+    F->>NBS: 15. approveLoan(lb_address, amount)
+    Note over NBS: 16. Transfer to LB contract
+    BC->>LBS: 17. Transfer on-chain
+    LBS->>Br: 18. Receive funds
+
+    Note over WBA, Br: Repayment cascades back up
+
+    Br->>LBS: 19. payInstallment()
+    LBS->>LBk: 20. Forward share
+    LBk->>NBS: 21. Forward share to NB
+    NBS->>WBR: 22. Forward share to WB

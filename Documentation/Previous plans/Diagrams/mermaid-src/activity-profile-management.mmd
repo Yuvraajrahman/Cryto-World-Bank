@@ -1,0 +1,22 @@
+flowchart TB
+    A([START]) --> B[Open profile]
+    B --> C[Detect role]
+    C --> D[Load profile data]
+    D --> E[Show dashboard]
+    E --> F{Action?}
+    F -->|Edit| G[Edit form]
+    F -->|Terms| H[Show T and C]
+    F -->|Prefs| I[Preferences]
+    F -->|History| J[History list]
+    G --> K[Validate]
+    K --> L{OK?}
+    L -->|No| G
+    L -->|Yes| N[Save profile]
+    H --> O[Accept terms]
+    I --> P[Save prefs]
+    J --> R[Show table]
+    N --> S[Refresh view]
+    O --> S
+    P --> S
+    R --> S
+    S --> END1([END])

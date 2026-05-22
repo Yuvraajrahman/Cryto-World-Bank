@@ -1,0 +1,145 @@
+graph TB
+
+    subgraph PL["️ PRESENTATION LAYER"]
+        direction TB
+
+        subgraph PL_Core["Core Modules"]
+            direction TB
+            Dashboard["Dashboard\n<i>IDashboard</i>"]
+            LoanModule["Loan Module\n<i>ILoanService</i>"]
+            AdminPanel["Admin Panel\n<i>IAdminService</i>"]
+        end
+
+        subgraph PL_Features["Feature Modules"]
+            direction TB
+            RiskDash["Risk Dashboard\n<i>IRiskService</i>"]
+            ChatModule["Chat Module\n<i>IChatService</i>"]
+            ChatbotUI["Chatbot UI\n<i>IChatbotUI</i>"]
+        end
+
+        subgraph PL_Utility["Utility Modules"]
+            direction TB
+            ProfileMod["Profile Module\n<i>IProfileService</i>"]
+            MarketMod["Market Data\n<i>IMarketDataView</i>"]
+            QRModule["QR Module\n<i>IQRService</i>"]
+            WalletProv["Wallet Provider\n<i>Wagmi + RainbowKit</i>"]
+        end
+    end
+
+    subgraph SCL["️ SMART CONTRACT LAYER"]
+        direction TB
+
+        subgraph SC_Contracts["Contracts (Solidity 0.8.20)"]
+            direction TB
+            WBReserve["WorldBankReserve\n<i>IReserve</i>"]
+            WBReserveOps["depositToReserve( )\nregisterNatBank( )\nlendToNatBank( )\npause( ) / unpause( )\nemergencyWithdraw( )"]
+
+            NatBankC["NationalBank\n<i>INationalBank</i>"]
+            NatBankOps["registerLocalBank( )\nborrowFromWB( )\nlendToLocalBank( )"]
+
+            LocBankC["LocalBank\n<i>ILocalBank</i>"]
+            LocBankOps["requestLoan( )\napproveLoan( )\nrejectLoan( )\npayInstallment( )\nsetApprover( )"]
+        end
+
+        subgraph SC_Libs["Libraries"]
+            direction TB
+            OZ["OpenZeppelin\nReentrancyGuard\nOwnable"]
+        end
+
+        WBReserve -->|"lends to"| NatBankC
+        NatBankC -->|"lends to"| LocBankC
+        WBReserve -->|"implements"| WBReserveOps
+        NatBankC -->|"implements"| NatBankOps
+        LocBankC -->|"implements"| LocBankOps
+        SC_Contracts --> OZ
+    end
+
+    subgraph BSL["️ BACKEND SERVICES LAYER"]
+        direction TB
+
+        subgraph BS_API["API Gateway"]
+            direction TB
+            FastAPI["FastAPI\n<i>ILoanAPI · IUserAPI · IRiskAPI</i>"]
+        end
+
+        subgraph BS_Data["Data Services"]
+            direction TB
+            Postgres["PostgreSQL\n<i>IDataStore</i>\n15 tables"]
+            Redis["Redis Cache\n<i>ICacheService</i>"]
+            FileStor["File Storage\n<i>IFileStore</i>"]
+        end
+
+        subgraph BS_Intelligence["Intelligence Services"]
+            direction TB
+            AIML["AI/ML Engine\n<i>IMLService</i>\nRandom Forest\nIsolation Forest\nSHAP"]
+            ChatbotSvc["Chatbot Service\n<i>IChatbotService</i>"]
+        end
+
+        subgraph BS_Realtime["Realtime Services"]
+            direction TB
+            EventLsnr["Event Listener\n<i>IEventSync</i>"]
+            WSSvc["WebSocket\n<i>IWebSocket</i>"]
+            IncomeSvc["Income Proof\n<i>IIncomeService</i>"]
+        end
+
+        FastAPI --> Postgres
+        FastAPI --> Redis
+        FastAPI --> AIML
+        FastAPI --> ChatbotSvc
+        FastAPI --> IncomeSvc
+        IncomeSvc --> FileStor
+        EventLsnr --> Postgres
+    end
+
+    subgraph EXT[" EXTERNAL SERVICES"]
+        direction TB
+        MetaMask["MetaMask\n<i>IWalletAuth</i>"]
+        Polygon["Polygon PoS\n<i>IConsensus</i>"]
+        Alchemy["Alchemy RPC\n<i>IRPC</i>"]
+        CoinGecko["CoinGecko API\n<i>IMarketData</i>"]
+    end
+
+
+    Dashboard -->|"read stats"| SCL
+    LoanModule -->|"loan ops"| SCL
+    AdminPanel -->|"admin ops"| SCL
+    RiskDash -->|"risk queries"| SCL
+
+    LoanModule -->|"REST"| FastAPI
+    AdminPanel -->|"REST"| FastAPI
+    RiskDash -->|"REST"| FastAPI
+    ProfileMod -->|"REST"| FastAPI
+    ChatbotUI -->|"REST"| FastAPI
+    ChatModule -->|"ws://"| WSSvc
+    MarketMod -->|"cached"| Redis
+
+    WalletProv -->|"connect"| MetaMask
+    WalletProv -->|"RPC"| Alchemy
+
+    SC_Contracts -->|"deploy/tx"| Polygon
+    SC_Contracts -->|"RPC"| Alchemy
+
+    EventLsnr -->|"events"| Alchemy
+    Redis -->|"price feed"| CoinGecko
+
+    EventLsnr -->|"listen"| SCL
+
+    style PL fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    style PL_Core fill:#bbdefb,stroke:#1976d2,stroke-width:1px,color:#000
+    style PL_Features fill:#bbdefb,stroke:#1976d2,stroke-width:1px,color:#000
+    style PL_Utility fill:#bbdefb,stroke:#1976d2,stroke-width:1px,color:#000
+
+    style SCL fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style SC_Contracts fill:#ffe0b2,stroke:#ef6c00,stroke-width:1px,color:#000
+    style SC_Libs fill:#ffe0b2,stroke:#ef6c00,stroke-width:1px,color:#000
+
+    style BSL fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style BS_API fill:#c8e6c9,stroke:#388e3c,stroke-width:1px,color:#000
+    style BS_Data fill:#c8e6c9,stroke:#388e3c,stroke-width:1px,color:#000
+    style BS_Intelligence fill:#c8e6c9,stroke:#388e3c,stroke-width:1px,color:#000
+    style BS_Realtime fill:#c8e6c9,stroke:#388e3c,stroke-width:1px,color:#000
+
+    style EXT fill:#fce4ec,stroke:#c62828,stroke-width:2px,color:#000
+    style WBReserveOps fill:#fff8e1,stroke:#ef6c00,stroke-width:1px,color:#000
+    style NatBankOps fill:#fff8e1,stroke:#ef6c00,stroke-width:1px,color:#000
+    style LocBankOps fill:#fff8e1,stroke:#ef6c00,stroke-width:1px,color:#000

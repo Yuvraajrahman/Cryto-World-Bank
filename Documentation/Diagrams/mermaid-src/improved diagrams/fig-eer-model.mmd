@@ -1,0 +1,48 @@
+---
+title: EER Model - Generalization, Specialization, Weak Entities, and Aggregation
+---
+flowchart TB
+    classDef strong fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef weak   fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111,stroke-dasharray:4 3
+    classDef multi  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef agg    fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef rel    fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph S[" Specialization: BANK_USER hierarchy "]
+        BU["BANK_USER<br/>(superclass)"]:::strong
+        NB["NationalBankAdmin"]:::strong
+        LBA["LocalBankAdmin"]:::strong
+        AP["Approver"]:::strong
+        BU --> |"d, total"| NB
+        BU --> LBA
+        BU --> AP
+    end
+
+    subgraph W[" Weak entity & multi-valued attribute "]
+        LOAN2["LOAN"]:::strong
+        IN["INSTALLMENT<br/>(weak — identifying)"]:::weak
+        LOAN2 ==> IN
+        BR2["BORROWER"]:::strong
+        IP["{INCOME_PROOF}<br/>(multi-valued)"]:::multi
+        BR2 -.-> IP
+    end
+
+    subgraph A[" Aggregation: loan-centric cluster "]
+        direction LR
+        BRr["BORROWER"]:::strong
+        LRr["LOAN_REQUEST"]:::strong
+        APRV["APPROVAL"]:::rel
+        AGG["LOAN-CENTRIC<br/>aggregation"]:::agg
+        AILM["AI_ML_LOG"]:::strong
+        BRr --> LRr --> APRV --> AGG
+        AGG -.-> AILM
+    end
+
+    subgraph C[" Participation constraints "]
+        LRc["LOAN_REQUEST"]:::strong
+        Lc["LOAN"]:::strong
+        LRc ==> |"total — 1..1"| Lc
+        BRc["BORROWER"]:::strong
+        SBT["CREDIT_PASSPORT (SBT)"]:::strong
+        BRc -- "partial — 0..1" --> SBT
+    end

@@ -1,0 +1,22 @@
+% Auto-generated TikZ sequence from blockchain-tx-lifecycle.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hB) at (0,0) {Borrower};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hLB) at (2,0) {Local Bank};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hSC) at (4,0) {LoanController};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hO) at (6,0) {Oracle};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hAI) at (8,0) {CWB-AI-9B};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {requestLoan} (4,-1);
+  \draw[cwb arr] (4,-1.7) -- node[above,font=\tiny,align=center] {riskScoreRequest} (6,-1.7);
+  \draw[cwb arr] (6,-2.4) -- node[above,font=\tiny,align=center] {features plus context} (8,-2.4);
+  \draw[cwb arr dash] (8,-3.0999999999999996) -- node[above,font=\tiny,align=center] {tabular score plus narrative} (6,-3.0999999999999996);
+  \draw[cwb arr dash] (6,-3.8) -- node[above,font=\tiny,align=center] {updateRiskScore} (4,-3.8);
+  \draw[cwb arr] (2,-4.5) -- node[above,font=\tiny,align=center] {approveLoan} (4,-4.5);
+  \draw[cwb arr] (0,-5.2) -- node[above,font=\tiny,align=center] {repayInstallment} (4,-5.2);
+\end{tikzpicture}
+\end{center}

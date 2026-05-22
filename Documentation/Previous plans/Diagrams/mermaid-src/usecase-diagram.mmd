@@ -1,0 +1,122 @@
+flowchart LR
+    subgraph ACTORS[Actors]
+        direction TB
+        Borrower[Borrower]
+        Approver[Bank approver]
+        WBAdmin[WB admin]
+        NatBank[National bank]
+    end
+
+    subgraph BORROWER_UC[Borrower use cases]
+        direction TB
+        UC01[Connect wallet]
+        UC02[Accept terms]
+        UC03[Manage profile]
+        UC04[Request loan]
+        UC04a[Check limit]
+        UC04b[Upload proof]
+        UC05[View loans]
+        UC06[Pay installment]
+        UC11[Deposit reserve]
+        UC12[View limit]
+        UC13[Market data]
+        UC14[QR code]
+        UC15[Chat bank]
+        UC16[Chat borrower]
+        UC17[AI chatbot]
+        UC17a[Query loan]
+    end
+
+    subgraph BANK_UC[Bank and admin use cases]
+        direction TB
+        UC07[Review loan]
+        UC07a[Fraud scores]
+        UC07b[XAI view]
+        UC08[Approve loan]
+        UC09[Reject loan]
+        UC10[Review proof]
+        UC18[Risk dashboard]
+        UC19[Anomaly alerts]
+        UC20[Register nat. bank]
+        UC21[Lend to nat. bank]
+        UC22[Statistics]
+        UC23[Pause system]
+        UC24[Emergency withdraw]
+        UC25[Security logs]
+        UC26[Register local bank]
+        UC27[Borrow from WB]
+        UC28[Lend to local bank]
+        UC29[Set approver]
+        UC30[Add bank user]
+        UC31[Local portfolio]
+    end
+
+    UC04 -.->|include| UC04a
+    UC04 -.->|include| UC04b
+    UC07 -.->|include| UC07a
+    UC07 -.->|include| UC07b
+    UC15 -.->|extend| UC16
+    UC17 -.->|include| UC17a
+    UC04 -.->|include| UC01
+    UC06 -.->|include| UC01
+    UC11 -.->|include| UC01
+    UC15 -.->|include| UC01
+    UC17 -.->|include| UC01
+    UC06 -.->|include| UC12
+    UC08 -.->|include| UC07
+    UC09 -.->|include| UC07
+    UC08 -.->|include| UC10
+    UC28 -.->|include| UC27
+
+    Borrower --> UC01
+    Borrower --> UC02
+    Borrower --> UC03
+    Borrower --> UC04
+    Borrower --> UC05
+    Borrower --> UC06
+    Borrower --> UC11
+    Borrower --> UC12
+    Borrower --> UC13
+    Borrower --> UC14
+    Borrower --> UC15
+    Borrower --> UC17
+
+    Approver --> UC01
+    Approver --> UC02
+    Approver --> UC03
+    Approver --> UC07
+    Approver --> UC08
+    Approver --> UC09
+    Approver --> UC10
+    Approver --> UC12
+    Approver --> UC13
+    Approver --> UC16
+    Approver --> UC18
+    Approver --> UC19
+
+    WBAdmin --> UC01
+    WBAdmin --> UC02
+    WBAdmin --> UC03
+    WBAdmin --> UC20
+    WBAdmin --> UC21
+    WBAdmin --> UC22
+    WBAdmin --> UC23
+    WBAdmin --> UC24
+    WBAdmin --> UC25
+    WBAdmin --> UC18
+    WBAdmin --> UC19
+    WBAdmin --> UC13
+
+    NatBank --> UC01
+    NatBank --> UC02
+    NatBank --> UC03
+    NatBank --> UC26
+    NatBank --> UC27
+    NatBank --> UC28
+    NatBank --> UC29
+    NatBank --> UC30
+    NatBank --> UC31
+    NatBank --> UC18
+    NatBank --> UC19
+    NatBank --> UC12
+    NatBank --> UC13

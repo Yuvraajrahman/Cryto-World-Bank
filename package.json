@@ -15,7 +15,7 @@
     "backend:dev": "cd backend && npm run dev",
     "backend:build": "cd backend && npm run build",
     "ml:dev": "cd ml-service && uvicorn app.main:app --reload --port 8000",
-    "dev": "concurrently -n frontend,backend -c blue,green \"npm run frontend:dev\" \"npm run backend:dev\""
+    "dev": "sh -c 'for p in 4000 5173 5174; do lsof -ti :$p | xargs kill -9 2>/dev/null || true; done; concurrently -n frontend,backend -c blue,green \"npm run frontend:dev\" \"npm run backend:dev\"'"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
@@ -32,5 +32,21 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yuvraajrahman/Cryto-World-Bank.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Yuvraajrahman/Cryto-World-Bank/issues"
+  },
+  "homepage": "https://github.com/Yuvraajrahman/Cryto-World-Bank#readme"
 }

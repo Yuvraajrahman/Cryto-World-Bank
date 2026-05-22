@@ -1,0 +1,27 @@
+graph TB
+  subgraph L7 [Application Layer]
+    UI[Web dApp React]
+    API[Express API]
+  end
+  subgraph L6 [Off-chain Services]
+    AI[CWB-AI-9B plus RAG]
+    IDX[Event indexer]
+    ORA[Oracle relay]
+  end
+  subgraph L5 [Smart Contracts]
+    LC[LoanController]
+    WR[WorldBankReserve]
+    GL[GroupLendingPool planned]
+  end
+  subgraph L4 [Chain]
+    EVM[Polygon PoS testnet]
+  end
+  UI --> API --> LC
+  API --> AI --> ORA --> LC
+  IDX --> EVM
+  LC --> EVM
+  WR --> EVM
+  style GL stroke-dasharray:5 5
+  style WR fill:#1E3A8A,color:#fff
+  style LC fill:#2563EB,color:#fff
+  style AI fill:#3B82F6,color:#fff

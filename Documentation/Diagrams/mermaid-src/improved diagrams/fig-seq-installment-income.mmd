@@ -1,0 +1,37 @@
+---
+title: Sequence Diagrams - (a) Installment Payment Loop, (b) Income Verification
+---
+sequenceDiagram
+    autonumber
+    participant U as Borrower
+    participant FE as Frontend
+    participant API as Backend API
+    participant SC as LocalBank Contract
+    participant DB as PostgreSQL
+
+    rect rgb(245,245,245)
+        Note over U,DB: (a) Installment payment loop
+        loop For each scheduled installment
+            U->>FE: Pay installment N
+            FE->>API: POST /installments/N/pay (signed)
+            API->>SC: processInstallment(loanId, N) {value: amount}
+            SC->>SC: CEI: check → mark paid → release interest
+            SC-->>API: emit InstallmentPaid(loanId, N)
+            API->>DB: UPDATE installment SET status=PAID
+            API-->>U: receipt + next due date
+        end
+        Note over SC: On last installment → emit LoanClosed and bump SBT
+    end
+
+    rect rgb(238,238,238)
+        Note over U,DB: (b) Income verification
+        U->>FE: Upload income document (PDF / API token)
+        FE->>API: POST /income { doc | bankToken }
+        alt Open-Banking pull
+            API->>API: Fetch transactions (read-only)
+        else Manual review
+            API->>API: Queue for LB Operator
+        end
+        API->>DB: INSERT income_proof (doc_hash, method)
+        API-->>U: verified · SBT.credit_score bumped
+    end

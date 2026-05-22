@@ -1,0 +1,37 @@
+---
+title: Sequence Diagrams - (a) Chat System, (b) AI Chatbot (RAG + QLoRA)
+---
+sequenceDiagram
+    autonumber
+    participant U as User
+    participant FE as Frontend
+    participant WS as WebSocket Server
+    participant API as Backend API
+    participant DB as PostgreSQL
+    participant LLM as LLM Service
+    participant V as ChromaDB
+
+    rect rgb(245,245,245)
+        Note over U,DB: (a) Chat system
+        U->>FE: Open thread
+        FE->>WS: connect(JWT)
+        WS->>API: validate JWT (Redis blacklist)
+        API-->>WS: ok · room=loan_42
+        U->>FE: send message
+        FE->>WS: emit('msg', text)
+        WS->>DB: INSERT chat_message
+        WS-->>FE: broadcast to room
+    end
+
+    rect rgb(238,238,238)
+        Note over U,V: (b) AI chatbot (RAG + QLoRA-tuned LLM)
+        U->>FE: ask question
+        FE->>API: POST /assistant/ask
+        API->>V: top-k similarity search
+        V-->>API: chunks + sources
+        API->>LLM: prompt(user, chunks)
+        LLM->>LLM: QLoRA-tuned 7B + system prompt
+        LLM-->>API: answer + cited sources
+        API->>API: hallucination guard (regex + reg-rule list)
+        API-->>U: answer with citations<br/>(fallback: 'see human approver')
+    end

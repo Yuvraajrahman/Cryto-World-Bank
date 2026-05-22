@@ -1,0 +1,27 @@
+% Auto-generated TikZ sequence from sequence-borrowing-limit.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hS) at (0,0) {System / Trigger};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hAPI) at (2,0) {FastAPI};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hBLE) at (4,0) {BorrowingLimitEngine};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hDB) at (6,0) {PostgreSQL};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {1. Calculate borrowing limit (borrower\_id)} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {2. Process limit calculation} (4,-1.7);
+  \draw[cwb arr] (4,-2.4) -- node[above,font=\tiny,align=center] {3. Query TRANSACTION (last 6 months)} (6,-2.4);
+  \draw[cwb arr dash] (6,-3.0999999999999996) -- node[above,font=\tiny,align=center] {4. Return 6-month transactions} (4,-3.0999999999999996);
+  \draw[cwb arr] (4,-3.8) -- node[above,font=\tiny,align=center] {6. Query TRANSACTION (last 12 months)} (6,-3.8);
+  \draw[cwb arr dash] (6,-4.5) -- node[above,font=\tiny,align=center] {7. Return 12-month transactions} (4,-4.5);
+  \draw[cwb arr] (4,-5.2) -- node[above,font=\tiny,align=center] {9. Query BORROWER.consecutive\_paid\_loans} (6,-5.2);
+  \draw[cwb arr dash] (6,-5.9) -- node[above,font=\tiny,align=center] {10. Return consecutive count} (4,-5.9);
+  \draw[cwb arr] (4,-6.6000000000000005) -- node[above,font=\tiny,align=center] {12. Query active LOAN\_REQUEST count} (6,-6.6000000000000005);
+  \draw[cwb arr dash] (6,-7.300000000000001) -- node[above,font=\tiny,align=center] {13. Return active loan count} (4,-7.300000000000001);
+  \draw[cwb arr] (4,-8.0) -- node[above,font=\tiny,align=center] {17. UPSERT BORROWING\_LIMIT} (6,-8.0);
+  \draw[cwb arr dash] (6,-8.7) -- node[above,font=\tiny,align=center] {18. Confirm update} (4,-8.7);
+  \draw[cwb arr dash] (4,-9.399999999999999) -- node[above,font=\tiny,align=center] {19. Return calculated limit} (2,-9.399999999999999);
+  \draw[cwb arr dash] (2,-10.099999999999998) -- node[above,font=\tiny,align=center] {20. Return limit result} (0,-10.099999999999998);
+\end{tikzpicture}
+\end{center}

@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant B as Borrower
+  participant SC as LoanController
+  participant O as Oracle relay
+  participant ML as Tabular scorer
+  participant LLM as CWB-AI-9B
+  B->>SC: requestLoan
+  SC->>O: scoreRequest
+  O->>ML: computeRiskScore
+  ML-->>O: numeric score
+  O->>LLM: explainScore
+  LLM-->>O: narrative
+  O-->>SC: updateRiskScore

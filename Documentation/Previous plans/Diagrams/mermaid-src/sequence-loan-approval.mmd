@@ -1,0 +1,78 @@
+sequenceDiagram
+    participant B as Borrower
+    participant F as Frontend
+    participant MM as MetaMask
+    participant LB as LocalBank.sol
+    participant PP as Polygon PoS
+    participant BA as Backend API
+    participant AI as AI/ML Service
+    participant AU as Approver UI
+    participant AW as Approver Wallet
+
+    B->>F: 1. Open DApp
+    B->>F: 2. Click Connect Wallet
+    F->>MM: 3. Request accounts
+    MM-->>F: 4. Return wallet address
+
+    B->>F: 5. Enter loan amount: 50 ETH, purpose: Business
+    F->>BA: 6. Check borrowing limit via API
+    BA-->>F: 7. Return: limit OK, 6m_remaining: 200
+
+    F->>MM: 8. Prepare unsigned requestLoan(50 ETH, Business)
+    MM-->>B: 9. MetaMask popup — Confirm tx? Gas: 0.003 MATIC
+    B-->>MM: 10. User clicks Confirm
+
+    Note over MM: 11. Sign tx with private key
+    MM->>LB: 12. Broadcast signed tx
+
+    Note over LB: 13. require(amount > 0)\n14. require(purpose != "")\n15. require(amount <= totalReserve)
+    Note over LB: 16. loanCounter++\n17. Store Loan(id, borrower, amount,\npurpose, Pending, now, 0)\n18. userLoans[sender].push(loanId)
+
+    LB->>PP: 19. emit LoanRequested(loanId, borrower, amount, purpose)
+    Note over PP: 20. Block validated (~2 sec)
+    PP-->>F: 21. Tx confirmed — hash: 0xabc...
+    F-->>B: 22. Loan Requested Successfully!
+
+    PP->>BA: 23. Event listener detects event
+    Note over BA: 24. INSERT INTO LOAN_REQUEST (off-chain DB)
+    BA->>AI: 25. Trigger AI/ML risk assessment
+
+    Note over AI: 26. Extract features:\n- loan amount\n- borrower history\n- wallet age\n- tx frequency
+    Note over AI: 27. Random Forest predict(features)\nfraud_score: 0.12
+    Note over AI: 28. SHAP explain(prediction)\ntop features returned
+    Note over AI: 29. Isolation Forest\nanomaly_score: -0.3
+
+    AI-->>BA: 30. Return: fraud_score: 0.12, anomaly: normal, shap_features
+    Note over BA: 31. INSERT INTO AI_ML_SECURITY_LOG
+
+    Note over AU: 32. Approver opens pending loans page
+    AU->>BA: 33. GET /loans/pending + risk scores
+    BA-->>AU: 34. Return loan list with risk data
+    Note over AU: 35. Display: Loan #5: 50 ETH\nRisk: LOW (0.12)\nSHAP: amount down, history up
+
+    alt Approve
+        AU->>AW: 36. Click Approve
+        Note over AW: 37. Sign approveLoan(5)
+        AW->>LB: approveLoan(5)
+
+        Note over LB: 38. require(onlyApprover)\n39. require(status == Pending)\n40. require(balance >= amount)
+        Note over LB: 41. loan.status = Approved\n42. loan.approvedAt = block.timestamp\n43. totalReserve -= loan.amount\n44. Transfer 50 ETH to borrower via call
+
+        LB-->>B: 45. 50 ETH received in wallet
+        LB->>PP: 46. emit LoanApproved(5, borrower, 50)
+        PP->>BA: 47. Event listener detects event
+        Note over BA: 48. UPDATE LOAN_REQUEST status = approved\n49. INSERT INTO TRANSACTION\n50. UPDATE BORROWING_LIMIT
+
+    else Reject
+        AU->>AW: 36b. Click Reject — reason: High fraud risk
+        Note over AW: 37b. Sign rejectLoan(5, High fraud risk)
+        AW->>LB: rejectLoan(5, High fraud risk)
+
+        Note over LB: 38b. require(onlyApprover)\n39b. require(status == Pending)\n40b. loan.status = Rejected\n41b. loan.rejectedAt = block.timestamp
+
+        LB->>PP: 42b. emit LoanRejected(5, borrower, 50, High fraud risk)
+        PP->>BA: 43b. Event listener detects event
+        Note over BA: 44b. UPDATE LOAN_REQUEST\nstatus = rejected\nrejected_reason = High fraud risk
+        BA->>F: 45b. Push notification
+        F-->>B: 46b. Display: Loan #5 Rejected — Reason: High fraud risk
+    end

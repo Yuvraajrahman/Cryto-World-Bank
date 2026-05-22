@@ -1,0 +1,11 @@
+flowchart LR
+  U[User query] --> R[Task prefix]
+  D[RAG corpus] --> M[9B instruct plus QLoRA]
+  R --> M
+  M --> C[Chat and policy]
+  M --> S[Security advisory]
+  M --> E[Risk explanation]
+  T[Tabular features] --> RF[RF or XGB score]
+  RF --> E
+  ST[Slither CI] -.-> D
+  style M fill:#1E3A8A,color:#fff

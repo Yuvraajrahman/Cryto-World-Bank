@@ -32,5 +32,5 @@ export function AppLayout() {
         };
     }, [token, setUser, reset]);
     const authed = Boolean(token) || (isConnected && Boolean(address));
-    return (_jsxs("div", { className: "flex min-h-screen flex-col", children: [_jsx(AppHeader, {}), _jsxs("div", { className: "flex flex-1", children: [_jsx(Sidebar, {}), _jsx("main", { className: "flex-1 bg-grid-gold/10", children: _jsx("div", { className: "container-page py-8 sm:py-10", children: authed && user ? _jsx(Outlet, {}) : _jsx(WalletGate, {}) }) })] }), authed && user ? _jsx(ChatbotWidget, {}) : null] }));
+    return (_jsxs("div", { className: "flex min-h-screen flex-col", children: [_jsx(AppHeader, {}), _jsxs("div", { className: "flex flex-1", children: [_jsx(Sidebar, {}), _jsx("main", { className: "flex-1 bg-grid-gold/10", children: _jsx("div", { className: "container-page py-8 sm:py-10", children: authed && user ? _jsx(Outlet, {}) : _jsx(WalletGate, {}) }) })] }), authed ? _jsx(ChatbotWidget, {}) : null] }));
 }

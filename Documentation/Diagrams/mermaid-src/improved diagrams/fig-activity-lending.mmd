@@ -1,0 +1,44 @@
+---
+title: Lending Activity Flows - (a) Loan Request, (b) Hierarchical Capital Flow, (c) Borrowing-Limit Check
+---
+flowchart TB
+    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef finish fill:#FFFFFF,stroke:#1F1F1F,stroke-width:2px,color:#111111
+
+    subgraph A[" (a) Loan request to repayment "]
+        direction TB
+        A1((Start)):::start --> A2["Borrower<br/>completes KYC"]:::act
+        A2 --> A3["Submit loan<br/>request (amount, term)"]:::act
+        A3 --> A4{Borrowing-limit<br/>OK?}:::dec
+        A4 -- No --> A5["Reject + log<br/>AI_ML_LOG"]:::act --> AE((End)):::finish
+        A4 -- Yes --> A6["ML risk score<br/>via oracle"]:::act
+        A6 --> A7{Approver<br/>review}:::dec
+        A7 -- Reject --> A5
+        A7 -- Approve --> A8["Disburse + create<br/>INSTALLMENT rows"]:::act
+        A8 --> A9["Borrower pays installments<br/>(processInstallment)"]:::act
+        A9 --> A10{All paid?}:::dec
+        A10 -- No --> A9
+        A10 -- Yes --> A11["Close loan<br/>+ update SBT"]:::act --> AE
+    end
+
+    subgraph B[" (b) Hierarchical capital flow "]
+        direction TB
+        B1((Start)):::start --> B2["WB allocates to NB<br/>(reserve ratio check)"]:::act
+        B2 --> B3{NB ratio<br/>≥ min?}:::dec
+        B3 -- No --> B4["Hold + queue<br/>governance review"]:::act --> BE((End)):::finish
+        B3 -- Yes --> B5["NB allocates to LB"]:::act
+        B5 --> B6{LB ratio<br/>≥ min?}:::dec
+        B6 -- No --> B4
+        B6 -- Yes --> B7["LB pool funded<br/>for borrower draws"]:::act --> BE
+    end
+
+    subgraph C[" (c) Borrowing-limit enforcement "]
+        direction TB
+        C1((Start)):::start --> C2["Read SBT.openLoans<br/>+ credit_score"]:::act
+        C2 --> C3["Compute tier ceiling<br/>(per Table 3.1)"]:::act
+        C3 --> C4{requested ≤ ceiling<br/>AND openLoans &lt; cap?}:::dec
+        C4 -- No --> C5["Revert with<br/>BORROW_LIMIT_EXCEEDED"]:::act --> CE((End)):::finish
+        C4 -- Yes --> C6["Proceed to ML scoring"]:::act --> CE
+    end

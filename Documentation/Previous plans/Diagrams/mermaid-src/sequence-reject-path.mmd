@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant AU as Approver UI
+    participant AW as Approver Wallet
+    participant LB as LocalBank.sol
+    participant PP as Polygon PoS
+    participant BA as Backend API
+    participant FB as Frontend / Borrower
+
+    Note over AU, FB: alt [Reject] — continues from Diagram 1, step 35
+
+    AU->>AW: 36b. Click Reject — enter reason: High fraud risk
+
+    Note over AW: 37b. Sign rejectLoan(5, High fraud risk)
+    AW->>LB: rejectLoan(5, High fraud risk)
+
+    Note over LB: 38b. require(onlyApprover)\n39b. require(status == Pending)
+    Note over LB: 40b. loan.status = Rejected\n41b. loan.rejectedAt = block.timestamp
+
+    LB->>PP: 42b. emit LoanRejected(5, borrower, 50, High fraud risk)
+    PP->>BA: 43b. Event listener detects event
+
+    Note over BA: 44b. UPDATE LOAN_REQUEST\nstatus = rejected\nrejected_reason = High fraud risk
+
+    BA->>FB: 45b. Push notification
+    Note over FB: 46b. Display:\nLoan #5 Rejected\nReason: High fraud risk

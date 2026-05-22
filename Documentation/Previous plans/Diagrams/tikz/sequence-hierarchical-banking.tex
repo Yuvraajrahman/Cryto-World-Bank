@@ -1,0 +1,43 @@
+% Auto-generated TikZ sequence from sequence-hierarchical-banking.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hWBA) at (0,0) {WorldBankAdmin};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hF) at (2,0) {Frontend};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hWBR) at (4,0) {WBReserve.sol};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hBC) at (6,0) {Blockchain};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hNB) at (8,0) {NationalBank};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \node[font=\scriptsize\bfseries] (hNBS) at (10,0) {NationalBank.sol};
+  \draw[dashed,gray!60] (10,-0.35) -- (10,-5);
+  \node[font=\scriptsize\bfseries] (hLBk) at (12,0) {LocalBank};
+  \draw[dashed,gray!60] (12,-0.35) -- (12,-5);
+  \node[font=\scriptsize\bfseries] (hLBS) at (14,0) {LocalBank.sol};
+  \draw[dashed,gray!60] (14,-0.35) -- (14,-5);
+  \node[font=\scriptsize\bfseries] (hBr) at (16,0) {Borrower};
+  \draw[dashed,gray!60] (16,-0.35) -- (16,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {1. Deposit funds to reserve} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {2. deposit() with value: amount} (4,-1.7);
+  \draw[cwb arr] (4,-2.4) -- node[above,font=\tiny,align=center] {3. Record transaction} (6,-2.4);
+  \draw[cwb arr dash] (6,-3.0999999999999996) -- node[above,font=\tiny,align=center] {4. Confirm} (4,-3.0999999999999996);
+  \draw[cwb arr] (8,-3.8) -- node[above,font=\tiny,align=center] {5. Request loan from World Bank} (2,-3.8);
+  \draw[cwb arr] (2,-4.5) -- node[above,font=\tiny,align=center] {6. requestLoan(amount)} (4,-4.5);
+  \draw[cwb arr] (0,-5.2) -- node[above,font=\tiny,align=center] {8. Approve NB loan} (2,-5.2);
+  \draw[cwb arr] (2,-5.9) -- node[above,font=\tiny,align=center] {9. approveLoan(nb\_address, amount)} (4,-5.9);
+  \draw[cwb arr] (4,-6.6000000000000005) -- node[above,font=\tiny,align=center] {10. Transfer funds to NB contract} (6,-6.6000000000000005);
+  \draw[cwb arr] (6,-7.300000000000001) -- node[above,font=\tiny,align=center] {11. Receive funds} (10,-7.300000000000001);
+  \draw[cwb arr] (12,-8.0) -- node[above,font=\tiny,align=center] {12. Request loan from National Bank} (2,-8.0);
+  \draw[cwb arr] (2,-8.7) -- node[above,font=\tiny,align=center] {13. requestLoan(amount)} (10,-8.7);
+  \draw[cwb arr] (8,-9.399999999999999) -- node[above,font=\tiny,align=center] {14. Approve LB loan} (2,-9.399999999999999);
+  \draw[cwb arr] (2,-10.099999999999998) -- node[above,font=\tiny,align=center] {15. approveLoan(lb\_address, amount)} (10,-10.099999999999998);
+  \draw[cwb arr] (6,-10.799999999999997) -- node[above,font=\tiny,align=center] {17. Transfer on-chain} (14,-10.799999999999997);
+  \draw[cwb arr] (14,-11.499999999999996) -- node[above,font=\tiny,align=center] {18. Receive funds} (16,-11.499999999999996);
+  \draw[cwb arr] (16,-12.199999999999996) -- node[above,font=\tiny,align=center] {19. payInstallment()} (14,-12.199999999999996);
+  \draw[cwb arr] (14,-12.899999999999995) -- node[above,font=\tiny,align=center] {20. Forward share} (12,-12.899999999999995);
+  \draw[cwb arr] (12,-13.599999999999994) -- node[above,font=\tiny,align=center] {21. Forward share to NB} (10,-13.599999999999994);
+  \draw[cwb arr] (10,-14.299999999999994) -- node[above,font=\tiny,align=center] {22. Forward share to WB} (4,-14.299999999999994);
+\end{tikzpicture}
+\end{center}

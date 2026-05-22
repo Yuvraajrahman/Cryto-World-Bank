@@ -1,0 +1,17 @@
+% Auto-generated TikZ from mermaid-src/blockchain-stack-layers.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, node distance=0.7cm and 1.0cm]
+  \node[cwb box, align=center] (IDX) at (0.0,0.0) {Event indexer};
+  \node[cwb box, align=center] (EVM) at (2.8,0.0) {Polygon PoS testnet};
+  \node[cwb box, align=center] (LC) at (0.0,-1.4) {LoanController};
+  \node[cwb box wb, align=center] (WR) at (2.8,-1.4) {WorldBankReserve};
+  \node[cwb box, align=center] (UI) at (0.0,-2.8) {Web dApp React};
+  \node[cwb box, align=center] (API) at (2.8,-2.8) {Express API};
+  \node[cwb box, align=center] (AI) at (0.0,-4.199999999999999) {CWB-AI-9B plus RAG};
+  \node[cwb box, align=center] (ORA) at (2.8,-4.199999999999999) {Oracle relay};
+  \node[cwb box planned, align=center] (GL) at (0.0,-5.6) {GroupLendingPool planned};
+  \draw[cwb arr] (IDX) -- (EVM);
+  \draw[cwb arr] (LC) -- (EVM);
+  \draw[cwb arr] (WR) -- (EVM);
+\end{tikzpicture}
+\end{center}

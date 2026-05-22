@@ -1,0 +1,62 @@
+flowchart TD
+    subgraph ext["External Entities"]
+        direction LR
+        Borrower[Borrower]
+        BankApprover[Bank Approver]
+        WorldBankAdmin[World Bank Admin]
+        NationalBank[National Bank]
+        CoinGeckoAPI[CoinGecko API]
+    end
+
+    subgraph core["Core Loan Processing"]
+        P1("1.0 Process Loan Request")
+        P2("2.0 Manage Loan Lifecycle")
+        P3("3.0 AI/ML Risk Assessment")
+        P4("4.0 Execute Blockchain Transaction")
+        P5("5.0 Synchronize Event Data")
+    end
+
+    subgraph support["Supporting Services"]
+        P6("6.0 Calculate Borrowing Limits")
+        P7("7.0 Fetch &amp; Cache Market Data")
+        P8("8.0 Manage Bank Hierarchy &amp; System Controls")
+    end
+
+    subgraph datastores["Data Stores"]
+        D1[(D1: LOAN_REQUEST)]
+        D2[(D2: TRANSACTION)]
+        D3[(D3: AI_ML_SECURITY_LOG)]
+        D4[(D4: BORROWING_LIMIT)]
+        D5[(D5: BORROWER)]
+        D10[(D10: MARKET_DATA)]
+        D11[(D11: INSTALLMENT)]
+    end
+
+    Borrower -->|"Amount, Purpose,\nWallet Address"| P1
+    P1 -->|"Loan Data"| P2
+    P2 -->|"Validation Result"| P1
+    P2 -->|"Risk Query"| P3
+    P3 -->|"Risk Score +\nSHAP Features"| P2
+    P1 -->|"Signed Transaction"| P4
+    P2 -->|"Installment Data"| D11
+    P2 -->|"Pending Loans +\nRisk Scores"| BankApprover
+    BankApprover -->|"Approval/Rejection"| P4
+
+    P4 -->|"Transaction Events"| P5
+    P5 -->|"Loan Record"| D1
+    P5 -->|"Transaction Log"| D2
+    P5 -->|"Security Log"| D3
+    P5 --> P6
+
+    P6 -->|"Limit Data"| D4
+    D4 -->|"History Data"| P6
+
+    CoinGeckoAPI -->|"Price Data"| P7
+    P7 -->|"Market Prices"| Borrower
+    P7 -->|"Cached Price Data"| D10
+
+    WorldBankAdmin -->|"Register Banks, Lend,\nPause/Unpause"| P8
+    NationalBank -->|"Register Local,\nBorrow, Lend"| P8
+
+    D1 -.->|"loan context"| P2
+    D5 -.->|"borrower identity"| P1

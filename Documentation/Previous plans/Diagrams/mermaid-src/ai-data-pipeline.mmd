@@ -1,0 +1,9 @@
+flowchart TB
+  A[Architecture docs] --> C[Chunk and clean]
+  B[SWC security pairs] --> C
+  S[Synthetic loan dialogues] --> C
+  C --> J[SFT JSONL]
+  C --> V[Vector index RAG]
+  J --> T[QLoRA training]
+  V --> I[Inference API]
+  style T fill:#2563EB,color:#fff

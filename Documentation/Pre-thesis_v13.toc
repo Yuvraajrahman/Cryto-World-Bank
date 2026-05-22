@@ -1,0 +1,143 @@
+\contentsline {chapter}{Declaration}{2}{section*.2}%
+\contentsline {chapter}{Approval}{3}{section*.4}%
+\contentsline {chapter}{Ethics Statement}{5}{section*.6}%
+\contentsline {chapter}{Abstract}{6}{section*.8}%
+\contentsline {chapter}{Document Status (Pre-thesis 1)}{7}{section*.10}%
+\contentsline {chapter}{Dedication}{8}{section*.12}%
+\contentsline {chapter}{Acknowledgment}{9}{section*.14}%
+\contentsline {chapter}{List of Tables}{v}{section*.16}%
+\contentsline {chapter}{List of Figures}{vii}{section*.18}%
+\contentsline {chapter}{List of Formulas}{xi}{section*.21}%
+\contentsline {chapter}{List of Abbreviations}{xiii}{section*.23}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background}{2}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Rationale of the Study}{3}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Problem Statement}{3}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Objectives}{5}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Research Questions}{6}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Research Contribution}{6}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Blockchain Justification}{7}{section.1.7}%
+\contentsline {subsection}{\numberline {1.7.1}Blockchain Fundamentals and the EVM Execution Model}{8}{subsection.1.7.1}%
+\contentsline {section}{\numberline {1.8}Proposed Solution}{10}{section.1.8}%
+\contentsline {subsection}{\numberline {1.8.1}Banking Functions of the Platform}{11}{subsection.1.8.1}%
+\contentsline {subsection}{\numberline {1.8.2}Service Delivery Across Scale}{12}{subsection.1.8.2}%
+\contentsline {subsection}{\numberline {1.8.3}Cross-Tier Lending System}{13}{subsection.1.8.3}%
+\contentsline {subsubsection}{Same-Tier Lending}{13}{subsubsection*.30}%
+\contentsline {subsubsection}{Upward Lending}{14}{subsubsection*.31}%
+\contentsline {subsubsection}{Tiered Borrower Access}{14}{subsubsection*.32}%
+\contentsline {section}{\numberline {1.9}Methodology in Brief}{16}{section.1.9}%
+\contentsline {section}{\numberline {1.10}Scopes and Challenges}{16}{section.1.10}%
+\contentsline {subsection}{\numberline {1.10.1}Economic Sustainability: Interest Revenue Versus Gas Costs}{17}{subsection.1.10.1}%
+\contentsline {subsection}{\numberline {1.10.2}Resistance to Institutional Capture}{17}{subsection.1.10.2}%
+\contentsline {subsection}{\numberline {1.10.3}Cryptocurrency Supply Constraints and Scalability}{18}{subsection.1.10.3}%
+\contentsline {section}{\numberline {1.11}Market Analysis and Partnership Ecosystem}{18}{section.1.11}%
+\contentsline {subsection}{\numberline {1.11.1}Market Sizing}{19}{subsection.1.11.1}%
+\contentsline {subsection}{\numberline {1.11.2}Target Customer Segment}{19}{subsection.1.11.2}%
+\contentsline {subsection}{\numberline {1.11.3}Partner Ecosystem}{21}{subsection.1.11.3}%
+\contentsline {subsection}{\numberline {1.11.4}Incentive Alignment Through the Blockchain Platform}{21}{subsection.1.11.4}%
+\contentsline {chapter}{\numberline {2}Literature Review}{22}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Preliminaries}{22}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Review of Existing Research}{23}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Decentralized Lending and DeFi Protocol Design}{23}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Machine Learning for Blockchain Security}{24}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Explainable AI in Financial Decision Systems}{25}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Blockchain for Financial Inclusion}{25}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}Group Lending and Microfinance Digitization}{26}{subsection.2.2.5}%
+\contentsline {subsection}{\numberline {2.2.6}Smart Contract Security and Governance}{26}{subsection.2.2.6}%
+\contentsline {subsection}{\numberline {2.2.7}AI Security Features for Blockchain Lending}{27}{subsection.2.2.7}%
+\contentsline {subsection}{\numberline {2.2.8}Gas Cost Optimization and Layer~2 Scalability}{28}{subsection.2.2.8}%
+\contentsline {subsection}{\numberline {2.2.9}Correspondent Banking and Cross-Border Settlement}{28}{subsection.2.2.9}%
+\contentsline {subsection}{\numberline {2.2.10}Monetary Policy Distribution and Financial Inequality}{28}{subsection.2.2.10}%
+\contentsline {subsection}{\numberline {2.2.11}Real-World Asset Tokenization and Institutional DeFi}{29}{subsection.2.2.11}%
+\contentsline {section}{\numberline {2.3}Literature Review Summary}{30}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Comparative Protocol Analysis}{35}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Literature Synthesis}{35}{subsection.2.4.1}%
+\contentsline {section}{\numberline {2.5}Summary of Key Findings}{36}{section.2.5}%
+\contentsline {chapter}{\numberline {3}System Architecture and Design}{38}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Prototype Scope}{38}{section.3.1}%
+\contentsline {section}{\numberline {3.2}High-Level Architecture}{39}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Blockchain Platform Selection}{41}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Transaction Verification and Consensus}{42}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Oracle Architecture: Off-Chain AI to On-Chain Decision}{42}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Data Model and Database Design}{43}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Entity Summary}{47}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}EER Constructs Applied}{48}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Normalization}{49}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Indexing Strategy}{49}{subsection.3.4.4}%
+\contentsline {subsection}{\numberline {3.4.5}Functional Dependencies}{50}{subsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.4.6}Relational Integrity Constraints}{50}{subsection.3.4.6}%
+\contentsline {section}{\numberline {3.5}On-Chain and Off-Chain Data Partitioning}{51}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Digital Identity System}{51}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}ZKP KYC Compliance Architecture}{52}{subsection.3.6.1}%
+\contentsline {section}{\numberline {3.7}Kinked Interest Rate Model}{53}{section.3.7}%
+\contentsline {section}{\numberline {3.8}Reentrancy and Security Analysis}{53}{section.3.8}%
+\contentsline {section}{\numberline {3.9}System Modeling}{54}{section.3.9}%
+\contentsline {subsection}{\numberline {3.9.1}Use Case Diagram}{54}{subsection.3.9.1}%
+\contentsline {subsection}{\numberline {3.9.2}Activity Diagrams}{54}{subsection.3.9.2}%
+\contentsline {subsection}{\numberline {3.9.3}Data Flow Diagrams}{56}{subsection.3.9.3}%
+\contentsline {subsection}{\numberline {3.9.4}Sequence Diagrams}{58}{subsection.3.9.4}%
+\contentsline {subsection}{\numberline {3.9.5}Four-Tier Capital Flow}{63}{subsection.3.9.5}%
+\contentsline {section}{\numberline {3.10}Auxiliary Dual-Currency Facility}{63}{section.3.10}%
+\contentsline {section}{\numberline {3.11}Banking Product Suite}{64}{section.3.11}%
+\contentsline {subsection}{\numberline {3.11.1}Savings Products}{64}{subsection.3.11.1}%
+\contentsline {subsection}{\numberline {3.11.2}Checking and Transactional Accounts}{65}{subsection.3.11.2}%
+\contentsline {subsection}{\numberline {3.11.3}Group / Solidarity Lending}{65}{subsection.3.11.3}%
+\contentsline {subsection}{\numberline {3.11.4}Foreign Exchange and Multi-Currency Operations}{66}{subsection.3.11.4}%
+\contentsline {subsection}{\numberline {3.11.5}Trade Finance Facilitation (Planned)}{66}{subsection.3.11.5}%
+\contentsline {subsection}{\numberline {3.11.6}Privacy-Preserving Identity Compliance (Planned)}{67}{subsection.3.11.6}%
+\contentsline {section}{\numberline {3.12}Governance Framework}{67}{section.3.12}%
+\contentsline {subsection}{\numberline {3.12.1}Network Membership Governance}{67}{subsection.3.12.1}%
+\contentsline {subsection}{\numberline {3.12.2}Business Network Governance}{68}{subsection.3.12.2}%
+\contentsline {subsection}{\numberline {3.12.3}Technology Infrastructure Governance}{68}{subsection.3.12.3}%
+\contentsline {subsection}{\numberline {3.12.4}Regulatory Compliance Considerations}{69}{subsection.3.12.4}%
+\contentsline {subsection}{\numberline {3.12.5}Asset Tokenization}{69}{subsection.3.12.5}%
+\contentsline {section}{\numberline {3.13}Threat Model and Security Controls}{69}{section.3.13}%
+\contentsline {chapter}{\numberline {4}Methodology}{71}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Development Methodology}{71}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Intelligent Services: Unified Fine-Tuned 9B Assistant (Design)}{72}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Base Models and Quantization}{72}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Task Specification and Guardrails}{72}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Training Data and QLoRA Pipeline}{73}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Evaluation and Oracle Integration}{73}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Legacy Tabular Components and Limitations}{73}{subsection.4.2.5}%
+\contentsline {paragraph}{Limitations (design and research context).}{74}{paragraph*.106}%
+\contentsline {section}{\numberline {4.3}Evaluation Methodology}{74}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Sprint Plan and Deliverables}{77}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Sprint 1: Foundation and Core Banking (Weeks 1--3)}{77}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Sprint 2: Lending Features and Communication (Weeks 4--6)}{78}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Sprint 3: AI/ML Security and Finalization (Weeks 7--8)}{79}{subsection.4.4.3}%
+\contentsline {section}{\numberline {4.5}SDLC Stage Mapping}{81}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Design Decisions and Alternatives}{83}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Justification of Selected Technologies}{85}{subsection.4.6.1}%
+\contentsline {section}{\numberline {4.7}Design Patterns}{88}{section.4.7}%
+\contentsline {section}{\numberline {4.8}Software Testing Strategy}{88}{section.4.8}%
+\contentsline {chapter}{\numberline {5}Market Analysis and Feasibility}{90}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Market Sizing}{90}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Target Customer Segment}{91}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Partner Ecosystem}{92}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Competitive Landscape}{92}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Risk Taxonomy}{97}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Technical Feasibility}{98}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Economic Feasibility}{99}{section.5.7}%
+\contentsline {section}{\numberline {5.8}Revenue Projection}{100}{section.5.8}%
+\contentsline {subsection}{\numberline {5.8.1}Transaction Economics: Interest Rates}{104}{subsection.5.8.1}%
+\contentsline {subsection}{\numberline {5.8.2}Global Economic Impact}{105}{subsection.5.8.2}%
+\contentsline {subsection}{\numberline {5.8.3}Value Proposition and Go-to-Market}{106}{subsection.5.8.3}%
+\contentsline {section}{\numberline {5.9}Currency Risk and the Stablecoin Imperative}{107}{section.5.9}%
+\contentsline {section}{\numberline {5.10}Bootstrap Funding and the Tier~1 Capitalization Problem}{107}{section.5.10}%
+\contentsline {section}{\numberline {5.11}Prototype Scope and Limitations}{108}{section.5.11}%
+\contentsline {section}{\numberline {5.12}Accessibility Design Considerations}{109}{section.5.12}%
+\contentsline {chapter}{\numberline {6}Conclusion}{110}{chapter.6}%
+\contentsline {chapter}{\numberline {A}Technology Stack}{113}{appendix.A}%
+\contentsline {section}{\numberline {A.1}In-product assistant: local large language model (LLM) integration (prototype)}{113}{section.A.1}%
+\contentsline {paragraph}{Purpose.}{113}{paragraph*.140}%
+\contentsline {paragraph}{Model and runtime (local development).}{113}{paragraph*.141}%
+\contentsline {paragraph}{End-to-end behavior.}{113}{paragraph*.142}%
+\contentsline {paragraph}{Security and limitations (prototype stance).}{113}{paragraph*.143}%
+\contentsline {paragraph}{Architecture diagram (Mermaid).}{114}{paragraph*.144}%
+\contentsline {paragraph}{Implementation analysis (brief).}{115}{paragraph*.147}%
+\contentsline {paragraph}{Relationship to the earlier rule-based assistant (legacy).}{115}{paragraph*.148}%
+\contentsline {chapter}{\numberline {B}Smart Contract Capabilities}{116}{appendix.B}%
+\contentsline {chapter}{Appendix C: Deployed Testnet Contract Addresses}{117}{section*.151}%
+\contentsline {chapter}{Appendix D: WorldBankReserve Contract Interface}{118}{section*.154}%
+\contentsline {chapter}{References}{120}{section*.156}%

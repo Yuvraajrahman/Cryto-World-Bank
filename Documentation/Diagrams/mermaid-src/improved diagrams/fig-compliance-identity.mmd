@@ -1,0 +1,36 @@
+---
+title: Compliance and Identity Stack - zkKYC, zkAML, DID/VC, ERC-4337 AA
+---
+flowchart TB
+    classDef actor fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef proc  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    subgraph A[" (a) zkKYC + DID / VC issuance "]
+        direction LR
+        U1(("User")):::actor --> ID["zkKYC Provider<br/>(Polygon ID · Onfido)"]:::proc
+        ID --> VC["Verifiable Credential<br/>signed by issuer"]:::store
+        VC --> U1
+        U1 -- "ZKP of VC" --> SC1["LocalBank contract<br/>kycVerified[wallet]"]:::chain
+    end
+
+    subgraph B[" (b) zkAML continuous monitoring "]
+        direction LR
+        TX["On-chain tx"] --> AML["zkAML circuit<br/>(sanction-list match)"]:::proc
+        AML -- "non-membership proof" --> AT["Attestation event<br/>amlClean(txHash)"]:::chain
+        AML -- "match" --> FLAG["Compliance alert +<br/>function pause"]:::store
+    end
+
+    subgraph C[" (c) Tiered KYC ladder "]
+        direction TB
+        L1["L1 zkKYC<br/>≤ 0.5 ETH"]:::chain --> L2["L2 phone+ID hash<br/>≤ 5 ETH"]:::chain --> L3["L3 full KYC + selfie<br/>≤ 50 ETH"]:::chain --> L4["L4 entity + SoF<br/>&gt; 50 ETH"]:::chain
+    end
+
+    subgraph D[" (d) ERC-4337 Account Abstraction onboarding "]
+        direction LR
+        U2(("Non-crypto user")):::actor --> WAL["Smart-account wallet<br/>(passkey / social)"]:::proc
+        WAL --> BUN["Bundler / Paymaster<br/>(gas sponsored)"]:::proc
+        BUN --> EP["EntryPoint contract"]:::chain
+        EP --> SC2["LocalBank receives<br/>UserOperation"]:::chain
+    end

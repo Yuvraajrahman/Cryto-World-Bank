@@ -1,0 +1,29 @@
+graph LR
+    subgraph TRAD["TRADITIONAL CORRESPONDENT BANKING"]
+        direction LR
+        SA["Sender Bank"] -->|"MT103 SWIFT"| CB1["Correspondent 1"]
+        CB1 -->|"Compliance"| CB2["Correspondent 2"]
+        CB2 -->|"FX"| CB3["Correspondent 3"]
+        CB3 -->|"Nostro credit"| RB["Receiver Bank"]
+        T1["2-5 days settlement"]
+        T2["~42 USD per tx"]
+        T3["Capital in nostro"]
+    end
+    subgraph CWB["CWB ON-CHAIN SETTLEMENT"]
+        direction LR
+        S2["Sender Local Bank"] -->|"Smart contract"| BC["Polygon L2"]
+        BC -->|"State update"| R2["Receiver Local Bank"]
+        T4["~2 sec finality"]
+        T5["under 0.01 USD"]
+        T6["No pre-funding"]
+    end
+    style TRAD fill:#FEF3C7,stroke:#D97706,stroke-width:2px
+    style CWB fill:#DCFCE7,stroke:#16A34A,stroke-width:2px
+    style SA fill:#FDE68A,stroke:#F59E0B
+    style CB1 fill:#FDE68A,stroke:#F59E0B
+    style CB2 fill:#FDE68A,stroke:#F59E0B
+    style CB3 fill:#FDE68A,stroke:#F59E0B
+    style RB fill:#FDE68A,stroke:#F59E0B
+    style S2 fill:#86EFAC,stroke:#22C55E
+    style BC fill:#86EFAC,stroke:#22C55E
+    style R2 fill:#86EFAC,stroke:#22C55E

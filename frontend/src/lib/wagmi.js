@@ -16,14 +16,23 @@ const connectors = connectorsForWallets([
     appName: "Crypto World Bank",
     projectId: projectId || "00000000000000000000000000000000",
 });
+// NOTE: Wagmi/Viem `http()` without a URL may pick a provider that does not
+// allow browser CORS (you may see errors to `eth.merkle.io`). For local dev,
+// pin public RPC endpoints (and allow overrides via env).
+const sepoliaRpc = import.meta.env.VITE_SEPOLIA_RPC_URL?.trim() ||
+    "https://rpc.sepolia.org";
+const polygonAmoyRpc = import.meta.env.VITE_POLYGON_AMOY_RPC_URL?.trim() ||
+    "https://rpc-amoy.polygon.technology";
+const mainnetRpc = import.meta.env.VITE_MAINNET_RPC_URL?.trim() ||
+    "https://cloudflare-eth.com";
 export const wagmiConfig = createConfig({
     connectors,
     chains: [sepolia, polygonAmoy, mainnet, hardhat],
     ssr: false,
     transports: {
-        [sepolia.id]: http(),
-        [polygonAmoy.id]: http(),
-        [mainnet.id]: http(),
+        [sepolia.id]: http(sepoliaRpc),
+        [polygonAmoy.id]: http(polygonAmoyRpc),
+        [mainnet.id]: http(mainnetRpc),
         [hardhat.id]: http("http://127.0.0.1:8545"),
     },
 });

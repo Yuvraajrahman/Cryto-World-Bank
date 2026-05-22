@@ -1,0 +1,38 @@
+sequenceDiagram
+    participant B as Borrower
+    participant F as Frontend
+    participant CS as ChatbotService
+    participant NLP as NLPEngine
+    participant DB as PostgreSQL
+
+    B->>F: 1. Open AI Chatbot
+    F->>CS: 2. Initialize session (borrower_id)
+    CS->>DB: 3. Load user context (BORROWER, LOAN_REQUEST, BORROWING_LIMIT)
+    DB-->>CS: 4. Return user data
+    CS-->>F: 5. Return welcome message + context summary
+    F-->>B: 6. Display chatbot interface
+
+    B->>F: 7. Ask question (e.g. What is my borrowing limit?)
+    F->>CS: 8. POST /chatbot/ask (session_id, message)
+    CS->>NLP: 9. Tokenize + Remove stop words
+
+    Note over NLP: 10. Classify intent\n(loan_limit / payment_due /\nbank_info / general)
+    Note over NLP: 11. Extract entities
+
+    NLP-->>CS: 12. Return intent + entities
+
+    alt intent = loan_limit
+        CS->>DB: 13a. Query BORROWING_LIMIT
+        DB-->>CS: 13a. Return limit data
+    else intent = payment_due
+        CS->>DB: 13b. Query INSTALLMENT WHERE status = pending
+        DB-->>CS: 13b. Return pending installments
+    else intent = bank_info
+        CS->>DB: 13c. Query LOCAL_BANK / NATIONAL_BANK
+        DB-->>CS: 13c. Return bank data
+    end
+
+    Note over CS: 14. Format response with data
+    CS->>DB: 15. INSERT INTO AI_CHATBOT_LOG
+    CS-->>F: 16. Return formatted response
+    F-->>B: 17. Display response

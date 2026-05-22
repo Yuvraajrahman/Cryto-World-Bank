@@ -1,0 +1,35 @@
+---
+title: Sequence Diagram - Loan Request, AI Risk Check, and Approval (with Reject Path)
+---
+sequenceDiagram
+    autonumber
+    participant U as Borrower
+    participant FE as Frontend (React)
+    participant API as Backend API
+    participant ML as ML Oracle (FastAPI)
+    participant SC as LocalBank Contract
+    participant DB as PostgreSQL
+
+    U->>FE: Submit loan request (amount, term)
+    FE->>API: POST /loans { signed EIP-712 }
+    API->>DB: INSERT loan_request (status=PENDING)
+    API->>SC: applyLoan(borrower, amount)
+    SC-->>API: emit LoanApplied(event)
+    API->>ML: POST /score { borrower features }
+    ML->>ML: RF + iForest + SHAP
+    ML-->>API: { score, shap, model_version }
+    API->>DB: INSERT ai_ml_log
+    Note over API,SC: Commit-reveal: API commits hash now, reveals at approval
+
+    alt Approver approves
+        API->>SC: approveLoan(requestId, commitHash)
+        SC->>SC: revealScore() + verify
+        SC-->>API: emit LoanApproved
+        API->>DB: UPDATE loan SET status=ACTIVE
+        API-->>U: 'Loan approved · disbursed'
+    else Approver rejects
+        API->>SC: rejectLoan(requestId, reason)
+        SC-->>API: emit LoanRejected(reason)
+        API->>DB: UPDATE loan SET status=REJECTED
+        API-->>U: 'Loan rejected — see reason'
+    end

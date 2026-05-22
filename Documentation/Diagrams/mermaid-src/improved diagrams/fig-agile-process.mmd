@@ -1,0 +1,30 @@
+---
+title: Agile / Scrum Process with Sprint Submission Cycle
+---
+flowchart LR
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef cer  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef art  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef loop fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    PB["Product Backlog<br/>(user stories + NFRs)"]:::art
+    SP["Sprint Planning"]:::cer
+    SB["Sprint Backlog"]:::art
+    DEV["Development<br/>(2-week iterations)"]:::step
+    DSM["Daily Stand-up"]:::cer
+    REV["Sprint Review<br/>(demo)"]:::cer
+    RET["Sprint Retrospective"]:::cer
+    INC["Potentially-shippable<br/>Increment"]:::art
+    SUB["Sprint Submission<br/>(report + PRs + CI green)"]:::art
+
+    PB --> SP --> SB --> DEV --> REV --> RET --> SP
+    DEV -.-> DSM -.-> DEV
+    DEV --> INC --> SUB
+
+    subgraph PT[" Sprint point estimates "]
+        direction TB
+        P1["Sprint 1 · 34 pts"]:::loop
+        P2["Sprint 2 · 41 pts"]:::loop
+        P3["Sprint 3 · 47 pts"]:::loop
+    end
+    SUB -.-> PT

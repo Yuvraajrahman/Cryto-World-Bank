@@ -1,0 +1,22 @@
+% Auto-generated TikZ sequence from ai-oracle-loan-sequence.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hB) at (0,0) {Borrower};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hSC) at (2,0) {LoanController};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hO) at (4,0) {Oracle relay};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hML) at (6,0) {Tabular scorer};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hLLM) at (8,0) {CWB-AI-9B};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {requestLoan} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {scoreRequest} (4,-1.7);
+  \draw[cwb arr] (4,-2.4) -- node[above,font=\tiny,align=center] {computeRiskScore} (6,-2.4);
+  \draw[cwb arr dash] (6,-3.0999999999999996) -- node[above,font=\tiny,align=center] {numeric score} (4,-3.0999999999999996);
+  \draw[cwb arr] (4,-3.8) -- node[above,font=\tiny,align=center] {explainScore} (8,-3.8);
+  \draw[cwb arr dash] (8,-4.5) -- node[above,font=\tiny,align=center] {narrative} (4,-4.5);
+  \draw[cwb arr dash] (4,-5.2) -- node[above,font=\tiny,align=center] {updateRiskScore} (2,-5.2);
+\end{tikzpicture}
+\end{center}

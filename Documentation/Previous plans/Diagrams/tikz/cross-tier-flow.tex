@@ -1,0 +1,31 @@
+% Auto-generated TikZ from mermaid-src/cross-tier-flow.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, node distance=0.7cm and 1.0cm]
+  \node[cwb box wb, align=center] (WB) at (0.0,0.0) {WORLD BANK\\\\Global Reserve};
+  \node[cwb box, align=center] (NB1) at (2.8,0.0) {National Bank A};
+  \node[cwb box, align=center] (NB2) at (0.0,-1.4) {National Bank B};
+  \node[cwb box, align=center] (NB3) at (2.8,-1.4) {National Bank C};
+  \node[cwb box, align=center] (LB1) at (0.0,-2.8) {Local Bank 1};
+  \node[cwb box, align=center] (LB2) at (2.8,-2.8) {Local Bank 2};
+  \node[cwb box, align=center] (LB3) at (0.0,-4.199999999999999) {Local Bank 3};
+  \node[cwb box, align=center] (LB4) at (2.8,-4.199999999999999) {Local Bank 4};
+  \node[cwb box, align=center] (U1) at (0.0,-5.6) {Individual\\\\0.01-10 ETH};
+  \node[cwb box, align=center] (U2) at (2.8,-5.6) {SME\\\\1-100 ETH};
+  \node[cwb box, align=center] (U3) at (0.0,-7.0) {Corporate\\\\50-10K ETH};
+  \node[cwb box, align=center] (U4) at (2.8,-7.0) {Institutional\\\\1000+ ETH};
+  \draw[cwb arr] (WB) -- node[midway,font=\tiny,align=center] {3 pct Down} (NB1);
+  \draw[cwb arr] (WB) -- node[midway,font=\tiny,align=center] {3 pct Down} (NB2);
+  \draw[cwb arr] (WB) -- node[midway,font=\tiny,align=center] {3 pct Down} (NB3);
+  \draw[cwb arr] (NB1) -- node[midway,font=\tiny,align=center] {5 pct} (LB1);
+  \draw[cwb arr] (NB1) -- node[midway,font=\tiny,align=center] {5 pct} (LB2);
+  \draw[cwb arr] (NB2) -- node[midway,font=\tiny,align=center] {5 pct} (LB3);
+  \draw[cwb arr] (NB3) -- node[midway,font=\tiny,align=center] {5 pct} (LB4);
+  \draw[cwb arr] (LB1) -- node[midway,font=\tiny,align=center] {8 pct} (U1);
+  \draw[cwb arr] (LB1) -- node[midway,font=\tiny,align=center] {8 pct} (U2);
+  \draw[cwb arr] (LB3) -- node[midway,font=\tiny,align=center] {8 pct} (U2);
+  \draw[cwb arr dash] (LB2) -- node[midway,font=\tiny,align=center] {Surplus up} (NB1);
+  \draw[cwb arr dash] (NB3) -- node[midway,font=\tiny,align=center] {Surplus up} (WB);
+  \draw[cwb arr] (NB2) -- node[midway,font=\tiny,align=center] {Direct} (U3);
+  \draw[cwb arr] (WB) -- node[midway,font=\tiny,align=center] {Direct} (U4);
+\end{tikzpicture}
+\end{center}

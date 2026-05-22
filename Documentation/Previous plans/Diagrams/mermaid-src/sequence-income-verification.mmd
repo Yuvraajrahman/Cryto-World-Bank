@@ -1,0 +1,42 @@
+sequenceDiagram
+    participant B as Borrower
+    participant F as Frontend
+    participant API as FastAPI
+    participant DB as PostgreSQL
+    participant FS as FileStorage
+    participant BA as BankApprover
+
+    B->>F: 1. Open Income Verification page
+    F->>API: 2. GET /income-proof/status (borrower_id)
+    API->>DB: 3. Query INCOME_PROOF table
+    DB-->>API: 4. Return status (or empty)
+    API-->>F: 5. Return verification status
+    F-->>B: 6. Show upload form (if no verified proof exists)
+
+    B->>F: 7. Select file + Upload
+    Note over F: 8. Client-side validation\n(type, size <= 5MB)
+    F->>API: 9. POST /income-proof/upload (file, borrower_id)
+
+    Note over API: 10. Server-side validation\n+ SHA-256 hash
+    API->>FS: 11. Store encrypted file
+    FS-->>API: 12. Return file_path
+    API->>DB: 13. INSERT INTO INCOME_PROOF (status = pending)
+    DB-->>API: 14. Confirm insert
+    API-->>F: 15. Return success
+    F-->>B: 16. Show Pending Review status
+
+    Note over B, BA: Bank Review Phase
+
+    BA->>F: 17. View pending income proofs
+    F->>API: 18. GET /income-proofs/pending
+    API->>DB: 19. Query pending INCOME_PROOF records
+    DB-->>API: 20. Return pending proofs
+    API-->>F: 21. Return proofs list
+    F->>BA: 22. Display proofs for review
+
+    BA->>F: 23. Approve/Reject with notes
+    F->>API: 24. PATCH /income-proof/id (status, notes)
+    API->>DB: 25. UPDATE INCOME_PROOF SET status, reviewed_by, reviewed_at
+    DB-->>API: 26. Confirm update
+    API-->>F: 27. Return updated status
+    F->>BA: 28. Show confirmation

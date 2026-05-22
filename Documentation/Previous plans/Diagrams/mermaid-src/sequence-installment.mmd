@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant B as Borrower
+    participant F as Frontend
+    participant MM as MetaMask
+    participant LB as LocalBank.sol
+    participant PP as Polygon PoS
+    participant BA as Backend API
+
+    B->>F: 1. Open My Loans
+    F->>BA: 2. GET /loans/active + installments
+    BA-->>F: 3. Return loan list with schedule
+    F-->>B: 4. Display loan with installment progress (X of Y paid)
+
+    loop For each installment until loan is fully repaid
+        B->>F: 5. Select next due installment
+        B->>F: 6. Click Pay Installment
+
+        F->>MM: 7. Prepare unsigned payInstallment(loanId, installmentNo)
+        MM-->>B: 8. MetaMask popup — Pay 10 ETH? Gas: 0.002 MATIC
+        B-->>MM: 9. User clicks Confirm
+        MM->>LB: 10. Sign and broadcast
+
+        Note over LB: 11. require(installment exists\nand status = pending)\n12. require(msg.value ==\ninstallmentAmount)
+        Note over LB: 13. Mark installment as paid\n14. totalRepaid += amount
+
+        LB->>PP: 15. emit InstallmentPaid(loanId, number, amount)
+        PP->>BA: 16. Event listener detects event
+        Note over BA: 17. UPDATE INSTALLMENT status = paid\n18. INSERT INTO TRANSACTION
+
+        PP-->>F: 19. Tx confirmed
+        F-->>B: 20. Installment Paid! Progress: X of Y
+
+        opt All installments paid
+            Note over LB: 21. loan.status = Repaid
+            LB->>PP: 22. emit LoanFullyRepaid(loanId, borrower)
+            PP->>BA: 23. Event detected
+            Note over BA: 23. UPDATE LOAN_REQUEST status = repaid\n24. UPDATE BORROWING_LIMIT (increase)
+            F-->>B: 25. Loan Fully Repaid!
+        end
+    end

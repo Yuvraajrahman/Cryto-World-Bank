@@ -1,0 +1,6 @@
+flowchart TD
+  A[Loan denominated in stablecoin] --> B[Oracle price feed]
+  B --> C[FXModule quote planned]
+  C --> D[Borrower accepts rate]
+  D --> E[Settle on-chain]
+  style C stroke-dasharray:5 5

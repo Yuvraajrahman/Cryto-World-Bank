@@ -1,0 +1,874 @@
+%% ============================================================
+%%  Crypto World Bank -- Pre-thesis v14 Bibliography
+%%  Style: ACM-Reference-Format.bst
+%%  Entries derived from v13 inline bibitems + literature_review_top10.md
+%%  + Plans for pre-thesis1 v14.md additions.
+%% ============================================================
+
+%% ---- DeFi foundations (Werner SoK, Gudgeon PLF, Aave, Compound, Maker) ----
+
+@inproceedings{werner2022sokDefi,
+  author    = {Sam M. Werner and Daniel Perez and Lewis Gudgeon and Ariah Klages-Mundt and Dominik Harz and William J. Knottenbelt},
+  title     = {{SoK}: Decentralized Finance ({DeFi})},
+  booktitle = {Proceedings of the 4th ACM Conference on Advances in Financial Technologies (AFT '22)},
+  pages     = {30--46},
+  year      = {2022},
+  publisher = {ACM},
+  doi       = {10.1145/3558535.3559780},
+  url       = {https://arxiv.org/abs/2101.08778}
+}
+
+@inproceedings{gudgeon2020plf,
+  author    = {Lewis Gudgeon and Daniel Perez and Dominik Harz and Benjamin Livshits and Arthur Gervais},
+  title     = {{DeFi} Protocols for Loanable Funds: Interest Rates, Liquidity and Market Efficiency},
+  booktitle = {Proceedings of the 2nd ACM Conference on Advances in Financial Technologies (AFT '20)},
+  pages     = {92--112},
+  year      = {2020},
+  publisher = {ACM},
+  doi       = {10.1145/3419614.3423254}
+}
+
+@inproceedings{bastankhah2023adaptive,
+  author    = {Sara Bastankhah and Maryam Hashemi and Wenbo Shi},
+  title     = {An Adaptive Data-Driven {DeFi} Borrow-Lending Protocol},
+  booktitle = {Proc. IEEE International Conference on Blockchain},
+  year      = {2023}
+}
+
+@misc{aaveDocs,
+  author       = {{Aave}},
+  title        = {Aave Protocol Documentation},
+  year         = {2024},
+  howpublished = {\url{https://docs.aave.com/}},
+  urldate      = {2025-12-01}
+}
+
+@misc{aaveTechpaper2022,
+  author       = {{Aave}},
+  title        = {Aave Protocol {V3} Technical Paper},
+  year         = {2022},
+  howpublished = {\url{https://github.com/aave/aave-v3-core/blob/master/techpaper/Aave_V3_Technical_Paper.pdf}}
+}
+
+@misc{compoundDocs,
+  author       = {{Compound}},
+  title        = {Compound Protocol Documentation},
+  year         = {2024},
+  howpublished = {\url{https://docs.compound.finance/}}
+}
+
+@misc{openzeppelin,
+  author       = {{OpenZeppelin}},
+  title        = {{OpenZeppelin} Contracts},
+  year         = {2024},
+  howpublished = {\url{https://openzeppelin.com/contracts}}
+}
+
+@misc{defillamaLending,
+  author       = {{DefiLlama}},
+  title        = {Lending Protocols --- {DeFi} {TVL} and Protocol Rankings},
+  year         = {2025},
+  howpublished = {\url{https://defillama.com/protocols/lending}}
+}
+
+@misc{defillamaAaveV3,
+  author       = {{DefiLlama}},
+  title        = {Aave {V3} {TVL}, Fees, Revenue \& Income Statement},
+  year         = {2026},
+  howpublished = {\url{https://defillama.com/protocol/aave-v3}}
+}
+
+@misc{defillamaCompoundV3,
+  author       = {{DefiLlama}},
+  title        = {Compound {V3} {TVL}, Fees, Revenue \& Income Statement},
+  year         = {2026},
+  howpublished = {\url{https://defillama.com/protocol/compound-v3}}
+}
+
+@misc{morphoData,
+  author       = {{Morpho}},
+  title        = {Network Data},
+  year         = {2026},
+  howpublished = {\url{https://data.morpho.org/}}
+}
+
+@misc{galaxyCryptoLending,
+  author       = {{Galaxy Digital}},
+  title        = {The State of Crypto Lending and Borrowing},
+  year         = {2024},
+  howpublished = {\url{https://www.galaxy.com/insights/research/the-state-of-crypto-lending}}
+}
+
+@misc{dlnewsState2025,
+  author       = {{DL News}},
+  title        = {State of {DeFi} 2025},
+  year         = {2026},
+  howpublished = {\url{https://www.dlnews.com/research/internal/state-of-defi-2025/}}
+}
+
+%% ---- ML, fraud detection, anomaly, GNN ----
+
+@inproceedings{palaiokrassas2023ml,
+  author    = {Georgios Palaiokrassas and Anastasios Skoufis and Leandros Tassiulas},
+  title     = {Leveraging Machine Learning for Multichain {DeFi} Fraud Detection},
+  booktitle = {Proc. IEEE Int. Conf. Blockchain and Cryptocurrency (ICBC)},
+  year      = {2023}
+}
+
+@inproceedings{liu2008iforest,
+  author    = {Fei Tony Liu and Kai Ming Ting and Zhi-Hua Zhou},
+  title     = {Isolation Forest},
+  booktitle = {Proc. IEEE Int. Conf. Data Mining (ICDM)},
+  pages     = {413--422},
+  year      = {2008},
+  doi       = {10.1109/ICDM.2008.17}
+}
+
+@article{hassan2022mlblockchain,
+  author  = {M.~T. Hassan and F. Ahmad and A. Mehmood},
+  title   = {Blockchain and Machine Learning for Fraud Detection: A Privacy-Preserving and Adaptive Incentive Based Approach},
+  journal = {IEEE Access},
+  volume  = {10},
+  pages   = {87115--87131},
+  year    = {2022},
+  doi     = {10.1109/ACCESS.2022.3199498}
+}
+
+@inproceedings{aiblockchainFraud2024,
+  title     = {{AI}-Powered Blockchain Systems for Real-Time Fraud Detection in Financial Services},
+  booktitle = {Proc. IEEE Int. Conf.},
+  year      = {2024},
+  doi       = {10.1109/[10923418]},
+  note      = {IEEE Xplore document 10923418}
+}
+
+@article{cheng2024gnnFraud,
+  author       = {Liyuan Cheng and others},
+  title        = {Graph Neural Networks for {DeFi} Fraud Detection: A Survey and Benchmarks},
+  journal      = {arXiv preprint arXiv:2411.05815},
+  year         = {2024},
+  url          = {https://arxiv.org/abs/2411.05815}
+}
+
+@article{wang2024defiguard,
+  author = {Wei Wang and Hao Liu and others},
+  title  = {{DeFiGuard}: A Graph Neural Network Defense for Decentralized Finance},
+  journal = {arXiv preprint arXiv:2406.11157},
+  year   = {2024},
+  url    = {https://arxiv.org/abs/2406.11157}
+}
+
+@article{wang2025gnnFraud,
+  author  = {Yang Wang and Lei Wang},
+  title   = {Graph Neural Network Approaches to Blockchain Fraud Detection},
+  journal = {SAGE Journals - Applied Sciences},
+  year    = {2025}
+}
+
+@article{privchainAi2025,
+  author  = {{PrivChain-AI Authors}},
+  title   = {{PrivChain-AI}: Federated Learning over Blockchain for Privacy-Preserving Fraud Detection},
+  journal = {Nature Scientific Reports},
+  year    = {2025}
+}
+
+@article{abbassi2025federated,
+  author  = {A. Abbassi and others},
+  title   = {Federated Learning on Blockchain for Financial Fraud Detection},
+  journal = {Springer},
+  year    = {2025}
+}
+
+@article{fedSpfd2025,
+  author  = {{FED-SPFD Authors}},
+  title   = {{FED-SPFD}: Federated and Secure Payment Fraud Detection},
+  journal = {MDPI Risks},
+  year    = {2025}
+}
+
+%% ---- Explainable AI, SHAP ----
+
+@inproceedings{lundberg2017shap,
+  author    = {Scott M. Lundberg and Su-In Lee},
+  title     = {A Unified Approach to Interpreting Model Predictions},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  pages     = {4765--4774},
+  year      = {2017}
+}
+
+@article{adom2022limeShap,
+  author  = {D. Adom and E.~O. Acheampong and M. Boateng},
+  title   = {{LIME} and {SHAP}: A Comparison of Model-Agnostic Approaches to Explainability in Loan Approval Systems},
+  journal = {International Journal of Advanced Computer Science and Applications},
+  volume  = {13},
+  number  = {11},
+  year    = {2022}
+}
+
+@article{bracke2019mlfinance,
+  author       = {Philippe Bracke and Anupam Datta and Carsten Jung and Shayak Sen},
+  title        = {Machine Learning Explainability in Finance: An Application to Default Risk Analysis},
+  journal      = {Bank of England Staff Working Paper No.~816},
+  year         = {2019},
+  howpublished = {\url{https://www.bankofengland.co.uk/working-paper/2019/machine-learning-explainability-in-finance}}
+}
+
+@inproceedings{gupta2024shapCredit,
+  author    = {S. Gupta and A. Kumar and R. Sharma},
+  title     = {{SHAP}-based Interpretable Models for Credit Default Assessment Using Machine Learning},
+  booktitle = {Proc. IEEE Int. Conf. Artificial Intelligence and Data Science},
+  year      = {2024},
+  doi       = {10.1109/ICAIDS60875.2024.10840375}
+}
+
+@article{xaiCreditRisk2024,
+  title   = {Credit Risk Assessment and Financial Decision Support Using Explainable Artificial Intelligence},
+  journal = {MDPI Risks},
+  volume  = {12},
+  number  = {10},
+  pages   = {Article 164},
+  year    = {2024},
+  doi     = {10.3390/risks12100164}
+}
+
+%% ---- Smart contract security ----
+
+@inproceedings{atzei2017sok,
+  author    = {Nicola Atzei and Massimo Bartoletti and Tiziana Cimoli},
+  title     = {A Survey of Attacks on {Ethereum} Smart Contracts ({SoK})},
+  booktitle = {Proc. Int. Conf. Principles of Security and Trust (POST)},
+  pages     = {164--186},
+  year      = {2017},
+  doi       = {10.1007/978-3-662-54455-6_8}
+}
+
+@article{wang2020contractward,
+  author  = {Y. Wang and J. Liu and Z. Chen},
+  title   = {{ContractWard}: Automated Vulnerability Detection Models for {Ethereum} Smart Contracts},
+  journal = {IEEE Trans. Network Science and Engineering},
+  volume  = {8},
+  number  = {2},
+  pages   = {1133--1144},
+  year    = {2020},
+  doi     = {10.1109/TNSE.2020.2968505}
+}
+
+@inproceedings{liao2019soliaudit,
+  author    = {C.-F. Liao and T.-H. Tsai and C.-J. Chen},
+  title     = {{SoliAudit}: Smart Contract Vulnerability Assessment Based on Machine Learning and Fuzz Testing},
+  booktitle = {Proc. IEEE Int. Conf. Internet of Things (iThings)},
+  pages     = {458--465},
+  year      = {2019},
+  doi       = {10.1109/iThings/GreenCom/CPSCom/SmartData.2019.00098}
+}
+
+@inproceedings{so2020verismart,
+  author    = {S. So and M. Lee and J. Park and H. Lee and H. Oh},
+  title     = {{VERISMART}: A Highly Precise Safety Verifier for {Ethereum} Smart Contracts},
+  booktitle = {Proc. IEEE Symp. Security and Privacy (S\&P)},
+  pages     = {1678--1694},
+  year      = {2020},
+  doi       = {10.1109/SP40000.2020.00032}
+}
+
+@article{smartContractVuln2020,
+  title   = {Smart Contract Vulnerability Analysis and Security Audit},
+  journal = {IEEE Network},
+  volume  = {34},
+  number  = {5},
+  year    = {2020},
+  doi     = {10.1109/MNET.001.1900565}
+}
+
+@article{wu2024flashLoan,
+  author  = {Kuan-Wei Wu},
+  title   = {Strengthening {DeFi} Security: A Static Analysis Approach to Flash Loan Vulnerabilities},
+  journal = {arXiv preprint arXiv:2411.01230},
+  year    = {2024}
+}
+
+@article{exploitablePatterns2025,
+  title   = {A Comprehensive Study of Exploitable Patterns in Smart Contracts: From Vulnerability to Defense},
+  journal = {arXiv preprint arXiv:2504.21480},
+  year    = {2025}
+}
+
+@inproceedings{albert2020gasol,
+  author    = {E. Albert and J. Correas and P. Gordillo and G. Rom\'{a}n-D\'{i}ez and A. Rubio},
+  title     = {{GASOL}: Gas Analysis and Optimization for {Ethereum} Smart Contracts},
+  booktitle = {Proc. TACAS},
+  publisher = {Springer},
+  year      = {2020},
+  doi       = {10.1007/978-3-030-45237-7_7}
+}
+
+@article{tolmach2024gas,
+  author  = {P. Tolmach and Y. Li and S. Lin},
+  title   = {Optimal Gas Fee Minimization in {DeFi}: Enhancing Efficiency and Security on the {Ethereum} Blockchain},
+  journal = {IEEE Trans. Dependable and Secure Computing},
+  year    = {2024},
+  doi     = {10.1109/TDSC.2024.3495637}
+}
+
+@article{aponte2021fiftyOne,
+  author  = {F.~A. Aponte-Novoa and A.~L.~S. Orozco and R. Villanueva-Polanco and P. Wightman},
+  title   = {The 51\% Attack on Blockchains: A Mining Behavior Study},
+  journal = {IEEE Access},
+  volume  = {9},
+  pages   = {140549--140564},
+  year    = {2021},
+  doi     = {10.1109/ACCESS.2021.3119110}
+}
+
+@article{commitReveal2025,
+  title   = {Commit-Reveal2: Securing Randomness Beacons with Randomized Reveal Order in Smart Contracts},
+  journal = {arXiv preprint arXiv:2504.03936},
+  year    = {2025}
+}
+
+@misc{certoraOpenSource2025,
+  author       = {{Certora}},
+  title        = {Certora Prover Open-Source Release},
+  year         = {2025},
+  howpublished = {\url{https://www.certora.com/blog/certora-prover-open-source}},
+  urldate      = {2026-01-15}
+}
+
+@article{certora2023formal,
+  title   = {Formal Verification of Real-World {Solidity} Contracts at Industrial Scale},
+  journal = {arXiv preprint arXiv:2307.02325},
+  year    = {2023}
+}
+
+@article{mackinga2023attacks,
+  author = {T. Mackinga and T. Nadahalli and R. Wattenhofer},
+  title  = {Attacks on Dynamic {DeFi} Interest Rate Curves},
+  journal = {arXiv preprint arXiv:2307.13139},
+  year   = {2023}
+}
+
+%% ---- Oracles, blockchain primitives ----
+
+@article{beniiche2020oracles,
+  author  = {Abdeljalil Beniiche},
+  title   = {A Study of Blockchain Oracles},
+  journal = {arXiv preprint arXiv:2004.07140},
+  year    = {2020}
+}
+
+@article{pasdar2023connect,
+  author  = {A. Pasdar and Y.~C. Lee and Z. Dong},
+  title   = {Connect {API} with Blockchain: A Survey on Blockchain Oracle Implementation},
+  journal = {ACM Computing Surveys},
+  volume  = {55},
+  number  = {10},
+  year    = {2023},
+  doi     = {10.1145/3567582}
+}
+
+@misc{nakamoto2008bitcoin,
+  author       = {Satoshi Nakamoto},
+  title        = {{Bitcoin}: A Peer-to-Peer Electronic Cash System},
+  year         = {2008},
+  howpublished = {\url{https://bitcoin.org/bitcoin.pdf}}
+}
+
+@misc{wood2014ethereum,
+  author       = {Gavin Wood},
+  title        = {{Ethereum}: A Secure Decentralised Generalised Transaction Ledger (Yellow Paper)},
+  year         = {2014},
+  howpublished = {\url{https://ethereum.github.io/yellowpaper/paper.pdf}}
+}
+
+%% ---- Identity, ZKP, KYC, AML ----
+
+@article{piper2025zkkyc,
+  author  = {Felix Piper and Karl Wolf and Jonathan Heiss},
+  title   = {Privacy-Preserving On-chain Permissioning for {KYC}-Compliant Decentralized Applications},
+  journal = {arXiv preprint arXiv:2510.05807},
+  year    = {2025},
+  note    = {TU Berlin}
+}
+
+@misc{decker2025zkp,
+  author       = {N. Decker},
+  title        = {Zero-Knowledge Proofs: Cryptographic Model for Financial Compliance and Global Banking Security},
+  howpublished = {SSRN Working Paper No.~5170068},
+  year         = {2025}
+}
+
+@misc{zkAml2025,
+  author       = {{zkAML Authors}},
+  title        = {{zkAML}: Zero-Knowledge {AML} Compliance via {zk-SNARKs}},
+  howpublished = {IACR ePrint Archive 2025/465},
+  year         = {2025},
+  url          = {https://eprint.iacr.org/2025/465}
+}
+
+@article{arshad2026web3identity,
+  author  = {Umar Arshad and Abdallah Tubaishat and Sumayya Anwar and Zahid Halim and Abedallah Abualkishik and Asad Ullah},
+  title   = {{Web3}-Based Identity and {KYC} Innovations for Next-Generation {FinTech}},
+  journal = {ACM Transactions on the Web},
+  volume  = {20},
+  number  = {1},
+  pages   = {1--23},
+  year    = {2026},
+  doi     = {10.1145/3771991}
+}
+
+@article{buterin2022soulbound,
+  author = {Vitalik Buterin and E. Glen Weyl and Puja Ohlhaver},
+  title  = {Decentralized Society: Finding {Web3}'s Soul},
+  journal = {SSRN Working Paper No.~4105763},
+  year   = {2022}
+}
+
+%% ---- CBDC, monetary policy, financial inclusion ----
+
+@techreport{tan2023cbdc,
+  author      = {Bo Wei Tan},
+  title       = {Central Bank Digital Currency and Financial Inclusion},
+  institution = {International Monetary Fund},
+  number      = {Working Paper WP/23/69},
+  year        = {2023}
+}
+
+@inproceedings{islam2024cbdc,
+  author    = {S. Islam and R. Khan and M.~A. Rahman},
+  title     = {Central Bank Digital Currency ({CBDC}): Design Requirements and Challenges},
+  booktitle = {Proc. IEEE Int. Conf. Computing, Communication, and Intelligent Systems (ICCCIS)},
+  year      = {2024},
+  doi       = {10.1109/ICCCIS62002.2024.10634472}
+}
+
+@incollection{mhlanga2022blockchain,
+  author    = {David Mhlanga},
+  title     = {Blockchain Technology for Financial Inclusion and Sustainable Development},
+  booktitle = {Digital Financial Inclusion},
+  publisher = {Springer},
+  year      = {2022}
+}
+
+@misc{findex2021,
+  author       = {{World Bank}},
+  title        = {The Global Findex Database 2021: Financial Inclusion, Digital Payments, and Resilience},
+  year         = {2021},
+  howpublished = {\url{https://www.worldbank.org/en/publication/globalfindex}}
+}
+
+@misc{worldBank2022wdr,
+  author       = {{World Bank}},
+  title        = {World Development Report 2022: Finance for an Equitable Recovery},
+  year         = {2022},
+  howpublished = {\url{https://www.worldbank.org/en/publication/wdr2022}}
+}
+
+@misc{ifc2019msme,
+  author       = {{International Finance Corporation}},
+  title        = {{MSME} Finance Gap},
+  year         = {2019},
+  howpublished = {\url{https://www.ifc.org/en/insights-reports/2019/msme-finance-gap}}
+}
+
+@misc{bis2024defiLending,
+  author       = {{Bank for International Settlements}},
+  title        = {{DeFi} Lending: Intermediation Without Information?},
+  howpublished = {BIS Working Paper No.~1183},
+  year         = {2024}
+}
+
+@misc{worldBankRemit2024,
+  author       = {{World Bank}},
+  title        = {Remittance Prices Worldwide: Making Markets More Transparent},
+  howpublished = {Migration and Development Brief~40},
+  year         = {2024}
+}
+
+@misc{cpmi2016correspondent,
+  author       = {{Committee on Payments and Market Infrastructures}},
+  title        = {Correspondent Banking --- Technical Report},
+  howpublished = {CPMI Papers No.~147, BIS},
+  year         = {2016}
+}
+
+@misc{fsb2020crossborder,
+  author       = {{Financial Stability Board}},
+  title        = {Enhancing Cross-border Payments: Stage 3 Roadmap},
+  year         = {2020}
+}
+
+@article{beyer2025monetary,
+  author  = {A. Beyer and B. Gasperini and P. Theodoridis},
+  title   = {Monetary Policy and Inequality: Distributional Effects of Asset Purchase Programs},
+  journal = {Journal of International Money and Finance},
+  volume  = {157},
+  year    = {2025}
+}
+
+@misc{federalReserve2025distribution,
+  author       = {{Federal Reserve Board}},
+  title        = {Monetary Policy and the Distribution of Income: Evidence from {U.S.} Metropolitan Areas},
+  howpublished = {FEDS Notes},
+  year         = {2025}
+}
+
+@book{cantillon1755essay,
+  author    = {Richard Cantillon},
+  title     = {Essai sur la Nature du Commerce en G\'en\'eral},
+  year      = {1755},
+  publisher = {Posthumous}
+}
+
+@misc{hrf2025cbdc,
+  author       = {{Human Rights Foundation}},
+  title        = {Tracking {CBDCs} Before They Track You},
+  year         = {2025}
+}
+
+%% ---- Microfinance / Bangladesh ----
+
+@inproceedings{kumar2023p2pSme,
+  author    = {Deepak Kumar and B.~V. Phani and Naveen Chilamkurti and Sandeep Saurabh and Vanessa Ratten},
+  title     = {A Blockchain-based Decentralized Peer-to-Peer Lending Framework for {SMEs}},
+  booktitle = {Proc. ACM Int. Conf. Intelligent Computing and Its Emerging Applications (ICEA '23)},
+  pages     = {130--140},
+  year      = {2023},
+  doi       = {10.1145/3659154.3659188}
+}
+
+@article{toufaily2024microcredit,
+  author  = {Elias Toufaily and Tatiana Zalan},
+  title   = {How Can Blockchain-Based Lending Platforms Support Microcredit Activities in Developing Countries? An Empirical Validation of Its Opportunities and Challenges},
+  journal = {Technological Forecasting and Social Change},
+  volume  = {203},
+  year    = {2024},
+  doi     = {10.1016/j.techfore.2024.123403}
+}
+
+@inproceedings{alam2021microcredit,
+  author    = {M.~S. Alam and S.~M. Hossain and A.~K. Das},
+  title     = {Towards Using Blockchain Technology for Microcredit Industry in {Bangladesh}},
+  booktitle = {Proc. IEEE Region 10 Symp. (TENSYMP)},
+  pages     = {1--6},
+  year      = {2021},
+  doi       = {10.1109/TENSYMP52854.2021.9392730}
+}
+
+@article{howlader2025bangladesh,
+  author  = {S. Howlader and P. Halder},
+  title   = {{Fintech}'s Impact on Financial Inclusion Through Mobile Financial Services in {Bangladesh}},
+  journal = {Sage Publications},
+  year    = {2025},
+  doi     = {10.1177/09763996251356998}
+}
+
+@misc{atlasGrameen2024,
+  author       = {{Atlas of Wars}},
+  title        = {{Grameen Bank}: A Successful Microcredit Model},
+  year         = {2024}
+}
+
+@misc{bangladeshBank2025,
+  author       = {{Bangladesh Bank}},
+  title        = {Special Publication {SP2025-02}: Financial Inclusion and Gender Parity Indicators},
+  year         = {2025},
+  howpublished = {\url{https://www.bb.org.bd/}}
+}
+
+@misc{brac2025microfinance,
+  author       = {{BRAC}},
+  title        = {{BRAC} Microfinance 2025 Annual Data},
+  year         = {2025}
+}
+
+@misc{nusMicrofinance2025,
+  author       = {{NUS Economics Society}},
+  title        = {Bangladesh Microfinance Analysis},
+  year         = {2025},
+  howpublished = {\url{https://nuseconsociety.com/}}
+}
+
+@misc{bangladeshFeCircular2025,
+  author       = {{Bangladesh Bank}},
+  title        = {{FE} Circular No.~06: Electronic {LC} Communication},
+  year         = {2025}
+}
+
+%% ---- Regulation, MiCA, GENIUS Act, Sygnum, mBridge, Agora ----
+
+@misc{micaRegulation,
+  author       = {{European Union}},
+  title        = {Markets in Crypto-Assets Regulation ({MiCA})},
+  year         = {2024},
+  howpublished = {Regulation (EU) 2023/1114}
+}
+
+@misc{scorechainMica2025,
+  author       = {{Scorechain}},
+  title        = {{MiCA} Stablecoin Compliance Analysis},
+  year         = {2025}
+}
+
+@misc{geniusAct2025,
+  author       = {{United States Congress}},
+  title        = {Guiding and Establishing National Innovation for {U.S.} Stablecoins ({GENIUS}) Act},
+  year         = {2025}
+}
+
+@misc{sygnum2026defi,
+  author       = {{Sygnum Bank}},
+  title        = {Institutional {DeFi} in 2025: The Disconnect Between Infrastructure and Allocation},
+  year         = {2026}
+}
+
+@misc{bisMbridge2024,
+  author       = {{Bank for International Settlements}},
+  title        = {Project {mBridge}: Connecting Economies Through {CBDC}},
+  year         = {2024}
+}
+
+@misc{bisAgora2024,
+  author       = {{Bank for International Settlements}},
+  title        = {Project Agora: Public-Private Sector Collaboration on Cross-Border Payments},
+  year         = {2024}
+}
+
+@misc{imfCbdcSurvey2025,
+  author       = {{International Monetary Fund}},
+  title        = {{CBDC} Survey 2025},
+  year         = {2025}
+}
+
+@misc{bcolbd2025,
+  author       = {{BCOLBD}},
+  title        = {Blockchain Olympiad {Bangladesh}: Guideline and Evaluation Scheme},
+  year         = {2025}
+}
+
+@misc{ainvestBangladesh2025,
+  author       = {{Ainvest}},
+  title        = {{Bangladesh} Crypto Regulatory Analysis},
+  year         = {2025},
+  howpublished = {\url{https://www.ainvest.com/}}
+}
+
+@article{stablecoinDevaluation2025,
+  title   = {Stablecoin Devaluation Risk},
+  journal = {The European Journal of Finance, Taylor \& Francis},
+  year    = {2025},
+  doi     = {10.1080/1351847X.2025.2505757}
+}
+
+@misc{carstens2021stablecoins,
+  author       = {Agust\'in Carstens and others},
+  title        = {Stablecoins: Risks, Potential and Regulation},
+  howpublished = {BIS Working Papers No.~905},
+  year         = {2021}
+}
+
+@misc{ocampo2024mdbs,
+  author       = {Jos\'e Antonio Ocampo and Kevin Gallagher},
+  title        = {The Role of Multilateral Development Banks and Development Assistance in the Provision of Global Public Goods},
+  howpublished = {UNDP Background Paper},
+  year         = {2024}
+}
+
+%% ---- Governance, RWA, institutional adoption ----
+
+@article{beck2018governance,
+  author  = {Roman Beck and Christoph M{\"u}ller-Bloch and John Leslie King},
+  title   = {Governance in the Blockchain Economy: A Framework and Research Agenda},
+  journal = {Journal of the Association for Information Systems},
+  volume  = {19},
+  number  = {10},
+  pages   = {1020--1034},
+  year    = {2018},
+  doi     = {10.17705/1jais.00518}
+}
+
+@misc{cordaRwa2025,
+  author       = {{GlobeNewswire}},
+  title        = {{R3}'s Corda Leads Tokenized {RWA} Market with Over \$10 Billion in On-chain Assets},
+  year         = {2025}
+}
+
+@misc{centrifugeRwa2025,
+  author       = {{Centrifuge}},
+  title        = {Real-World Asset Tokenization: Key Trends from 2025},
+  year         = {2025}
+}
+
+@misc{worldBankBlockchain2025,
+  author       = {{World Bank}},
+  title        = {{World Bank} Group Tracks Project Funds with New Blockchain Tool},
+  year         = {2025}
+}
+
+@misc{jpmKinexys2025,
+  author       = {{JPMorgan Chase}},
+  title        = {Kinexys Digital Payments: Real-Time Multicurrency Payments},
+  year         = {2025}
+}
+
+@misc{wefDefi2022,
+  author       = {{World Economic Forum}},
+  title        = {Why Decentralized Finance Is a Leapfrog Technology for the 1.1 Billion People Who Are Unbanked},
+  year         = {2022}
+}
+
+@misc{operaCelo2026,
+  author       = {{Opera Newsroom}},
+  title        = {160{M} {CELO} Allocation Proposal to Grow {Opera} from Distribution Partner into Key Network Stakeholder},
+  year         = {2026}
+}
+
+@misc{stellar2025report,
+  author       = {{Stellar Development Foundation}},
+  title        = {End of Year 2025 Report --- Execution at Scale},
+  year         = {2025}
+}
+
+@misc{deloitte2024banking,
+  author       = {{Deloitte}},
+  title        = {Global Banking Outlook 2024},
+  year         = {2024}
+}
+
+@misc{rippleRlusd2026,
+  author       = {{Ripple}},
+  title        = {{RLUSD} Use Case Analysis},
+  year         = {2026}
+}
+
+@misc{wir2026,
+  author       = {{World Inequality Lab}},
+  title        = {Exorbitant Privilege},
+  howpublished = {World Inequality Report 2026},
+  year         = {2026}
+}
+
+@misc{fensorySky2026,
+  author       = {{Fensory}},
+  title        = {Sky Protocol Projects \$611M Revenue in 2026 as {USDS} Supply Targets \$20.6 Billion},
+  year         = {2026}
+}
+
+@misc{fensoryMaple2026,
+  author       = {{Fensory}},
+  title        = {Maple Finance --- Institutional {DeFi} Lending Protocol},
+  year         = {2026}
+}
+
+@misc{fensoryCredit2026,
+  author       = {{Fensory}},
+  title        = {{DeFi} Credit Platforms Hit \$2.4B Milestone},
+  year         = {2026}
+}
+
+%% ---- Multi-chain, lending platforms ----
+
+@inproceedings{li2024multichain,
+  author    = {Yifei Li and Xiao Zhang and Hao Wang},
+  title     = {Design and Implementation of a Multi-Chain Lending Model in Blockchain},
+  booktitle = {Proc. IEEE Int. Conf. Blockchain},
+  year      = {2024},
+  doi       = {10.1109/Blockchain62396.2024.10729983}
+}
+
+@inproceedings{xu2023defiEval,
+  author    = {Ruofan Xu and Sicheng Chen and Lin Yang},
+  title     = {An Evaluation System for {DeFi} Lending Protocols},
+  booktitle = {Proc. IEEE Int. Conf. Blockchain and Cryptocurrency (ICBC)},
+  pages     = {1--6},
+  year      = {2023},
+  doi       = {10.1109/ICBC56567.2023.10240601}
+}
+
+@inproceedings{sharma2021p2p,
+  author    = {A. Sharma and R.~K. Singh and S. Gupta},
+  title     = {Blockchain Empowered Framework for Peer to Peer Lending},
+  booktitle = {Proc. IEEE Int. Conf. Blockchain Computing and Applications (BCCA)},
+  pages     = {142--147},
+  year      = {2021},
+  doi       = {10.1109/BCCA53669.2021.9596552}
+}
+
+@inproceedings{dao2025creditScoring,
+  author    = {T. Dao and T. Trinh and V. Pham},
+  title     = {Optimizing Credit Scoring Models for Decentralized Financial Applications},
+  booktitle = {Information and Communication Technology},
+  publisher = {Springer},
+  year      = {2025},
+  doi       = {10.1007/978-981-96-4282-3_36}
+}
+
+@incollection{gucuk2024microlending,
+  author    = {G.-L. G{\"u}c{\"u}k and S. Leible and J. Edinger},
+  title     = {Blockchain-Based Microlending for Financial Inclusivity: A Literature Review of Its Privacy and Trust},
+  publisher = {Springer},
+  year      = {2024},
+  doi       = {10.1007/978-3-032-12801-0_22}
+}
+
+@article{rlInterestRate2025,
+  title   = {Reinforcement Learning for Interest Rate Adjustment in {DeFi} Lending},
+  journal = {arXiv preprint arXiv:2506.00505},
+  year    = {2025}
+}
+
+%% ---- LLMs in finance ----
+
+@inproceedings{nie2023llmFinance,
+  author    = {Yuqi Nie and others},
+  title     = {Large Language Models in Finance: A Survey},
+  booktitle = {Proc. 4th ACM Int. Conf. on AI in Finance (ICAIF '23)},
+  year      = {2023},
+  doi       = {10.1145/3604237.3626869}
+}
+
+@misc{ltimindtreeLlm2025,
+  author       = {{LTIMindtree}},
+  title        = {{LLM} Fine-Tuning Guide for Financial Services},
+  year         = {2025}
+}
+
+@misc{aveniLlm2025,
+  author       = {{Aveni}},
+  title        = {{LLM} Training Playbook for Regulated Industries},
+  year         = {2025}
+}
+
+@article{llmFinanceVuln2025,
+  title   = {Adversarial Vulnerabilities of {LLMs} in Financial Tasks},
+  journal = {arXiv preprint arXiv:2509.10546},
+  year    = {2025}
+}
+
+%% ---- Self-reference + reviews ----
+
+@misc{libguides2025,
+  author       = {{Michigan State University Libraries}},
+  title        = {Literature Table and Synthesis --- Nursing Literature Reviews},
+  howpublished = {LibGuides},
+  year         = {2025}
+}
+
+@misc{cwbRepo2026,
+  author       = {Juboraz, Md.~Bokhtiar Rahman and Ahmed, Md.~Mahir Ahnaf},
+  title        = {Crypto World Bank --- Source Repository},
+  year         = {2026},
+  howpublished = {GitHub repository, \url{https://github.com/Yuvraajrahman/Cryto-World-Bank}},
+  urldate      = {2026-02-15}
+}
+
+@article{prismaBanking2025,
+  title   = {Blockchain in Banking: A Systematic {PRISMA} Review of 38 Studies},
+  journal = {ScienceDirect Systematic Reviews},
+  year    = {2025}
+}
+
+@article{flBlockchainPrisma2024,
+  title   = {Federated Learning over Blockchain: A {PRISMA} Review of 1585 Studies},
+  journal = {MDPI Electronics},
+  year    = {2024}
+}

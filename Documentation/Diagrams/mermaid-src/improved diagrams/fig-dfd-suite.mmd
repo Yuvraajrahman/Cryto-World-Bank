@@ -1,0 +1,57 @@
+---
+title: Data-Flow Diagrams - Context (Level-0) and Level-1 Decomposition
+---
+flowchart TB
+    classDef ext   fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef proc  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:2 2
+    classDef sys   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    subgraph L0[" Level-0 Context Diagram "]
+        direction LR
+        BORR(("Borrower")):::ext
+        APV(("Approver / LB Operator")):::ext
+        REG(("Regulator")):::ext
+        ORA(("Chainlink<br/>Oracle / CCIP")):::ext
+        KYCp(("zkKYC<br/>Provider")):::ext
+        CWB["Crypto World Bank<br/>Platform"]:::sys
+        BORR -- "loan req / installment / chat" --> CWB
+        CWB  -- "status / disbursement / receipts" --> BORR
+        APV  -- "review / approve / reject" --> CWB
+        CWB  -- "queue / ML score / audit" --> APV
+        REG  <-- "read-only audit feed" --> CWB
+        ORA  <-- "price + cross-chain msgs" --> CWB
+        KYCp -- "VC / ZKP attestation" --> CWB
+    end
+
+    subgraph L1[" Level-1: Core Lending Subsystem "]
+        direction LR
+        P1["P1.1 Loan Origination<br/>(Express API)"]:::proc
+        P1b["P1.2 ML Risk Scoring<br/>(FastAPI)"]:::proc
+        P1c["P1.3 Disbursement<br/>(LocalBank contract)"]:::proc
+        P1d["P1.4 Installment Engine<br/>(scheduler + chain)"]:::proc
+        D1[("D1 PostgreSQL<br/>loans, installments")]:::store
+        D2[("D2 On-chain state<br/>(EVM)")]:::store
+        D3[("D3 AI_ML_LOG")]:::store
+        P1 --> P1b --> P1c --> D2
+        P1 --> D1
+        P1d --> D1
+        P1d --> D2
+        P1b --> D3
+    end
+
+    subgraph L1B[" Level-1: Deposit, IBLP, FX, Netting "]
+        direction LR
+        Q1["Q1.1 SavingsVault /<br/>FixedDeposit"]:::proc
+        Q2["Q1.2 InterBankLendingPool"]:::proc
+        Q3["Q1.3 TreasurySwap (FX)"]:::proc
+        Q4["Q1.4 NettingEngine /<br/>Coordinator"]:::proc
+        E1[("E1 deposits, accounts")]:::store
+        E2[("E2 interbank_loan,<br/>upward_deposit")]:::store
+        E3[("E3 treasury_swap")]:::store
+        E4[("E4 netting_batch,<br/>netting_entry")]:::store
+        Q1 --> E1
+        Q2 --> E2
+        Q3 --> E3
+        Q4 --> E4
+    end

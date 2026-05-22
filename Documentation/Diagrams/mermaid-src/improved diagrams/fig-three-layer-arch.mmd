@@ -1,0 +1,35 @@
+---
+title: Three-Layer Decentralised Application Architecture
+---
+flowchart TB
+    classDef layer fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef tech  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph PRES[" Presentation Layer "]
+        direction LR
+        P1["React 18 + TypeScript"]:::tech
+        P2["Material Design 3"]:::tech
+        P3["Wagmi + Viem<br/>(EIP-1193 wallets)"]:::tech
+        P4["Modules: Dashboard · Deposit ·<br/>Loan · Admin · Risk AI · QR"]:::tech
+    end
+
+    subgraph SC[" Smart-Contract Layer (EVM: Polygon / Ethereum) "]
+        direction LR
+        S1["WorldBankReserve"]:::tech
+        S2["NationalBank"]:::tech
+        S3["LocalBank"]:::tech
+        S4["Ops: Reserve Mgmt · Hierarchical Lending ·<br/>Loan Lifecycle · RBAC · Emergency Controls"]:::tech
+    end
+
+    subgraph OFF[" Off-Chain Services Layer "]
+        direction LR
+        O1["Express.js REST API"]:::tech
+        O2["PostgreSQL<br/>(relational DB, 3NF)"]:::tech
+        O3["FastAPI ML Service<br/>RF · Isolation Forest · SHAP"]:::tech
+        O4["Event Listener + Redis cache"]:::tech
+    end
+
+    PRES --> SC
+    SC   --> OFF
+
+    class PRES,SC,OFF layer

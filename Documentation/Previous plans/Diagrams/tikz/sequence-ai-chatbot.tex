@@ -1,0 +1,34 @@
+% Auto-generated TikZ sequence from sequence-ai-chatbot.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hB) at (0,0) {Borrower};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hF) at (2,0) {Frontend};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hCS) at (4,0) {ChatbotService};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hNLP) at (6,0) {NLPEngine};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hDB) at (8,0) {PostgreSQL};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {1. Open AI Chatbot} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {2. Initialize session (borrower\_id)} (4,-1.7);
+  \draw[cwb arr] (4,-2.4) -- node[above,font=\tiny,align=center] {3. Load user context (BORROWER, LOAN\_REQUEST, BORROWING\_LIMIT)} (8,-2.4);
+  \draw[cwb arr dash] (8,-3.0999999999999996) -- node[above,font=\tiny,align=center] {4. Return user data} (4,-3.0999999999999996);
+  \draw[cwb arr dash] (4,-3.8) -- node[above,font=\tiny,align=center] {5. Return welcome message + context summary} (2,-3.8);
+  \draw[cwb arr dash] (2,-4.5) -- node[above,font=\tiny,align=center] {6. Display chatbot interface} (0,-4.5);
+  \draw[cwb arr] (0,-5.2) -- node[above,font=\tiny,align=center] {7. Ask question (e.g. What is my borrowing limit?)} (2,-5.2);
+  \draw[cwb arr] (2,-5.9) -- node[above,font=\tiny,align=center] {8. POST /chatbot/ask (session\_id, message)} (4,-5.9);
+  \draw[cwb arr] (4,-6.6000000000000005) -- node[above,font=\tiny,align=center] {9. Tokenize + Remove stop words} (6,-6.6000000000000005);
+  \draw[cwb arr dash] (6,-7.300000000000001) -- node[above,font=\tiny,align=center] {12. Return intent + entities} (4,-7.300000000000001);
+  \draw[cwb arr] (4,-8.0) -- node[above,font=\tiny,align=center] {13a. Query BORROWING\_LIMIT} (8,-8.0);
+  \draw[cwb arr dash] (8,-8.7) -- node[above,font=\tiny,align=center] {13a. Return limit data} (4,-8.7);
+  \draw[cwb arr] (4,-9.399999999999999) -- node[above,font=\tiny,align=center] {13b. Query INSTALLMENT WHERE status = pending} (8,-9.399999999999999);
+  \draw[cwb arr dash] (8,-10.099999999999998) -- node[above,font=\tiny,align=center] {13b. Return pending installments} (4,-10.099999999999998);
+  \draw[cwb arr] (4,-10.799999999999997) -- node[above,font=\tiny,align=center] {13c. Query LOCAL\_BANK / NATIONAL\_BANK} (8,-10.799999999999997);
+  \draw[cwb arr dash] (8,-11.499999999999996) -- node[above,font=\tiny,align=center] {13c. Return bank data} (4,-11.499999999999996);
+  \draw[cwb arr] (4,-12.199999999999996) -- node[above,font=\tiny,align=center] {15. INSERT INTO AI\_CHATBOT\_LOG} (8,-12.199999999999996);
+  \draw[cwb arr dash] (4,-12.899999999999995) -- node[above,font=\tiny,align=center] {16. Return formatted response} (2,-12.899999999999995);
+  \draw[cwb arr dash] (2,-13.599999999999994) -- node[above,font=\tiny,align=center] {17. Display response} (0,-13.599999999999994);
+\end{tikzpicture}
+\end{center}

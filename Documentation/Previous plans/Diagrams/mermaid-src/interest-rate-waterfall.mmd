@@ -1,0 +1,14 @@
+graph LR
+    WB["World Bank\nLends 3 pct APR"] -->|"NB margin 2 pct"| NB["National Bank\nLends 5 pct"]
+    NB -->|"LB margin 3 pct"| LB["Local Bank\nLends 8 pct"]
+    LB -->|"Borrower pays"| BR["Borrower 8 pct"]
+    WB2["Cost 0 pct"] -.-> WB
+    NB2["Cost 3 pct\nMargin 2 pct"] -.-> NB
+    LB2["Cost 5 pct\nMargin 3 pct"] -.-> LB
+    style WB fill:#1E3A8A,color:#fff,stroke-width:2px
+    style NB fill:#2563EB,color:#fff
+    style LB fill:#3B82F6,color:#fff
+    style BR fill:#93C5FD,stroke:#3B82F6
+    style WB2 fill:#EFF6FF,stroke:#BFDBFE
+    style NB2 fill:#EFF6FF,stroke:#BFDBFE
+    style LB2 fill:#EFF6FF,stroke:#BFDBFE

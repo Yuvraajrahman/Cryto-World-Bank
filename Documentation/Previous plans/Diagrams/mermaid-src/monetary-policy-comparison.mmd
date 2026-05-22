@@ -1,0 +1,24 @@
+graph TD
+    subgraph TRAD["TRADITIONAL - Cantillon Effect"]
+        direction TB
+        CB["Central Bank"] -->|"First access"| BANKS["Banks and Funds"]
+        BANKS -->|"Second"| CORP["Large Corporations"]
+        CORP -->|"Third"| SME2["Small Business"]
+        SME2 -->|"Last"| PEOPLE["General Population"]
+        NOTE1["Top 1 pct holds 32 pct wealth"]
+        NOTE2["800B USD/year from developing economies"]
+    end
+    subgraph CWB2["CWB - Transparent Algorithmic"]
+        direction TB
+        WBR["World Bank Reserve"] -->|"3 pct visible"| NBR["National Banks"]
+        NBR -->|"5 pct visible"| LBR["Local Banks"]
+        LBR -->|"8 pct visible"| PPL["All Borrowers Same Rules"]
+        NOTE3["Rates on-chain auditable"]
+        NOTE4["No hidden fees"]
+    end
+    style TRAD fill:#FEF2F2,stroke:#DC2626,stroke-width:2px
+    style CWB2 fill:#F0FDF4,stroke:#16A34A,stroke-width:2px
+    style WBR fill:#166534,color:#fff
+    style NBR fill:#16A34A,color:#fff
+    style LBR fill:#4ADE80,stroke:#22C55E
+    style PPL fill:#DCFCE7,stroke:#86EFAC

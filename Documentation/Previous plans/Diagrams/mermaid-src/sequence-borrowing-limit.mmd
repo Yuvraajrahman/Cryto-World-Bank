@@ -1,0 +1,33 @@
+sequenceDiagram
+    participant S as System / Trigger
+    participant API as FastAPI
+    participant BLE as BorrowingLimitEngine
+    participant DB as PostgreSQL
+
+    Note over S: Trigger: Loan Request / Approval / Payment / Scheduled Job
+
+    S->>API: 1. Calculate borrowing limit (borrower_id)
+    API->>BLE: 2. Process limit calculation
+
+    BLE->>DB: 3. Query TRANSACTION (last 6 months)
+    DB-->>BLE: 4. Return 6-month transactions
+    Note over BLE: 5. Calculate 6-month rolling sum
+
+    BLE->>DB: 6. Query TRANSACTION (last 12 months)
+    DB-->>BLE: 7. Return 12-month transactions
+    Note over BLE: 8. Calculate 12-month rolling sum
+
+    BLE->>DB: 9. Query BORROWER.consecutive_paid_loans
+    DB-->>BLE: 10. Return consecutive count
+    Note over BLE: 11. Apply loyalty multiplier
+
+    BLE->>DB: 12. Query active LOAN_REQUEST count
+    DB-->>BLE: 13. Return active loan count
+    Note over BLE: 14. Check max concurrent loans (3)
+    Note over BLE: 15. Check yearly limit not exceeded
+    Note over BLE: 16. Final limit =\nmin(6mo, 12mo) x loyalty x availability
+
+    BLE->>DB: 17. UPSERT BORROWING_LIMIT
+    DB-->>BLE: 18. Confirm update
+    BLE-->>API: 19. Return calculated limit
+    API-->>S: 20. Return limit result

@@ -1,0 +1,24 @@
+---
+title: Local LLM Assistant — Component Data Flow
+---
+flowchart TB
+    classDef ui   fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef api  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef srv  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    subgraph CLIENT[" Browser "]
+        UI["Web UI (Vite + React)<br/>Landing assistant · in-app widget"]:::ui
+    end
+
+    subgraph SERVER[" CWB backend "]
+        API["Express API<br/>POST /api/ai/chat/stream (SSE)<br/>optionalAuth · prompt shaping"]:::api
+    end
+
+    subgraph INFER[" Local inference "]
+        LM["LM Studio · OpenAI-compatible<br/>127.0.0.1:1234<br/>/v1/chat/completions (stream)"]:::srv
+    end
+
+    UI -->|"transcript + feature context"| API
+    API -->|"chat completions (stream)"| LM
+    LM -->|"token deltas"| API
+    API -->|"SSE tokens + metadata"| UI

@@ -1,0 +1,33 @@
+graph TB
+    subgraph FLAT["EXISTING DeFi - Flat Pool"]
+        direction TB
+        LP1["Lender A\n10K USD"] --> POOL["Single Liquidity Pool\n26.3B TVL"]
+        LP2["Lender B\n500K USD"] --> POOL
+        LP3["Lender C\n50M USD"] --> POOL
+        POOL --> BR1["Borrower X\nRetail"]
+        POOL --> BR2["Borrower Y\nInstitutional"]
+        POOL --> BR3["Borrower Z\nDAO"]
+    end
+    subgraph HIER["CRYPTO WORLD BANK - Multi-Tier"]
+        direction TB
+        WB["World Bank Reserve"] -->|"3 pct APR"| NB1["National Bank A"]
+        WB -->|"3 pct APR"| NB2["National Bank B"]
+        NB1 -->|"5 pct APR"| LB1["Local Bank 1"]
+        NB1 -->|"5 pct APR"| LB2["Local Bank 2"]
+        NB2 -->|"5 pct APR"| LB3["Local Bank 3"]
+        LB1 -->|"8 pct APR"| U1["Individual"]
+        LB1 -->|"8 pct APR"| U2["SME"]
+        LB2 -->|"8 pct APR"| U3["Micro-enterprise"]
+        NB1 <-->|"Same-tier"| NB2
+        LB1 <-->|"Same-tier"| LB2
+        LB1 -.->|"Upward surplus"| NB1
+    end
+    style FLAT fill:#FEE2E2,stroke:#DC2626,stroke-width:2px
+    style HIER fill:#DCFCE7,stroke:#16A34A,stroke-width:2px
+    style POOL fill:#FECACA,stroke:#EF4444
+    style WB fill:#1E40AF,color:#fff,stroke:#1E3A8A,stroke-width:2px
+    style NB1 fill:#2563EB,color:#fff
+    style NB2 fill:#2563EB,color:#fff
+    style LB1 fill:#3B82F6,color:#fff
+    style LB2 fill:#3B82F6,color:#fff
+    style LB3 fill:#3B82F6,color:#fff

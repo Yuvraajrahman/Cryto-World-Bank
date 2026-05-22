@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { PublicHeader } from "@/components/layout/Header";
 import { Logo } from "@/components/ui/Logo";
+import { LandingAssistantSection } from "@/components/chatbot/LandingAssistantSection";
 
 export function Landing() {
   return (
@@ -28,6 +29,7 @@ export function Landing() {
       <Hero />
       <TrustStrip />
       <Features />
+      <LandingAssistantSection />
       <Hierarchy />
       <Security />
       <Numbers />

@@ -1,0 +1,36 @@
+% Auto-generated TikZ sequence from sequence-market-data.mmd
+\begin{center}
+\begin{tikzpicture}[cwb, x=1.35cm, y=0.55cm]
+  \node[font=\scriptsize\bfseries] (hB) at (0,0) {Borrower};
+  \draw[dashed,gray!60] (0,-0.35) -- (0,-5);
+  \node[font=\scriptsize\bfseries] (hF) at (2,0) {Frontend};
+  \draw[dashed,gray!60] (2,-0.35) -- (2,-5);
+  \node[font=\scriptsize\bfseries] (hAPI) at (4,0) {FastAPI};
+  \draw[dashed,gray!60] (4,-0.35) -- (4,-5);
+  \node[font=\scriptsize\bfseries] (hRC) at (6,0) {RedisCache};
+  \draw[dashed,gray!60] (6,-0.35) -- (6,-5);
+  \node[font=\scriptsize\bfseries] (hDB) at (8,0) {PostgreSQL};
+  \draw[dashed,gray!60] (8,-0.35) -- (8,-5);
+  \node[font=\scriptsize\bfseries] (hCG) at (10,0) {CoinGeckoAPI};
+  \draw[dashed,gray!60] (10,-0.35) -- (10,-5);
+  \draw[cwb arr] (0,-1) -- node[above,font=\tiny,align=center] {1. Navigate to Market Data dashboard} (2,-1);
+  \draw[cwb arr] (2,-1.7) -- node[above,font=\tiny,align=center] {2. GET /market-data/prices (crypto\_ids)} (4,-1.7);
+  \draw[cwb arr] (4,-2.4) -- node[above,font=\tiny,align=center] {3. Check cache (key: market\_prices\_crypto\_id)} (6,-2.4);
+  \draw[cwb arr dash] (6,-3.0999999999999996) -- node[above,font=\tiny,align=center] {4a. Return cached data} (4,-3.0999999999999996);
+  \draw[cwb arr] (4,-3.8) -- node[above,font=\tiny,align=center] {4b. GET /simple/price?ids=...\&vs\_currencies=usd} (10,-3.8);
+  \draw[cwb arr dash] (10,-4.5) -- node[above,font=\tiny,align=center] {5b. Return price data} (4,-4.5);
+  \draw[cwb arr] (4,-5.2) -- node[above,font=\tiny,align=center] {6b. SET cache (TTL: 5 min)} (6,-5.2);
+  \draw[cwb arr] (4,-5.9) -- node[above,font=\tiny,align=center] {7b. INSERT/UPDATE MARKET\_DATA} (8,-5.9);
+  \draw[cwb arr dash] (4,-6.6000000000000005) -- node[above,font=\tiny,align=center] {8. Return price data} (2,-6.6000000000000005);
+  \draw[cwb arr dash] (2,-7.300000000000001) -- node[above,font=\tiny,align=center] {9. Render price cards} (0,-7.300000000000001);
+  \draw[cwb arr] (0,-8.0) -- node[above,font=\tiny,align=center] {10. Select crypto for historical chart} (2,-8.0);
+  \draw[cwb arr] (2,-8.7) -- node[above,font=\tiny,align=center] {11. GET /market-data/history (crypto\_id, range)} (4,-8.7);
+  \draw[cwb arr] (4,-9.399999999999999) -- node[above,font=\tiny,align=center] {12. Query MARKET\_DATA WHERE crypto\_id AND date range} (8,-9.399999999999999);
+  \draw[cwb arr dash] (8,-10.099999999999998) -- node[above,font=\tiny,align=center] {13. Return historical data} (4,-10.099999999999998);
+  \draw[cwb arr dash] (4,-10.799999999999997) -- node[above,font=\tiny,align=center] {14. Return data points} (2,-10.799999999999997);
+  \draw[cwb arr dash] (2,-11.499999999999996) -- node[above,font=\tiny,align=center] {16. Display interactive chart} (0,-11.499999999999996);
+  \draw[cwb arr] (2,-12.199999999999996) -- node[above,font=\tiny,align=center] {17. GET /market-data/prices (polling)} (4,-12.199999999999996);
+  \draw[cwb arr dash] (4,-12.899999999999995) -- node[above,font=\tiny,align=center] {18. Return updated prices} (2,-12.899999999999995);
+  \draw[cwb arr dash] (2,-13.599999999999994) -- node[above,font=\tiny,align=center] {19. Re-render price cards} (0,-13.599999999999994);
+\end{tikzpicture}
+\end{center}

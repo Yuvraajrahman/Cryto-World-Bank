@@ -1,0 +1,66 @@
+---
+title: Use-Case Diagram with Seven-User Taxonomy
+---
+flowchart LR
+    classDef actor fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef uc    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef sys   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    V(("Visitor")):::actor
+    R(("Retail<br/>User")):::actor
+    B(("Borrower")):::actor
+    AP(("Approver")):::actor
+    LBO(("Local-Bank<br/>Operator")):::actor
+    NBA(("National-Bank<br/>Admin")):::actor
+    WBA(("World-Bank<br/>Admin")):::actor
+
+    subgraph SYS[" Crypto World Bank platform "]
+        direction TB
+        UC1["Register / KYC (tiered)"]:::uc
+        UC2["Connect wallet (EIP-712 sign-in)"]:::uc
+        UC3["Browse market data"]:::uc
+        UC4["Open SavingsVault / FixedDeposit"]:::uc
+        UC5["Open CurrentAccount"]:::uc
+        UC6["Apply for loan"]:::uc
+        UC7["Form group (solidarity lending)"]:::uc
+        UC8["Pay installment"]:::uc
+        UC9["Chat with bank / AI bot"]:::uc
+        UC10["Review loan + run ML risk score"]:::uc
+        UC11["Approve / reject loan"]:::uc
+        UC12["Trigger liquidation"]:::uc
+        UC13["Register Local Bank"]:::uc
+        UC14["Allocate capital to LB"]:::uc
+        UC15["Subscribe to SyndicatedLoan"]:::uc
+        UC16["Execute TreasurySwap"]:::uc
+        UC17["Register National Bank"]:::uc
+        UC18["Set platform reserve ratio"]:::uc
+        UC19["Coordinate NettingBatch"]:::uc
+        UC20["Read-only regulator dashboard"]:::uc
+    end
+    class SYS sys
+
+    V --> UC1
+    V --> UC2
+    V --> UC3
+    R --> UC4
+    R --> UC5
+    R --> UC9
+    B --> UC6
+    B --> UC7
+    B --> UC8
+    B --> UC9
+    AP --> UC10
+    AP --> UC11
+    LBO --> UC10
+    LBO --> UC11
+    LBO --> UC12
+    LBO --> UC15
+    NBA --> UC13
+    NBA --> UC14
+    NBA --> UC15
+    NBA --> UC16
+    NBA --> UC19
+    WBA --> UC17
+    WBA --> UC18
+    WBA --> UC19
+    WBA --> UC20

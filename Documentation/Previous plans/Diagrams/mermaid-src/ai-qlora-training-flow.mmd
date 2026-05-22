@@ -1,0 +1,6 @@
+flowchart LR
+  B[Load 4-bit base model] --> L[Attach LoRA adapters]
+  L --> TR[Train on multi-task SFT]
+  TR --> M[Merge or export adapters]
+  M --> D[Deploy Ollama or vLLM]
+  style TR fill:#1E3A8A,color:#fff

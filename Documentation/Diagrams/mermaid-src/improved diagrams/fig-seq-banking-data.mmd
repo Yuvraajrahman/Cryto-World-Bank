@@ -1,0 +1,43 @@
+---
+title: Sequence Diagrams - (a) Hierarchical Banking, (b) Market Data, (c) Borrowing-Limit Calculation
+---
+sequenceDiagram
+    autonumber
+    participant WBA as WB Admin
+    participant WB as WorldBankReserve
+    participant NB as NationalBank
+    participant LB as LocalBank
+    participant API as Backend
+    participant U as Borrower
+
+    rect rgb(245,245,245)
+        Note over WBA,U: (a) Hierarchical capital flow
+        WBA->>WB: allocateCapital(NB, amount)
+        WB->>WB: require ratio ≥ min
+        WB-->>NB: transfer + emit CapitalAllocated
+        NB->>NB: allocateCapital(LB, amount)
+        NB-->>LB: transfer + emit CapitalAllocated
+        LB-->>API: pool funded → loans available
+    end
+
+    rect rgb(238,238,238)
+        Note over WBA,U: (b) Market-data retrieval
+        U->>API: GET /market
+        API->>API: cache miss?
+        API->>WB: read Chainlink price feeds (RPC)
+        WB-->>API: USDC/ETH, ETH/USD, BDT/USD
+        API-->>U: prices (cached 10s)
+    end
+
+    rect rgb(230,230,230)
+        Note over WBA,U: (c) Borrowing-limit calculation
+        U->>API: POST /loans { amount, term }
+        API->>LB: read SBT.openLoans + tier
+        LB-->>API: tier ceiling, simultaneous-loan cap
+        API->>API: ceiling check + cap check
+        alt Pass
+            API-->>U: proceed to ML scoring
+        else Fail
+            API-->>U: 'borrowing limit exceeded'
+        end
+    end

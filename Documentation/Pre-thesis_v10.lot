@@ -1,0 +1,93 @@
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces Borrower tier access rules.}}{13}{table.caption.25}%
+\contentsline {table}{\numberline {1.2}Tiered Borrower Access Rules by Borrower Type and Loan Size}{13}{section*.26}%
+\contentsline {table}{\numberline {1.3}{\ignorespaces Market segments.}}{17}{table.caption.27}%
+\contentsline {table}{\numberline {1.4}Market Sizing: TAM, SAM, and SOM for the Crypto World Bank}{17}{section*.28}%
+\contentsline {table}{\numberline {1.5}{\ignorespaces Target customer segment profile.}}{18}{table.caption.29}%
+\contentsline {table}{\numberline {1.6}Target Retail Customer Segment Profile and Constraints}{18}{section*.30}%
+\contentsline {table}{\numberline {1.7}{\ignorespaces Partner categories and roles.}}{19}{table.caption.31}%
+\contentsline {table}{\numberline {1.8}Partner Ecosystem: External Dependencies and Integration Points}{19}{section*.32}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Literature review summary (Part A): DeFi lending, fraud detection, and XAI.}}{28}{table.caption.33}%
+\contentsline {table}{\numberline {2.2}Literature Review Summary (Part 1): DeFi Lending and Hierarchical Architecture}{28}{section*.34}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Literature review summary (Part B): DeFi protocol systematisation and adaptive lending.}}{29}{table.caption.35}%
+\contentsline {table}{\numberline {2.4}Literature Review Summary (Part 2): Governance, Settlement, and Institutional Adoption}{29}{section*.36}%
+\contentsline {table}{\numberline {2.5}{\ignorespaces Literature review summary (Part C): blockchain P2P lending, privacy-preserving ML, and smart contract auditing.}}{30}{table.caption.37}%
+\contentsline {table}{\numberline {2.6}Literature Review Summary (Part 3): Cross-Border Settlement and Security Tooling}{30}{section*.38}%
+\contentsline {table}{\numberline {2.7}{\ignorespaces Literature review summary (Part D): CBDC design, cross-border settlement, and multi-chain DeFi.}}{31}{table.caption.39}%
+\contentsline {table}{\numberline {2.8}Literature Review Summary (Part 4): Risk Monitoring and AI/ML in Finance}{31}{section*.40}%
+\contentsline {table}{\numberline {2.9}{\ignorespaces Literature review summary (Part E): multi-chain DeFi, smart microfinance, gas optimisation, and SHAP-based credit models.}}{32}{table.caption.41}%
+\contentsline {table}{\numberline {2.10}Literature Review Summary (Part 5): Institutional Adoption and Financial Inclusion}{32}{section*.42}%
+\contentsline {table}{\numberline {2.11}{\ignorespaces Comparative protocol analysis: existing DeFi lending protocols vs.\ the Crypto World Bank (CWB). {\normalfont \textcolor {green!55!black}{\faCheck }{} = implemented/present; \textcolor {orange!85!black}{\faHourglassHalf }{} = designed/partial; \textcolor {blue!75!black}{\faCircle }{} = planned; \textcolor {red!75!black}{\faTimes }{} = absent.}}}{33}{table.caption.43}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Prototype scope: feature implementation status as of pre-thesis submission. \textcolor {green!55!black}{\faCheck }{} = Implemented and testnet-verified; \textcolor {orange!85!black}{\faHourglassHalf }{} = Designed or partially scaffolded; \textcolor {blue!75!black}{\faCircle }{} = Planned for final thesis phase.}}{36}{table.caption.44}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Blockchain platform selection criteria and justification.}}{38}{table.caption.46}%
+\contentsline {table}{\numberline {3.3}Blockchain Platform Selection: Comparison of EVM-Compatible Networks}{38}{section*.47}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Blockchain platform selection (continued): operational and deployment factors.}}{39}{table.caption.48}%
+\contentsline {table}{\numberline {3.5}Blockchain Platform Selection (Continued): Operational and Deployment Factors}{39}{section*.49}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Database entity summary (15 entities).}}{44}{table.caption.53}%
+\contentsline {table}{\numberline {3.7}Database Entity Summary: 15 Normalized Entities in the Relational Schema}{44}{section*.54}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces EER constructs applied: specialisation, hierarchy, and constraints.}}{45}{table.caption.55}%
+\contentsline {table}{\numberline {3.9}EER Constructs Applied: Specialization, Hierarchy, and Constraints}{45}{section*.56}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Indexing strategy: B-tree indexes for time-window and high-frequency queries.}}{46}{table.caption.57}%
+\contentsline {table}{\numberline {3.11}Indexing Strategy: B-tree Indexes for Time-Window and High-Frequency Queries}{46}{section*.58}%
+\contentsline {table}{\numberline {3.12}{\ignorespaces Representative functional dependencies.}}{47}{table.caption.59}%
+\contentsline {table}{\numberline {3.13}Functional Dependencies in the Core Lending and Identity Schema}{47}{section*.60}%
+\contentsline {table}{\numberline {3.14}{\ignorespaces Relational integrity constraints.}}{47}{table.caption.61}%
+\contentsline {table}{\numberline {3.15}Relational Integrity Constraints: Referential and Domain Rules}{47}{section*.62}%
+\contentsline {table}{\numberline {3.16}{\ignorespaces Data partitioning between on-chain and off-chain storage.}}{48}{table.caption.63}%
+\contentsline {table}{\numberline {3.17}On-Chain vs.~Off-Chain Data Partitioning: State, Analytics, and Privacy Boundaries}{48}{section*.64}%
+\contentsline {table}{\numberline {3.18}{\ignorespaces Network membership governance.}}{70}{table.caption.88}%
+\contentsline {table}{\numberline {3.19}Banking Product Suite: Deposit, Credit, and Ancillary Contract Specifications}{70}{section*.89}%
+\contentsline {table}{\numberline {3.20}{\ignorespaces Business network governance.}}{70}{table.caption.90}%
+\contentsline {table}{\numberline {3.21}Security Threat Model: Vulnerability Classes, Attack Vectors, and Mitigations}{70}{section*.91}%
+\contentsline {table}{\numberline {3.22}{\ignorespaces Technology infrastructure governance.}}{71}{table.caption.92}%
+\contentsline {table}{\numberline {3.23}Governance Framework: Operational, Business, and Technology Governance Layers}{71}{section*.93}%
+\contentsline {table}{\numberline {3.24}{\ignorespaces Threat model and security controls mapping}}{73}{table.caption.94}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Sprint 1 backlog: smart contract development (21 pts).}}{78}{table.caption.99}%
+\contentsline {table}{\numberline {4.2}Agile Sprint Plan: Three-Sprint Development Timeline and Deliverables}{78}{section*.100}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Sprint 1 backlog: frontend foundation (13 pts) and database schema (8 pts).}}{78}{table.caption.101}%
+\contentsline {table}{\numberline {4.4}Technology Stack: Primary Choices and Justifications}{78}{section*.102}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Sprint 2 backlog: lending and communication features (50 pts).}}{79}{table.caption.103}%
+\contentsline {table}{\numberline {4.6}Technology Stack (Continued): Framework and Tooling Selection}{79}{section*.104}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Sprint 3 backlog: AI/ML security and polish (38 pts).}}{80}{table.caption.105}%
+\contentsline {table}{\numberline {4.8}Technology Stack: Second-Choice Alternatives and Trade-offs}{80}{section*.106}%
+\contentsline {table}{\numberline {4.9}{\ignorespaces SDLC stage mapping.}}{82}{table.caption.108}%
+\contentsline {table}{\numberline {4.10}Technology Stack: Additional Alternative Evaluations}{82}{section*.109}%
+\contentsline {table}{\numberline {4.11}{\ignorespaces Design decisions and alternatives considered.}}{84}{table.caption.111}%
+\contentsline {table}{\numberline {4.12}Software Testing Strategy: Acceptance Criteria Across Four Test Layers}{84}{section*.112}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Market segments with supporting data.}}{90}{table.caption.114}%
+\contentsline {table}{\numberline {5.2}Market Sizing: DeFi Lending TVL, Remittances, and MSME Financing Gap}{90}{section*.115}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Target customer segment profile.}}{91}{table.caption.116}%
+\contentsline {table}{\numberline {5.4}Target Customer Segment: Retail Borrower Profile and Product Fit}{91}{section*.117}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Partner categories and roles.}}{92}{table.caption.118}%
+\contentsline {table}{\numberline {5.6}Partner Ecosystem: Integration Partners and External Dependencies (Chapter 5)}{92}{section*.119}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Detailed competitive landscape analysis (Part 1).}}{93}{table.caption.120}%
+\contentsline {table}{\numberline {5.8}Competitive Landscape (Part 1): DeFi Lending and Payment Rail Protocols}{93}{section*.121}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces Detailed competitive landscape analysis (Part 2).}}{94}{table.caption.122}%
+\contentsline {table}{\numberline {5.10}Competitive Landscape (Part 2): Inclusion Wallets and Institutional Blockchain Systems}{94}{section*.123}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces Detailed competitive landscape analysis (Part 3): multi-tier capital flow as differentiating feature.}}{95}{table.caption.124}%
+\contentsline {table}{\numberline {5.12}Competitive Landscape (Part 3): Multi-Tier Capital Flow as Differentiating Feature}{95}{section*.125}%
+\contentsline {table}{\numberline {5.13}{\ignorespaces Risk taxonomy and mitigation.}}{96}{table.caption.126}%
+\contentsline {table}{\numberline {5.14}Risk Taxonomy: Technical, Financial, Regulatory, and Operational Risk Categories}{96}{section*.127}%
+\contentsline {table}{\numberline {5.15}{\ignorespaces Technical feasibility assessment.}}{97}{table.caption.128}%
+\contentsline {table}{\numberline {5.16}Technical Feasibility Assessment: Infrastructure Readiness and Ecosystem Maturity}{97}{section*.129}%
+\contentsline {table}{\numberline {5.17}{\ignorespaces Economic feasibility --- zero-cost prototype.}}{98}{table.caption.130}%
+\contentsline {table}{\numberline {5.18}Economic Feasibility: Cost Drivers vs.~Revenue Potential on Layer-2 Networks}{98}{section*.131}%
+\contentsline {table}{\numberline {5.19}{\ignorespaces Revenue projection assumptions.}}{99}{table.caption.132}%
+\contentsline {table}{\numberline {5.20}Revenue Projection by Tier (Base Case, USD Millions)}{99}{section*.133}%
+\contentsline {table}{\numberline {5.21}{\ignorespaces System-wide annual revenue summary.}}{99}{table.caption.134}%
+\contentsline {table}{\numberline {5.22}Revenue Projection Assumptions and Sensitivity Inputs}{99}{section*.135}%
+\contentsline {table}{\numberline {5.23}{\ignorespaces Default rate sensitivity scenarios with economic basis.}}{101}{table.caption.136}%
+\contentsline {table}{\numberline {5.24}{\ignorespaces Interest rate parameters.}}{102}{table.caption.138}%
+\contentsline {table}{\numberline {5.25}Tiered Interest Rate Parameters: APR Spreads Across the Four-Tier Hierarchy}{102}{section*.139}%
+\contentsline {table}{\numberline {5.26}{\ignorespaces Go-to-market phases.}}{104}{table.caption.141}%
+\contentsline {table}{\numberline {5.27}Value Proposition and Go-to-Market: User Benefits Mapped to Platform Features}{104}{section*.142}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {A.1}{\ignorespaces Technology stack summary.}}{114}{table.caption.152}%
+\contentsline {table}{\numberline {A.2}Local LLM Assistant Integration: Components, Configuration, and Prototype Stance}{114}{section*.153}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {B.1}{\ignorespaces Deployed smart contract addresses, Polygon Amoy testnet (as of pre-thesis submission).}}{116}{table.caption.156}%

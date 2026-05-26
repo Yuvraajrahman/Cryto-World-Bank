@@ -45,7 +45,7 @@ described in Chapters 3–5 of the thesis.
 
 ```bash
 # From the repo root
-npm install
+npm install   # also installs shared git hooks (strips Cursor co-author trailers)
 
 # Frontend
 cd frontend && npm install && cd ..
@@ -121,6 +121,18 @@ These extension points are wired and marked with TODOs in the code:
 - **Event indexer** — Prisma `OnChainEvent` model is already present; a listener service under `backend/src/indexer/` can watch contract events and keep the DB in sync.
 - **Real ML models** — Train Random Forest + Isolation Forest on synthetic / publicly available DeFi datasets and replace the stub `score` logic in `ml-service/app/main.py`.
 - **InterBankLendingPool** — same-tier and upward flows (Section 1.7.1 of the thesis) are architecturally designed but intentionally out of scope for this milestone.
+
+## Git commits and Cursor
+
+This repository blocks `Co-authored-by: Cursor` / `Made-with: Cursor` so **cursoragent** does not appear on GitHub’s contributor graph.
+
+After clone, run **`npm install` at the repo root** (runs `scripts/install-git-hooks.sh` automatically). Without npm, run:
+
+```bash
+sh scripts/install-git-hooks.sh
+```
+
+Also turn off **Cursor → Settings → Agents → Attribution** on each machine. GitHub Actions rejects PRs/pushes to `main` that still include Cursor trailers.
 
 ## License
 

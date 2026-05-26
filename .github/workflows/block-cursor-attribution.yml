@@ -1,0 +1,42 @@
+name: Block Cursor attribution
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reject Cursor co-author trailers
+        shell: bash
+        run: |
+          set -euo pipefail
+          pattern='cursoragent@cursor\.com|^Made-with: Cursor$|^Co-authored-by: Cursor'
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+            range="$base..$head"
+          else
+            before="${{ github.event.before }}"
+            after="${{ github.sha }}"
+            if [ "$before" = "0000000000000000000000000000000000000000" ] || [ -z "$before" ]; then
+              range="$after"
+            else
+              range="$before..$after"
+            fi
+          fi
+
+          if git log "$range" --format='%B' 2>/dev/null | grep -qE "$pattern"; then
+            echo "::error::Commit message contains Cursor attribution (Co-authored-by: Cursor / Made-with: Cursor)."
+            echo "Run 'npm install' at repo root to enable local git hooks, or remove the trailer manually."
+            exit 1
+          fi
+
+          echo "No Cursor attribution found in commits."

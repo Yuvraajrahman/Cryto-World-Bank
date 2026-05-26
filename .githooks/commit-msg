@@ -1,0 +1,11 @@
+#!/bin/sh
+# Reject commits that still contain Cursor attribution (e.g. git commit --no-verify on prepare hook).
+msgfile="$1"
+[ -f "$msgfile" ] || exit 0
+
+if grep -qE 'cursoragent@cursor\.com|^Made-with: Cursor$|^Co-authored-by: Cursor' "$msgfile"; then
+  echo "ERROR: Cursor attribution is not allowed in commit messages for this repository." >&2
+  echo "       Remove Co-authored-by: Cursor / Made-with: Cursor lines and try again." >&2
+  echo "       Also disable Cursor Settings → Agents → Attribution." >&2
+  exit 1
+fi

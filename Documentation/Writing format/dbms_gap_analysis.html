@@ -1,0 +1,188 @@
+
+<style>
+  .wrap { padding: 1rem 0; font-family: var(--font-sans); }
+  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: .06em; text-transform: uppercase; margin: 0 0 8px; }
+  .module-row { display: grid; grid-template-columns: 220px 1fr 80px; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary); align-items: stretch; }
+  .module-row:last-child { border-bottom: none; }
+  .mod-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); padding: 10px 12px 10px 0; border-right: 0.5px solid var(--color-border-tertiary); }
+  .mod-detail { font-size: 12px; color: var(--color-text-secondary); padding: 10px 12px; line-height: 1.5; }
+  .mod-score { padding: 10px 0 10px 12px; display: flex; align-items: center; justify-content: flex-end; }
+  .pill { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .done { background: #EAF3DE; color: #3B6D11; }
+  .partial { background: #FAEEDA; color: #854F0B; }
+  .missing { background: #FCEBEB; color: #A32D2D; }
+  .planned { background: #E6F1FB; color: #185FA5; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+  h3 { font-size: 15px; font-weight: 500; margin: 0 0 10px; color: var(--color-text-primary); }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+  .tag.add { background: #E6F1FB; color: #185FA5; border-color: #B5D4F4; }
+  .tag.replace { background: #FAEEDA; color: #854F0B; border-color: #FAC775; }
+  .tag.improve { background: #EAF3DE; color: #3B6D11; border-color: #C0DD97; }
+</style>
+<div class="wrap">
+  <h2 style="font-size:18px;font-weight:500;margin:0 0 6px;color:var(--color-text-primary)">DBMS curriculum coverage</h2>
+  <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 1rem">Crypto World Bank thesis (v15) — blockchain + AI/ML context</p>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#639922"></div>Implemented</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#BA7517"></div>Partial / design only</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#E24B4A"></div>Missing / not addressed</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#378ADD"></div>Planned for final thesis</div>
+  </div>
+
+  <div class="card">
+    <h3>Module 1–3 · Foundations, relational model & design</h3>
+    <div class="module-row">
+      <div class="mod-name">ER / EER modeling</div>
+      <div class="mod-detail">15-entity ERD + EER with weak entity (INSTALLMENT), ISA hierarchy (BANK_USER), aggregation, multi-valued attributes. Well executed.</div>
+      <div class="mod-score"><span class="pill done">Done ✓</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Normalization to 3NF/BCNF</div>
+      <div class="mod-detail">Explicitly checked to BCNF. Functional dependencies table present. No transitive or partial dependencies documented.</div>
+      <div class="mod-score"><span class="pill done">Done ✓</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">SQL advanced features</div>
+      <div class="mod-detail">Window functions implied for 6-month/1-year rolling windows but no explicit SQL given. CTEs, triggers, stored procs, views absent.</div>
+      <div class="mod-score"><span class="pill partial">Partial</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Integrity constraints</div>
+      <div class="mod-detail">PK, FK, UNIQUE, CHECK, NOT NULL all defined. Solid coverage.</div>
+      <div class="mod-score"><span class="pill done">Done ✓</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Module 4 · Storage & indexing</h3>
+    <div class="module-row">
+      <div class="mod-name">B-tree indexes</div>
+      <div class="mod-detail">6 explicit B-tree indexes on borrower_id, status, due_date, created_at, symbol. Well-justified for range queries.</div>
+      <div class="mod-score"><span class="pill done">Done ✓</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Hash indexes</div>
+      <div class="mod-detail">Correctly noted as unsuitable for range queries; B-tree preferred. No use case warranting hash identified.</div>
+      <div class="mod-score"><span class="pill done">Done ✓</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Vector indexes (HNSW / IVF)</div>
+      <div class="mod-detail">ChromaDB used for RAG chatbot but vector indexing internals (HNSW, ANN, cosine similarity) not discussed. pgvector not mentioned despite PostgreSQL stack.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Bloom filters / LSM trees</div>
+      <div class="mod-detail">Not discussed. Bloom filters would benefit the credit-passport lookup; LSM relevant if write-heavy audit logs considered.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Module 5–6 · Query processing & optimization</h3>
+    <div class="module-row">
+      <div class="mod-name">Query processing pipeline</div>
+      <div class="mod-detail">No discussion of parser, logical/physical plan, join algorithms for PostgreSQL. The rolling-window borrowing-limit query is architecturally central but never specified in SQL.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">ANALYZE / statistics / cost model</div>
+      <div class="mod-detail">PostgreSQL ANALYZE/VACUUM not mentioned. No cardinality estimation discussion for fraud query planning.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Materialized views</div>
+      <div class="mod-detail">Not used. Borrowing limits and reserve ratios are recomputed on every query; materialized views would dramatically cut latency for dashboard reads.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Module 7–8 · Transactions, concurrency & recovery</h3>
+    <div class="module-row">
+      <div class="mod-name">ACID in PostgreSQL</div>
+      <div class="mod-detail">Mentioned in passing ("ACID compliance"). No isolation level chosen or justified for concurrent loan approvals. Phantom read risk in borrowing-limit checks not addressed.</div>
+      <div class="mod-score"><span class="pill partial">Partial</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Smart-contract concurrency control</div>
+      <div class="mod-detail">nonReentrant (mutex-style), CEI pattern, role-gated functions. Effectively a custom concurrency model — well-specified and analogous to Strict 2PL.</div>
+      <div class="mod-score"><span class="pill done">Done ✓</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">WAL / ARIES / checkpointing</div>
+      <div class="mod-detail">PostgreSQL's WAL is relied on implicitly. No crash-recovery strategy documented for the off-chain DB. ARIES not discussed.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Module 9 · Distributed databases</h3>
+    <div class="module-row">
+      <div class="mod-name">CAP theorem</div>
+      <div class="mod-detail">Not discussed despite the system running both a CA relational DB (PostgreSQL) and a PA blockchain (Polygon PoS). The tension is architecturally central but invisible in the thesis.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">2PC / distributed transactions</div>
+      <div class="mod-detail">On-chain atomicity replaces 2PC for blockchain state. Off-chain → on-chain consistency (the oracle relay) is discussed but not framed through distributed transaction theory.</div>
+      <div class="mod-score"><span class="pill partial">Partial</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">DB-level sharding / replication</div>
+      <div class="mod-detail">Not discussed. The four-tier hierarchy implies multi-bank PostgreSQL instances but no partitioning or replication strategy specified.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Module 10 · NoSQL systems</h3>
+    <div class="module-row">
+      <div class="mod-name">Key-value (Redis)</div>
+      <div class="mod-detail">Used for JWT blacklist, session caching. Appropriate and justified.</div>
+      <div class="mod-score"><span class="pill done">Done ✓</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Document store (MongoDB)</div>
+      <div class="mod-detail">Mentioned as early prototype choice then replaced by PostgreSQL. Decision noted but not architecturally justified in the final design.</div>
+      <div class="mod-score"><span class="pill partial">Partial</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Graph database (Neo4j / etc.)</div>
+      <div class="mod-detail">GNN fraud detection (GraphSAGE) operates on a wallet-interaction graph — but this graph is never stored in a native graph DB. Graph computed in-memory from PostgreSQL rows.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Vector database (ChromaDB)</div>
+      <div class="mod-detail">ChromaDB used for RAG chatbot. Mentioned but not deeply integrated with the DBMS curriculum framing.</div>
+      <div class="mod-score"><span class="pill partial">Partial</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Module 12–13 · Analytics, AI-era databases</h3>
+    <div class="module-row">
+      <div class="mod-name">OLAP / data warehouse layer</div>
+      <div class="mod-detail">No OLAP layer. Fraud analytics, reserve dashboards, and feasibility simulations all query the same OLTP PostgreSQL. DuckDB or a separate analytics schema not considered.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">Streaming database</div>
+      <div class="mod-detail">The Graph + WebSocket handle event streaming, but a proper streaming DB (Flink, RisingWave, Materialize) for continuous fraud scoring or real-time reserve-ratio monitoring is absent.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">ML feature store</div>
+      <div class="mod-detail">18 behavioral features computed fresh per request in FastAPI. No feature store (Feast/Hopsworks) to version, cache, or share features across Random Forest, Isolation Forest, and GNN.</div>
+      <div class="mod-score"><span class="pill missing">Missing</span></div>
+    </div>
+    <div class="module-row">
+      <div class="mod-name">RAG pipeline / vector search</div>
+      <div class="mod-detail">ChromaDB + QLoRA LLM RAG assistant is specified. Chunking, embedding model, and hybrid search not discussed at the DB level.</div>
+      <div class="mod-score"><span class="pill planned">Planned</span></div>
+    </div>
+  </div>
+</div>

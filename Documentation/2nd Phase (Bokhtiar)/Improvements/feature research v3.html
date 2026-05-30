@@ -1,0 +1,283 @@
+
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.tnav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem}
+.tbtn{padding:7px 16px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;font-size:13px;cursor:pointer;color:var(--color-text-secondary);transition:all .15s}
+.tbtn.on{background:var(--color-background-secondary);color:var(--color-text-primary);border-color:var(--color-border-primary)}
+.pane{display:none}.pane.on{display:block}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem}
+.sc{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
+.eg{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.ec{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;cursor:pointer;transition:border-color .15s}
+.ec:hover{border-color:var(--color-border-primary)}
+.bd{display:inline-block;font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500;margin-bottom:8px}
+.bc{background:var(--color-background-info);color:var(--color-text-info)}
+.bx{background:var(--color-background-success);color:var(--color-text-success)}
+.ip{margin-top:1.5rem;padding:14px;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);font-size:13px;line-height:1.6}
+.ip h3{font-size:14px;font-weight:500;margin:0 0 8px}
+.al{border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px;border:0.5px solid}
+.lu{background:var(--color-background-info);border-color:var(--color-border-info)}
+.le{background:var(--color-background-secondary);border-color:var(--color-border-secondary)}
+.lc{background:var(--color-background-success);border-color:var(--color-border-success)}
+.lf{background:var(--color-background-warning);border-color:var(--color-border-warning)}
+.ln{display:flex;gap:8px;flex-wrap:wrap}
+.nd{font-size:12px;padding:6px 10px;border-radius:var(--border-radius-md);background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:border-color .15s}
+.nd:hover{border-color:var(--color-border-primary)}
+.rb{margin-bottom:12px}.rl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.rt{height:8px;background:var(--color-background-secondary);border-radius:4px;overflow:hidden}
+.rf{height:100%;border-radius:4px}
+table{width:100%;font-size:13px;border-collapse:collapse}
+td,th{padding:8px 4px;text-align:left}
+th{font-weight:500;border-bottom:0.5px solid var(--color-border-secondary)}
+td{border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+td:first-child{color:var(--color-text-primary)}
+</style>
+<h2 class="sr-only">Cryptocurrency exchange ecosystem: major platforms, technical architecture, revenue model, and monetary mechanisms</h2>
+<div id="cx" style="padding:0.5rem 0"></div>
+<script>
+(function(){
+const root=document.getElementById('cx');
+const exchanges=[
+  {n:'Binance',t:'CEX',v:'~$20B/day',note:'#1 by global volume',k:'binance'},
+  {n:'Coinbase',t:'CEX',v:'~$3B/day',note:'Nasdaq-listed (COIN)',k:'coinbase'},
+  {n:'OKX',t:'CEX',v:'~$5B/day',note:'Top derivatives platform',k:'okx'},
+  {n:'Bybit',t:'CEX',v:'~$4B/day',note:'Futures specialist',k:'bybit'},
+  {n:'Kraken',t:'CEX',v:'~$1B/day',note:'Never been hacked',k:'kraken'},
+  {n:'KuCoin',t:'CEX',v:'~$1B/day',note:'Altcoin hub, 700+ pairs',k:'kucoin'},
+  {n:'HTX (Huobi)',t:'CEX',v:'~$1B/day',note:'Asia market leader',k:'htx'},
+  {n:'Gemini',t:'CEX',v:'~$200M/day',note:'Most regulated US exchange',k:'gemini'},
+  {n:'Uniswap',t:'DEX',v:'~$2B/day',note:'AMM pioneer, Ethereum',k:'uniswap'},
+  {n:'PancakeSwap',t:'DEX',v:'~$400M/day',note:'BNB Chain AMM',k:'pancake'},
+  {n:'dYdX',t:'DEX',v:'~$500M/day',note:'On-chain perpetuals',k:'dydx'},
+  {n:'Curve Finance',t:'DEX',v:'~$300M/day',note:'Stablecoin swaps',k:'curve'},
+];
+const exInfo={
+  binance:'Founded 2017 by Changpeng Zhao. Proprietary matching engine handles 1.4M+ orders/second. Operates BNB Chain (L1) and BNB Smart Chain (EVM). The BNB token fuels fee discounts, gas, DeFi, and launchpad access. Quarterly token burns from revenue reduce supply. Annual revenue estimated at $20B+. Also operates a non-custodial wallet and NFT marketplace.',
+  coinbase:'Founded 2012, Nasdaq-listed (COIN) since 2021. Most compliance-forward US exchange — SOC 2, NY BitLicense. Coinbase Prime serves institutional clients with custodial services. Launched Base (Ethereum L2) in 2023. Revenue ~$3B/yr. The most trusted retail brand in the US crypto market.',
+  okx:'Top derivatives exchange globally. Operates OKT Chain (L1) and the OKB token. Heavy Web3 investment — OKX Wallet supports 80+ blockchains natively. Based in Seychelles, serving a globally diverse userbase. Strong in options, futures, and perpetual swaps.',
+  bybit:'Launched 2018, rapidly grew to #2 in derivatives. Offers both inverse and USDT-margined perpetuals. TradingView integration. Pioneered copy trading at scale for retail users. Insurance fund exceeds $300M. No native discount token, competes purely on fee pricing.',
+  kraken:'Founded 2011, one of the oldest surviving exchanges. Has never been hacked at the exchange level. Strong EUR markets. Offers staking, margin trading, and a separate Kraken Futures entity. Uses dark pools for institutional block trades. In 2023 acquired NinjaTrader for futures expansion.',
+  kucoin:'The "People\'s Exchange" lists new altcoins faster than any major competitor. 700+ trading pairs. KCS token distributes 50% of daily fee income directly to holders — a genuine revenue-sharing model. Suffered a $281M hack in 2020 but covered all user losses from company funds.',
+  htx:'Founded 2013 in China as Huobi, now operating from Seychelles after China\'s 2021 ban. Justin Sun (Tron founder) became an adviser in 2022. HT token offers fee discounts and voting rights. One of Asia\'s oldest and most recognized crypto brands.',
+  gemini:'Founded by Tyler and Cameron Winklevoss in 2014. Operates as a NY trust company — the highest state-level regulatory standard. Launched the GUSD (Gemini dollar) stablecoin. Gemini Earn faced regulatory action in 2023. Strong focus on institutional and HNW clients.',
+  uniswap:'The first major AMM on Ethereum. Uses x·y=k constant product formula — no order book, no counterparty, fully permissionless. V3 introduced concentrated liquidity enabling LPs to define custom price ranges, dramatically improving capital efficiency. UNI is governance-only. The protocol is immutable — no admin keys.',
+  pancake:'Dominant DEX on BNB Chain. $0.01 gas fees drive extremely high transaction counts. CAKE has a deflationary burn mechanism. Expanded to Ethereum, zkSync, Polygon, and Linea. TVL ~$1.5B. Launched a perpetuals DEX and prediction markets alongside spot AMM.',
+  dydx:'On-chain perpetual futures with off-chain order book and on-chain settlement. Migrated from Ethereum StarkEx L2 to its own Cosmos app-chain (dYdX Chain v4) for full decentralization. Governance entirely on-chain. Directly competes with Binance and OKX on perpetuals product.',
+  curve:'AMM specialized for stablecoin and pegged-asset swaps. Stableswap invariant minimizes slippage near a 1:1 peg. veCRV (vote-escrowed CRV) earns 50% of all protocol swap fees. The "Curve Wars" — protocols competing to direct CRV liquidity mining emissions — became a defining DeFi dynamic in 2021-22.',
+};
+const archLayers=[
+  {n:'User interface layer',c:'al lu',tc:'color:var(--color-text-info)',nodes:[
+    {k:'webapp',l:'Web application (SPA)'},
+    {k:'mobileapp',l:'Mobile app (iOS/Android)'},
+    {k:'tradingapi',l:'Trading API (REST/FIX)'},
+    {k:'websocket',l:'WebSocket data feeds'},
+    {k:'kyc',l:'KYC / AML verification'},
+  ]},
+  {n:'Exchange engine layer',c:'al le',tc:'',nodes:[
+    {k:'orderbook',l:'Order book'},
+    {k:'matching',l:'Matching engine'},
+    {k:'riskengine',l:'Risk engine'},
+    {k:'clearing',l:'Clearing & settlement'},
+    {k:'custody',l:'Custody / cold storage'},
+    {k:'amm',l:'AMM algorithm (DEX)'},
+    {k:'lpool',l:'Liquidity pools (DEX)'},
+  ]},
+  {n:'Blockchain / protocol layer',c:'al lc',tc:'color:var(--color-text-success)',nodes:[
+    {k:'nodes',l:'Full blockchain nodes'},
+    {k:'sc',l:'Smart contracts'},
+    {k:'wallets',l:'Hot & cold wallets'},
+    {k:'consensus',l:'Consensus mechanisms'},
+    {k:'bridge',l:'Cross-chain bridges'},
+    {k:'mempool',l:'Mempool & tx validation'},
+  ]},
+  {n:'Fiat / banking integration layer',c:'al lf',tc:'color:var(--color-text-warning)',nodes:[
+    {k:'bankrail',l:'Bank rails (ACH/SEPA/SWIFT)'},
+    {k:'stablecoin',l:'Stablecoin reserves (USDT/USDC)'},
+    {k:'custbank',l:'Custodian banks'},
+    {k:'compliance',l:'Regulatory compliance'},
+  ]},
+];
+const archInfo={
+  webapp:'Typically a React or Vue SPA with TradingView charting. Real-time price feeds arrive via WebSocket streams. REST APIs handle order placement, account management, and history. CDN-distributed globally for latency reduction. Sessions secured with 2FA (TOTP or hardware security keys like YubiKey).',
+  mobileapp:'Native iOS/Android or React Native. Push notifications for fills and alerts. Biometric authentication. Binance app has 100M+ downloads — mobile now drives the majority of retail trading volume globally. Apps are often limited to spot trading while advanced derivatives remain desktop-only.',
+  tradingapi:'REST + WebSocket APIs for algorithmic and institutional trading. FIX protocol support for HFT firms needing sub-millisecond latency. Rate limits prevent abuse. Permission tiers: read-only, trading, and withdrawal. Critical rule: never generate withdrawal-permission API keys for automated bots.',
+  websocket:'Real-time streaming of order book depth updates, trade tickers, and user account state. Binance publishes depth snapshots every 100ms. Data flows from exchange colocation servers through regional CDN PoPs to end clients. Critical for HFT strategies that require microsecond awareness of book changes.',
+  kyc:'Regulated exchanges use identity verification partners (Jumio, Onfido, Sumsub) for document + liveness checks. AML screening against OFAC/FATF sanctions lists. Blockchain analytics (Chainalysis, Elliptic) flag suspicious on-chain history. FATF Travel Rule: exchanges must share sender/receiver info on transfers over $1,000.',
+  orderbook:'A data structure holding all outstanding limit orders organized by price level. Typically implemented as a sorted tree (red-black tree or skiplist). Bids on one side, asks on the other — the spread between them represents liquidity cost. High-frequency market makers update quotes thousands of times per second.',
+  matching:'The core of any CEX: matches buy and sell orders by price-time priority (FIFO). Must be deterministic and extremely fast. Binance processes 1.4M+ orders/second at microsecond latency using bare-metal servers with kernel-bypass networking (DPDK/RDMA). Single-threaded design is required for determinism.',
+  riskengine:'For derivatives: computes real-time mark prices from multiple price indices, calculates maintenance margin requirements, and triggers forced liquidations when account equity falls below threshold. Insurance funds absorb deficits from liquidations that cannot be closed at the bankruptcy price. Auto-deleveraging (ADL) only activates if the fund is empty.',
+  clearing:'After a trade match, positions update in the exchange\'s internal database — not on-chain for a CEX. Blockchain settlement only happens on withdrawal. This "net settlement" model means millions of internal trades result in only thousands of on-chain transactions, dramatically improving throughput and cost efficiency.',
+  custody:'Industry standard: 95%+ of user funds in air-gapped cold storage. Hot wallets hold only enough for daily withdrawal flow. Withdrawals require multi-sig (M-of-N keyholders) or MPC (multi-party computation, e.g. Fireblocks, Copper). Hardware Security Modules (HSMs) protect private key material from extraction.',
+  amm:'Replaces the order book with a mathematical formula. Uniswap v2: x·y=k (constant product — infinite liquidity, bounded slippage). Uniswap v3: concentrated liquidity in user-defined price ranges (much better capital efficiency). Curve: stableswap invariant for near-zero slippage near a 1:1 peg. Price is fully determined by pool token ratios.',
+  lpool:'Smart contracts holding token pairs (e.g. ETH/USDC). Anyone can become a liquidity provider by depositing both tokens proportionally and receiving LP tokens representing their share. LPs earn swap fees but are exposed to impermanent loss — the opportunity cost when prices diverge from the deposit ratio.',
+  nodes:'Exchanges run multiple full nodes of every supported blockchain, syncing the complete transaction history. This allows real-time verification of incoming deposits without trusting third-party APIs. Full nodes also enable transaction broadcasting, address monitoring, and accurate confirmation tracking.',
+  sc:'DEXes run entirely through audited, immutable smart contracts — Uniswap core contracts have no admin keys. Security audits by Trail of Bits, OpenZeppelin, and Certik are required. Formal verification (proving correctness mathematically) is best practice for high-value, high-risk contract logic.',
+  wallets:'Hot wallets: always-online, connected to the withdrawal system — hold the minimum needed for daily operations. Cold wallets: air-gapped HSMs for bulk storage. HD wallets generate a unique deposit address per user from a single master seed. MPC wallet infrastructure enables distributed key management with no single point of compromise.',
+  consensus:'Bitcoin PoW: confirmed after ~6 blocks (~60 min). Ethereum PoS: final in ~13 min with economic finality. Solana PoH: ~400ms blocks, near-instant finality. Exchanges calibrate minimum confirmation counts per chain based on security model and 51%-attack cost (confirmations required ≈ cost to reverse/attack).',
+  bridge:'Protocols that lock tokens on one chain and mint wrapped equivalents on another. The most-hacked DeFi infrastructure: Ronin ($625M), Wormhole ($320M), Nomad ($190M). Most major CEXes internalize cross-chain moves through their own multi-chain hot wallets rather than trusting external bridges.',
+  mempool:'The pending transaction pool — unconfirmed transactions waiting to be picked up by validators. Exchanges monitor the mempool to credit incoming deposits before blockchain confirmation (useful for small deposits). Gas fees (Ethereum) or priority fees (Bitcoin) determine how quickly validators include transactions.',
+  bankrail:'ACH: US, 1-3 days. Fedwire: US same-day for institutional. SEPA: Europe, 1 business day. SWIFT: international, 1-5 days. Crypto-friendly banking is the most fragile layer post-2023 (Signature Bank and Silvergate both closed in March 2023). Exchanges now use Cross River Bank, Western Alliance, and international alternatives.',
+  stablecoin:'USDT ($100B+ supply) and USDC ($45B+) are the monetary base for crypto trading — most pairs price against them. USDT backed by T-bills and cash equivalents (audited by BDO). USDC backed 1:1 with cash and short-term US Treasuries (Deloitte audit). During the 2022 Terra collapse, $20B+ USDT was redeemed without breaking the peg.',
+  custbank:'Regulated exchanges hold fiat at FDIC-insured banks in segregated custodial accounts. After the 2023 banking crisis, most exchanges diversified to 5-10+ banking partners to avoid concentration risk. Institutional clients use qualified custodians: Fidelity Digital Assets, Anchorage Digital, or BitGo — all with SOC-2 certification.',
+  compliance:'MiCA (EU Markets in Crypto-Assets, effective 2024): first comprehensive licensing regime. FinCEN (US): MSB registration required, suspicious activity reports (SARs) mandated. FATF Travel Rule: exchanges must transmit sender/receiver KYC info on transfers over $1,000. Compliance teams at major exchanges now larger than their engineering organizations.',
+};
+const revenues=[
+  {l:'Trading fees — spot & derivatives',p:65,c:'#185FA5'},
+  {l:'Native token ecosystem (BNB, OKB…)',p:15,c:'#0F6E56'},
+  {l:'Staking & yield products',p:8,c:'#854F0B'},
+  {l:'Project listing & launchpad fees',p:5,c:'#993556'},
+  {l:'OTC & institutional desk',p:4,c:'#534AB7'},
+  {l:'Data feeds & analytics subscriptions',p:2,c:'#5F5E5A'},
+  {l:'NFT marketplace commissions',p:1,c:'#993C1D'},
+];
+const fees=[
+  {n:'Binance',s:'0.10%',f:'0.02% / 0.05%',t:'BNB token: 25% off'},
+  {n:'Coinbase Advanced',s:'0.40% / 0.60%',f:'0.03% / 0.05%',t:'Volume tiers only'},
+  {n:'Kraken',s:'0.25% / 0.40%',f:'0.01% / 0.05%',t:'Volume tiers only'},
+  {n:'OKX',s:'0.08% / 0.10%',f:'0.02% / 0.05%',t:'OKB token: 20–40% off'},
+  {n:'Bybit',s:'0.10% / 0.10%',f:'0.02% / 0.055%',t:'No native token'},
+  {n:'KuCoin',s:'0.10% / 0.10%',f:'0.02% / 0.06%',t:'KCS token: 20% off'},
+  {n:'Uniswap (DEX)',s:'0.05–1.00%',f:'N/A (no futures)',t:'UNI: governance only'},
+];
+const tokens=[
+  {n:'BNB (Binance)',s:'145M max supply',b:'Quarterly auto-burn from revenue',u:'Fee discounts, gas on BNB Chain, DeFi, launchpad',mc:'~$85B'},
+  {n:'OKB (OKX)',s:'300M fixed supply',b:'Monthly buyback & burn',u:'Fee discounts, staking, governance voting',mc:'~$3B'},
+  {n:'KCS (KuCoin)',s:'200M',b:'10% of profits used for buyback',u:'50% of daily trading fees distributed to KCS holders',mc:'~$1B'},
+  {n:'HT (HTX)',s:'500M',b:'Quarterly burn from fee revenue',u:'Fee discounts, voting rights, launchpad access',mc:'~$500M'},
+  {n:'UNI (Uniswap)',s:'1B total, 60% community',b:'No burn (governance vote ongoing)',u:'Protocol governance only — no fee share yet',mc:'~$6B'},
+  {n:'CRV (Curve)',s:'~3.3B circulating',b:'None — inflationary rewards model',u:'veCRV locks earn 50% of all swap fees',mc:'~$800M'},
+];
+const liquidity=[
+  {t:'Market maker programs',b:'Exchanges offer rebates to designated market makers who commit to posting tight spreads. Market makers earn negative fees (i.e. are paid) for adding liquidity — e.g. Binance pays -0.005% maker rebate at top VIP tiers. This ensures deep, liquid order books for retail traders without the exchange warehousing directional risk.'},
+  {t:'Liquidity mining (DeFi)',b:'DEXes incentivize liquidity provision by continuously emitting governance tokens to LPs. Uniswap and Curve pioneered this. The mechanism creates a "liquidity flywheel": tokens attract LPs → LPs attract traders → fee revenue sustains LPs. The critical risk is inflation — too many tokens emitted can destroy token value if growth stalls.'},
+  {t:'Insurance & stability funds',b:'Derivatives exchanges maintain insurance funds (Binance\'s exceeds $1B) to absorb losses from liquidations that can\'t be fully executed at the bankruptcy price. When a liquidated position can\'t be filled, the fund covers the deficit instead of spreading losses to winning traders. Auto-deleveraging (ADL) only triggers if the fund is exhausted.'},
+  {t:'Stablecoin monetary policy',b:'USDT and USDC function as the de facto monetary base of crypto markets — created and redeemed on demand as USD flows in and out of the ecosystem. Tether mints new USDT when institutions deposit USD and redeems it on withdrawal, maintaining a full reserve. During the 2022 Terra collapse, $20B+ USDT was redeemed in days without the peg breaking.'},
+  {t:'Tokenized revenue sharing',b:'Exchange tokens like KCS create a direct economic link between platform revenue and token value. KuCoin distributes 50% of all trading fee income to KCS holders daily. Combined with buyback-and-burn using remaining profits, this creates buying pressure proportional to platform growth — aligning token holders\' incentives with the platform\'s success.'},
+];
+
+function h(tag,attrs,text){
+  const e=document.createElement(tag);
+  if(attrs) Object.entries(attrs).forEach(([k,v])=>{
+    if(k==='cls')e.className=v;
+    else if(k==='html')e.innerHTML=v;
+    else if(k==='txt')e.textContent=v;
+    else if(k==='st')e.style.cssText=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else e.setAttribute(k,v);
+  });
+  if(text)e.textContent=text;
+  return e;
+}
+function ap(parent,...children){children.forEach(c=>c&&parent.appendChild(c));return parent;}
+
+const nav=h('div',{cls:'tnav'});
+const tabDefs=[['Exchange platforms',0],['Technical architecture',1],['Revenue & economics',2],['Monetary system',3]];
+let panes=[];
+tabDefs.forEach(([label,i])=>{
+  const btn=h('button',{cls:'tbtn'+(i===0?' on':''),onclick:()=>showTab(i)},label);
+  nav.appendChild(btn);
+});
+ap(root,nav);
+
+const pw=h('div',{});
+ap(root,pw);
+
+// Shared info panel maker
+function mkPanel(){
+  const p=h('div',{cls:'ip',st:'display:none'});
+  const tl=h('h3',{});
+  const bd=h('p',{st:'margin:0'});
+  ap(p,tl,bd);
+  return{p,tl,bd};
+}
+
+// PANE 0
+const {p:ep,tl:et,bd:eb}=mkPanel();
+const p0=h('div',{cls:'pane on'});
+const sg=h('div',{cls:'sg'});
+[['$80B+','Daily global vol.'],['600+','Active exchanges'],['22,000+','Trading pairs'],['$3T+','Crypto market cap']].forEach(([v,l])=>{
+  ap(sg,ap(h('div',{cls:'sc'}),h('div',{cls:'sval',txt:v}),h('div',{cls:'slbl',txt:l})));
+});
+const eg=h('div',{cls:'eg'});
+exchanges.forEach(ex=>{
+  const c=h('div',{cls:'ec',onclick:()=>{et.textContent=ex.n;eb.textContent=exInfo[ex.k];ep.style.display='block';}});
+  ap(c,
+    h('span',{cls:'bd '+(ex.t==='DEX'?'bx':'bc'),txt:ex.t}),
+    h('div',{st:'font-size:15px;font-weight:500;margin-bottom:4px',txt:ex.n}),
+    h('div',{st:'font-size:12px;color:var(--color-text-secondary)',txt:ex.v}),
+    h('div',{st:'font-size:12px;color:var(--color-text-secondary)',txt:ex.note})
+  );
+  eg.appendChild(c);
+});
+ap(p0,sg,eg,ep);
+panes.push(p0);pw.appendChild(p0);
+
+// PANE 1
+const {p:ap1,tl:at,bd:ab}=mkPanel();
+const p1=h('div',{cls:'pane'});
+p1.appendChild(h('div',{st:'font-size:12px;color:var(--color-text-secondary);margin-bottom:1rem',txt:'Click any component to learn how it works'}));
+archLayers.forEach((layer,li)=>{
+  if(li>0)p1.appendChild(h('div',{st:'text-align:center;font-size:16px;color:var(--color-text-secondary);margin:2px 0',txt:'⇕'}));
+  const div=h('div',{cls:layer.c});
+  const title=h('div',{cls:'',st:'font-size:13px;font-weight:500;margin-bottom:8px'});
+  title.innerHTML=`<span style="${layer.tc}">${layer.n}</span>`;
+  const nodes=h('div',{cls:'ln'});
+  layer.nodes.forEach(n=>{
+    const btn=h('div',{cls:'nd',txt:n.l,onclick:()=>{at.textContent=n.l;ab.textContent=archInfo[n.k];ap1.style.display='block';}});
+    nodes.appendChild(btn);
+  });
+  ap(div,title,nodes);
+  p1.appendChild(div);
+});
+p1.appendChild(ap1);
+panes.push(p1);pw.appendChild(p1);
+
+// PANE 2
+const p2=h('div',{cls:'pane'});
+p2.appendChild(h('div',{st:'font-size:14px;font-weight:500;margin-bottom:1rem',txt:'Revenue streams — typical large CEX (estimated breakdown)'}));
+revenues.forEach(r=>{
+  const w=h('div',{cls:'rb'});
+  const rl=h('div',{cls:'rl'});
+  ap(rl,h('span',{txt:r.l}),h('span',{st:'color:var(--color-text-secondary)',txt:r.p+'%'}));
+  const rt=h('div',{cls:'rt'});
+  rt.appendChild(h('div',{cls:'rf',st:`width:${r.p}%;background:${r.c}`}));
+  ap(w,rl,rt);
+  p2.appendChild(w);
+});
+p2.appendChild(h('div',{st:'font-size:14px;font-weight:500;margin:1.5rem 0 1rem',txt:'Fee structures — maker / taker comparison'}));
+const tbl=h('table',{});
+tbl.innerHTML=`<thead><tr><th>Exchange</th><th>Spot fee</th><th>Futures fee</th><th>Native token benefit</th></tr></thead>`;
+const tbody=h('tbody',{});
+fees.forEach(f=>tbody.appendChild(h('tr',{html:`<td>${f.n}</td><td>${f.s}</td><td>${f.f}</td><td>${f.t}</td>`})));
+tbl.appendChild(tbody);
+p2.appendChild(tbl);
+panes.push(p2);pw.appendChild(p2);
+
+// PANE 3
+const p3=h('div',{cls:'pane'});
+p3.appendChild(h('div',{st:'font-size:14px;font-weight:500;margin-bottom:1rem',txt:'Native exchange tokens — tokenomics overview'}));
+const tg=h('div',{cls:'eg'});
+tokens.forEach(t=>{
+  const c=h('div',{cls:'ec',st:'cursor:default'});
+  c.innerHTML=`<div style="font-size:14px;font-weight:500;margin-bottom:6px">${t.n}</div>
+<div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Supply: ${t.s}</div>
+<div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Deflation: ${t.b}</div>
+<div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:3px">Utility: ${t.u}</div>
+<div style="font-size:11px;font-weight:500;margin-top:8px">Est. market cap: ${t.mc}</div>`;
+  tg.appendChild(c);
+});
+p3.appendChild(tg);
+p3.appendChild(h('div',{st:'font-size:14px;font-weight:500;margin:1.5rem 0 1rem',txt:'Liquidity & monetary mechanisms'}));
+liquidity.forEach(m=>{
+  const c=h('div',{st:'padding:14px;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-secondary);margin-bottom:10px;background:var(--color-background-primary)'});
+  c.innerHTML=`<div style="font-size:14px;font-weight:500;margin-bottom:6px">${m.t}</div><div style="font-size:13px;color:var(--color-text-secondary);line-height:1.55">${m.b}</div>`;
+  p3.appendChild(c);
+});
+panes.push(p3);pw.appendChild(p3);
+
+function showTab(idx){
+  panes.forEach((p,i)=>p.className='pane'+(i===idx?' on':''));
+  nav.querySelectorAll('.tbtn').forEach((b,i)=>b.className='tbtn'+(i===idx?' on':''));
+}
+})();
+</script>

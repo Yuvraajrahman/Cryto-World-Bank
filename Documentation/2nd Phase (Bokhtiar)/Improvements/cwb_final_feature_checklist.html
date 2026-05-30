@@ -1,0 +1,244 @@
+
+<style>
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+*{box-sizing:border-box}
+body{margin:0}
+.section{margin-bottom:2rem}
+.section-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:10px}
+.section-header i{font-size:18px}
+.section-header span{font-size:14px;font-weight:500}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px}
+.card-sub{font-size:12px;color:var(--color-text-secondary);margin:0;line-height:1.5}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:10px;margin-top:6px}
+.tag-build{background:var(--color-background-success);color:var(--color-text-success)}
+.tag-specify{background:var(--color-background-warning);color:var(--color-text-warning)}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:1.5rem 0}
+.note{font-size:12px;color:var(--color-text-secondary);padding:10px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-top:6px}
+</style>
+
+<h2 class="sr-only">CWB final feature recommendations — what to build and what to specify for the demo</h2>
+
+<div class="section">
+  <div class="section-header" style="background:var(--color-background-success)">
+    <i class="ti ti-building-bank" style="color:var(--color-text-success)" aria-hidden="true"></i>
+    <span style="color:var(--color-text-success)">1. Four-tier banking contracts</span>
+    <span class="badge" style="background:var(--color-background-success);color:var(--color-text-success);border:0.5px solid var(--color-border-success)">the core thesis — non-negotiable</span>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <p class="card-title">WorldBank contract</p>
+      <p class="card-sub">Global reserve, National Bank registration, capital injection</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">NationalBank contract</p>
+      <p class="card-sub">Borrows from WB, lends down to Local Banks, manages tier rules</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">LocalBank contract</p>
+      <p class="card-sub">RBAC roles, lends to clients, enforces borrowing limits</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Loan lifecycle</p>
+      <p class="card-sub">Request → approve → disburse → EMI → repay, fully on-chain</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">SBT Credit Passport</p>
+      <p class="card-sub">Non-transferable token, borrowing tier, repayment history</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Chainlink Proof of Reserve</p>
+      <p class="card-sub">Reserve balance cryptographically verifiable, no admin trust needed</p>
+      <span class="tag tag-build">build</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" style="background:var(--color-background-info)">
+    <i class="ti ti-robot" style="color:var(--color-text-info)" aria-hidden="true"></i>
+    <span style="color:var(--color-text-info)">2. Autonomous banking agent</span>
+    <span class="badge" style="background:var(--color-background-info);color:var(--color-text-info);border:0.5px solid var(--color-border-info)">the standout differentiator</span>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <p class="card-title">Qwen3-8B local LLM</p>
+      <p class="card-sub">Runs free on your GPU, Bengali + English, tool-calling native</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">MCP tool server</p>
+      <p class="card-sub">16 restricted banking tools — read SBT, submit loan, schedule EMI</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Client chat interface</p>
+      <p class="card-sub">"I need 10 ETH loan" → agent guides full application flow</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Human-gate pattern</p>
+      <p class="card-sub">Agent proposes, client signs permission, authority signs approval</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Authority brief UI</p>
+      <p class="card-sub">Agent shows risk score, SHAP breakdown, yes/no recommendation</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">EMI reminder system</p>
+      <p class="card-sub">Cron job + push notification 3 days and 1 day before due date</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">EIP-7702 session keys</p>
+      <p class="card-sub">Scoped, time-bound agent wallet — can't exceed authorized ops</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">ERC-4337 smart wallet</p>
+      <p class="card-sub">Gasless onboarding — no ETH needed, Face ID sign-in</p>
+      <span class="tag tag-build">build</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" style="background:var(--color-background-warning)">
+    <i class="ti ti-brain" style="color:var(--color-text-warning)" aria-hidden="true"></i>
+    <span style="color:var(--color-text-warning)">3. ML risk scoring pipeline</span>
+    <span class="badge" style="background:var(--color-background-warning);color:var(--color-text-warning);border:0.5px solid var(--color-border-warning)">academic credibility</span>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <p class="card-title">Random Forest model</p>
+      <p class="card-sub">Credit risk scoring, trained on synthetic loan data</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">SHAP explainability</p>
+      <p class="card-sub">Feature breakdown visible to client and authority — EU AI Act compliant</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Isolation Forest</p>
+      <p class="card-sub">Wallet anomaly detection, flags suspicious transaction patterns</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">FastAPI ML service</p>
+      <p class="card-sub">REST endpoint, Dockerised, called by agent and Chainlink Functions</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Risk dashboard</p>
+      <p class="card-sub">Live fraud flags, score history, reserve ratio gauge</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Chainlink Functions oracle</p>
+      <p class="card-sub">Trustless on-chain call to ML service — no admin relay needed</p>
+      <span class="tag tag-build">build</span>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header" style="background:var(--color-background-secondary)">
+    <i class="ti ti-server" style="color:var(--color-text-secondary)" aria-hidden="true"></i>
+    <span style="color:var(--color-text-primary)">4. Infrastructure and demo backbone</span>
+    <span class="badge" style="background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary)">makes the demo work</span>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <p class="card-title">Polygon zkEVM testnet</p>
+      <p class="card-sub">ZK rollup deployment — stronger security story than Amoy PoS</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">The Graph subgraph</p>
+      <p class="card-sub">Real-time event indexing powering the live dashboard</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Chainlink price feeds</p>
+      <p class="card-sub">BDT/USD FX rate, ETH/USD for reserve valuation</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Chainlink Automation</p>
+      <p class="card-sub">Time-based triggers for interest accrual and EMI due-date checks</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">USDC as lending asset</p>
+      <p class="card-sub">GENIUS Act compliant, Circle-issued, stable for demo flows</p>
+      <span class="tag tag-build">build</span>
+    </div>
+    <div class="card">
+      <p class="card-title">300-client simulation</p>
+      <p class="card-sub">Foundry script — stress test shown live on dashboard during demo</p>
+      <span class="tag tag-build">build</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <div class="section-header" style="background:var(--color-background-secondary)">
+    <i class="ti ti-file-description" style="color:var(--color-text-secondary)" aria-hidden="true"></i>
+    <span style="color:var(--color-text-primary)">5. Specify in thesis — full credit, no code</span>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <p class="card-title">Groth16 zkKYC circuit</p>
+      <p class="card-sub">Design the circuit, cite Polygon ID + zk-X509 for Bangladesh NID</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Federated learning module</p>
+      <p class="card-sub">Architecture + privacy proofs, cite PrivChain-AI (Nature 2025)</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+    <div class="card">
+      <p class="card-title">On-device AI (future)</p>
+      <p class="card-sub">Qwen3-0.6B via ExecuTorch on Snapdragon NPU — propose the split</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+    <div class="card">
+      <p class="card-title">ERC-4626 SavingsVault</p>
+      <p class="card-sub">Yield-bearing deposits — implement if time allows, else specify</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Polygon CDK sovereign chain</p>
+      <p class="card-sub">Phase 3 architecture — CWB as its own L2 with WB governance</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+    <div class="card">
+      <p class="card-title">World ID anti-Sybil</p>
+      <p class="card-sub">Proof-of-personhood gate for GroupLendingPool membership</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+    <div class="card">
+      <p class="card-title">On-chain AI model registry</p>
+      <p class="card-sub">Training hashes on-chain for EU AI Act Article 13 compliance</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+    <div class="card">
+      <p class="card-title">Chainlink CCIP bridge</p>
+      <p class="card-sub">Multi-chain NB deployment path — specify the cross-tier architecture</p>
+      <span class="tag tag-specify">specify only</span>
+    </div>
+  </div>
+  <div class="note">These 8 features earn full academic credit as "Phase 2/3 future work" — every strong systems thesis has this section. You design them rigorously, cite the literature, and bound the implementation clearly.</div>
+</div>

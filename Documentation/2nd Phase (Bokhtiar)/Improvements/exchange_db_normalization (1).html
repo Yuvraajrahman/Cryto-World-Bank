@@ -1,0 +1,169 @@
+<style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0;}</style>
+<h2 class="sr-only">Exchange database normalization: schema, primary and foreign keys, 1NF, 2NF, 3NF — interactive reference grounded in Binance and FTX</h2>
+
+<div id="tnav" style="display:none;border-bottom:0.5px solid var(--color-border-tertiary);margin:0 0 1.25rem;overflow-x:auto;white-space:nowrap;"></div>
+
+<section id="p-schema">
+  <div style="display:flex;align-items:center;gap:10px;margin:0 0 1rem;flex-wrap:wrap;">
+    <span style="font-size:12px;color:var(--color-text-secondary);">Key legend:</span>
+    <span id="lgd-pk"></span><span id="lgd-fk"></span><span id="lgd-uq"></span>
+  </div>
+  <div id="sgrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;"></div>
+</section>
+
+<section id="p-keys"></section>
+<section id="p-1nf"></section>
+<section id="p-2nf"></section>
+<section id="p-3nf"></section>
+
+<script>
+var C={
+  PK:{bg:'var(--color-background-warning)',tx:'var(--color-text-warning)'},
+  FK:{bg:'var(--color-background-info)',tx:'var(--color-text-info)'},
+  UQ:{bg:'var(--color-background-success)',tx:'var(--color-text-success)'},
+  bad:{bg:'var(--color-background-danger)',tx:'var(--color-text-danger)'}
+};
+function bdg(txt,type){var s=C[type]||C.PK;return '<span style="background:'+s.bg+';color:'+s.tx+';font-size:11px;font-weight:500;padding:2px 6px;border-radius:3px;font-family:var(--font-mono);white-space:nowrap;">'+txt+'</span>';}
+document.getElementById('lgd-pk').innerHTML=bdg('PK','PK')+' <span style="font-size:12px;color:var(--color-text-secondary);">Primary key</span>';
+document.getElementById('lgd-fk').innerHTML=bdg('FK','FK')+' <span style="font-size:12px;color:var(--color-text-secondary);">Foreign key</span>';
+document.getElementById('lgd-uq').innerHTML=bdg('UQ','UQ')+' <span style="font-size:12px;color:var(--color-text-secondary);">Unique</span>';
+
+var TABLES=[
+  {id:'users',icon:'ti-users',label:'Accounts',cols:[{n:'user_id',t:'INT',k:'PK'},{n:'name',t:'VARCHAR(100)'},{n:'email',t:'VARCHAR(255)',k:'UQ'},{n:'kyc_tier',t:'TINYINT'},{n:'country',t:'CHAR(2)'},{n:'created_at',t:'DATETIME'}]},
+  {id:'assets',icon:'ti-currency-bitcoin',label:'Tokens & coins',cols:[{n:'asset_id',t:'VARCHAR(10)',k:'PK'},{n:'symbol',t:'VARCHAR(10)',k:'UQ'},{n:'name',t:'VARCHAR(100)'},{n:'blockchain',t:'VARCHAR(50)'},{n:'decimals',t:'TINYINT'}]},
+  {id:'trading_pairs',icon:'ti-arrows-exchange',label:'Markets',cols:[{n:'pair_id',t:'INT',k:'PK'},{n:'base_asset_id',t:'VARCHAR(10)',k:'FK→assets'},{n:'quote_asset_id',t:'VARCHAR(10)',k:'FK→assets'},{n:'maker_fee',t:'DECIMAL(6,4)'},{n:'taker_fee',t:'DECIMAL(6,4)'}]},
+  {id:'wallets',icon:'ti-wallet',label:'Balances',cols:[{n:'wallet_id',t:'INT',k:'PK'},{n:'user_id',t:'INT',k:'FK→users'},{n:'asset_id',t:'VARCHAR(10)',k:'FK→assets'},{n:'balance',t:'DECIMAL(18,8)'},{n:'wallet_type',t:"ENUM('hot','cold')"}]},
+  {id:'orders',icon:'ti-list-details',label:'Buy/sell orders',cols:[{n:'order_id',t:'BIGINT',k:'PK'},{n:'user_id',t:'INT',k:'FK→users'},{n:'pair_id',t:'INT',k:'FK→trading_pairs'},{n:'order_type',t:"ENUM('market','limit','stop')"},{n:'side',t:"ENUM('buy','sell')"},{n:'price',t:'DECIMAL(18,8)'},{n:'quantity',t:'DECIMAL(18,8)'},{n:'status',t:"ENUM('open','filled','cancelled')"},{n:'created_at',t:'DATETIME'}]},
+  {id:'trades',icon:'ti-transfer',label:'Executions',cols:[{n:'trade_id',t:'BIGINT',k:'PK'},{n:'buy_order_id',t:'BIGINT',k:'FK→orders'},{n:'sell_order_id',t:'BIGINT',k:'FK→orders'},{n:'exec_price',t:'DECIMAL(18,8)'},{n:'exec_qty',t:'DECIMAL(18,8)'},{n:'fee_amount',t:'DECIMAL(18,8)'},{n:'executed_at',t:'DATETIME'}]},
+  {id:'transactions',icon:'ti-receipt',label:'Deposits/withdrawals',cols:[{n:'tx_id',t:'BIGINT',k:'PK'},{n:'user_id',t:'INT',k:'FK→users'},{n:'asset_id',t:'VARCHAR(10)',k:'FK→assets'},{n:'amount',t:'DECIMAL(18,8)'},{n:'tx_type',t:"ENUM('deposit','withdrawal')"},{n:'blockchain_hash',t:'VARCHAR(100)',k:'UQ'},{n:'status',t:"ENUM('pending','confirmed','failed')"}]}
+];
+
+var grid=document.getElementById('sgrid');
+TABLES.forEach(function(tbl){
+  var rows=tbl.cols.map(function(c){
+    var isPK=c.k==='PK',isFK=c.k&&c.k.startsWith('FK'),isUQ=c.k==='UQ';
+    var kbdg=isPK?bdg('PK','PK'):isFK?bdg('FK','FK'):isUQ?bdg('UQ','UQ'):'';
+    var ref=isFK?'<span style="font-size:11px;color:var(--color-text-secondary);"> '+c.k+'</span>':'';
+    var nameStyle='padding:5px 10px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);border-bottom:0.5px solid var(--color-border-tertiary);'+(isPK?'font-weight:500;':'');
+    return '<tr><td style="'+nameStyle+'">'+c.n+'</td>'
+      +'<td style="padding:5px 10px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);">'+c.t+'</td>'
+      +'<td style="padding:5px 10px;border-bottom:0.5px solid var(--color-border-tertiary);">'+kbdg+ref+'</td></tr>';
+  }).join('');
+  var div=document.createElement('div');
+  div.style.cssText='background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;';
+  div.innerHTML='<div style="padding:8px 12px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px;">'
+    +'<i class="ti '+tbl.icon+'" style="font-size:14px;color:var(--color-text-secondary);" aria-hidden="true"></i>'
+    +'<code style="font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--color-text-primary);">'+tbl.id+'</code>'
+    +'<span style="margin-left:auto;font-size:11px;color:var(--color-text-secondary);">'+tbl.label+'</span></div>'
+    +'<table style="width:100%;border-collapse:collapse;"><tbody>'+rows+'</tbody></table>';
+  grid.appendChild(div);
+});
+
+function mkCard(headerHtml,bodyHtml){return '<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;">'+'<div style="padding:8px 12px;background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);">'+headerHtml+'</div><div style="overflow-x:auto;">'+bodyHtml+'</div></div>';}
+function tblCode(name,label){return '<code style="font-family:var(--font-mono);font-size:12px;font-weight:500;color:var(--color-text-primary);">'+name+'</code><span style="margin-left:8px;font-size:11px;color:var(--color-text-success);">'+label+'</span>';}
+function ruleBox(h){return '<div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:12px 16px;margin:0 0 1.25rem;">'+h+'</div>';}
+function slabel(t,bad){return '<p style="font-size:11px;font-weight:500;color:'+(bad?'var(--color-text-danger)':'var(--color-text-success)')+';text-transform:uppercase;letter-spacing:.8px;margin:0 0 8px;">'+t+'</p>';}
+function arw(){return '<div style="text-align:center;padding:8px 0;font-size:18px;color:var(--color-text-secondary);" aria-hidden="true"><i class="ti ti-arrow-down"></i></div>';}
+function th(txt,type,extra){var s=type?C[type]:{bg:'var(--color-background-secondary)',tx:'var(--color-text-secondary)'};return '<th style="padding:7px 10px;background:'+s.bg+';color:'+s.tx+';text-align:left;font-size:11px;font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap;">'+(extra||'')+txt+'</th>';}
+function td(txt,type){var s=type?C[type]:{bg:'',tx:'var(--color-text-primary)'};return '<td style="padding:6px 10px;'+(type?'background:'+s.bg+';color:'+s.tx+';':'color:var(--color-text-primary);')+'border-bottom:0.5px solid var(--color-border-tertiary);font-family:var(--font-mono);font-size:12px;">'+txt+'</td>';}
+function sth(txt,type){var s=type?C[type]:{bg:'var(--color-background-secondary)',tx:'var(--color-text-secondary)'};return '<th style="padding:5px 8px;background:'+s.bg+';color:'+s.tx+';font-size:11px;font-weight:500;text-align:left;border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap;">'+txt+'</th>';}
+function std(txt,type){var s=type?C[type]:{bg:'',tx:''};return '<td style="padding:5px 8px;'+(type?'background:'+s.bg+';color:'+s.tx+';':'color:var(--color-text-primary);')+'border-bottom:0.5px solid var(--color-border-tertiary);font-family:var(--font-mono);font-size:11px;">'+txt+'</td>';}
+
+document.getElementById('p-keys').innerHTML=
+  '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-bottom:1.25rem;">'
+  +'<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;">'
+  +'<div style="padding:10px 14px;background:var(--color-background-warning);border-bottom:0.5px solid var(--color-border-tertiary);"><p style="font-size:13px;font-weight:500;color:var(--color-text-warning);">'+bdg('PK','PK')+' Primary key</p></div>'
+  +'<div style="padding:12px 14px;"><p style="font-size:13px;color:var(--color-text-primary);line-height:1.6;margin-bottom:10px;">Uniquely identifies every row in a table. No two rows share the same PK value, and it can never be null. The entire database relies on PKs to locate specific records.</p>'
+  +'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">'
+  +'<thead><tr>'+th('user_id '+bdg('PK','PK'),'PK')+th('name',null)+th('email',null)+'</tr></thead>'
+  +'<tbody><tr>'+td('1001','PK')+td('CZ')+td('cz@binance.com')+'</tr><tr>'+td('1002','PK')+td('Sam B-F')+td('sbf@ftx.com')+'</tr><tr>'+td('1003','PK')+td('Richard T')+td('richard@binance.com')+'</tr></tbody>'
+  +'</table></div></div></div>'
+  +'<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;">'
+  +'<div style="padding:10px 14px;background:var(--color-background-info);border-bottom:0.5px solid var(--color-border-tertiary);"><p style="font-size:13px;font-weight:500;color:var(--color-text-info);">'+bdg('FK','FK')+' Foreign key</p></div>'
+  +'<div style="padding:12px 14px;"><p style="font-size:13px;color:var(--color-text-primary);line-height:1.6;margin-bottom:8px;">References the PK of another table, enforcing referential integrity. You cannot create an order for a user that does not exist in <code style="font-family:var(--font-mono);font-size:12px;">users</code>.</p>'
+  +'<p style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;font-family:var(--font-mono);">orders.user_id → users.user_id</p>'
+  +'<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">'
+  +'<thead><tr>'+th('order_id',null)+th('user_id '+bdg('FK→users','FK'),'FK')+th('pair',null)+th('qty',null)+'</tr></thead>'
+  +'<tbody><tr>'+td('ORD-901')+td('1001','FK')+td('BTC/USDT')+td('0.5')+'</tr><tr>'+td('ORD-902')+td('1002','FK')+td('FTT/USDT')+td('50000')+'</tr></tbody>'
+  +'</table></div></div></div></div>'
+  +'<div style="background:var(--color-background-danger);border:0.5px solid var(--color-border-danger);border-radius:var(--border-radius-md);padding:12px 14px;">'
+  +'<p style="font-size:13px;font-weight:500;color:var(--color-text-danger);margin-bottom:6px;"><i class="ti ti-alert-triangle" style="font-size:14px;vertical-align:-2px;margin-right:6px;" aria-hidden="true"></i>The FTX case: no referential integrity</p>'
+  +'<p style="font-size:13px;color:var(--color-text-danger);line-height:1.6;">FTX ran accounting on QuickBooks — a basic tool with no FK constraints. A hidden code feature let Alameda\'s account balance go arbitrarily negative with no balance check against real assets. Proper FK enforcement would have required every debit to reference a valid, positive asset record, surfacing the fraud immediately.</p>'
+  +'</div>';
+
+document.getElementById('p-1nf').innerHTML=
+  ruleBox('<p style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;">First normal form (1NF)</p>'
+    +'<ul style="font-size:13px;color:var(--color-text-secondary);margin:0 0 0 16px;line-height:1.9;"><li>Every cell holds exactly one atomic value</li><li>No repeating groups or multi-value fields</li><li>Each row is uniquely identifiable by a primary key</li></ul>')
+  +slabel('Before — violates 1NF',true)
+  +'<div style="overflow-x:auto;margin-bottom:8px;"><table style="width:100%;border-collapse:collapse;min-width:560px;">'
+  +'<thead><tr>'+th('rec_id',null)+th('client_info','bad')+th('assets_held','bad')+th('recent_trades','bad')+th('status',null)+'</tr></thead>'
+  +'<tbody><tr>'+td('1')+td('Sam B-F | sbf@ftx.com | USA | CEO','bad')+td('FTT:100000, SOL:500, BTC:5','bad')+td('T001/buy/FTT/22.00, T002/sell/SOL/45.20','bad')+td('active')+'</tr>'
+  +'<tr>'+td('2')+td('Caroline E | ceo@alameda.com | USA','bad')+td('FTT:80000, USDT:2000000','bad')+td('T003/buy/FTT/21.50','bad')+td('active')+'</tr></tbody></table></div>'
+  +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.25rem;">'+bdg('client_info: 4 values in 1 cell','bad')+bdg('assets_held: multiple asset:amount pairs','bad')+bdg('recent_trades: a list inside a cell','bad')+'</div>'
+  +arw()
+  +slabel('After — satisfies 1NF',false)
+  +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">'
+  +mkCard(tblCode('users','one fact per column'),
+    '<table style="width:100%;border-collapse:collapse;">'
+    +'<thead><tr>'+sth('user_id','PK')+sth('name',null)+sth('email',null)+sth('country',null)+'</tr></thead>'
+    +'<tbody><tr>'+std('101','PK')+std('Sam B-F')+std('sbf@ftx.com')+std('USA')+'</tr>'
+    +'<tr>'+std('102','PK')+std('Caroline E')+std('ceo@alameda.com')+std('USA')+'</tr></tbody></table>')
+  +mkCard(tblCode('wallets','replaces assets_held'),
+    '<table style="width:100%;border-collapse:collapse;">'
+    +'<thead><tr>'+sth('wallet_id','PK')+sth('user_id '+bdg('FK','FK'),'FK')+sth('asset',null)+sth('balance',null)+'</tr></thead>'
+    +'<tbody><tr>'+std('W-1','PK')+std('101','FK')+std('FTT')+std('100000')+'</tr>'
+    +'<tr>'+std('W-2','PK')+std('101','FK')+std('SOL')+std('500')+'</tr>'
+    +'<tr>'+std('W-3','PK')+std('101','FK')+std('BTC')+std('5')+'</tr>'
+    +'<tr>'+std('W-4','PK')+std('102','FK')+std('FTT')+std('80000')+'</tr>'
+    +'<tr>'+std('W-5','PK')+std('102','FK')+std('USDT')+std('2000000')+'</tr></tbody></table>')
+  +'</div>';
+
+document.getElementById('p-2nf').innerHTML=
+  ruleBox('<p style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;">Second normal form (2NF)</p>'
+    +'<p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;">Must be in 1NF + every non-key column must depend on the <span style="font-weight:500;color:var(--color-text-primary);">entire</span> composite primary key, not just part of it. This eliminates partial dependencies.</p>')
+  +slabel('Before — violates 2NF (partial dependency)',true)
+  +'<p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:8px;">Composite PK is <code style="font-family:var(--font-mono);font-size:12px;">(order_id + asset_id)</code>. But <code style="font-family:var(--font-mono);font-size:12px;">asset_name</code> and <code style="font-family:var(--font-mono);font-size:12px;">asset_blockchain</code> only depend on <code style="font-family:var(--font-mono);font-size:12px;">asset_id</code> alone — a partial dependency on half the key.</p>'
+  +'<div style="overflow-x:auto;margin-bottom:8px;"><table style="width:100%;border-collapse:collapse;min-width:520px;">'
+  +'<thead><tr>'+th('order_id '+bdg('PK','PK'),'PK')+th('asset_id '+bdg('PK','PK'),'PK')+th('asset_name — partial','bad')+th('asset_blockchain — partial','bad')+th('fill_qty',null)+th('fee_usd',null)+'</tr></thead>'
+  +'<tbody><tr>'+td('ORD-001','PK')+td('FTT','PK')+td('FTX Token','bad')+td('Ethereum','bad')+td('1000')+td('4.40')+'</tr>'
+  +'<tr>'+td('ORD-001','PK')+td('SOL','PK')+td('Solana','bad')+td('Solana Chain','bad')+td('50')+td('4.52')+'</tr>'
+  +'<tr>'+td('ORD-002','PK')+td('FTT','PK')+td('FTX Token','bad')+td('Ethereum','bad')+td('5000')+td('21.50')+'</tr></tbody></table></div>'
+  +'<div style="margin-bottom:1.25rem;">'+bdg('"FTX Token" and "Ethereum" repeat on every FTT row — update anomaly waiting to happen','bad')+'</div>'
+  +arw()
+  +slabel('After — satisfies 2NF',false)
+  +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">'
+  +mkCard(tblCode('assets','extracted — stored once'),
+    '<table style="width:100%;border-collapse:collapse;">'
+    +'<thead><tr>'+sth('asset_id','PK')+sth('name',null)+sth('blockchain',null)+'</tr></thead>'
+    +'<tbody><tr>'+std('FTT','PK')+std('FTX Token')+std('Ethereum')+'</tr>'
+    +'<tr>'+std('SOL','PK')+std('Solana')+std('Solana Chain')+'</tr></tbody></table>')
+  +mkCard(tblCode('order_fills','partial dep. removed'),
+    '<table style="width:100%;border-collapse:collapse;">'
+    +'<thead><tr>'+sth('order_id','PK')+sth('asset_id '+bdg('PK+FK','FK'),'FK')+sth('fill_qty',null)+sth('fee_usd',null)+'</tr></thead>'
+    +'<tbody><tr>'+std('ORD-001','PK')+std('FTT','FK')+std('1000')+std('4.40')+'</tr>'
+    +'<tr>'+std('ORD-001','PK')+std('SOL','FK')+std('50')+std('4.52')+'</tr>'
+    +'<tr>'+std('ORD-002','PK')+std('FTT','FK')+std('5000')+std('21.50')+'</tr></tbody></table>')
+  +'</div>';
+
+document.getElementById('p-3nf').innerHTML=
+  ruleBox('<p style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;">Third normal form (3NF)</p>'
+    +'<p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;">Must be in 2NF + every non-key column must depend <span style="font-weight:500;color:var(--color-text-primary);">directly</span> on the primary key — not on another non-key column. Transitive dependencies must be eliminated.</p>')
+  +slabel('Before — violates 3NF (transitive dependency)',true)
+  +'<p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:8px;"><code style="font-family:var(--font-mono);font-size:12px;">tier_fee_rate</code> depends on <code style="font-family:var(--font-mono);font-size:12px;">user_tier</code>, which depends on <code style="font-family:var(--font-mono);font-size:12px;">user_id</code> — a chain through a non-key column.</p>'
+  +'<div style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 14px;font-family:var(--font-mono);font-size:12px;margin-bottom:12px;overflow-x:auto;white-space:nowrap;">'
+  +'<span style="color:var(--color-text-primary);">order_id</span> <span style="color:var(--color-text-secondary);">→</span> <span style="color:var(--color-text-info);">user_id</span> <span style="color:var(--color-text-secondary);">→</span> <span style="color:var(--color-text-danger);">user_tier</span> <span style="color:var(--color-text-secondary);">→</span> <span style="color:var(--color-text-danger);">tier_fee_rate</span></div>'
+  +'<div style="overflow-x:auto;margin-bottom:8px;"><table style="width:100%;border-collapse:collapse;min-width:500px;">'
+  +'<thead><tr>'+th('order_id '+bdg('PK','PK'),'PK')+th('user_id '+bdg('FK','FK'),'FK')+th('user_tier — transitive','bad')+th('tier_fee_rate — transitive','bad')+th('pair',null)+th('qty',null)+'</tr></thead>'
+  +'<tbody><tr>'+td('ORD-001','PK')+td('U101','FK')+td('VIP3','bad')+td('0.02%','bad')+td('BTC/USDT')+td('0.5')+'</tr>'
+  +'<tr>'+td('ORD-002','PK')+td('U202','FK')+td('VIP1','bad')+td('0.08%','bad')+td('ETH/USDT')+td('2.0')+'</tr>'
+  +'<tr>'+td('ORD-003','PK')+td('U101','FK')+td('VIP3','bad')+td('0.02%','bad')+td('FTT/USDT')+td('10000')+'</tr></tbody></table></div>'
+  +'<div style="margin-bottom:1.25rem;">'+bdg('"VIP3" and "0.02%" repeat on every U101 order — change one fee, update thousands of rows','bad')+'</div>'
+  +arw()
+  +slabel('After — satisfies 3NF',false)
+  +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">'
+  +mkCard(tblCode('vip_tiers','fee rules extracted'),
+    '<table style="width:100%;border-collapse:collapse;">'
+    +'<thead><tr>'+sth('user_tier','PK')+sth('fee_rate',null)+sth('max_leverage',null)+'</tr></thead>'
+    +'<tbody><tr>'+std('VIP1','PK')+std('0.08%')+std('20x')+'</tr>'
+    +'<tr>'+std('VIP3','PK')+std('0.02%')+std('125x')+'</tr></tbody></table>')
+  +mk

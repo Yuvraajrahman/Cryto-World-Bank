@@ -1,0 +1,137 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+h2{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0}
+.summary-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.85rem 1rem}
+.stat .n{font-size:26px;font-weight:500}
+.stat .l{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.stat.ok .n{color:var(--color-text-success)}
+.stat.warn .n{color:var(--color-text-danger)}
+.stat.note .n{color:var(--color-text-secondary)}
+.section-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.04em;text-transform:uppercase;margin:1.25rem 0 .5rem}
+.rows{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.row{display:flex;align-items:flex-start;gap:10px;padding:.65rem 1rem;font-size:13.5px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.row:last-child{border-bottom:none}
+.row.ok{background:var(--color-background-success)}
+.row.bad{background:var(--color-background-danger)}
+.row.note{background:var(--color-background-secondary)}
+.icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.icon.ok{color:var(--color-text-success)}
+.icon.bad{color:var(--color-text-danger)}
+.icon.note{color:var(--color-text-secondary)}
+.item-text{flex:1;color:var(--color-text-primary);line-height:1.45}
+.loc{font-size:11.5px;color:var(--color-text-tertiary);margin-top:2px;font-family:var(--font-mono)}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:var(--border-radius-md);font-weight:500;margin-left:6px;vertical-align:middle;line-height:1.4}
+.badge.applied{background:var(--color-background-success);color:var(--color-text-success)}
+.badge.missing{background:var(--color-background-danger);color:var(--color-text-danger)}
+.badge.partial{background:var(--color-background-warning);color:var(--color-text-warning)}
+.section-toggle{cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none}
+.section-toggle i{font-size:13px;color:var(--color-text-secondary);transition:transform .15s}
+.section-toggle.open i.ti-chevron-down{transform:rotate(0deg)}
+.section-toggle.closed i.ti-chevron-down{transform:rotate(-90deg)}
+.collapsible{overflow:hidden;transition:max-height .18s ease}
+.divider{height:0.5px;background:var(--color-border-tertiary);margin:1.25rem 0}
+</style>
+
+<div class="wrap">
+<h2>v23 → v24 improvement audit</h2>
+<p style="font-size:13px;color:var(--color-text-secondary);margin:.3rem 0 1.2rem">Cross-referenced against <code>CWB_v24_Upgrade_Plan.md</code> and <code>CWB_v24_Improvement_Analysis.md</code> · 4,922 lines scanned</p>
+
+<div class="summary-bar">
+  <div class="stat ok"><div class="n">43</div><div class="l">items fully applied</div></div>
+  <div class="stat warn"><div class="n">11</div><div class="l">items missing or incomplete</div></div>
+  <div class="stat note"><div class="n">~80%</div><div class="l">overall completion</div></div>
+</div>
+
+<div class="section-title">✅ Fully applied (all confirmed in the .tex)</div>
+<div class="rows" id="applied-rows">
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">List of Abbreviations — all 8 new entries (DON, EIP-7702, FATF, MCP, PoR, RLS, SAR, zkEVM) inserted in correct alphabetical positions<div class="loc">lines 820–863</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.1 Background — autonomous banking agent paragraph added<div class="loc">line 893</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.1 Objective 3 — MCP tool server + human-gate wording added<div class="loc">line 933</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.1 Contribution 3 — "Extension – Autonomous agent architecture (v24)" sub-paragraph added<div class="loc">line 973–974</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.1 Blockchain Justification §E — rewritten from Polygon PoS to Polygon zkEVM; ZK validity proof security model description<div class="loc">lines 1029–1030</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.2 LLMs in Finance — MCP as safety architecture paragraph added (4 sentences)<div class="loc">line 1368</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Prototype Scope table — 10 new \tmarkPlanned rows added (AI Agent, EIP-7702, SAR, sessions, PoR, The Graph, etc.)<div class="loc">lines 1601–1613</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 High-Level Architecture — updated to four-layer description; figure caption updated<div class="loc">lines 1625, 1630</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Blockchain Selection Table 1 — Network + Consensus rows updated to zkEVM; italic note updated; Security model row added to Table 2<div class="loc">lines 1665–1693</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Transaction Verification — Polygon zkEVM Cardona bullet rewritten; Amoy → Cardona in bullet 2<div class="loc">line 1707</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Oracle Architecture — MAJOR OVERHAUL: all 5 new paragraphs present (Chainlink Functions + DON, commit-reveal fallback, Automation, Price Feeds, PoR)<div class="loc">lines 1717–1799</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Data Model — "15 → 19 entities" updated everywhere in Ch.3<div class="loc">lines 1804, 1896</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Entity Summary table — 4 new rows (SESSIONS, AGENT_ACTION_LOG, INTEREST_RATE_TIER, ASSETS) + updated caption note<div class="loc">lines 1918–1931</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 EER Constructs table — append-only policy row added<div class="loc">line 1956</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Normalization — INTEREST_RATE_TIER 3NF transitive-dependency fix paragraph added<div class="loc">line 1977</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Indexing Strategy — 5 new composite/partial indexes added (idx_loan_bank_status, idx_loan_client_active, idx_agent_client_date, idx_agent_status, idx_aiml_score); idx_installment_due partial predicate added<div class="loc">lines 1994–2010</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Functional Dependencies — 4 new entity FD blocks added (sessions, agent_action_log, assets, interest_rate_tier)<div class="loc">lines 2041–2047</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Relational Integrity — APPEND-ONLY, new FK constraints, and UNIQUE(assets.symbol) rows added<div class="loc">line ~2060–2100</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 On-Chain/Off-Chain Partitioning — 3 new rows (agent action log, session key material, Chainlink oracle price data) added<div class="loc">line ~2110</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Digital Identity — EIP-7702 session key authorisation bullet added<div class="loc">line 2131</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 User Taxonomy — "nine actors" intro updated; formal actor taxonomy table (tab:actor-taxonomy) and permission matrix (tab:permission-matrix) added<div class="loc">lines 2166, 2196, 2214</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 ERC-4337 — EIP-7702 session keys paragraph added<div class="loc">line ~2240</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Credit Passport — credit tier schedule table (Bronze→Diamond) added with agent coaching description<div class="loc">lines 2424–2439</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Cross-Chain Bridge — "now uses" Chainlink Functions wording confirmed<div class="loc">line 2447</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Upward Surplus Repatriation — FATF Travel Rule compliance paragraph added (with verbatim packet spec)<div class="loc">lines 2515–2531</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Reentrancy & Security — failed-attempt lockout and address whitelisting paragraph added<div class="loc">lines 2641–2642</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Use Case Diagram — nine actors (5 primary / 4 secondary) description updated; A5–A9 modelling sentence added<div class="loc">line 2652</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Activity Diagrams — SAR activity flow 5-step enumerated paragraph added<div class="loc">line 2689</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.3 Regulatory Compliance — 3 new paragraphs (FATF R.16, SAR workflow recap, Regulator audit request sequence)<div class="loc">lines 2936–2940</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.4 AI/ML Support — MAJOR OVERHAUL: six-step pipeline, MCP tool server table (16 tools), Authority Brief verbatim, per-user personalization, extended capabilities<div class="loc">lines ~3100–3244</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.4 LLM Evaluation — 3 new items (action accuracy, human-gate bypass, session key scope enforcement)<div class="loc">lines 3369–3373</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.4 Sprint 1 — US-1.12–1.21 added; total updated 42 → 70 story points<div class="loc">lines 3418–3458</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.4 Sprint 2 — US-2.12–2.20 added; total updated 50 → 92 story points<div class="loc">lines 3491–3504</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.4 Sprint 3 — US-3.11–3.18 added; total updated 38 → 80 story points<div class="loc">lines 3532–3546</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.4 Design Decisions table — 4 new rows (network, oracle, agent framework, session auth)<div class="loc">line 3619</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.5 Revenue Projection — CWB revenue stream taxonomy table + hard rule no-native-token paragraph added<div class="loc">lines 4152–4185</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.5 Bangladesh Regulatory — FATF Travel Rule scoping paragraph added<div class="loc">lines 4322–4339</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.6 Research Contributions — extended to include MCP/EIP-7702/human-gate + actor-permission matrix + SAR workflow<div class="loc">line 4403</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.6 Future Work — 6 new items added: FATF, SAR hardening, Groth16 zkKYC, World ID, Federated Learning, Polygon CDK<div class="loc">lines 4448–4465</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Ch.6 Future Work — existing items 5, 9, 12 updated (Chainlink Functions, 300 clients/Foundry, The Graph dashboard)<div class="loc">lines 4438–4445</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Appendix A — Model and runtime: Qwen3-8B description retained; thinking/non-thinking modes described<div class="loc">line ~4484</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Appendix D — getReserveSummary() four-return function spec added to WorldBankReserve interface<div class="loc">lines 4655–4665</div></div></div>
+<div class="row ok"><i class="ti ti-check icon ok" aria-hidden="true"></i><div class="item-text">Appendix B — fifteen modular contracts count kept; freezeAccount referenced correctly in the SAR compliance section (Ch.3)<div class="loc">line 4545</div></div></div>
+</div>
+
+<div class="divider"></div>
+
+<div class="section-title">❌ Missing or incomplete — action required</div>
+<div class="rows">
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix A · <code>\paragraph{Purpose.}</code> — NOT rewritten</strong><br>
+Still describes "streaming chat assistant to help users understand platform concepts." Plan §9.1 requires a full rewrite: "The in-product assistant is an autonomous AI banking agent, not a static product guide." Action: replace the entire Purpose paragraph body with the v24 wording.<div class="loc">line 4471 — current text unchanged from pre-v24</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix A · <code>\paragraph{End-to-end behavior.}</code> — NOT extended</strong><br>
+The paragraph still describes only the read-only SSE/Markdown path. Plan §9.1 requires adding write-tool path: agent assembles parameters → confirmation summary → user affirms → MCP write tool called → EIP-7702 session key signs → logs to agent_action_log. Action: append the write-tool block after the existing streaming description.<div class="loc">line ~4488</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix A · <code>\paragraph{Live on-chain context injection.}</code> — OLD JSON block</strong><br>
+JSON still shows the v22 schema (loanStatus, riskTier, openLoans, poolUtilisation, sbtLastDefault, kycLevel). Plan §9.1 requires replacing it with the full per-user context namespace: client_id, language, credit_tier, credit_score, active_loans array, savings_balance, pool_utilisation, kyc_tier, conversation_history. Action: replace the verbatim block.<div class="loc">line ~4493</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix A · <code>\paragraph{Security and limitations.}</code> — NOT rewritten</strong><br>
+Still says "read-only product guide: it is not an authoritative source of on-chain truth and it does not sign transactions." Plan §9.1 requires the three-level safety posture rewrite: (1) tool-schema boundary, (2) human confirmation gate, (3) session key scope. Action: replace the entire paragraph body.<div class="loc">line 4494</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix A · Figure captions for fig-local-llm-mermaid and fig-local-llm-tikz — NOT updated</strong><br>
+Captions still read "compact local LLM assistant request path" / "Expanded local LLM assistant data flow." Plan §9.1 requires updating both to describe the full autonomous agent pipeline (browser UI → MCP tool server → human confirmation gate → write-tool execution → on-chain tx).<div class="loc">lines ~4507, 4514</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix A · Technology Stack table (tab:tech-stack) — 9 rows missing; 2 rows stale</strong><br>
+Missing rows: AI Agent Engine, MCP Tool Server, Session Keys, Oracle Network, Price Feeds, Automation, Proof of Reserve, Event Indexing, Target Network. Stale rows: "Target Networks" still says "Polygon Amoy, Ethereum Sepolia" (→ zkEVM Cardona); "Database" still says "15 tables, 3NF" (→ 19 tables). Action: add all 9 rows and fix the 2 stale rows.<div class="loc">lines 4523–4537</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix B · Local Bank Contract — freezeAccount description missing</strong><br>
+Current: "loan application processing, approval and rejection workflows, installment generation…" Plan §10.1 requires adding: "…and a freezeAccount(clientId) function gated by onlyApprover modifier, used by the SAR workflow to suspend operations for a flagged client." Action: extend the Local Bank bullet.<div class="loc">line 4551</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix B · InsuranceFund Contract — Chainlink PoR mention missing</strong><br>
+Current: "Premium collection, claims processing, default coverage disbursement, and fund reserve management." Plan §10.1 requires adding: "…and publishes its reserve balance to Chainlink Proof of Reserve for external verifiability." Action: extend the InsuranceFund bullet.<div class="loc">line 4559</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Appendix C · Contract Addresses — entirely NOT updated to zkEVM Cardona</strong><br>
+Opening paragraph, table caption, Network column (all 4 rows), block-explorer URL, and deployment paths all still say "Polygon Amoy." Plan §11.1 requires: change all "Polygon Amoy testnet" → "Polygon zkEVM Cardona testnet"; update explorer URL to Cardona explorer; update deployment paths from /amoy/ → /cardona/; add the sentence "Sprint 1 deployment is scheduled on Polygon zkEVM Cardona. Existing Amoy addresses retained for pre-thesis verification only." Action: update Appendix C throughout.<div class="loc">lines 4582–4604</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Technical Feasibility table (Ch.5) — two stale rows</strong><br>
+"Blockchain deployment" row still mentions "Polygon Amoy and Ethereum Sepolia." "Database backend" row still says "15 tables, 3NF." Both need updating to match the rest of the document (zkEVM Cardona; 19 tables). Action: fix both rows.<div class="loc">lines 3959–3964</div></div></div>
+
+<div class="row bad"><i class="ti ti-x icon bad" aria-hidden="true"></i><div class="item-text"><strong>Residual "Polygon Amoy" in body text — 3 locations</strong><br>
+(a) Methodology intro (line ~1140): "All deployments target Polygon Amoy and Ethereum Sepolia testnets." (b) Bangladesh regulatory section (line 4311): "deployed exclusively on public testnets (Polygon Amoy, Ethereum Sepolia)." (c) Bridge architecture prose (line 2444): "Polygon Amoy + Ethereum Sepolia in the prototype." All three should say "Polygon zkEVM Cardona" per plan §15 final checklist. Action: update all three.<div class="loc">lines ~1140, 2444, 4311</div></div></div>
+
+</div>
+
+<p style="font-size:12px;color:var(--color-text-tertiary);margin-top:1rem">Plan source: CWB_v24_Upgrade_Plan.md §9, §10, §11, §15 final checklist · v23 file: Pre-thesis_v23_fully_improved_draft_ready.tex (4,922 lines)</p>
+</div>

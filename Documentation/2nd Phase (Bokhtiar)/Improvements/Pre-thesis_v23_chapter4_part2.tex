@@ -1,0 +1,819 @@
+%% =============================================================================
+%% Pre-thesis v24 — Chapter 4: Methodology  (SECOND HALF)
+%% =============================================================================
+%% This file is the direct continuation of Pre-thesis_v24_chapter4_part1.tex.
+%% It must be included immediately after the first half in the master document.
+%%
+%% Sections covered:
+%%   SDLC Phase Mapping                       (figure + brief text)
+%%   Sprint Plan and Deliverables             [v24-G MAJOR: totals 70 / 92 / 80]
+%%     Sprint 1 Backlog (US-1.01–1.21)        [v24 adds US-1.12–1.21, +28 pts]
+%%     Sprint 2 Backlog (US-2.01–2.20)        [v24 adds US-2.12–2.20, +42 pts]
+%%     Sprint 3 Backlog (US-3.01–3.18)        [v24 adds US-3.11–3.18, +42 pts]
+%%   Design Decisions and Alternatives        [v24: +4 rows to tab:design-decisions]
+%%   Justification of Technologies            [v24: +4 entries]
+%%   Design Patterns Employed
+%%   Software Testing Strategy
+%%
+%% v24 improvements applied in this file:
+%%   * v24-G: Sprint 1 total updated 42 → 70 pts (US-1.12–1.21 added).
+%%   * v24-G: Sprint 2 total updated 50 → 92 pts (US-2.12–2.20 added).
+%%   * v24-G: Sprint 3 total updated 38 → 80 pts (US-3.11–3.18 added).
+%%   * v24-C/D: Design Decisions table extended with 4 new rows:
+%%     Polygon zkEVM Cardona network selection, Chainlink Functions oracle,
+%%     MCP tool server agent framework, EIP-7702 session key auth.
+%%   * v24-A/B/C: Justification of Technologies extended with 4 new entries:
+%%     Chainlink Services, The Graph, EIP-7702 session keys, Qwen3-8B + MCP.
+%% =============================================================================
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Software Development Life Cycle Mapping}
+\label{sec:sdlc-mapping}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{figure}[H]
+\centering
+\OnePageDiagram{fig-sdlc-mapping.pdf}
+\caption{SDLC phase mapping for the Crypto World Bank prototype. Traditional
+Waterfall phases (Requirements, Design, Implementation, Verification,
+Maintenance) are overlaid with the three Agile sprints and their key
+deliverables. Formal verification (Certora CVL) and security testing (Foundry
+fuzz) run as a continuous cross-cutting activity across Sprint~2 and
+Sprint~3.}
+\label{fig:sdlc-mapping}
+\label{fig:methodology-technical}
+\end{figure}
+
+The CWB methodology blends traditional Systems Development Life Cycle (SDLC)
+discipline with Agile sprint execution. Table~\ref{tab:sdlc-phases} maps each
+SDLC phase to its prototype artefact and the sprint in which it is
+principally delivered.
+
+\begin{table}[H]
+\centering
+\caption{SDLC phase mapping to prototype artefacts and sprint schedule.}
+\label{tab:sdlc-phases}
+\small
+\begin{tabular}{p{3.0cm}p{4.8cm}p{4.7cm}}
+\hline
+\textbf{SDLC Phase} & \textbf{Primary Artefact(s)} & \textbf{Sprint / Milestone} \\
+\hline
+Requirements         & Research questions (RQ1--RQ5); actor taxonomy; feature checklist & Pre-thesis (completed) \\
+System Design        & Four-tier architecture; DB schema (19 entities); oracle design; actor permission matrix & Pre-thesis (completed) \\
+Implementation       & Smart contracts; off-chain services; AI agent; frontend & Sprint~1--3 \\
+Verification         & Foundry invariant + fuzz suite; Certora CVL proofs; red-team evaluation & Sprint~2--3 (continuous) \\
+Deployment           & Polygon~zkEVM Cardona testnet; Alchemy node; The Graph subgraph & Sprint~1 (testnet), Sprint~3 (full) \\
+Evaluation           & On-chain simulation (300~clients, 6~banks); LLM evaluation protocol & Sprint~3 \\
+\hline
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Sprint Plan and Deliverables}
+\label{sec:sprint-plan}
+% ─────────────────────────────────────────────────────────────────────────────
+
+The three implementation sprints are structured around increasing layers of
+the system stack: Sprint~1 establishes the foundation layer (contracts,
+schema, authentication, and testnet infrastructure); Sprint~2 builds the
+lending products, group facilities, and the autonomous AI agent; Sprint~3
+closes the loop with decentralised oracles, security hardening, compliance
+workflows, and the live simulation. Sprint point totals in v24 reflect all
+v23 deliverables \\emph{plus} the new capabilities specified in the
+improvement analysis: Sprint~1 rises from 42~to \\textbf{70}~points,
+Sprint~2 from 50~to \\textbf{92}~points, and Sprint~3 from 38~to
+\\textbf{80}~points.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Sprint~1 Backlog --- Foundation Layer}
+\label{sec:sprint1}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Sprint~1 delivers the deployable smart-contract hierarchy, the normalised
+database schema, the authentication module, and the testnet infrastructure
+on which Sprints~2 and~3 build. The 10~v24 additions (US-1.12--1.21) address
+the Chainlink oracle integration, the InsuranceFund contract, four new
+database entities, composite indexes, and the network migration from Polygon
+Amoy PoS to Polygon zkEVM Cardona.
+
+\begin{table}[H]
+\centering
+\caption{Sprint~1 backlog --- smart contracts and on-chain components.
+Original user stories from v23: US-1.01--1.05 (22~pts). v24 additions:
+US-1.12--1.16 (16~pts). Table subtotal: 38~story points.}
+\label{tab:sprint1-contracts}
+\small
+\begin{tabular}{p{1.3cm}p{10.2cm}r}
+\hline
+\textbf{US-ID} & \textbf{Description} & \textbf{Pts} \\
+\hline
+US-1.01 & \texttt{WorldBankReserve.sol} --- UUPS upgradeable proxy,
+  \texttt{AccessControl} RBAC (GOVERNANCE\_ROLE, OPERATOR\_ROLE),
+  deposit and capital-allocation functions, minimum reserve ratio
+  enforcement. & 5 \\
+US-1.02 & \texttt{NationalBankPool.sol} + \texttt{InterBankLendingPool.sol}
+  base interfaces --- kinked interest rate model stub, cross-tier
+  allocation entry points. & 5 \\
+US-1.03 & \texttt{LocalBankPool.sol} + \texttt{LoanController.sol} ---
+  full loan state machine (DRAFT $\to$ PENDING\_KYC $\to$ PENDING\_SCORE
+  $\to$ PENDING\_APPROVAL $\to$ ACTIVE $\to$ CLOSED / DEFAULTED) with
+  oracle slot and APPROVER\_ROLE gate. & 5 \\
+US-1.04 & \texttt{CreditPassport.sol} SBT (ERC-5192 non-transferable) ---
+  on-chain credit score, tier enum (Bronze--Diamond), KYC level, cross-tier
+  portability interface. & 5 \\
+US-1.05 & Hardhat deployment scripts + OpenZeppelin UUPS upgrade factory;
+  deterministic CREATE2 address derivation for all tier contracts. & 2 \\
+\hline
+\multicolumn{2}{l}{\textit{v24 additions below}} & \\
+\hline
+US-1.12 & \texttt{InsuranceFund.sol} --- captures 5\% of all interest
+  collected across the lending hierarchy; claims-processing logic;
+  default-coverage disbursement; Chainlink PoR publication of fund
+  balance. & 5 \\
+US-1.13 & \texttt{getReserveSummary()} view function on each tier contract ---
+  returns \texttt{(totalDeposited, totalLoaned, reserveRatio, insuranceFundBalance)}
+  for Chainlink Proof of Reserve and the Reserve Transparency Dashboard
+  (Table~\ref{tab:psr-formula}). & 3 \\
+US-1.14 & Chainlink Price Feeds integration --- \texttt{AggregatorV3Interface}
+  for BDT/USD and ETH/USD; \texttt{getBdtEquivalent()} function in
+  \texttt{FXModule.sol}; 8-decimal precision convention; fallback to
+  last-known price on stale feed. & 3 \\
+US-1.15 & Chainlink Proof of Reserve job registration for
+  \texttt{WorldBankReserve} and \texttt{InsuranceFund} --- on-chain PoR
+  feed address configuration; external verifier read interface. & 3 \\
+US-1.16 & Append-only \texttt{audit\_logs} enforcement --- \texttt{CREATE ROLE
+  audit\_writer}; \texttt{GRANT INSERT} only; \texttt{ALTER TABLE
+  audit\_logs ENABLE ROW LEVEL SECURITY}; \texttt{audit\_insert\_only}
+  policy; no UPDATE / DELETE path from any application role. & 2 \\
+\hline
+\multicolumn{2}{r}{\textbf{Subtotal (contracts)}} & \textbf{38} \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Sprint~1 backlog --- off-chain infrastructure, schema, and testnet.
+Original user stories from v23: US-1.06--1.11 (20~pts). v24 additions:
+US-1.17--1.21 (12~pts). Table subtotal: 32~story points.}
+\label{tab:sprint1-frontend}
+\small
+\begin{tabular}{p{1.3cm}p{10.2cm}r}
+\hline
+\textbf{US-ID} & \textbf{Description} & \textbf{Pts} \\
+\hline
+US-1.06 & ERC-4337 account abstraction module --- \texttt{EntryPoint}
+  integration, \texttt{SimpleAccount} factory, gas-sponsorship paymaster
+  stub for retail onboarding (Section~\ref{sec:erc4337}). & 5 \\
+US-1.07 & PostgreSQL v1 schema --- 15 normalised entities (CLIENT, LOAN,
+  INSTALLMENT, SAVINGS\_ACCOUNT, FIXED\_DEPOSIT, GROUP\_LOAN,
+  CHAT\_MESSAGE, AI\_CHATBOT\_LOG, AI\_ML\_LOG, AI\_ML\_SECURITY\_LOG,
+  LOCAL\_BANK, NATIONAL\_BANK, WORLD\_BANK, AUDIT\_LOGS, MARKET\_DATA);
+  Alembic migrations; seed script. & 3 \\
+US-1.08 & React 18 frontend scaffold + Wagmi v2 wallet connection +
+  RainbowKit modal; dashboard skeleton; SSE consumer hook for agent
+  responses. & 3 \\
+US-1.09 & Express.js API scaffold + EIP-712 typed-data authentication +
+  JWT issuance (15~min lifetime); refresh-token rotation; Redis JWT
+  blacklist on logout. & 3 \\
+US-1.10 & FastAPI ML service scaffold --- \texttt{/health}, \texttt{/score},
+  \texttt{/commit} placeholder endpoints; 18-feature computation pipeline
+  stub; Pydantic request / response models. & 3 \\
+US-1.11 & Polygon Amoy testnet configuration --- Alchemy RPC node,
+  \texttt{.env} template, faucet automation scripts,
+  contract-address registry; Hardhat network config. & 3 \\
+\hline
+\multicolumn{2}{l}{\textit{v24 additions below}} & \\
+\hline
+US-1.17 & \texttt{sessions} table implementation + EIP-7702 session key
+  schema --- columns: \texttt{session\_key\_hash}, \texttt{session\_key\_scope}
+  (JSONB), \texttt{session\_key\_expires\_at}, \texttt{revoked}; FK to
+  \texttt{client}; index on \texttt{client\_id, expires\_at}. & 3 \\
+US-1.18 & \texttt{assets} table + \texttt{collateral\_asset\_id} /
+  \texttt{loan\_asset\_id} FK migration in LOAN --- normalises inline
+  \texttt{collateral\_symbol} VARCHAR; UNIQUE constraint on
+  \texttt{symbol}; active flag. & 2 \\
+US-1.19 & \texttt{interest\_rate\_tier} table --- extracts base\_rate,
+  kink\_utilisation, rate\_above\_kink, max\_rate from bank-tier columns
+  into a keyed lookup; eliminates the 3NF transitive dependency identified
+  in Section~\ref{sec:normalization}. & 2 \\
+US-1.20 & Composite indexes: \texttt{idx\_loan\_bank\_status}
+  \texttt{LOAN(local\_bank\_id, status, created\_at DESC)};
+  \texttt{idx\_loan\_client\_active} partial on \texttt{status='ACTIVE'};
+  \texttt{idx\_installment\_due} partial on \texttt{status='PENDING'};
+  \texttt{idx\_aiml\_score} partial on \texttt{anomaly\_score > 0.5}. & 2 \\
+US-1.21 & Network migration --- Polygon~zkEVM Cardona testnet
+  setup: Alchemy zkEVM RPC endpoint, updated \texttt{hardhat.config.ts},
+  Cardona faucet scripts, block explorer URL update; deprecation of Amoy
+  deployment config (addresses retained for reference in Appendix~C). & 3 \\
+\hline
+\multicolumn{2}{r}{\textbf{Subtotal (off-chain / infra)}} & \textbf{32} \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Sprint~1 story-point summary.}
+\label{tab:sprint1-summary}
+\small
+\begin{tabular}{lrr}
+\hline
+\textbf{Table} & \textbf{v23 points} & \textbf{v24 points} \\
+\hline
+Contracts \& on-chain (Tab.~\ref{tab:sprint1-contracts})  & 22 & 38 \\
+Off-chain / infrastructure (Tab.~\ref{tab:sprint1-frontend}) & 20 & 32 \\
+\hline
+\textbf{Sprint~1 total}            & \textbf{42} & \textbf{70} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Sprint~2 Backlog --- Lending Products and AI Agent}
+\label{sec:sprint2}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Sprint~2 delivers the full lending lifecycle, the savings and fixed-deposit
+products, the group lending facility, and --- the principal v24 addition ---
+the autonomous AI agent: the MCP tool server, the Qwen3-8B chat interface
+with human-gate confirmation, the EIP-7702 session key manager, and the
+Chainlink Automation instalment trigger. The nine v24 additions
+(US-2.12--2.20) account for 42~of the 92~sprint points.
+
+\begin{table}[H]
+\centering
+\caption{Sprint~2 backlog --- lending products, group facility, and AI agent.
+Original user stories from v23: US-2.01--2.11 (50~pts). v24 additions:
+US-2.12--2.20 (42~pts). Sprint~2 total: \textbf{92}~story points.}
+\label{tab:sprint2}
+\small
+\begin{tabular}{p{1.3cm}p{1.0cm}p{8.4cm}r}
+\hline
+\textbf{US-ID} & \textbf{Pri.} & \textbf{Description} & \textbf{Pts} \\
+\hline
+US-2.01 & P0 & \texttt{applyLoan()} end-to-end --- application form $\to$
+  KYC-tier gate $\to$ ML oracle trigger $\to$ approver notification;
+  over-indebtedness control (max-concurrent-loan check). & 8 \\
+US-2.02 & P0 & Bank approver dashboard --- approve / reject / request-more-info
+  workflow; on-chain state change with APPROVER\_ROLE signature;
+  notification back to client. & 8 \\
+US-2.03 & P0 & Instalment schedule generation (EMI formula~-- see List of
+  Formulas) + repayment transaction flow; late-payment grace-period logic;
+  \texttt{INSTALLMENT} table population. & 5 \\
+US-2.04 & P0 & \texttt{SavingsVault.sol} + flexible savings deposit /
+  withdrawal UI; real-time balance display via The Graph query. & 5 \\
+US-2.05 & P0 & \texttt{FixedDeposit.sol} + term-locked deposit product;
+  maturity-release transaction; early-withdrawal penalty calculation. & 5 \\
+US-2.06 & P1 & \texttt{GroupLendingPool.sol} --- member registration, group
+  credit-score aggregation, joint-liability disbursement, group reputation
+  event emission. & 5 \\
+US-2.07 & P1 & \texttt{InterBankLendingPool} cross-tier capital flow ---
+  Local Bank borrowing requests to National Bank; repayment lifecycle;
+  on-chain events for The Graph. & 3 \\
+US-2.08 & P1 & \texttt{UpwardDepositFacility} surplus repatriation ---
+  National Bank $\to$ World Bank excess-capital transfer; Travel Rule
+  data-packet stub (Future Work, Section~\ref{sec:regulatory-compliance}).
+  & 3 \\
+US-2.09 & P1 & KYC tier-gated loan-limit enforcement in
+  \texttt{LoanController} --- Bronze/Silver/Gold/Platinum/Diamond caps
+  from \texttt{interest\_rate\_tier} table; runtime tier lookup via
+  \texttt{CreditPassport.getScore()}. & 3 \\
+US-2.10 & P1 & Full RBAC implementation --- APPROVER\_ROLE,
+  BORROWER\_ROLE, GOVERNANCE\_ROLE, COMPLIANCE\_ROLE; role-segregation
+  enforced as Foundry invariant (Section~\ref{sec:foundry}). & 3 \\
+US-2.11 & P2 & Notification stub --- EMI-due, loan-approved, loan-rejected
+  channels (email + push); Express.js \texttt{notification-service}
+  queue; Kafka consumer wiring. & 2 \\
+\hline
+\multicolumn{3}{l}{\textit{v24 additions below}} & \\
+\hline
+US-2.12 & P0 & MCP tool server --- 16 banking tools
+  (Table~\ref{tab:mcp-tools}) wired to Express.js banking API; typed
+  parameter schemas; error-code propagation back to agent. & 8 \\
+US-2.13 & P0 & Agent chat interface --- Qwen3-8B + tool-calling +
+  human-gate confirmation pattern; SSE streaming; per-user context
+  namespace injection (Section~\ref{sec:aiml-support}); RAG from
+  ChromaDB policy store. & 8 \\
+US-2.14 & P0 & EIP-7702 session key management --- scope enforcement
+  (\texttt{session\_key\_scope} JSONB); 24-hour TTL; 500~USDC value cap;
+  revocation endpoint; \texttt{sessions} table integration. & 5 \\
+US-2.15 & P1 & Authority Brief UI --- SHAP breakdown rendered in bank
+  approver dashboard; one-click APPROVE / REQUEST~MORE~INFO / DECLINE
+  buttons; agent event monitor for approval-state polling
+  (Section~\ref{sec:aiml-support}). & 5 \\
+US-2.16 & P1 & Chainlink Automation for instalment due-date checks ---
+  \texttt{checkUpkeep()} / \texttt{performUpkeep()} implementation in
+  \texttt{LocalBankPool.sol}; removes centralised cron for overdue
+  flagging; Automation job registration on Cardona. & 5 \\
+US-2.17 & P1 & EMI reminder cron $\to$ agent push notification --- daily
+  \texttt{get\_installment\_schedule} poll; proactive agent message
+  3~days and 1~day before due date; opt-in \texttt{REMINDER} flag in
+  CLIENT table. & 3 \\
+US-2.18 & P1 & Credit tier schedule in \texttt{CreditPassport.sol} ---
+  Bronze (0--299) / Silver (300--549) / Gold (550--749) / Platinum
+  (750--899) / Diamond (900--1000) thresholds with max-loan caps and
+  interest modifiers (Table~\ref{tab:credit-tier-schedule}). & 3 \\
+US-2.19 & P1 & \texttt{agent\_action\_log} table --- append-only;
+  \texttt{tool\_name}, \texttt{parameters} JSONB,
+  \texttt{confirmation\_turn\_id} FK to \texttt{chat\_message},
+  \texttt{onchain\_tx\_hash}, \texttt{status}
+  (PENDING $|$ SUBMITTED $|$ CONFIRMED $|$ FAILED); DB INSERT-only role. & 3 \\
+US-2.20 & P1 & \texttt{interest\_rate\_tier} table integration with the
+  Kinked Rate Model --- runtime base-rate lookups from
+  \texttt{interest\_rate\_tier} replace hard-coded constants in all
+  \texttt{calculateBorrowRate()} functions. & 2 \\
+\hline
+\multicolumn{3}{r}{\textbf{Sprint~2 total}} & \textbf{92} \\
+\hline
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\subsection{Sprint~3 Backlog --- AI/ML, Security, Compliance, and Demo}
+\label{sec:sprint3}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Sprint~3 replaces the interim commit-reveal ML relay with a Chainlink
+Functions decentralised oracle, adds The Graph event indexing and Reserve
+Transparency Dashboard, implements the SAR compliance workflow, completes
+the security test suite, and runs the 300-client Foundry simulation that
+produces the RQ5 empirical evidence. The eight v24 additions (US-3.11--3.18)
+account for 42~of the 80~sprint points.
+
+\begin{table}[H]
+\centering
+\caption{Sprint~3 backlog --- AI/ML pipeline, security, compliance, and demo.
+Original user stories from v23: US-3.01--3.10 (38~pts). v24 additions:
+US-3.11--3.18 (42~pts). Sprint~3 total: \textbf{80}~story points.}
+\label{tab:sprint3}
+\small
+\begin{tabular}{p{1.3cm}p{10.2cm}r}
+\hline
+\textbf{US-ID} & \textbf{Description} & \textbf{Pts} \\
+\hline
+US-3.01 & Random Forest classifier --- 18~behavioral + 4~application
+  features; Platt-scaling calibration; cross-validated probability
+  output $p_f \in [0,1]$; serialised model artefact for FastAPI serving. & 5 \\
+US-3.02 & SHAP explainability --- top-3 contributing features per
+  decision; \texttt{AI\_ML\_SECURITY\_LOG} storage; client-facing
+  plain-language UI output
+  (Section~\ref{sec:aiml-support}). & 5 \\
+US-3.03 & Commit-reveal ML oracle --- FastAPI \texttt{commitRiskScore}
+  endpoint; \texttt{keccak256}$(s\,\|\,\text{nonce})$ commitment;
+  reveal transaction; LoanController SCORE\_REVEALED state gate
+  (Section~\ref{sec:oracle-architecture}). & 5 \\
+US-3.04 & Isolation Forest anomaly detection --- per-loan anomaly score
+  $a \in [0,1]$; stacking meta-learner wiring with $p_f$;
+  \texttt{AI\_ML\_SECURITY\_LOG} integration. & 5 \\
+US-3.05 & Foundry invariant suite --- 3~invariants: solvency,
+  role-segregation, capital-flow direction; 10{,}000 fuzz runs each;
+  counterexamples saved as deterministic replay tests
+  (Section~\ref{sec:foundry}). & 5 \\
+US-3.06 & Certora CVL specification --- reserve never under-collateralised
+  invariant; no-over-allocation-downstream invariant; prover run on
+  \texttt{WorldBankReserve} contract
+  (Section~\ref{sec:certora}). & 3 \\
+US-3.07 & Tenderly monitoring --- 6~critical alerts: single disbursement
+  $>5$~ETH-equivalent; $>3$ loan requests per wallet per hour;
+  reserve-ratio $<20\%$; failed \texttt{disburseLoan}; role-grant event;
+  pause / unpause governance action. & 3 \\
+US-3.08 & The Graph subgraph prototype + React dashboard integration ---
+  \texttt{LoanRequested}, \texttt{Repayment}, \texttt{ReserveRatioUpdated}
+  event indexing; GraphQL query from frontend
+  (Section~\ref{sec:realtime}). & 3 \\
+US-3.09 & End-to-end demo script preparation --- Foundry simulation
+  walkthrough (50-client dry run); live-dashboard timing; approver
+  Authority Brief demo flow; examiner Q\&A script. & 2 \\
+US-3.10 & Gas optimisation pass --- storage-variable packing; event
+  emission instead of storage for audit fields; UUPS \texttt{\_authorizeUpgrade}
+  access-control verification. & 2 \\
+\hline
+\multicolumn{2}{l}{\textit{v24 additions below}} & \\
+\hline
+US-3.11 & Chainlink Functions oracle replacing commit-reveal relay ---
+  DON JavaScript source (\texttt{Functions.makeHttpRequest} to ML
+  service); multi-node consensus on risk score; \texttt{encodeUint256}
+  6-decimal precision; 30--60~s latency budget for loan-approval
+  lifecycle (Section~\ref{sec:oracle-architecture}). & 8 \\
+US-3.12 & The Graph subgraph (full deployment) --- \texttt{LoanApplication}
+  and \texttt{ReserveRatioSnapshot} GraphQL entities; Cardona subgraph
+  registration; subgraph manifest + schema; \texttt{AssetsMapping.ts}
+  event handler (Section~\ref{sec:realtime}). & 5 \\
+US-3.13 & SAR workflow --- Isolation Forest anomaly\_score $> 0.75$ trigger;
+  Express.js Kafka topic \texttt{aml-alert}; admin compliance queue UI;
+  false-positive dismiss path with audit note; confirmed-SAR path:
+  insert \texttt{audit\_logs} + notify tier above + call
+  \texttt{freezeAccount(clientId)}
+  (Section~\ref{sec:regulatory-compliance}). & 5 \\
+US-3.14 & Reserve Transparency Dashboard --- React component querying
+  The Graph subgraph in real time; per-bank reserve-ratio time series;
+  insurance-fund balance gauge; live update during 300-client simulation;
+  public read-only access (no wallet required). & 5 \\
+US-3.15 & 300-client Foundry simulation --- 6~banks (1~World Bank,
+  2~National Banks, 3~Local Banks), deterministic seed (SEED~=~42),
+  12-month compressed loan lifecycle per client, 5\% configured fraud
+  rate, CSV manifest output for RQ5 evaluation
+  (Section~\ref{sec:abm-sim}). & 8 \\
+US-3.16 & No-privileged-exemption Foundry invariant test --- asserts that
+  all accounts (including GOVERNANCE\_ROLE) are subject to identical
+  liquidation and default logic; no address can bypass
+  \texttt{enforceSolvency()} via role check; replay test on any
+  regression. & 3 \\
+US-3.17 & Pool-level Isolation Forest --- portfolio-wide anomaly detection
+  across all active loans in a Local Bank pool (not per-loan); threshold
+  triggers a pool-level AML review; \texttt{AI\_ML\_SECURITY\_LOG} records
+  pool-anomaly events separately from individual scores. & 5 \\
+US-3.18 & \texttt{freezeAccount(clientId)} function in
+  \texttt{LocalBankPool.sol} with \texttt{onlyApprover} modifier;
+  blocks new loan disbursements and instalment payments for the frozen
+  wallet; Foundry invariant test: frozen account cannot receive
+  disbursement; unfreezeAccount path with compliance-officer role check. & 3 \\
+\hline
+\multicolumn{2}{r}{\textbf{Sprint~3 total}} & \textbf{80} \\
+\hline
+\end{tabular}
+\end{table}
+
+\noindent The three-sprint story-point progression (70 $\to$ 92 $\to$ 80)
+reflects deliberate load balancing: Sprint~1 front-loads infrastructure
+to unlock parallel development; Sprint~2 is the largest because it delivers
+both the lending products and the AI agent simultaneously; Sprint~3 is
+slightly lighter to preserve buffer for security testing, examiner
+preparation, and the live simulation.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Design Decisions and Alternatives}
+\label{sec:design-decisions}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Each major technical decision was evaluated against at least one concrete
+alternative. Table~\ref{tab:design-decisions} records the chosen approach,
+the primary alternative considered, and the rationale. The four rows shaded
+below the rule are v24 additions; all rows above it are unchanged from v23.
+
+\begin{table}[H]
+\centering
+\caption{Design decisions and alternatives.}
+\label{tab:design-decisions}
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{2.8cm}p{2.9cm}p{2.9cm}p{3.7cm}}
+\hline
+\textbf{Decision area} & \textbf{Chosen approach} & \textbf{Alternative(s) considered} & \textbf{Rationale} \\
+\hline
+Blockchain platform  & Polygon L2 (zkEVM Cardona) & Ethereum mainnet; Solana & Lower gas cost; EVM-compatible; ZK proof security (see rows below); testnet maturity. \\
+Contract language    & Solidity~0.8.x         & Vyper; Rust (Solana) & Largest EVM tooling ecosystem; Foundry / Hardhat / OpenZeppelin; UUPS upgrade support. \\
+Off-chain database   & PostgreSQL~16            & MongoDB; Firebase       & ACID compliance required for financial records; Row-Level Security for append-only audit. \\
+Identity / reputation & ERC-5192 SBT            & DID registry; centralised KYC DB & Non-transferable on-chain credit history; portable across tiers; GDPR pseudonymity via wallet address. \\
+ML risk scoring      & Random Forest + stacking meta-learner & Neural network; LLM-only scoring & SHAP explainability; lightweight; calibrated probability output; audit-trail compatibility. \\
+Contract upgradeability & UUPS proxy pattern    & Transparent proxy; immutable & Smaller upgrade footprint; no selector clash; \texttt{\_authorizeUpgrade} role-gated. \\
+Frontend framework   & React~18 + Wagmi~v2     & Next.js SSR; Vue~3      & Component reuse; Wagmi wallet-connection hooks; active maintenance; Vite dev-server proxying. \\
+API authentication   & EIP-712 signed message + JWT & OAuth~2.0; API key & Trustless; no shared secret; wallet-native; nonce prevents replay. \\
+\hline
+\multicolumn{4}{l}{\textit{v24 additions (four rows below)}} \\
+\hline
+Network (primary)    & Polygon~zkEVM Cardona   & Polygon~Amoy~PoS        & ZK validity-proof security model vs.\ validator-set assumption: a malicious sequencer cannot publish an invalid batch because the ZK proof would not verify on Ethereum~L1. \\
+Oracle mechanism     & Chainlink Functions (DON) & Commit-reveal FastAPI relay & Decentralised trust: DON consensus across multiple independent nodes vs.\ single-key operator trust; removes the oracle trust assumption noted in v23. \\
+Agent tool framework & MCP tool server (16 tools) & Direct Express.js API calls & Typed tool schema is the safety boundary: the agent cannot execute arbitrary code or access data outside the defined 16~tools, regardless of prompt content. \\
+Agent session auth   & EIP-7702 session keys   & ERC-4337 paymasters     & Scope restriction enforced at the key level, not the application level; time-bound 24-hour TTL and 500~USDC value cap are cryptographically enforced, not policy-level controls. \\
+\hline
+\end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Justification of Technologies}
+\label{sec:tech-justification}
+% ─────────────────────────────────────────────────────────────────────────────
+
+This section justifies the selection of each major technology in the CWB
+stack. For technologies present in the v23 architecture, only the
+v24-modified rationale is noted; the original justifications are preserved
+verbatim below. The four v24 additions appear at the end of the section.
+
+\paragraph{Polygon zkEVM Cardona.}
+Polygon~zkEVM Cardona is an Ethereum Layer-2 that submits zero-knowledge
+validity proofs to Ethereum mainnet, meaning every transaction batch is
+cryptographically verified on L1. For a banking prototype, this provides a
+materially stronger security narrative than a Proof-of-Stake sidechain: a
+malicious operator cannot publish invalid state because the ZK proof would
+fail Ethereum's on-chain verifier. Cardona offers EVM equivalence (all
+Hardhat / Foundry tooling works without modification), a free public testnet,
+and Alchemy RPC support, making it operationally accessible. This replaces
+the v23 Polygon~Amoy~PoS testnet while maintaining identical development
+tooling.
+
+\paragraph{Solidity 0.8.x and OpenZeppelin Contracts.}
+Solidity remains the standard for EVM-compatible smart contracts, supported
+by every major security auditing tool (Foundry, Certora, Slither, Echidna).
+OpenZeppelin Contracts v5 provides production-audited implementations of
+UUPS upgradeable proxies, AccessControl RBAC, ERC-5192 (non-transferable
+SBT), and ERC-4337 account abstraction, reducing the bespoke code surface
+exposed to audit scrutiny.
+
+\paragraph{PostgreSQL 16 with Row-Level Security.}
+Financial ledger data requires ACID transaction semantics, rich integrity
+constraints (FK cascades, CHECK constraints), and access-control policies
+enforced at the database layer rather than the application layer. PostgreSQL's
+Row-Level Security (RLS) enables the append-only \texttt{audit\_logs} policy
+that prevents even administrative roles from deleting compliance records.
+TimescaleDB --- a PostgreSQL extension --- provides hypertable compression for
+the \texttt{MARKET\_DATA} time-series without introducing a separate database
+engine.
+
+\paragraph{React~18, Wagmi~v2, and Vite.}
+React's component model maps cleanly onto the multi-role banking dashboard
+(client view, approver view, admin view, public reserve dashboard). Wagmi~v2
+provides typed hooks for EIP-1193 wallet connections, ERC-4337 user-operation
+submission, and EIP-712 signing, eliminating the need for low-level
+\texttt{window.ethereum} calls. Vite's dev-server proxy avoids CORS
+complications between the React SPA, the Express.js backend, and the Alchemy
+RPC endpoint during development.
+
+\paragraph{Express.js and FastAPI.}
+Express.js handles real-time client interactions over Server-Sent Events
+(agent streaming), WebSocket forwarding from Socket.IO, and JWT-authenticated
+REST routes. The context-injection layer that prepends per-user on-chain state
+into every LLM system prompt is implemented as Express.js middleware, allowing
+it to be updated without touching the model serving layer. FastAPI, backed by
+Python's scientific ecosystem (scikit-learn, SHAP, networkx), serves the ML
+scoring, SHAP explanation, and anomaly detection endpoints at typed REST
+boundaries; separation from Express.js keeps the AI/ML stack independently
+deployable and replaceable.
+
+\paragraph{ChromaDB for RAG.}
+ChromaDB provides a lightweight, file-backed vector store suitable for the
+academic prototype's scale (a few hundred policy document chunks). RAG
+retrieval latency is benchmarked at $<100$~ms p95 on the demo hardware,
+meeting the target set in Section~\ref{sec:llm-eval}. Replacing it with a
+hosted vector DB (Pinecone, Weaviate) requires only a client-library swap
+because all RAG calls are encapsulated in a \texttt{PolicyStore} abstraction
+class.
+
+\paragraph{Hardhat (integration) and Foundry (invariants / fuzzing).}
+Hardhat remains the primary deployment and integration-test framework because
+its JavaScript environment is familiar to the Web3 community and supports
+the project's TypeScript-based deployment scripts. Foundry is adopted
+\emph{in addition} for invariant testing and stateful fuzzing because its
+Solidity-native test environment catches whole classes of bugs that Hardhat
+JavaScript tests cannot (reentrancy under adversarial call sequences,
+invariant violations under 10,000 randomly generated execution paths). The
+industry practice of combining both frameworks is now standard for any
+contract seeking a security audit~[R39].
+
+% ── v24 additions ──────────────────────────────────────────────────────────
+\paragraph{Chainlink Functions, Automation, Price Feeds, and Proof of Reserve.}
+\emph{(v24 addition.)} The four Chainlink services adopted in v24 serve
+distinct roles in the decentralised trust model.
+(1)~\textbf{Functions}: runs the ML-score fetch inside a
+Decentralised Oracle Network, requiring consensus across independent nodes
+before committing the score on-chain; this eliminates the single-operator
+trust assumption of the v23 commit-reveal relay.
+(2)~\textbf{Automation}: replaces the centralised cron job for overdue
+instalment detection with a trustless \texttt{checkUpkeep} /
+\texttt{performUpkeep} trigger registered on Cardona, removing the last
+centralised component from the loan lifecycle.
+(3)~\textbf{Price Feeds}: supplies BDT/USD and ETH/USD via
+\texttt{AggregatorV3Interface} with 8-decimal precision, replacing the
+governance-approved forex oracle of earlier versions.
+(4)~\textbf{Proof of Reserve}: publishes the \texttt{WorldBankReserve} and
+\texttt{InsuranceFund} balances to Chainlink PoR feeds, enabling any
+external auditor to cryptographically verify reserve backing without
+trusting the CWB administrator --- the on-chain analogue of the Merkle-tree
+PoR used by major exchanges (Section~\ref{sec:security-analysis}).
+
+\paragraph{The Graph (subgraph event indexing).}
+\emph{(v24 addition.)} Polling contract state via RPC for every dashboard
+page load is slow (one RPC call per view) and imposes rate-limit pressure
+on the Alchemy free tier. The Graph indexes every event the CWB contracts
+emit into a GraphQL queryable subgraph, reducing dashboard refresh from
+seconds (RPC polling) to tens of milliseconds (subgraph query). The hosted
+service supports Polygon~zkEVM~Cardona at no cost for student projects, and
+The Graph's sub-second indexing latency makes the Reserve Transparency
+Dashboard a genuinely live instrument during the 300-client simulation
+(Section~\ref{sec:abm-sim}).
+
+\paragraph{EIP-7702 session keys.}
+\emph{(v24 addition.)} The AI agent requires a mechanism to sign on-chain
+transactions on the client's behalf after confirmation, without the client
+handing over their main private key. ERC-4337 paymasters could achieve
+similar delegation but enforce scope at the application level, meaning a
+compromised Express.js backend could call any paymaster-permitted operation.
+EIP-7702 session keys enforce scope \emph{at the cryptographic key level}:
+the key is mathematically incapable of signing transactions outside its
+approved tool scope, beyond its 500~USDC value cap, or after its 24-hour
+TTL --- these constraints are not policy rules but key properties. This
+provides a stronger safety guarantee with a smaller on-chain footprint than
+ERC-4337 paymasters for agent-controlled operations, while ERC-4337 is
+retained for retail gas sponsorship (its original purpose).
+
+\paragraph{Qwen3-8B with llama.cpp and Model Context Protocol (MCP).}
+\emph{(v24 addition.)} Qwen3-8B (Apache~2.0 licence, ~5~GB
+Q4\_K\_M quantised) was selected over larger open-source models (Llama-3-70B,
+Mistral-22B) because it fits the demo hardware's 16~GB VRAM budget, achieves
+$\geq 5$~tokens/s on the AMD Radeon RX~9060~XT (ROCm~6.4 / llama.cpp), and
+natively supports tool-calling (MCP) with structured JSON parameter
+schemas. The Model Context Protocol constrains the agent to interact with
+CWB exclusively through the 16 typed banking tools, preventing arbitrary API
+calls or code execution. The privacy-preserving local hosting means client
+conversation data never leaves the institution's infrastructure, satisfying
+the GDPR data-residency requirement for a Bangladesh deployment without
+requiring a consent exemption for cloud AI processing.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Design Patterns Employed}
+\label{sec:design-patterns}
+% ─────────────────────────────────────────────────────────────────────────────
+
+The following design patterns govern the CWB architecture. Each pattern
+is selected because it addresses a concrete failure mode observed in
+comparable DeFi projects.
+
+\paragraph{Checks-Effects-Interactions (CEI).}
+All state-modifying contract functions follow the CEI ordering: validate
+preconditions (Checks), update local state (Effects), then call external
+contracts (Interactions). This prevents reentrancy attacks of the class
+responsible for the \$60~million DAO hack of 2016 and the \$80~million
+Fei Protocol exploit of 2022. The Foundry fuzz suite includes a reentrancy
+harness that verifies CEI adherence under adversarial call sequences for
+\texttt{disburseLoan}, \texttt{repayInstalment}, and
+\texttt{withdrawSavings}.
+
+\paragraph{UUPS Upgradeable Proxy.}
+The WorldBankReserve, NationalBankPool, and LocalBankPool contracts are
+deployed behind OpenZeppelin UUPS proxies, allowing logic upgrades without
+migrating state. The \texttt{\_authorizeUpgrade} function is gated by
+GOVERNANCE\_ROLE with a time-lock, so no upgrade can take effect
+immediately; this removes the ability for a compromised admin key to deploy
+a malicious implementation in a single transaction. The upgrade pattern
+also satisfies the Certora verifier's requirement that invariants hold
+across \emph{all reachable states}, including post-upgrade states.
+
+\paragraph{Factory Pattern (Local Bank Deployment).}
+A \texttt{LocalBankFactory} contract deploys new Local Bank instances via
+\texttt{CREATE2} with a deterministic address derived from
+\texttt{(nationalBankAddress, bankId)}. This enables the National Bank
+Admin to onboard a new Local Bank in a single transaction without
+deploying contracts manually, and allows the World Bank to predict the
+address of any Local Bank from its ID before deployment.
+
+\paragraph{Observer Pattern (Event-Driven Architecture).}
+All significant state transitions emit indexed events. The event log is the
+authoritative on-chain audit trail; no state is inferred from the absence
+of events. This decouples producers (contracts) from consumers (The Graph
+subgraph, React dashboard, Tenderly monitors, AGENT\_ACTION\_LOG recorder)
+without introducing tight coupling or blocking calls.
+
+\paragraph{State Machine (Loan Lifecycle).}
+\texttt{LoanController} implements an explicit state machine with
+transitions guarded by access-control modifiers and oracle preconditions:
+DRAFT $\to$ PENDING\_KYC $\to$ PENDING\_SCORE $\to$ PENDING\_APPROVAL
+$\to$ ACTIVE $\to$ \{CLOSED, DEFAULTED\}. Invalid transitions revert with
+a named error code (\texttt{LoanController\_\_InvalidState}). This makes
+the frontend Transaction-State Machine of Section~\ref{sec:tx-state-machine}
+a faithful projection of the on-chain state rather than an independent UX
+model that can diverge.
+
+\paragraph{Commit-Reveal (ML Oracle Integrity).}
+The ML score is committed on-chain as $h = \mathrm{keccak256}(s \,\|\,
+\text{nonce})$ before it is revealed. This prevents the oracle operator from
+tailoring the revealed score to a known loan application after seeing
+approval intent. The Chainlink Functions upgrade (US-3.11) supersedes this
+pattern for the primary oracle path, but the commit-reveal endpoint is
+retained as a prototype-phase fallback, ensuring the LoanController state
+machine never depends on network availability of the Chainlink DON.
+
+\paragraph{Repository Pattern (Off-Chain Data Access).}
+All database access from Express.js goes through typed repository classes
+(\texttt{LoanRepository}, \texttt{ClientRepository},
+\texttt{AgentActionRepository}). Repository interfaces are injected via the
+Express.js dependency injection container; tests substitute in-memory
+repositories, eliminating the need for a live database in the Hardhat
+integration test suite. This also isolates the PostgreSQL schema migrations
+from the API layer, so a schema change requires updating the repository but
+not the route handler.
+
+\paragraph{Circuit Breaker (Emergency Pause).}
+Each contract inherits OpenZeppelin \texttt{Pausable}. The GOVERNANCE\_ROLE
+can pause a single contract (granular pause) without halting the entire
+system. A COMPLIANCE\_ROLE pause-trigger fires automatically from the
+Tenderly alert when a reserve-ratio breach is detected. Every paused state
+emits a \texttt{Paused(address account)} event consumed by both the
+Tenderly monitor and the SAR workflow (Section~\ref{sec:regulatory-compliance}).
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Software Testing Strategy}
+\label{sec:testing}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{figure}[H]
+\centering
+\OnePageDiagram{fig-testing-pyramid.pdf}
+\caption{CWB software testing pyramid. The base layer (Foundry unit + fuzz
+tests and Hardhat integration tests) runs in CI on every pull request. The
+middle layer (end-to-end tests and the Foundry simulation) runs pre-merge.
+The apex (formal verification and red-team security tests) runs at sprint
+boundaries.}
+\label{fig:testing-pyramid}
+\end{figure}
+
+The testing strategy follows a test pyramid structure: a broad base of
+automated unit tests that run quickly, a middle tier of integration and
+system tests, and a narrow apex of formal verification and adversarial
+security tests that run at sprint boundaries.
+
+\paragraph{Unit testing --- Foundry and Hardhat.}
+Every smart-contract function is tested in two frameworks:
+\begin{itemize}[noitemsep]
+\item \textbf{Foundry} (\texttt{forge test}): Solidity-native unit tests
+with stateful fuzzing (10{,}000 runs per invariant). Foundry tests cover
+access-control reverts (non-APPROVER\_ROLE calls to \texttt{approveLoan}),
+arithmetic edge cases (zero-amount loans, maximum USDC amounts), state
+machine guards (transition from wrong state reverts with correct error),
+and the three cross-cutting invariants
+(Section~\ref{sec:foundry}).
+\item \textbf{Hardhat + Ethers.js}: TypeScript integration tests deploy the
+full contract hierarchy to a local Hardhat network and run scenario-level
+tests (apply loan $\to$ score $\to$ approve $\to$ repay $\times N$) with
+Chai assertions on emitted events and final balances.
+\end{itemize}
+
+\paragraph{Integration testing.}
+Integration tests span the contract $\leftrightarrow$ Express.js
+$\leftrightarrow$ FastAPI boundary. Supertest drives the Express.js API
+against a live Hardhat local network; FastAPI is stubbed with
+\texttt{respx} mocks returning deterministic risk scores. Integration tests
+cover the full EIP-712 login $\to$ JWT $\to$ authenticated loan-apply
+$\to$ ML oracle callback $\to$ approval notification flow for all actor
+roles defined in Section~\ref{sec:actor-taxonomy}.
+
+\paragraph{System and end-to-end testing.}
+The 300-client Foundry simulation (US-3.15) constitutes the primary system
+test: it exercises the complete four-tier capital flow, the instalment
+lifecycle, the fraud-rate stress scenario, and the reserve-ratio
+dashboard in a single deterministic run. A separate Playwright
+end-to-end suite drives the React frontend against the Cardona testnet,
+covering wallet connection, loan application submission, approver
+dashboard interaction, agent chat (read tools), and confirmation-gate
+flow (write tools). Playwright tests record a video artefact for the
+live demo.
+
+\paragraph{Security testing --- fuzz, invariants, and Certora.}
+\begin{itemize}[noitemsep]
+\item \textbf{Foundry stateful fuzzer}: 10{,}000 fuzz runs per invariant;
+counterexamples are saved as deterministic replay tests that fail CI on
+regression. The no-privileged-exemption test (US-3.16) and the
+\texttt{freezeAccount} invariant (US-3.18) run as part of this suite.
+\item \textbf{Certora Prover}: two CVL specifications verified against
+\texttt{WorldBankReserve} (reserve never under-collateralised; no
+over-allocation downstream). The prover is run at the Sprint~3 gate; any
+unresolved counterexample blocks the sprint delivery
+(Section~\ref{sec:certora}).
+\item \textbf{Slither static analyser}: run in CI on every contract change;
+high-severity findings block merge. Medium and informational findings are
+reviewed and documented with accept / fix decisions in the security log.
+\item \textbf{Session key scope enforcement}: the ten test scenarios of
+Section~\ref{sec:llm-eval} (Item~6) are automated as a Foundry test that
+attempts to sign transactions with an out-of-scope session key and asserts
+\texttt{EIP7702\_\_ScopeViolation} revert in all cases.
+\end{itemize}
+
+\paragraph{LLM red-team testing.}
+The adversarial evaluation protocol of Section~\ref{sec:llm-eval} is
+executed as a scripted test sequence:
+\begin{itemize}[noitemsep]
+\item \textbf{Regulatory hallucination} (50~prompts): target $100\%$
+refusal-or-defer rate.
+\item \textbf{Human-gate bypass} (20~prompts): target zero-bypass rate;
+any write-tool execution without a prior confirmation turn is a
+critical failure that blocks sprint delivery.
+\item \textbf{Action accuracy} (50~scenarios): target $\geq 95\%$ correct
+tool identification and parameter assembly.
+\end{itemize}
+Red-team results are logged in \texttt{AI\_ML\_SECURITY\_LOG} and reviewed
+against the evaluation thresholds before the final thesis submission.
+
+\paragraph{Gas benchmarking.}
+Every contract function is benchmarked with Foundry's
+\texttt{--gas-report} flag. Target ceilings: \texttt{applyLoan}
+$\leq 120{,}000$~gas; \texttt{approveRisk} (with oracle commit)
+$\leq 80{,}000$~gas; \texttt{repayInstalment} $\leq 60{,}000$~gas.
+Gas costs are converted to USD at the spot ETH/USD Chainlink price feed
+rate and reported in Table~\ref{tab:gas-costs}. This converts gas
+benchmarking from an informal note into a reportable empirical finding
+for RQ2.
+
+\paragraph{Continuous integration.}
+All tests run in a GitHub Actions CI pipeline triggered on every pull
+request to \texttt{main}. The pipeline stages are: (1)~Slither static
+analysis; (2)~Foundry unit + fuzz suite (\texttt{forge test}); (3)~Hardhat
+integration tests; (4)~FastAPI ML service unit tests (pytest); (5)~React
+component tests (Vitest). Certora and Playwright end-to-end tests run
+on a separate workflow triggered at sprint-close tags. A failing CI
+pipeline blocks merge; the policy is enforced at the GitHub branch-protection
+level.
+
+%% =============================================================================
+%% END OF CHAPTER 4 — SECOND HALF
+%% Next: Chapter 5 — Market Analysis and Feasibility
+%% =============================================================================

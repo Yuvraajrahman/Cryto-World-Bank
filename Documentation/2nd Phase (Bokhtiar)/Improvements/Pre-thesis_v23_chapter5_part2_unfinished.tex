@@ -1,0 +1,517 @@
+%% =============================================================================
+%% Pre-thesis v24 — Chapter 5: Market Analysis and Feasibility  (FIRST HALF)
+%% =============================================================================
+%% This file is the direct continuation of Pre-thesis_v24_chapter4_part2.tex.
+%% It must be included immediately after Chapter 4 in the master document.
+%%
+%% Sections covered in this file (first half):
+%%   Chapter 5 opening paragraph
+%%   Bangladesh Financial Landscape                            §5.1
+%%   Underserved Population and Demand Analysis                §5.2
+%%   Competitive and Comparative Analysis                      §5.3
+%%   Revenue Projection                                        §5.4
+%%     Interest spread mechanics, origination fee,
+%%     deposit product yield
+%%     [v24-F §7.1: revenue taxonomy table — NEW]
+%%     [v24-F §7.1: no native-token hard-rule paragraph — NEW]
+%%
+%% v24 improvements applied in this file:
+%%   * v24-F §7.1: Revenue stream taxonomy table inserted after
+%%     the existing Revenue Projection text, before
+%%     \subsection{Transaction Economics}.
+%%     (Source: CWB_v24_Improvement_Analysis.md §6.1;
+%%              crypto_exchange_ecosystem_dashboard analysis.)
+%%   * v24-F §7.1: Hard-rule paragraph (no native CWB governance
+%%     token in the prototype) added immediately after the taxonomy
+%%     table, citing the FTX November 2022 collapse as evidence.
+%%     (Source: CWB_v24_Improvement_Analysis.md §6.2.)
+%%
+%% Sections deferred to Pre-thesis_v24_chapter5_part2.tex:
+%%   Transaction Economics                                     §5.4.1
+%%   Cost Model                                                §5.4.2
+%%   Break-even Analysis                                       §5.4.3
+%%   Technical Feasibility                                     §5.5
+%%   Operational Feasibility                                   §5.6
+%%   Risk Analysis                                             §5.7
+%%   Adoption and Scaling Pathway                              §5.8
+%%   Bangladesh Regulatory Reality [v24-C §7.2]               §5.9
+%% =============================================================================
+
+% ─────────────────────────────────────────────────────────────────────────────
+\chapter{Market Analysis and Feasibility}
+\label{chap:market-analysis}
+% ─────────────────────────────────────────────────────────────────────────────
+
+The Crypto World Bank addresses a financing gap that conventional banking and
+existing decentralised finance protocols have not closed: providing
+collateral-flexible, algorithmically scored, and KYC-tiered credit to
+economically active but financially excluded populations in emerging economies.
+This chapter situates the CWB prototype within the Bangladesh financial
+landscape, analyses the underserved target population, benchmarks the system
+against comparable existing solutions, and evaluates the financial, technical,
+and operational feasibility of the proposed four-tier architecture. The chapter
+concludes with the Bangladesh regulatory reality and a phased adoption pathway
+designed to build institutional trust before seeking a formal banking licence.
+All market figures are presented at the 300-client, 6-bank prototype scale
+unless otherwise stated; Section~\ref{sec:target-population} addresses the
+fully-scaled addressable market separately.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Bangladesh Financial Landscape}
+\label{sec:bangladesh-landscape}
+% ─────────────────────────────────────────────────────────────────────────────
+
+Bangladesh presents one of the most compelling deployment contexts for
+blockchain-based financial inclusion infrastructure. With a population of
+approximately 172~million and a nominal GDP of USD~460~billion in 2024~[R40],
+the country has sustained above-6\% annual economic growth for over a decade,
+driven primarily by the ready-made garments (RMG) sector, remittances
+(USD~21.9~billion in FY~2024), and an expanding small and medium enterprise
+(SME) ecosystem. Despite this macroeconomic trajectory, structural gaps in
+financial access remain unresolved by the existing institutional architecture.
+
+\begin{figure}[H]
+\centering
+\OnePageDiagram{fig-bangladesh-market.pdf}
+\caption{Bangladesh financial landscape overview: formal banking penetration,
+mobile financial services reach, microfinance sector coverage, and the
+remaining unbanked population as the primary CWB target market. Population
+figures from World Bank 2024~[R40]; MFS data from Bangladesh Bank Annual
+Report~[R46].}
+\label{fig:bangladesh-market}
+\end{figure}
+
+\paragraph{Formal banking exclusion.}
+According to the World Bank Global Findex 2021 dataset~[R41], approximately
+47\% of Bangladeshi adults lacked a formal bank account, placing the country
+below the regional average for South Asia. Account ownership is concentrated
+in urban and peri-urban households; in rural divisions --- Barisal, Rajshahi,
+and Sylhet --- the unbanked share exceeds 55\%. Structural barriers include
+minimum-balance requirements (typically BDT~2,500--5,000), branch geography
+(the national bank-branch-to-population ratio is one branch per 17,500
+people~[R41]), documentation demands that exclude informal workers without
+payslips or land records, and the absence of collateral acceptable to
+commercial banks from low-income borrowers. These barriers are not individual
+failures; they are architectural properties of a credit system designed for
+formal employment and registered property ownership.
+
+\paragraph{Mobile financial services: reach without credit.}
+The mobile financial services (MFS) layer has achieved remarkable reach while
+solving only part of the financial access problem. bKash, operated by BRAC
+Bank, surpassed 63~million registered wallets by Q3~2024~[R42]; Nagad,
+operated by Bangladesh Post Office, reported 90~million registered
+users~[R43]. However, both platforms remain principally peer-to-peer transfer
+and utility-payment instruments. Neither extends credit to their user base;
+they are velocity layers for existing liquidity, not sources of new capital.
+The population that uses MFS daily --- small traders, garment workers,
+agricultural households, rickshaw operators --- continues to rely on informal
+moneylenders charging 25--60\% annual interest, rotating savings and credit
+associations (ROSCAs, locally called \emph{Samity}), and microfinance
+institutions whose onboarding processes can take 4--8~weeks~[R44].
+CWB's AI-agent-assisted application path (Chapter~3,
+Section~\ref{sec:aiml-support}) compresses this to hours.
+
+\paragraph{Microfinance sector and its structural ceiling.}
+Bangladesh hosts the world's most developed microfinance sector, including
+BRAC (7.6~million active borrowers), Grameen Bank (founded 1983,
+9.5~million members), and over 750~MFIs licensed by the Microcredit
+Regulatory Authority (MRA)~[R44]. Aggregate MFI disbursements exceeded
+BDT~1.8~trillion (approximately USD~16~billion) in FY~2024. However, MFI
+penetration creates its own structural ceiling. Interest rates of 20--27\%
+(flat, not declining balance) represent a high cost of capital for borrowers.
+Group-meeting attendance requirements impose time costs incompatible with
+the schedules of full-time workers. Most critically, credit-score portability
+does not exist across MFI boundaries: a borrower who repays reliably at BRAC
+for three years receives no formal credit benefit when seeking a loan from
+Grameen Bank, a cooperative, or a commercial bank. CWB's on-chain Credit
+Passport SBT (Chapter~3, Section~\ref{sec:credit-passport}) is designed to
+solve precisely this portability problem --- every on-time repayment advances
+the borrower's credit score permanently on-chain, regardless of which Local
+Bank issued the loan.
+
+\paragraph{SME credit gap.}
+The International Finance Corporation estimates the SME finance gap for
+Bangladesh at approximately USD~2.8~billion annually~[R45], representing
+the difference between SME demand for formal credit and the supply delivered
+by commercial banks and MFIs combined. Formal bank credit to SMEs is
+constrained by collateral requirements --- typically land-registered property,
+which excludes most urban micro-entrepreneurs --- and by documentation
+processes averaging 6--10~weeks from application to disbursement. The CWB
+four-tier architecture, with Local Banks operating within communities and the
+AI agent compressing the application-to-decision cycle, is sized to serve
+this segment at ticket sizes between 500~USDC and 5,000~USDC
+(Table~\ref{tab:credit-tier-schedule} in Chapter~3).
+
+\paragraph{Bangladesh Bank digital finance policy.}
+Bangladesh Bank published its Digital Banking Regulation~2023~[R46] and the
+updated FinTech Policy~2025~[R47], which together create a regulatory sandbox
+framework for non-bank digital financial service providers. The sandbox allows
+approved entities to operate for up to two~years under relaxed licensing
+conditions while accumulating the track record required for full regulatory
+authorisation under the Bank Company Act. CWB's adoption pathway
+(Section~\ref{sec:adoption-pathway}) is designed around this sandbox
+mechanism. The full regulatory pathway, including implications of the FATF
+Travel Rule and anti-money-laundering requirements, is examined in
+Section~\ref{sec:bangladesh-regulatory}.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Underserved Population and Demand Analysis}
+\label{sec:target-population}
+% ─────────────────────────────────────────────────────────────────────────────
+
+The CWB architecture serves three economically distinct client segments, each
+mapped to a KYC tier and Credit Passport tier range. The segmentation is
+grounded in Bangladeshi income distribution data from the Household Income and
+Expenditure Survey (HIES)~[R48] and qualitative field research on
+microfinance demand published by the BRAC Institute of Governance and
+Development~[R49].
+
+\begin{table}[H]
+\centering
+\caption{CWB target population segments: income profile, primary financial
+need, KYC tier alignment, and Credit Passport tier range.}
+\label{tab:target-segments}
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{2.5cm}p{3.0cm}p{3.0cm}p{1.8cm}p{1.9cm}}
+\hline
+\textbf{Segment} & \textbf{Profile} & \textbf{Primary need} &
+\textbf{KYC tier} & \textbf{Credit tier} \\
+\hline
+Urban micro-entrepreneur &
+  Monthly income BDT~12,000--30,000; garment workers, street retail,
+  rickshaw owners, domestic workers &
+  Working-capital loan BDT~5,000--25,000 (50--250~USDC); short duration
+  (3--6~months) &
+  Tier~1 &
+  Bronze--Silver \\
+Rural agricultural household &
+  Seasonal income BDT~6,000--18,000; smallholder farmers, pond-fish
+  cultivators, poultry farmers &
+  Seasonal credit BDT~5,000--50,000 (50--500~USDC); group lending preferred;
+  repayment aligned to harvest cycle &
+  Tier~1 &
+  Bronze--Gold \\
+SME / formal micro-business &
+  Annual turnover BDT~0.5M--5M; tailoring workshops, small manufacturers,
+  service providers, tech freelancers &
+  Term loan BDT~50,000--500,000 (500--5,000~USDC); fixed deposit for
+  surplus; longer duration (6--18~months) &
+  Tier~2 &
+  Silver--Platinum \\
+\hline
+\end{tabular}
+\end{table}
+
+\paragraph{Group lending demand.}
+Bangladesh's MFI sector demonstrates robust demand for group-liability credit
+structures. BRAC's core lending model is group-based; Grameen Bank has
+disbursed over USD~38~billion through solidarity group lending since its
+founding and reports a repayment rate above 97\%~[R44]. CWB's
+\texttt{GroupLendingPool} (Chapter~3, Section~\ref{sec:group-lending})
+replicates the group-liability structure on-chain, providing the same
+social-collateral mechanism at a fraction of the administrative cost.
+The five-member group structure directly maps to the \emph{Samity} group model
+familiar to the vast majority of rural borrowers in Bangladesh, reducing
+adoption friction for the primary target segment. The AI agent can coordinate
+multi-member signature collection, track outstanding consents, and send
+reminders to unsigned members without any Local Bank administrator
+intervention (Chapter~4, Section~\ref{sec:aiml-support}).
+
+\paragraph{Remittance corridor opportunity.}
+Bangladesh receives the world's seventh-largest remittance inflow relative to
+GDP. Workers in the Gulf Cooperation Council, Malaysia, and Singapore
+collectively send USD~21.9~billion annually through formal channels, with an
+estimated USD~6--8~billion flowing through \emph{hundi} (informal) channels
+that carry lower fees but create compliance exposure for senders~[R48]. The
+\emph{hundi} system persists because formal remittance corridors charge
+3--7\% fees and take 2--5~business days for settlement. While remittance
+corridors are scoped as Phase~3 future work (Chapter~6), the ERC-4337
+wallet infrastructure built for CWB deposit accounts is directly compatible
+with USDC remittance receipt, positioning CWB for corridor entry without
+additional identity infrastructure investment.
+
+\paragraph{Addressable market sizing.}
+Conservatively restricting the addressable market to KYC~Tier~1 and
+Tier~2 segments (Table~\ref{tab:target-segments}) across six of Bangladesh's
+eight administrative divisions where Local Bank density is assumed to be
+viable, the serviceable addressable market is approximately
+12~million~households. At an average loan size of 150~USDC and 1.5~loan
+cycles per household per year, the credit deployment potential reaches
+USD~2.7~billion annually. At a 10\% net interest spread across the four-tier
+hierarchy (Chapter~3 kinked rate model), this implies annualised protocol
+net interest income of USD~270~million in a mature deployment, before
+origination fee and fixed-deposit margin revenue. This ceiling is
+illustrative; the prototype operates at the 300-client, 6-bank simulation
+scale validated in the Foundry stress test (Chapter~4, US-3.15).
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Competitive and Comparative Analysis}
+\label{sec:competitive-analysis}
+% ─────────────────────────────────────────────────────────────────────────────
+
+CWB occupies a design space between traditional microfinance institutions,
+decentralised finance (DeFi) lending protocols, and mobile financial services
+platforms. No existing system in any of these categories offers the full
+combination of: on-chain credit history portability, a four-tier capital
+hierarchy, AI-agent-assisted banking operations, and locally-hosted
+privacy-preserving inference. Table~\ref{tab:competitive-comparison}
+benchmarks CWB against the most relevant comparators across eleven
+architectural and regulatory dimensions.
+
+\begin{table}[H]
+\centering
+\caption{CWB competitive and comparative benchmark across eleven dimensions.
+\checkmark{} = natively supported; $\sim$ = partially or via third-party
+integration; $\times$ = not supported; N/A = not applicable to platform
+category.}
+\label{tab:competitive-comparison}
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{3.5cm}p{1.5cm}p{1.5cm}p{1.7cm}p{1.5cm}p{1.7cm}}
+\hline
+\textbf{Feature} &
+\textbf{CWB (v24)} &
+\textbf{Aave v3} &
+\textbf{Grameen} &
+\textbf{bKash} &
+\textbf{Goldfinch} \\
+\hline
+On-chain credit history portability & \checkmark & $\times$ & $\times$ & $\times$ & $\sim$ \\
+Under-collateralised credit & \checkmark & $\times$ & \checkmark & $\times$ & \checkmark \\
+AI-assisted loan approval & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Agent-executed banking ops. & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Tiered interest rate by borrower risk & \checkmark & $\sim$ & \checkmark & N/A & $\sim$ \\
+Group lending pool & \checkmark & $\times$ & \checkmark & $\times$ & $\times$ \\
+Privacy-preserving local inference & \checkmark & N/A & N/A & N/A & N/A \\
+Reserve ratio on-chain transparency & \checkmark & \checkmark & $\times$ & $\times$ & $\sim$ \\
+Chainlink Proof of Reserve & \checkmark & $\times$ & $\times$ & $\times$ & $\times$ \\
+Mobile-first onboarding & \checkmark & $\sim$ & $\sim$ & \checkmark & $\times$ \\
+FATF Travel Rule data packet & \checkmark${}^{*}$ & $\times$ & $\times$ & $\times$ & $\times$ \\
+\hline
+\multicolumn{6}{l}{\footnotesize ${}^{*}$ Specified; implementation is Future
+Work (Section~\ref{sec:regulatory-compliance} and
+Section~\ref{sec:bangladesh-regulatory}).} \\
+\end{tabular}
+\end{table}
+
+\paragraph{DeFi protocol comparison.}
+Aave~v3 and Compound~v3 are the leading collateralised DeFi lending
+protocols, collectively managing over USD~15~billion in total value locked as
+of Q1~2025. Both require overcollateralisation --- typically 150--200\% of
+the loan value denominated in on-chain assets --- and have no concept of
+borrower identity, credit history, or income. They are structurally
+inaccessible to the CWB target population, who cannot post on-chain
+collateral equivalent to, let alone larger than, the loan amount sought.
+Goldfinch Finance and Centrifuge address real-world credit but operate via
+institutional underwriters and are not designed for individual retail
+borrowers in emerging markets; minimum deal sizes are USD~100,000--1,000,000.
+CWB's SBT-based Credit Passport, AI-assisted ML scoring, and KYC-tier-gated
+loan caps enable undercollateralised credit at ticket sizes starting at
+50~USDC, which are three orders of magnitude smaller than any comparable DeFi
+mechanism.
+
+\paragraph{Traditional MFI comparison.}
+BRAC and Grameen Bank are the most operationally successful microfinance
+models in Bangladesh, and CWB explicitly models its group-lending structure
+and institutional trust-bootstrapping pathway on BRAC's field
+experience~[R49]. However, both institutions share structural limitations that
+the CWB architecture addresses. Credit history does not transfer between MFI
+institutions: a borrower who repays reliably at BRAC for three years has no
+formal credit record visible to Grameen Bank or a commercial bank. Loan
+processing takes 4--8~weeks from application to disbursement, driven by
+manual document collection, physical approval meetings, and paper-based
+disbursement processes. MFIs also do not offer savings products competitive
+with commercial bank deposit rates; BRAC's savings rate of 4--5\% is below
+the rate CWB's \texttt{FixedDeposit} product targets for Tier~2 depositors.
+
+\paragraph{Mobile financial services comparison.}
+bKash and Nagad occupy a complementary rather than competing position to CWB.
+Neither platform extends credit; both are optimised for payment velocity at
+low cost. CWB wallets are USDC-denominated EVM addresses rather than
+MFS~wallet IDs, but the user experience pattern --- phone-number-linked,
+SMS-verified, biometric-authenticated --- is designed to be immediately
+familiar to the existing MFS user base, which numbered over 150~million
+registered accounts across all operators as of 2024. The adoption pathway
+(Section~\ref{sec:adoption-pathway}) describes a technical bridge between
+CWB USDC balances and bKash wallets for on-ramp and off-ramp via authorised
+exchange partners, allowing existing bKash users to fund CWB deposits without
+purchasing cryptocurrency through an exchange.
+
+\begin{figure}[H]
+\centering
+\OnePageDiagram{fig-competitive-positioning.pdf}
+\caption{CWB competitive positioning map: two-axis plot of credit accessibility
+(x-axis: collateral requirement from overcollateralised to zero-collateral)
+versus institutional trust model (y-axis: centralised to decentralised).
+CWB occupies the undercollateralised + decentralised-with-compliance quadrant,
+which is unoccupied by any existing system in the Bangladesh market.}
+\label{fig:competitive-positioning}
+\end{figure}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Revenue Projection}
+\label{sec:revenue-projection}
+% ─────────────────────────────────────────────────────────────────────────────
+
+The CWB revenue model is built around the four-tier interest spread as its
+primary mechanism, with five supplementary revenue streams activated
+progressively across deployment phases. Each tier in the hierarchy earns a
+spread between the rate at which it borrows capital from the tier above and
+the rate at which it lends to the tier below. The World Bank sets the base
+rate published in the \texttt{interest\_rate\_tier} table; the National Bank
+charges base~+~spread\textsubscript{NB} to Local Banks; the Local Bank
+charges base~+~spread\textsubscript{NB}~+~spread\textsubscript{LB} to
+clients; and the client's effective rate is then modulated downward by their
+Credit Passport tier modifier, as specified in
+Table~\ref{tab:credit-tier-schedule} of Chapter~3. The result is a system
+where a Diamond-tier borrower (score 900--1000) pays a materially lower rate
+than a Bronze-tier first-time borrower, creating a self-reinforcing incentive
+for on-time repayment and credit-score improvement.
+
+\paragraph{Interest spread mechanics.}
+The kinked interest rate model (Chapter~3, Section~\ref{sec:oracle-architecture})
+bounds the Local Bank lending rate below the kink utilisation threshold
+$U^* = 80\%$ and applies a steeper incremental rate above it to discourage
+pool over-utilisation. At the steady-state target of 70\% pool utilisation, a
+Gold-tier borrower (credit score 550--749) pays the base rate minus 1.0\%
+per annum. Five percent of all interest collected at each tier is diverted to
+the \texttt{InsuranceFund} contract before upward distribution
+(US-1.12,~Sprint~1), creating a reserve buffer against default losses. At
+the 300-client prototype scale --- average outstanding balance of 500~USDC
+per client, 70\% pool utilisation, 12\% lending rate --- gross annualised
+interest income is approximately USD~18{,}000, and USD~17{,}100 after the
+5\% insurance fund contribution. The \texttt{getReserveSummary()} view
+function (US-1.13) reports these figures to the Reserve Transparency
+Dashboard and to Chainlink Proof of Reserve in real time.
+
+\paragraph{Loan origination fee.}
+A flat origination fee of 0.5--1.0\% of the disbursed principal is deducted
+at the point of disbursement by the \texttt{LoanController} contract. The fee
+is retained by the Local Bank as an operating contribution, partially
+offsetting the cost of the approver dashboard and the Chainlink Automation
+registration. At an average loan size of 500~USDC and a 0.75\% fee, each
+loan generates USD~3.75 in one-time origination revenue. Across 300~clients
+executing 1.5~loan cycles per year at the prototype scale, annualised
+origination revenue is approximately USD~1{,}688. At the fully scaled
+12~million-household addressable market, the same fee rate applied to a
+150~USDC average loan generates USD~270~million annually in origination
+revenue alone, independent of the interest spread.
+
+\paragraph{Deposit product margin.}
+The \texttt{SavingsVault} pays a flexible deposit rate set by Local Bank
+governance, bounded at or above the minimum defined in the
+\texttt{interest\_rate\_tier} table to prevent predatory low-rate deposits.
+The \texttt{FixedDeposit} product pays a term premium above the flexible
+rate in exchange for a time-locked principal commitment. The spread between
+the deposit rate paid to savers and the lending rate charged to borrowers
+constitutes the net interest margin (NIM), the primary profit driver. With
+flexible deposits at 4\% and lending at 12\%, the gross NIM before operating
+costs and insurance fund contribution is 800~basis points per annum --- above
+the 650~basis points reported by Grameen Bank in its FY~2024 financial
+statements~[R44] and within the range of the most efficient commercial
+microfinance operations globally.
+
+% ── v24-F §7.1: Revenue taxonomy table ─────────────────────────────────────
+%% NEW in v24: Revenue stream taxonomy table (CWB_v24_Improvement_Analysis.md §6.1)
+%% Source: crypto_exchange_ecosystem_dashboard analysis + upgrade plan §7.1
+
+\paragraph{Revenue stream taxonomy.}
+Table~\ref{tab:revenue-streams} maps the six CWB revenue streams to their
+institutional crypto exchange analogues, situating the CWB revenue model
+within the broader landscape of digital financial infrastructure. The interest
+spread is the primary mechanism and is the only revenue stream fully modelled
+in the prototype; the remaining five streams are activated across deployment
+phases as the client and institutional base grows.
+
+\begin{table}[H]
+\centering
+\caption{CWB revenue stream taxonomy: analogues from the institutional crypto
+exchange sector. Comparison drawn from ecosystem analysis of Binance, Coinbase,
+Kraken, and KuCoin revenue structures~[R50]. Phase assignments follow the
+adoption pathway (Section~\ref{sec:adoption-pathway}).}
+\label{tab:revenue-streams}
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{3.5cm}p{3.2cm}p{5.2cm}}
+\hline
+\textbf{Revenue stream} & \textbf{Exchange analogue} & \textbf{CWB mechanism} \\
+\hline
+Interest spread (primary) &
+  Binance OTC desk / institutional lending desk &
+  \texttt{SavingsVault} deposit yield vs.\ retail lending rate; four-tier
+  accumulated spread modulated downward by Credit Passport tier
+  (Table~\ref{tab:credit-tier-schedule}). Fully modelled in the
+  prototype. \\
+Loan origination fee &
+  Spot trading fee (Binance: 0.10\%; Coinbase: 0.40\%) &
+  0.5--1\% flat fee deducted at disbursement by
+  \texttt{LoanController}; retained by the Local Bank as an
+  operating-cost contribution. Phase~1. \\
+Deposit mobilisation &
+  Binance Earn / KuCoin flexible savings &
+  \texttt{SavingsVault} flexible deposits + \texttt{FixedDeposit}
+  term products; Local Bank earns the SavingsVault--lending rate
+  spread. Phase~1. \\
+Local Bank registration &
+  Exchange listing fee (\$500K+ per token listing) &
+  One-time registration fee paid by a new Local Bank to the National
+  Bank on institutional onboarding; covers \texttt{CREATE2} contract
+  deployment gas and KYC verification of the institution. Phase~2. \\
+Syndicated loan arrangement &
+  Institutional OTC desk / block-trade facilitation &
+  Lead Arranger fee on \texttt{TranchedPool} /
+  \texttt{SyndicatedLoan} facilities for corporate borrowers above the
+  KYC~Tier~2 cap; activated in Phase~2 for SME and cooperative
+  borrowers. Phase~2. \\
+Reserve transparency API &
+  Exchange data-feed and analytics API subscriptions &
+  Phase~3: a paid GraphQL API layer over The Graph subgraph,
+  exposing reserve-ratio time series, pool utilisation, and insurance
+  fund balance to institutional investors and regulators; public
+  read-only tier free. Phase~3. \\
+\hline
+\end{tabular}
+\end{table}
+
+% ── v24-F §7.1: Hard rule — no native token ─────────────────────────────────
+%% NEW in v24: No-native-token hard-rule paragraph (CWB_v24_Improvement_Analysis.md §6.2)
+%% Source: FTX collapse analysis + upgrade plan §7.1
+
+\paragraph{Hard rule: no native CWB governance token in the prototype.}
+The FTX collapse of November 2022 demonstrated the systemic failure risk of
+self-minted tokens used as collateral or as a primary reserve asset. FTX's
+FTT token was simultaneously the dominant asset on Alameda Research's balance
+sheet and the implicit collateral backstop for FTX's solvency; its value was
+circular and collapsed to near zero within 72~hours of the Binance withdrawal
+announcement, triggering an eight-billion-dollar solvency gap that wiped out
+customer deposits across multiple jurisdictions. No native CWB governance
+token is issued in the thesis prototype. The Credit Passport SBT provides
+on-chain reputation, tier-gated credit access, and borrower identity without
+creating a speculative asset whose value can be manipulated, used as circular
+collateral, or become a systemic risk vector. A future governance token
+(Phase~3, following institutional trust bootstrapping as described in
+Section~\ref{sec:adoption-pathway}) is specified in Future Work
+(Chapter~6, Section~\ref{sec:future-work}) with explicit anti-FTX collateral
+hard rules encoded at the contract level: the token may not be accepted as
+collateral within any tier of the CWB lending hierarchy; its issuance is
+deferred until the system-wide reserve ratio has exceeded 150\% of
+outstanding principal for six consecutive months; and its supply schedule
+is governance-locked and cannot be inflated by any single keyholder or
+multisig configuration below a 5-of-7 threshold.
+
+%% =============================================================================
+%% END OF CHAPTER 5 — FIRST HALF
+%% Next: Pre-thesis_v24_chapter5_part2.tex
+%% Continues from: \subsection{Transaction Economics}
+%%
+%% Sections remaining for Part 2:
+%%   Transaction Economics          §5.4.1  (gas costs, oracle call costs)
+%%   Cost Model                     §5.4.2  (infrastructure, audit, oracle)
+%%   Break-even Analysis            §5.4.3  (300-client prototype scale)
+%%   Technical Feasibility          §5.5
+%%   Operational Feasibility        §5.6
+%%   Risk Analysis                  §5.7    (table: 4 risk categories)
+%%   Adoption and Scaling Pathway   §5.8    (BRAC pilot → Phase 1 → Phase 3)
+%%   Bangladesh Regulatory Reality  §5.9    [v24-C §7.2: FATF para — NEW]
+%% =============================================================================

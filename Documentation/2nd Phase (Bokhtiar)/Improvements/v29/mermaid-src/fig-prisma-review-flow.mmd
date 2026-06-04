@@ -1,0 +1,31 @@
+---
+title: PRISMA-Style Literature Review Flow
+---
+flowchart TB
+    classDef box  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef excl fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef syn  fill:#D8D8D8,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    ID["<b>Identification</b><br/>ACM · IEEE · Elsevier · MDPI<br/>arXiv (venue check) · BIS · World Bank<br/>Keywords: blockchain · DeFi · lending · ZKP<br/>Bangladesh · MFI anchors"]:::box
+
+    SCR["<b>Screening</b><br/>2017–2026 peer-reviewed or formal reports<br/>Relevance to ≥1 of 7 CWB modules<br/>Methodological transparency for reuse"]:::box
+
+    EX1["Excluded: out of scope<br/>or insufficient method"]:::excl
+    EX2["Excluded: pre-2017<br/>or non-archival grey lit"]:::excl
+
+    INC["<b>Included corpus</b><br/>114 entries in references.bib<br/>Top-10 ranked by architectural impact<br/>(Table tab:lit-top10)"]:::box
+
+    ID --> SCR
+    SCR --> EX1
+    SCR --> EX2
+    SCR --> INC
+
+    subgraph SYN[" Synthesis themes → CWB design "]
+        direction LR
+        T1["Institutional<br/>hierarchy"]:::syn
+        T2["AI/ML fraud &<br/>explainability"]:::syn
+        T3["Financial<br/>inclusion"]:::syn
+        T4["Security &<br/>compliance"]:::syn
+    end
+
+    INC --> SYN

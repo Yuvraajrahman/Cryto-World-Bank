@@ -1,0 +1,72 @@
+---
+title: Component Architecture — Four Layers with Agent and Chainlink
+---
+flowchart TB
+    classDef layer fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef node  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef live   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef plan   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef ext    fill:#EAEAEA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph FE[" Presentation Layer "]
+        UI["React 18 · Wagmi · ERC-4337<br/>Agent widget · Dashboard"]:::node
+    end
+
+    subgraph BE[" Off-Chain Backend "]
+        API["Express REST · SSE agent stream"]:::node
+        PG[("PostgreSQL 16<br/>20 entities · 3NF")]:::node
+        AG["Qwen3-8B + MCP Server<br/>17 tools"]:::node
+        MW["Agent middleware<br/>403 confirm · injection scan · scope"]:::node
+        ML["FastAPI ML · stacking meta-learner"]:::node
+        EL["Event listener · Redis"]:::node
+    end
+
+    subgraph SC[" Smart-Contract Layer (3 implemented / 15 target) "]
+        subgraph CORE[" Core [I] "]
+            WBR["WorldBankReserve"]:::live
+            NBC["NationalBank"]:::live
+            LBC["LocalBank"]:::live
+        end
+        subgraph PROD[" Banking products [II–III] "]
+            SV["SavingsVault"]:::plan
+            FD["FixedDeposit"]:::plan
+            GLP["GroupLendingPool"]:::plan
+            FX["FXModule"]:::plan
+            IF["InsuranceFund"]:::plan
+            CA["CurrentAccount"]:::plan
+        end
+        subgraph MEO[" Multi-entity [II–III] "]
+            IBLP["InterBankLendingPool"]:::plan
+            UDF["UpwardDepositFacility"]:::plan
+            SYN["SyndicatedLoan"]:::plan
+            NE["NettingEngine"]:::plan
+        end
+    end
+
+    subgraph CLK[" Chainlink "]
+        CF["Functions DON"]:::ext
+        AUTO["Automation"]:::ext
+        FEED["Price Feeds"]:::ext
+        POR["Proof of Reserve"]:::ext
+        CCIP["CCIP bridge"]:::ext
+    end
+
+    UI --> API
+    API --> PG
+    API --> AG
+    AG --> MW
+    API --> ML
+    API --> EL
+    MW --> AG
+    ML --> CF
+    CF --> CORE
+    AUTO --> LBC
+    FEED --> FX
+    POR --> WBR
+    API --> CORE
+    CORE --> PROD
+    CORE --> MEO
+    MEO -.-> CCIP
+
+    class FE,BE,SC,CLK layer
+    class CORE,PROD,MEO layer

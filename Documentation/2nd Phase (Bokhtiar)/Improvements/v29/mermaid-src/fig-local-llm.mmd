@@ -1,0 +1,47 @@
+---
+title: Autonomous AI Agent — Expanded Component Data Flow
+---
+flowchart TB
+    classDef ui   fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef api  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef srv  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef sec  fill:#D8D8D8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef data fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph CLIENT[" Browser "]
+        UI["Web UI (Vite + React)<br/>Landing assistant · in-app widget"]:::ui
+    end
+
+    subgraph SERVER[" CWB Express backend "]
+        API["Express API · SSE stream<br/>optionalAuth · context assembly"]:::api
+        INJ["Prompt injection scanner<br/>user-sourced fields"]:::sec
+        MW["403 confirmation middleware<br/>write-tool audit hook"]:::sec
+        MCP["MCP Tool Server<br/>17 tools · typed schema"]:::api
+    end
+
+    subgraph INFER[" Local inference "]
+        QW["Qwen3-8B<br/><i>not LM Studio</i>"]:::srv
+        RAG["ChromaDB RAG<br/>policy document retrieval"]:::srv
+    end
+
+    subgraph DATA[" Persistence "]
+        PG["PostgreSQL<br/>SESSIONS · AGENT_ACTION_LOG<br/>CHAT_MESSAGE confirmation FK"]:::data
+    end
+
+    subgraph CHAIN[" On-chain execution "]
+        SK["EIP-7702 session key signer<br/>scope · 500 USDC cap · 24h TTL"]:::sec
+        SC["LocalBank / LoanController<br/>smart contracts"]:::data
+    end
+
+    UI -->|"transcript + feature context"| API
+    API --> INJ
+    INJ --> QW
+    QW <-->|"grounding"| RAG
+    QW -->|"read tools"| MCP
+    MCP -->|"eth_call state"| PG
+
+    QW -->|"write intent"| MW
+    MW -->|"403 if no confirmation"| UI
+    MW -->|"verified"| MCP
+    MCP --> SK --> SC
+    API -->|"audit log"| PG

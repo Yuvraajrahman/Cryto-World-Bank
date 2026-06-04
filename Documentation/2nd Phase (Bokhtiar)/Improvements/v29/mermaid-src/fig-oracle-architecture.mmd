@@ -1,0 +1,44 @@
+---
+title: Oracle Architecture — Off-Chain AI to On-Chain Decision
+---
+flowchart LR
+    classDef node fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef primary fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef fallback fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef side fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph ML[" Off-Chain ML "]
+        FEAT["Feature engineering<br/>RF · iForest · stacking"]:::node
+        SVC["FastAPI ML service"]:::node
+        FEAT --> SVC
+    end
+
+    subgraph PRIMARY[" Primary — Chainlink Functions "]
+        DON["Decentralised Oracle Network<br/>multi-node consensus"]:::primary
+        FN["DON executes HTTP fetch<br/>encodeUint256 score"]:::primary
+        DON --> FN
+    end
+
+    subgraph FALLBACK[" Prototype fallback "]
+        CR["Commit-reveal relay<br/>single FastAPI key"]:::fallback
+    end
+
+    subgraph ONCHAIN[" On-Chain "]
+        LC["LoanController<br/>commitRiskScore / reveal"]:::node
+    end
+
+    subgraph SIDE[" Auxiliary Chainlink "]
+        AUTO["Automation<br/>checkUpkeep installments"]:::side
+        FEED["Price Feeds<br/>BDT/USD · ETH/USD 8-dec"]:::side
+        POR["PoR on WorldBankReserve"]:::side
+    end
+
+    SVC -->|"HTTPS score"| DON
+    FN -->|"consensus result"| LC
+    SVC -. "hash commit → reveal" .-> CR
+    CR -. "Phase I–II only" .-> LC
+    AUTO --> LC
+    FEED --> LC
+    POR --> LC
+
+    TRUST["Trust: DON consensus vs single relay"]:::fallback

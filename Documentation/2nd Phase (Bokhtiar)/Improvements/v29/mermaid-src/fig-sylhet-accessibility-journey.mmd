@@ -1,0 +1,18 @@
+---
+title: Accessibility Journey — Rural Sylhet Retail Client (testnet prototype)
+---
+flowchart LR
+    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef gate  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef ctx   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+
+    M["1 · Mobile access<br/>Android / iOS browser<br/>WalletConnect · React UI"]:::step
+    A["2 · Bengali agent<br/>Qwen3-8B + MCP read tools<br/>plain-language Q&A · policy RAG"]:::step
+    L["3 · USDC loan request<br/>~50k BDT (~430 USDC)<br/>tiered KYC · zkEVM Cardona"]:::step
+    G["4 · Confirmation gate<br/>affirmative consent required<br/>HTTP 403 · agent_action_log"]:::gate
+    OK["On-chain apply<br/>EIP-7702 session key<br/>≤500 USDC · 24h TTL"]:::step
+
+    CTX["Future-work BD context<br/>testnet only · no mainnet value<br/>Bengali UI planned"]:::ctx
+
+    M --> A --> L --> G --> OK
+    CTX -. "Section accessibility assessment" .-> M

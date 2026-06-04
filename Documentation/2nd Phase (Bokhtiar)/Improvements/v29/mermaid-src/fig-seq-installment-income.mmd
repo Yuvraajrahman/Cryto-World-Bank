@@ -1,0 +1,44 @@
+---
+title: Sequence Diagrams — Installment (Automation) and Income Verification
+---
+sequenceDiagram
+    autonumber
+    participant AUTO as Chainlink Automation
+    participant SC as LocalBank Contract
+    participant U as Borrower
+    participant FE as Frontend
+    participant API as Backend API
+    participant DB as PostgreSQL
+
+    rect rgb(242,242,242)
+        Note over AUTO,DB: (a) Installment payment — Automation checkUpkeep
+        AUTO->>SC: checkUpkeep() — due installment?
+        alt Upkeep needed
+            SC->>SC: performUpkeep() — mark overdue
+            SC-->>API: emit InstallmentDue(loanId, N)
+            API->>DB: UPDATE installment SET status=DUE
+            API-->>U: Push reminder notification
+        end
+        U->>FE: Pay installment N (USDC)
+        FE->>API: POST /installments/N/pay (signed)
+        API->>SC: processInstallment(loanId, N)
+        SC->>SC: CEI: check → mark paid → accrue interest
+        SC-->>API: emit InstallmentPaid(loanId, N)
+        API->>DB: UPDATE installment SET status=PAID
+        API-->>U: Receipt + next due date
+        Note over SC: Last installment → LoanClosed + SBT update
+    end
+
+    rect rgb(226,226,226)
+        Note over U,DB: (b) Income verification — doc hash only on-chain
+        U->>FE: Upload income document
+        FE->>API: POST /income { doc | bankToken }
+        alt Open-Banking pull
+            API->>API: Fetch transactions (read-only)
+        else Manual review
+            API->>API: Queue for LB Operator
+        end
+        API->>DB: INSERT income_proof (doc_hash, method)
+        Note over API,SC: Only SHA-256 doc_hash on-chain — no PII
+        API-->>U: Verified · SBT credit_score bumped
+    end

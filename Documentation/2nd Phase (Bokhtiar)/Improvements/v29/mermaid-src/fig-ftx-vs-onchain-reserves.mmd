@@ -1,0 +1,30 @@
+---
+title: Reserve Transparency — Opaque Centralized Custody vs On-Chain PoR (Conceptual)
+---
+flowchart LR
+    classDef bad  fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef good fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef item fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph FTX[" Centralized exchange model (opaque) "]
+        direction TB
+        F1["Client deposits<br/>commingled custody"]:::bad
+        F2["No real-time<br/>reserve proof"]:::bad
+        F3["Solvency visible<br/>only at bankruptcy"]:::bad
+        F4["Speculative trading ·<br/>derivatives focus"]:::bad
+        F1 --> F2 --> F3 --> F4
+    end
+
+    subgraph CWB[" CWB on-chain reserve model "]
+        direction TB
+        C1["Tier reserve ratios<br/>smart-contract invariants"]:::good
+        C2["Chainlink Proof of Reserve<br/>WorldBankReserve attestation"]:::good
+        C3["Real-time verifiable<br/>solvency — no third-party trust"]:::good
+        C4["Inclusion banking ·<br/>four-tier development finance"]:::good
+        C1 --> C2 --> C3 --> C4
+    end
+
+    FTX -. "structural contrast<br/>(neutral · conceptual)" .-> CWB
+
+    N1["<i>PoR by construction at institutional tier —<br/>not exchange-account attestation</i>"]:::item
+    CWB --> N1

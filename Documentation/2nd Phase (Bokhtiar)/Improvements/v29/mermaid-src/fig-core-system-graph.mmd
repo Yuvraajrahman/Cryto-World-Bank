@@ -1,0 +1,44 @@
+---
+title: Core System Graph — Entity Relationships (20 entities)
+---
+flowchart TB
+    classDef ent fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef hub fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    WB["WORLD_BANK"]:::ent
+    NB["NATIONAL_BANK"]:::ent
+    LB["LOCAL_BANK"]:::ent
+    BU["BANK_USER"]:::ent
+    CL["CLIENT / BORROWER"]:::hub
+
+    LR["LOAN_REQUEST"]:::ent
+    LN["LOAN"]:::ent
+    INS["INSTALLMENT"]:::ent
+    TX["TRANSACTION"]:::ent
+    IP["INCOME_PROOF"]:::ent
+    CM["CHAT_MESSAGE"]:::ent
+    AML["AI_ML_LOG"]:::ent
+    CP["CREDIT_PASSPORT"]:::ent
+    SES["SESSIONS"]:::ent
+    AAL["AGENT_ACTION_LOG"]:::ent
+    IRT["INTEREST_RATE_TIER"]:::ent
+    AST["ASSETS"]:::ent
+
+    WB --> NB --> LB
+    LB --> BU
+    LB --> CL
+    CL --> LR
+    BU --> LR
+    LR --> LN
+    LN --> INS
+    INS --> TX
+    CL --> IP
+    CL --> CM
+    LN --> AML
+    CL --> CP
+    CL --> SES
+    CM --> AAL
+    LB --> IRT
+    CL --> AST
+
+    NOTE["20 normalized entities · 3NF<br/>CLIENT rename planned"]:::ent

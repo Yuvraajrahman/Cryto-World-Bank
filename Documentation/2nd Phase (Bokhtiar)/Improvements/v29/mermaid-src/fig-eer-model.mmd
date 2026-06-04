@@ -1,0 +1,43 @@
+---
+title: EER Model — Specialization, Weak Entities, Agent Audit
+---
+flowchart TB
+    classDef strong fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef weak   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111,stroke-dasharray:4 3
+    classDef multi  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    subgraph S[" Disjoint specialization: BANK_USER "]
+        BU["BANK_USER"]:::strong
+        NBA["NationalBankAdmin"]:::strong
+        LBA["LocalBankAdmin"]:::strong
+        APR["Approver"]:::strong
+        BU -->|"d"| NBA
+        BU --> LBA
+        BU --> APR
+    end
+
+    subgraph W[" Weak entity: INSTALLMENT "]
+        LOAN["LOAN"]:::strong
+        INST["INSTALLMENT<br/>identifying weak entity"]:::weak
+        LOAN ==>|"1:N total"| INST
+    end
+
+    subgraph A[" Agent audit FK "]
+        CM["CHAT_MESSAGE"]:::strong
+        AAL["AGENT_ACTION_LOG<br/>confirmation turn FK"]:::strong
+        SES["SESSIONS"]:::strong
+        CM -->|"0..1"| AAL
+        SES --> CM
+    end
+
+    subgraph P[" Partial: CREDIT_PASSPORT SBT "]
+        BR["BORROWER / CLIENT"]:::strong
+        SBT["CREDIT_PASSPORT<br/>non-revocable SBT"]:::strong
+        BR -->|"partial 0..1"| SBT
+    end
+
+    subgraph M[" Multi-valued: INCOME_PROOF "]
+        BR2["BORROWER"]:::strong
+        IP["{INCOME_PROOF}"]:::multi
+        BR2 -.-> IP
+    end

@@ -1,0 +1,51 @@
+---
+title: Autonomous AI Agent — Six-Step Pipeline (Swimlane)
+---
+flowchart LR
+    classDef lane fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef gate fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef path fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    subgraph U[" User "]
+        M1["Client message<br/>(chat widget)"]:::step
+        M5["Affirmative consent<br/>Yes, proceed"]:::gate
+        M6["Status notification"]:::path
+    end
+
+    subgraph FE[" React frontend "]
+        S1["POST agent stream"]:::step
+        S5["Render confirmation UI"]:::gate
+        S6["Show tx reference + status"]:::path
+    end
+
+    subgraph API[" Express.js backend "]
+        S2["SSE stream + context inject<br/>on-chain JSON → prompt"]:::step
+        BR{"Q&A vs action?"}:::gate
+        QA["RAG path · ChromaDB<br/>no tool calls"]:::path
+        AC["Assemble MCP params<br/>plain-language summary"]:::step
+        S4["Human confirmation gate<br/>pause until consent"]:::gate
+        S5b["Confirmation audit hook"]:::gate
+        S3w["MCP write → banking API<br/>EIP-7702 session sign"]:::step
+        S3m["Poll tx · update AGENT_ACTION_LOG"]:::step
+    end
+
+    subgraph LLM[" Qwen3-8B "]
+        Q["Inference + tool selection"]:::step
+    end
+
+    subgraph CH[" Polygon zkEVM Cardona "]
+        TX["LocalBank tx<br/>LoanApplied · Repayment"]:::path
+    end
+
+    M1 --> S1 --> S2 --> Q
+    S2 --> BR
+    BR -->|informational| QA
+    BR -->|state-modifying| AC
+    AC --> S4
+    S4 --> S5
+    S5 --> M5
+    M5 --> S5b --> S3w
+    S3w --> TX
+    S3w --> S3m --> S6 --> M6
+    QA --> S6

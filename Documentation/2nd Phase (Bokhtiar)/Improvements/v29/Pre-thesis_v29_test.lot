@@ -1,0 +1,95 @@
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces Client tier access rules.}}{17}{table.caption.32}%
+\contentsline {table}{\numberline {1.2}Tiered Client Access Rules by Client Type and Loan Size}{17}{section*.33}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Top-10 ranked literature subset under the PRISMA-style frame. Ranking is by direct architectural impact on the CWB design; each entry maps to a v15 section that operationalizes the finding.}}{25}{table.caption.36}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Literature review summary (Part A): DeFi lending, fraud detection, and XAI.}}{34}{table.caption.38}%
+\contentsline {table}{\numberline {2.3}Literature Review Summary (Part 1): DeFi Lending and Hierarchical Architecture}{34}{section*.39}%
+\contentsline {table}{\numberline {2.4}{\ignorespaces Literature review summary (Part B): DeFi protocol systematisation and adaptive lending.}}{35}{table.caption.40}%
+\contentsline {table}{\numberline {2.5}Literature Review Summary (Part 2): Governance, Settlement, and Institutional Adoption}{35}{section*.41}%
+\contentsline {table}{\numberline {2.6}{\ignorespaces Literature review summary (Part C): blockchain P2P lending, privacy-preserving ML, and smart contract auditing.}}{35}{table.caption.42}%
+\contentsline {table}{\numberline {2.7}Literature Review Summary (Part 3): Cross-Border Settlement and Security Tooling}{35}{section*.43}%
+\contentsline {table}{\numberline {2.8}{\ignorespaces Literature review summary (Part D): CBDC design, cross-border settlement, and multi-chain DeFi.}}{36}{table.caption.44}%
+\contentsline {table}{\numberline {2.9}Literature Review Summary (Part 4): Risk Monitoring and AI/ML in Finance}{36}{section*.45}%
+\contentsline {table}{\numberline {2.10}{\ignorespaces Literature review summary (Part E): multi-chain DeFi, smart microfinance, gas optimisation, and SHAP-based credit models.}}{37}{table.caption.46}%
+\contentsline {table}{\numberline {2.11}Literature Review Summary (Part 5): Institutional Adoption and Financial Inclusion}{37}{section*.47}%
+\contentsline {table}{\numberline {2.12}{\ignorespaces Comparative protocol analysis: existing DeFi lending protocols vs.\ the Crypto World Bank (CWB). {\normalfont \textbf {\faCheck }{} = implemented/present; \faHourglassHalf {} = designed/partial; \textcolor {black!55}{\faCircle }{} = planned; \textbf {\faTimes }{} = absent.}}}{38}{table.caption.48}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Prototype scope: feature implementation status as of pre-thesis submission. \textbf {\faCheck }{} = Implemented and testnet-verified; \faHourglassHalf {} = Designed or partially scaffolded; \textcolor {black!55}{\faCircle }{} = Planned for final thesis phase.}}{45}{table.caption.53}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Blockchain platform selection criteria and justification.}}{51}{table.caption.58}%
+\contentsline {table}{\numberline {3.3}Blockchain Platform Selection: Comparison of EVM-Compatible Networks}{51}{section*.59}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces Blockchain platform selection (continued): operational and deployment factors.}}{51}{table.caption.60}%
+\contentsline {table}{\numberline {3.5}Blockchain Platform Selection (Continued): Operational and Deployment Factors}{51}{section*.61}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Database entity summary (20 entities).}}{59}{table.caption.72}%
+\contentsline {table}{\numberline {3.7}Database Entity Summary: 19 Normalized Entities in the Relational Schema}{59}{section*.73}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces EER constructs applied: specialisation, hierarchy, and constraints.}}{61}{table.caption.74}%
+\contentsline {table}{\numberline {3.9}EER Constructs Applied: Specialization, Hierarchy, and Constraints}{61}{section*.75}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Indexing strategy: B-tree indexes for time-window and high-frequency queries.}}{63}{table.caption.76}%
+\contentsline {table}{\numberline {3.11}Indexing Strategy: B-tree Indexes for Time-Window and High-Frequency Queries}{63}{section*.77}%
+\contentsline {table}{\numberline {3.12}{\ignorespaces Representative functional dependencies.}}{66}{table.caption.78}%
+\contentsline {table}{\numberline {3.13}Functional Dependencies in the Core Lending and Identity Schema}{66}{section*.79}%
+\contentsline {table}{\numberline {3.14}{\ignorespaces Relational integrity constraints.}}{67}{table.caption.80}%
+\contentsline {table}{\numberline {3.15}Relational Integrity Constraints: Referential and Domain Rules}{67}{section*.81}%
+\contentsline {table}{\numberline {3.16}{\ignorespaces Data partitioning between on-chain and off-chain storage.}}{68}{table.caption.82}%
+\contentsline {table}{\numberline {3.17}On-Chain vs.~Off-Chain Data Partitioning: State, Analytics, and Privacy Boundaries}{68}{section*.83}%
+\contentsline {table}{\numberline {3.18}{\ignorespaces Operational user taxonomy with KYC level, wallet type, and data-residence assumption. The taxonomy expands the actor list referenced in the use-case diagram of Section~\ref {sec:usecase}.}}{71}{table.caption.89}%
+\contentsline {table}{\numberline {3.19}{\ignorespaces CWB formal actor taxonomy (nine actors): five primary actors who initiate actions and four secondary actors who are external systems or authorities.}}{71}{table.caption.90}%
+\contentsline {table}{\numberline {3.20}{\ignorespaces CWB actor permission matrix. READ = read-only tool call; WRITE\dag {} = write tool requiring explicit human confirmation gate. * = own tier only.}}{72}{table.caption.91}%
+\contentsline {table}{\numberline {3.21}{\ignorespaces Tiered, risk-based KYC ladder. Higher KYC level unlocks larger loans but requires proportionally more verification.}}{74}{table.caption.95}%
+\contentsline {table}{\numberline {3.22}{\ignorespaces Credit tier schedule: score thresholds, maximum loan limits, and interest modifiers per tier.}}{80}{table.caption.112}%
+\contentsline {table}{\numberline {3.23}{\ignorespaces Network membership governance.}}{110}{table.caption.157}%
+\contentsline {table}{\numberline {3.24}Banking Product Suite: Deposit, Credit, and Ancillary Contract Specifications}{110}{section*.158}%
+\contentsline {table}{\numberline {3.25}{\ignorespaces Business network governance.}}{110}{table.caption.159}%
+\contentsline {table}{\numberline {3.26}Security Threat Model: Vulnerability Classes, Attack Vectors, and Mitigations}{110}{section*.160}%
+\contentsline {table}{\numberline {3.27}{\ignorespaces Technology infrastructure governance.}}{111}{table.caption.161}%
+\contentsline {table}{\numberline {3.28}Governance Framework: Operational, Business, and Technology Governance Layers}{111}{section*.162}%
+\contentsline {table}{\numberline {3.29}{\ignorespaces Five-layer defense-in-depth model for the Crypto World Bank platform. Each layer is necessary; breaching the contract layer requires defeating every layer above it.}}{116}{table.caption.169}%
+\contentsline {table}{\numberline {3.30}{\ignorespaces Threat model and security controls mapping, expanded to span all five layers of the defense-in-depth stack (Section~\ref {sec:defense-in-depth}).}}{118}{table.caption.173}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces MCP tool server: 9 read tools (always permitted) and 8 write tools (require human confirmation gate).}}{126}{table.caption.180}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Named toolsets: scoped tool visibility per agent turn.}}{131}{table.caption.189}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Phase I task register: smart contract and database foundation}}{142}{table.caption.207}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Phase II task register: core banking features and agent baseline.}}{144}{table.caption.208}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Phase III task register: AI/ML pipeline and agent harness.}}{146}{table.caption.209}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Phase IV task register: verification, evaluation, and finalization.}}{147}{table.caption.210}%
+\contentsline {table}{\numberline {4.7}{\ignorespaces Four-phase implementation timeline: 16-week project plan.}}{148}{table.caption.211}%
+\contentsline {table}{\numberline {4.8}{\ignorespaces SDLC stage mapping.}}{149}{table.caption.212}%
+\contentsline {table}{\numberline {4.9}Technology Stack: Additional Alternative Evaluations}{149}{section*.213}%
+\contentsline {table}{\numberline {4.10}{\ignorespaces Design decisions and alternatives considered.}}{150}{table.caption.214}%
+\contentsline {table}{\numberline {4.11}Software Testing Strategy: Acceptance Criteria Across Four Test Layers}{150}{section*.215}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Market segments with supporting data.}}{156}{table.caption.217}%
+\contentsline {table}{\numberline {5.2}Market Sizing: DeFi Lending TVL, Remittances, and MSME Financing Gap}{156}{section*.218}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Target customer segment profile.}}{157}{table.caption.219}%
+\contentsline {table}{\numberline {5.4}Target Customer Segment: Retail Client Profile and Product Fit}{157}{section*.220}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Partner categories and roles.}}{157}{table.caption.221}%
+\contentsline {table}{\numberline {5.6}Partner Ecosystem: Integration Partners and External Dependencies (Chapter 5)}{157}{section*.222}%
+\contentsline {table}{\numberline {5.7}{\ignorespaces Detailed competitive landscape analysis (Part 1).}}{158}{table.caption.223}%
+\contentsline {table}{\numberline {5.8}Competitive Landscape (Part 1): DeFi Lending and Payment Rail Protocols}{158}{section*.224}%
+\contentsline {table}{\numberline {5.9}{\ignorespaces Detailed competitive landscape analysis (Part 2).}}{159}{table.caption.225}%
+\contentsline {table}{\numberline {5.10}Competitive Landscape (Part 2): Inclusion Wallets and Institutional Blockchain Systems}{159}{section*.226}%
+\contentsline {table}{\numberline {5.11}{\ignorespaces Detailed competitive landscape analysis (Part 3): multi-tier capital flow as differentiating feature.}}{159}{table.caption.227}%
+\contentsline {table}{\numberline {5.12}Competitive Landscape (Part 3): Multi-Tier Capital Flow as Differentiating Feature}{159}{section*.228}%
+\contentsline {table}{\numberline {5.13}{\ignorespaces Risk taxonomy and mitigation.}}{160}{table.caption.229}%
+\contentsline {table}{\numberline {5.14}Risk Taxonomy: Technical, Financial, Regulatory, and Operational Risk Categories}{160}{section*.230}%
+\contentsline {table}{\numberline {5.15}{\ignorespaces Technical feasibility assessment.}}{161}{table.caption.231}%
+\contentsline {table}{\numberline {5.16}Technical Feasibility Assessment: Infrastructure Readiness and Ecosystem Maturity}{161}{section*.232}%
+\contentsline {table}{\numberline {5.17}{\ignorespaces Economic feasibility --- zero-cost prototype.}}{162}{table.caption.233}%
+\contentsline {table}{\numberline {5.18}Economic Feasibility: Cost Drivers vs.~Revenue Potential on Layer-2 Networks}{162}{section*.234}%
+\contentsline {table}{\numberline {5.19}{\ignorespaces Revenue projection assumptions.}}{163}{table.caption.235}%
+\contentsline {table}{\numberline {5.20}Revenue Projection by Tier (Base Case, USD Millions)}{163}{section*.236}%
+\contentsline {table}{\numberline {5.21}{\ignorespaces System-wide annual revenue summary --- spread-based accounting.}}{163}{table.caption.237}%
+\contentsline {table}{\numberline {5.22}{\ignorespaces ETH price sensitivity: annual interest spread revenue at three price points (all other assumptions held constant at base case).}}{164}{table.caption.238}%
+\contentsline {table}{\numberline {5.23}{\ignorespaces Default rate sensitivity scenarios with economic basis.}}{165}{table.caption.239}%
+\contentsline {table}{\numberline {5.24}{\ignorespaces CWB revenue stream taxonomy: analogues from the institutional crypto exchange sector.}}{166}{table.caption.241}%
+\contentsline {table}{\numberline {5.25}{\ignorespaces Interest rate parameters.}}{167}{table.caption.243}%
+\contentsline {table}{\numberline {5.26}Tiered Interest Rate Parameters: APR Spreads Across the Four-Tier Hierarchy}{167}{section*.244}%
+\contentsline {table}{\numberline {5.27}{\ignorespaces Go-to-market phases.}}{169}{table.caption.246}%
+\contentsline {table}{\numberline {5.28}Value Proposition and Go-to-Market: User Benefits Mapped to Platform Features}{169}{section*.247}%
+\contentsline {table}{\numberline {5.29}{\ignorespaces MiCA and GENIUS Act compliance mapping. Each row identifies a regulatory article relevant to a stablecoin-denominated crypto financial services platform and the corresponding CWB design control.}}{170}{table.caption.248}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {A.1}{\ignorespaces Technology stack summary.}}{188}{table.caption.268}%
+\contentsline {table}{\numberline {A.2}Local LLM Assistant Integration: Components, Configuration, and Prototype Stance}{188}{section*.269}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {B.1}{\ignorespaces Deployed smart contract addresses, Polygon zkEVM Cardona testnet (as of pre-thesis submission).}}{191}{table.caption.272}%

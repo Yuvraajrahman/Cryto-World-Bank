@@ -1,0 +1,78 @@
+---
+title: Protocol Comparison Heatmap — 11 Dimensions × 6 Protocols
+---
+flowchart TB
+    classDef hdr  fill:#D8D8D8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef dim fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef no   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#555555
+    classDef part fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef yes  fill:#C8C8C8,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef cwb  fill:#A8A8A8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    subgraph HDR[" "]
+        direction LR
+        H0["Feature"]:::hdr
+        HA["Aave"]:::hdr
+        HC["Compound"]:::hdr
+        HM["Maker"]:::hdr
+        HP["Maple"]:::hdr
+        HG["Goldfinch"]:::hdr
+        HW["CWB"]:::hdr
+    end
+
+    subgraph R1["1 · Institutional hierarchy"]
+        direction LR
+        D1[" "]:::dim --> A1["✗"]:::no --> C1["✗"]:::no --> M1["✗"]:::no --> P1["✗"]:::no --> G1["✗"]:::no --> W1["4-tier ✓"]:::cwb
+    end
+
+    subgraph R2["2 · Cross-tier capital flow"]
+        direction LR
+        D2[" "]:::dim --> A2["✗"]:::no --> C2["✗"]:::no --> M2["✗"]:::no --> P2["✗"]:::no --> G2["✗"]:::no --> W2["Designed"]:::cwb
+    end
+
+    subgraph R3["3 · Same-tier interbank lending"]
+        direction LR
+        D3[" "]:::dim --> A3["✗"]:::no --> C3["✗"]:::no --> M3["✗"]:::no --> P3["✗"]:::no --> G3["✗"]:::no --> W3["Designed"]:::cwb
+    end
+
+    subgraph R4["4 · Solidarity group lending"]
+        direction LR
+        D4[" "]:::dim --> A4["✗"]:::no --> C4["✗"]:::no --> M4["✗"]:::no --> P4["✗"]:::no --> G4["Partial"]:::part --> W4["Planned"]:::cwb
+    end
+
+    subgraph R5["5 · AI/ML fraud detection"]
+        direction LR
+        D5[" "]:::dim --> A5["✗"]:::no --> C5["✗"]:::no --> M5["✗"]:::no --> P5["Manual"]:::part --> G5["Manual"]:::part --> W5["Built"]:::cwb
+    end
+
+    subgraph R6["6 · SHAP explainability"]
+        direction LR
+        D6[" "]:::dim --> A6["✗"]:::no --> C6["✗"]:::no --> M6["✗"]:::no --> P6["✗"]:::no --> G6["✗"]:::no --> W6["Built"]:::cwb
+    end
+
+    subgraph R7["7 · ZKP KYC compliance"]
+        direction LR
+        D7[" "]:::dim --> A7["✗"]:::no --> C7["✗"]:::no --> M7["✗"]:::no --> P7["✗"]:::no --> G7["✗"]:::no --> W7["Planned"]:::cwb
+    end
+
+    subgraph R8["8 · Kinked interest rate curve"]
+        direction LR
+        D8[" "]:::dim --> A8["✓"]:::yes --> C8["✓"]:::yes --> M8["Gov."]:::part --> P8["✓"]:::yes --> G8["✗"]:::no --> W8["Designed"]:::cwb
+    end
+
+    subgraph R9["9 · Role-based access control"]
+        direction LR
+        D9[" "]:::dim --> A9["Partial"]:::part --> C9["Partial"]:::part --> M9["Gov."]:::part --> P9["✓"]:::yes --> G9["Partial"]:::part --> W9["✓"]:::cwb
+    end
+
+    subgraph R10["10 · Developing-economy focus"]
+        direction LR
+        D10[" "]:::dim --> A10["✗"]:::no --> C10["✗"]:::no --> M10["✗"]:::no --> P10["✗"]:::no --> G10["✓"]:::yes --> W10["Bangladesh"]:::cwb
+    end
+
+    subgraph R11["11 · TVL / status 2026"]
+        direction LR
+        D11[" "]:::dim --> A11["$26.3B"]:::yes --> C11["$1.4B"]:::yes --> M11["$10.5B"]:::yes --> P11["$2.6B"]:::yes --> G11["$680M"]:::yes --> W11["Testnet"]:::cwb
+    end
+
+    HDR --> R1 --> R2 --> R3 --> R4 --> R5 --> R6 --> R7 --> R8 --> R9 --> R10 --> R11

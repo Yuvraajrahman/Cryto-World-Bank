@@ -1,0 +1,25 @@
+---
+title: Autonomous AI Banking Agent — Compact Request Path (Qwen3-8B · MCP)
+---
+flowchart TB
+    classDef node fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef gate fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef write fill:#D8D8D8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    UI["Web UI<br/>Vite + React · agent widget"]:::node
+    P["Vite dev proxy<br/>/api → :4000"]:::node
+    S["CWB Express API<br/>POST /agent/stream (SSE)"]:::node
+    CTX["Context assembly<br/>3-tier prompt · on-chain JSON"]:::node
+    QW["Qwen3-8B<br/><i>local inference — not LM Studio</i>"]:::node
+
+    READ["Read path<br/>MCP read tools (9)"]:::node
+    CONF["Human confirmation gate<br/>affirmative consent required"]:::gate
+    WRITE["Write path<br/>MCP write tools (8)"]:::write
+    MCP["MCP Tool Server<br/>17 banking tools"]:::node
+    CHAIN["EIP-7702 sign → on-chain tx"]:::write
+
+    UI --> P --> S --> CTX --> QW
+    QW -->|"Q&A"| READ --> MCP
+    READ -->|"SSE reply"| UI
+    QW -->|"action"| CONF
+    CONF -->|"confirmed"| WRITE --> MCP --> CHAIN

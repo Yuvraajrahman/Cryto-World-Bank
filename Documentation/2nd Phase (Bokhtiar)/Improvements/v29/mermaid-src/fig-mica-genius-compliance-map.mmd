@@ -1,0 +1,60 @@
+---
+title: MiCA / GENIUS EMT Requirements → CWB Stablecoin Pool, PoR, audit_logs
+---
+flowchart TB
+    classDef statute fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef req    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef ctrl   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef store  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef note   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+
+    subgraph STAT[" Statute articles (EMT / payment stablecoin) "]
+        direction TB
+        M16["MiCA Art. 16<br/>EMT issuer authorisation"]:::statute
+        M36["MiCA Art. 36<br/>1:1 reserve of assets"]:::statute
+        M41["MiCA Art. 41<br/>Holder redemption at par"]:::statute
+        M62["MiCA Art. 62<br/>Operational resilience"]:::statute
+        G4["GENIUS Act §4<br/>Federal payment-stablecoin framework"]:::statute
+        G7["GENIUS Act §7<br/>Reserve disclosure"]:::statute
+    end
+
+    subgraph REQ[" High-level EMT requirements "]
+        direction TB
+        R1["Use authorised EMT only<br/>(USDC / USDT)"]:::req
+        R2["Segregated 1:1 backing<br/>+ issuer attestations"]:::req
+        R3["Non-impeded redemption<br/>to depositor wallet"]:::req
+        R4["Audits, governance,<br/>complaint handling"]:::req
+        R5["Public reserve disclosure<br/>+ monthly attestation"]:::req
+    end
+
+    subgraph CWB[" CWB design controls (prototype / target) "]
+        direction TB
+        POOL["Stablecoin pool<br/>SavingsVault · USDC primary<br/>per-pool ERC-20 parameter"]:::ctrl
+        POR["Chainlink Proof of Reserve<br/>WorldBankReserve tier ratios<br/>+ Circle / Tether attestations"]:::ctrl
+        AUD["PostgreSQL audit_logs<br/>append-only · regulator queries<br/>Travel Rule packets · tx hash link"]:::ctrl
+        DASH["Compliance dashboard<br/>issuer attestation links<br/>SHAP / SAR workflows"]:::store
+    end
+
+    M16 --> R1
+    G4 --> R1
+    M36 --> R2
+    G7 --> R5
+    M41 --> R3
+    M62 --> R4
+
+    R1 --> POOL
+    R1 -. "CWB uses, does not issue EMTs" .-> NOTE1["No native CWB token<br/>at prototype stage"]:::note
+
+    R2 --> POOL
+    R2 --> POR
+    R5 --> POR
+    R5 --> DASH
+
+    R3 --> POOL
+
+    R4 --> AUD
+    R4 --> DASH
+    POR --> AUD
+    POOL --> AUD
+
+    DASH --> AUD

@@ -1,0 +1,43 @@
+---
+title: Auxiliary Activity Flows — (a) Chat, (b) Agent Pipeline, (c) Market Data
+---
+flowchart TB
+    classDef start  fill:#1F1F1F,color:#FAFAFA,stroke:#1F1F1F
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef finish fill:#FAFAFA,stroke:#1F1F1F,stroke-width:2px,color:#111111
+
+    subgraph A[" (a) Borrower–Bank chat "]
+        direction TB
+        A1((Start)):::start --> A2["User opens chat thread"]:::act
+        A2 --> A3["WebSocket connects<br/>(JWT in handshake)"]:::act
+        A3 --> A4{User sends msg?}:::dec
+        A4 -- No --> A5["Idle / heartbeat"]:::act --> A4
+        A4 -- Yes --> A6["Persist CHAT_MESSAGE<br/>+ broadcast to room"]:::act
+        A6 --> A7{Close?}:::dec
+        A7 -- No --> A4
+        A7 -- Yes --> AE((End)):::finish
+    end
+
+    subgraph B[" (b) Autonomous agent — six-step pipeline "]
+        direction TB
+        B1((Start)):::start --> B2["1 · User message via SSE"]:::act
+        B2 --> B3["2 · Context inject<br/>(3-tier prompt · Qwen3-8B)"]:::act
+        B3 --> B4{Q&A or<br/>action?}:::dec
+        B4 -- Q&A --> B5["3 · RAG reply<br/>(read tools only)"]:::act --> BE((End)):::finish
+        B4 -- Action --> B6["4 · Assemble params ·<br/>present confirmation summary"]:::act
+        B6 --> B7{Explicit<br/>consent?}:::dec
+        B7 -- No / ambiguous --> B8["403 middleware · log<br/>agent_action_log"]:::act --> BE
+        B7 -- Yes --> B9["5 · MCP write tool ·<br/>EIP-7702 session key sign"]:::act
+        B9 --> B10["6 · Monitor tx · notify client"]:::act --> BE
+    end
+
+    subgraph C[" (c) Market data view "]
+        direction TB
+        C1((Start)):::start --> C2["Authenticated user<br/>opens dashboard"]:::act
+        C2 --> C3["API fetches Chainlink<br/>Price Feeds (cached 10s)"]:::act
+        C3 --> C4["Render charts<br/>(USDC · BDT/USD · ETH/USD)"]:::act
+        C4 --> C5{User opens<br/>loan sizing?}:::dec
+        C5 -- No --> CE((End)):::finish
+        C5 -- Yes --> C6["Pre-fill loan form<br/>(USDC denom default)"]:::act --> CE
+    end

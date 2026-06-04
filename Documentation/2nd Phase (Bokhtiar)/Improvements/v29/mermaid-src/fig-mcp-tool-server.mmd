@@ -1,0 +1,50 @@
+---
+title: MCP Tool Server — 9 Read / 8 Write Tools by Toolset
+---
+flowchart TB
+    classDef srv  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef read fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef write fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef set  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef api  fill:#EAEAEA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    AG["Qwen3-8B Agent"]:::srv --> MCP["MCP Tool Server<br/>17 typed tools · schema boundary"]:::srv
+    MCP --> API["Express.js banking API<br/>(same endpoints as React UI)"]:::api
+
+    subgraph RO[" read_only — 9 READ tools (always permitted) "]
+        R1["get_account_state"]:::read
+        R2["get_credit_score"]:::read
+        R3["get_loan_status"]:::read
+        R4["get_installment_schedule"]:::read
+        R5["get_pool_utilisation"]:::read
+        R6["get_interest_rate"]:::read
+        R7["get_market_data"]:::read
+        R8["get_requirements"]:::read
+        R9["get_session_history"]:::read
+    end
+
+    subgraph LA[" loan_actions — read_only + 4 WRITE† "]
+        W1["submit_loan_application"]:::write
+        W2["pay_installment"]:::write
+        W3["submit_group_application"]:::write
+        W4["join_group_pool"]:::write
+    end
+
+    subgraph AM[" account_management — read_only + 4 WRITE† "]
+        W5["submit_deposit"]:::write
+        W6["submit_fixed_deposit"]:::write
+        W7["submit_kyc_upgrade"]:::write
+        W8["schedule_payment_reminder"]:::write
+    end
+
+    MCP --> RO
+    MCP -. "intent: loan / installment" .-> LA
+    MCP -. "intent: savings / KYC" .-> AM
+
+    RO --> API
+    LA --> API
+    AM --> API
+
+    NOTE["† All 8 write tools require<br/>human confirmation gate + Hook 1 audit"]:::set
+    LA -.-> NOTE
+    AM -.-> NOTE

@@ -1,0 +1,263 @@
+\contentsline {chapter}{Declaration}{2}{section*.2}%
+\contentsline {chapter}{Approval}{3}{section*.4}%
+\contentsline {chapter}{Ethics Statement}{5}{section*.6}%
+\contentsline {chapter}{Abstract}{6}{section*.8}%
+\contentsline {chapter}{Dedication}{7}{section*.10}%
+\contentsline {chapter}{Acknowledgment}{8}{section*.12}%
+\contentsline {chapter}{List of Tables}{v}{section*.14}%
+\contentsline {chapter}{List of Figures}{viii}{section*.16}%
+\contentsline {chapter}{List of Formulas}{xiii}{section*.19}%
+\contentsline {chapter}{List of Abbreviations}{xv}{section*.21}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background}{2}{section.1.1}%
+\contentsline {paragraph}{What smart contracts and blockchain actually provide.}{2}{paragraph*.22}%
+\contentsline {paragraph}{Autonomous banking agents and the human-gate model.}{3}{paragraph*.23}%
+\contentsline {section}{\numberline {1.2}Rationale of the Study}{4}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Problem Statement}{4}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Objectives}{6}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Research Questions}{6}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Research Contribution}{7}{section.1.6}%
+\contentsline {paragraph}{Extension --- Autonomous agent architecture (v24).}{8}{paragraph*.24}%
+\contentsline {paragraph}{Positioning against institutional DeFi.}{8}{paragraph*.25}%
+\contentsline {section}{\numberline {1.7}Blockchain Justification}{9}{section.1.7}%
+\contentsline {subsection}{\numberline {1.7.1}Blockchain Fundamentals and the EVM Execution Model}{10}{subsection.1.7.1}%
+\contentsline {section}{\numberline {1.8}Proposed Solution}{12}{section.1.8}%
+\contentsline {subsection}{\numberline {1.8.1}Banking Functions of the Platform}{12}{subsection.1.8.1}%
+\contentsline {subsection}{\numberline {1.8.2}Service Delivery Across Scale}{14}{subsection.1.8.2}%
+\contentsline {subsection}{\numberline {1.8.3}Cross-Tier Lending System}{14}{subsection.1.8.3}%
+\contentsline {paragraph}{Can a group of entities lend or fund together?}{14}{paragraph*.27}%
+\contentsline {subsubsection}{Same-Tier Lending}{16}{subsubsection*.29}%
+\contentsline {subsubsection}{Upward Lending}{16}{subsubsection*.30}%
+\contentsline {subsubsection}{Tiered Client Access}{17}{subsubsection*.31}%
+\contentsline {section}{\numberline {1.9}Methodology in Brief}{18}{section.1.9}%
+\contentsline {section}{\numberline {1.10}Scopes and Challenges}{19}{section.1.10}%
+\contentsline {subsection}{\numberline {1.10.1}Economic Sustainability: Interest Revenue Versus Gas Costs}{20}{subsection.1.10.1}%
+\contentsline {subsection}{\numberline {1.10.2}Resistance to Institutional Capture}{20}{subsection.1.10.2}%
+\contentsline {subsection}{\numberline {1.10.3}Stablecoin-First Lending and Supply Scalability}{21}{subsection.1.10.3}%
+\contentsline {section}{\numberline {1.11}Market Analysis and Partnership Ecosystem}{22}{section.1.11}%
+\contentsline {subsection}{\numberline {1.11.1}Market Sizing}{22}{subsection.1.11.1}%
+\contentsline {subsection}{\numberline {1.11.2}Target Customer Segment}{23}{subsection.1.11.2}%
+\contentsline {subsection}{\numberline {1.11.3}Partner Ecosystem}{23}{subsection.1.11.3}%
+\contentsline {subsection}{\numberline {1.11.4}Incentive Alignment Through the Blockchain Platform}{23}{subsection.1.11.4}%
+\contentsline {chapter}{\numberline {2}Literature Review}{24}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Preliminaries}{24}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Review Methodology (PRISMA-Style Frame)}{24}{subsection.2.1.1}%
+\contentsline {section}{\numberline {2.2}Review of Existing Research}{26}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Decentralized Lending and DeFi Protocol Design}{27}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Machine Learning for Blockchain Security}{28}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Explainable AI in Financial Decision Systems}{28}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Blockchain for Financial Inclusion}{29}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}Group Lending and Microfinance Digitization}{29}{subsection.2.2.5}%
+\contentsline {subsection}{\numberline {2.2.6}Smart Contract Security and Governance}{29}{subsection.2.2.6}%
+\contentsline {subsection}{\numberline {2.2.7}AI Security Features for Blockchain Lending}{30}{subsection.2.2.7}%
+\contentsline {subsection}{\numberline {2.2.8}Gas Cost Optimization and Layer~2 Scalability}{31}{subsection.2.2.8}%
+\contentsline {subsection}{\numberline {2.2.9}Correspondent Banking and Cross-Border Settlement}{31}{subsection.2.2.9}%
+\contentsline {subsection}{\numberline {2.2.10}Monetary Policy Distribution and Financial Inequality}{31}{subsection.2.2.10}%
+\contentsline {subsection}{\numberline {2.2.11}Real-World Asset Tokenization and Institutional DeFi}{31}{subsection.2.2.11}%
+\contentsline {subsection}{\numberline {2.2.12}Graph Neural Networks for Relational Fraud Detection}{32}{subsection.2.2.12}%
+\contentsline {subsection}{\numberline {2.2.13}Federated Learning Across Banking Tiers}{32}{subsection.2.2.13}%
+\contentsline {subsection}{\numberline {2.2.14}Stablecoin Regulation: MiCA and GENIUS Act}{32}{subsection.2.2.14}%
+\contentsline {subsection}{\numberline {2.2.15}On-Chain Credit Passport and Soulbound Tokens}{33}{subsection.2.2.15}%
+\contentsline {subsection}{\numberline {2.2.16}Institutional DeFi Gap and the mBridge/Agora Landscape}{33}{subsection.2.2.16}%
+\contentsline {subsection}{\numberline {2.2.17}LLMs in Finance and Hallucination Risk}{33}{subsection.2.2.17}%
+\contentsline {section}{\numberline {2.3}Literature Review Summary}{33}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Comparative Protocol Analysis}{37}{section.2.4}%
+\contentsline {paragraph}{Note on ERC-3643 (T-REX) for institutional-tier permissioning.}{39}{paragraph*.50}%
+\contentsline {paragraph}{Positioning against failed centralized exchanges.}{40}{paragraph*.51}%
+\contentsline {subsection}{\numberline {2.4.1}Literature Synthesis}{41}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Agent Harness Engineering and Production Safety}{41}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Summary of Key Findings}{41}{section.2.5}%
+\contentsline {chapter}{\numberline {3}System Architecture and Design}{44}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Prototype Scope}{44}{section.3.1}%
+\contentsline {section}{\numberline {3.2}High-Level Architecture}{46}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Blockchain Platform Selection}{50}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Transaction Verification and Consensus}{52}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Oracle Architecture: Off-Chain AI to On-Chain Decision}{52}{subsection.3.3.2}%
+\contentsline {paragraph}{Chainlink Functions oracle (primary).}{52}{paragraph*.62}%
+\contentsline {paragraph}{Commit-reveal relay (prototype fallback).}{52}{paragraph*.63}%
+\contentsline {paragraph}{Chainlink Automation: trustless installment triggers.}{53}{paragraph*.64}%
+\contentsline {paragraph}{Chainlink Price Feeds: BDT/USD and ETH/USD.}{53}{paragraph*.65}%
+\contentsline {paragraph}{Chainlink Proof of Reserve.}{53}{paragraph*.66}%
+\contentsline {section}{\numberline {3.4}Data Model and Database Design}{54}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Entity Summary}{59}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}EER Constructs Applied}{61}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Normalization}{62}{subsection.3.4.3}%
+\contentsline {subsection}{\numberline {3.4.4}Indexing Strategy}{62}{subsection.3.4.4}%
+\contentsline {subsection}{\numberline {3.4.5}Functional Dependencies}{66}{subsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.4.6}Relational Integrity Constraints}{67}{subsection.3.4.6}%
+\contentsline {section}{\numberline {3.5}On-Chain and Off-Chain Data Partitioning}{68}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Digital Identity System}{68}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}ZKP KYC and zkAML Compliance Architecture}{69}{subsection.3.6.1}%
+\contentsline {paragraph}{KYC circuit (identity).}{70}{paragraph*.85}%
+\contentsline {paragraph}{zkAML circuit (anti-money-laundering).}{70}{paragraph*.86}%
+\contentsline {paragraph}{W3C DID / VC anchoring.}{70}{paragraph*.87}%
+\contentsline {paragraph}{Privacy posture.}{70}{paragraph*.88}%
+\contentsline {section}{\numberline {3.7}User Taxonomy and Onboarding Flows}{70}{section.3.7}%
+\contentsline {subsection}{\numberline {3.7.1}ERC-4337 Account Abstraction for Retail Onboarding}{72}{subsection.3.7.1}%
+\contentsline {paragraph}{Paymaster sybil-resistance controls.}{73}{paragraph*.92}%
+\contentsline {paragraph}{EIP-7702 session keys --- scoped agent wallet.}{73}{paragraph*.93}%
+\contentsline {subsection}{\numberline {3.7.2}Tiered Risk-Based KYC}{74}{subsection.3.7.2}%
+\contentsline {subsection}{\numberline {3.7.3}Five-Stage Conversion Funnel for Non-Crypto Users}{74}{subsection.3.7.3}%
+\contentsline {section}{\numberline {3.8}Kinked Interest Rate Model}{75}{section.3.8}%
+\contentsline {section}{\numberline {3.9}Liquidation Engine}{76}{section.3.9}%
+\contentsline {paragraph}{Liquidation life-cycle.}{76}{paragraph*.100}%
+\contentsline {paragraph}{Incentive design.}{76}{paragraph*.101}%
+\contentsline {paragraph}{Hierarchical liquidation queue.}{77}{paragraph*.102}%
+\contentsline {section}{\numberline {3.10}SavingsVault and FixedDeposit Modules}{77}{section.3.10}%
+\contentsline {paragraph}{SavingsVault.}{77}{paragraph*.104}%
+\contentsline {paragraph}{FixedDeposit.}{78}{paragraph*.105}%
+\contentsline {paragraph}{ERC-4626 and ERC-7540 interface alignment.}{78}{paragraph*.106}%
+\contentsline {paragraph}{Closed-loop economic argument.}{78}{paragraph*.107}%
+\contentsline {section}{\numberline {3.11}On-Chain Credit Passport (Soulbound Token)}{79}{section.3.11}%
+\contentsline {paragraph}{Public \texttt {ICreditPassport} interface for cross-protocol composability.}{79}{paragraph*.109}%
+\contentsline {paragraph}{GDPR and the permanent SBT default record.}{79}{paragraph*.110}%
+\contentsline {paragraph}{Credit tier schedule.}{80}{paragraph*.111}%
+\contentsline {section}{\numberline {3.12}Cross-Chain Bridge Architecture}{81}{section.3.12}%
+\contentsline {paragraph}{Bridge protocol selection.}{81}{paragraph*.114}%
+\contentsline {paragraph}{Cross-chain hierarchy invariant.}{82}{paragraph*.115}%
+\contentsline {section}{\numberline {3.13}Multi-Entity and Cross-Tier Capital Operations}{82}{section.3.13}%
+\contentsline {subsection}{\numberline {3.13.1}InterBankLendingPool: Fully Specified Same-Tier Lending}{83}{subsection.3.13.1}%
+\contentsline {paragraph}{Pool placement.}{83}{paragraph*.118}%
+\contentsline {paragraph}{Rate model.}{83}{paragraph*.119}%
+\contentsline {paragraph}{Settlement and default cascade.}{83}{paragraph*.120}%
+\contentsline {paragraph}{Operations.}{84}{paragraph*.121}%
+\contentsline {subsection}{\numberline {3.13.2}Upward Surplus Repatriation}{84}{subsection.3.13.2}%
+\contentsline {paragraph}{FATF Travel Rule compliance for inter-tier capital flows (Future Work).}{85}{paragraph*.122}%
+\contentsline {subsection}{\numberline {3.13.3}Syndicated and Club Lending}{85}{subsection.3.13.3}%
+\contentsline {paragraph}{Roles.}{85}{paragraph*.123}%
+\contentsline {paragraph}{Lifecycle.}{85}{paragraph*.124}%
+\contentsline {paragraph}{Cross-tier syndication.}{86}{paragraph*.125}%
+\contentsline {subsection}{\numberline {3.13.4}Senior--Junior Tranched Lending Pools}{86}{subsection.3.13.4}%
+\contentsline {paragraph}{Waterfall payment.}{87}{paragraph*.126}%
+\contentsline {paragraph}{Stress test.}{87}{paragraph*.127}%
+\contentsline {subsection}{\numberline {3.13.5}Cross-Tier Treasury FX Swap}{87}{subsection.3.13.5}%
+\contentsline {paragraph}{Mechanism.}{87}{paragraph*.128}%
+\contentsline {paragraph}{Hierarchy invariant.}{87}{paragraph*.129}%
+\contentsline {subsection}{\numberline {3.13.6}Multilateral Settlement Netting Engine}{87}{subsection.3.13.6}%
+\contentsline {paragraph}{Workflow.}{87}{paragraph*.130}%
+\contentsline {paragraph}{Why this matters.}{88}{paragraph*.131}%
+\contentsline {paragraph}{Trust assumption disclosure.}{88}{paragraph*.132}%
+\contentsline {paragraph}{Database mirror.}{88}{paragraph*.133}%
+\contentsline {paragraph}{Settlement failure path.}{88}{paragraph*.134}%
+\contentsline {subsection}{\numberline {3.13.7}Database, Phase, and Contract Consistency for Multi-Entity Operations}{88}{subsection.3.13.7}%
+\contentsline {paragraph}{ERD entities added (data model in Chapter~3 ERD).}{88}{paragraph*.135}%
+\contentsline {paragraph}{Smart contracts added (Appendix~B).}{89}{paragraph*.136}%
+\contentsline {paragraph}{Implementation phase plan update (Chapter~1, Methodology in Brief).}{89}{paragraph*.137}%
+\contentsline {section}{\numberline {3.14}Reentrancy and Security Analysis}{89}{section.3.14}%
+\contentsline {paragraph}{Failed-attempt lockout and address whitelisting.}{91}{paragraph*.138}%
+\contentsline {section}{\numberline {3.15}System Modeling}{91}{section.3.15}%
+\contentsline {subsection}{\numberline {3.15.1}Use Case Diagram}{91}{subsection.3.15.1}%
+\contentsline {subsection}{\numberline {3.15.2}Activity Diagrams}{93}{subsection.3.15.2}%
+\contentsline {paragraph}{SAR activity flow.}{96}{paragraph*.143}%
+\contentsline {subsection}{\numberline {3.15.3}Data Flow Diagrams}{97}{subsection.3.15.3}%
+\contentsline {subsection}{\numberline {3.15.4}Sequence Diagrams}{98}{subsection.3.15.4}%
+\contentsline {subsection}{\numberline {3.15.5}Four-Tier Capital Flow}{103}{subsection.3.15.5}%
+\contentsline {section}{\numberline {3.16}Auxiliary Dual-Currency Facility}{104}{section.3.16}%
+\contentsline {section}{\numberline {3.17}Banking Product Suite}{104}{section.3.17}%
+\contentsline {subsection}{\numberline {3.17.1}Savings Products}{104}{subsection.3.17.1}%
+\contentsline {subsection}{\numberline {3.17.2}Checking and Transactional Accounts}{105}{subsection.3.17.2}%
+\contentsline {subsection}{\numberline {3.17.3}Group / Solidarity Lending}{105}{subsection.3.17.3}%
+\contentsline {paragraph}{Stablecoin denomination at the group tier.}{107}{paragraph*.153}%
+\contentsline {paragraph}{Over-indebtedness risk control.}{107}{paragraph*.154}%
+\contentsline {paragraph}{Cross-pool query and debt-to-income enforcement.}{107}{paragraph*.155}%
+\contentsline {subsection}{\numberline {3.17.4}Foreign Exchange and Multi-Currency Operations}{108}{subsection.3.17.4}%
+\contentsline {subsection}{\numberline {3.17.5}Trade Finance Facilitation (Planned)}{108}{subsection.3.17.5}%
+\contentsline {subsection}{\numberline {3.17.6}Privacy-Preserving Identity Compliance (Planned)}{108}{subsection.3.17.6}%
+\contentsline {section}{\numberline {3.18}Governance Framework}{109}{section.3.18}%
+\contentsline {subsection}{\numberline {3.18.1}Network Membership}{109}{subsection.3.18.1}%
+\contentsline {subsection}{\numberline {3.18.2}Business Network Governance}{110}{subsection.3.18.2}%
+\contentsline {subsection}{\numberline {3.18.3}Technology Infrastructure Governance}{111}{subsection.3.18.3}%
+\contentsline {subsection}{\numberline {3.18.4}Regulatory Compliance Considerations}{111}{subsection.3.18.4}%
+\contentsline {paragraph}{Institutional trust bootstrapping.}{111}{paragraph*.163}%
+\contentsline {paragraph}{FATF Travel Rule (R.16) --- inter-tier flows.}{112}{paragraph*.164}%
+\contentsline {paragraph}{SAR workflow --- Isolation Forest to regulator.}{112}{paragraph*.165}%
+\contentsline {paragraph}{Regulator audit request flow (specify only).}{112}{paragraph*.166}%
+\contentsline {subsection}{\numberline {3.18.5}Asset Tokenization}{112}{subsection.3.18.5}%
+\contentsline {section}{\numberline {3.19}Five-Layer Defense-in-Depth Security Architecture}{114}{section.3.19}%
+\contentsline {paragraph}{Prompt injection scanning (Layer~2 --- Application).}{116}{paragraph*.170}%
+\contentsline {paragraph}{Per-tier admin-key model.}{117}{paragraph*.171}%
+\contentsline {paragraph}{SWC Registry mapping.}{117}{paragraph*.172}%
+\contentsline {section}{\numberline {3.20}Threat Model and Security Controls}{117}{section.3.20}%
+\contentsline {chapter}{\numberline {4}Methodology}{120}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Development Methodology}{120}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Planned AI/ML Support and Risk-Score Wiring}{123}{section.4.2}%
+\contentsline {paragraph}{SHAP explainability output to clients.}{124}{paragraph*.176}%
+\contentsline {paragraph}{Autonomous AI agent --- six-step pipeline.}{124}{paragraph*.177}%
+\contentsline {paragraph}{MCP tool server --- 17 banking tools (9 read, 8 write).}{125}{paragraph*.179}%
+\contentsline {paragraph}{Authority Brief UI --- SHAP breakdown for bank approvers.}{127}{paragraph*.182}%
+\contentsline {paragraph}{Per-user personalisation --- shared model, per-user context.}{128}{paragraph*.183}%
+\contentsline {paragraph}{Three-tier system prompt assembly.}{129}{paragraph*.184}%
+\contentsline {paragraph}{Session lineage and cross-session memory.}{130}{paragraph*.186}%
+\contentsline {paragraph}{Context compression strategy.}{130}{paragraph*.187}%
+\contentsline {paragraph}{Toolset scoping --- per-turn tool visibility.}{131}{paragraph*.188}%
+\contentsline {paragraph}{Lifecycle hook middleware --- policy enforcement at the application layer.}{132}{paragraph*.190}%
+\contentsline {section}{\numberline {4.3}Graph Neural Network Extension}{133}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Federated Learning Across Banking Tiers}{134}{section.4.4}%
+\contentsline {paragraph}{Cold start and activation threshold.}{134}{paragraph*.192}%
+\contentsline {section}{\numberline {4.5}Formal Verification of Reserve Invariants (Certora)}{134}{section.4.5}%
+\contentsline {paragraph}{Invariant 1 -- reserve never under-collateralized.}{134}{paragraph*.193}%
+\contentsline {paragraph}{Invariant 2 -- no over-allocation downstream.}{134}{paragraph*.194}%
+\contentsline {section}{\numberline {4.6}Foundry Invariant and Fuzz Test Suite}{135}{section.4.6}%
+\contentsline {paragraph}{Three invariants asserted under Foundry's stateful fuzzer.}{135}{paragraph*.195}%
+\contentsline {section}{\numberline {4.7}On-Chain Economic Feasibility Simulation}{135}{section.4.7}%
+\contentsline {paragraph}{Simulation scope.}{135}{paragraph*.196}%
+\contentsline {paragraph}{Simulation script design.}{136}{paragraph*.198}%
+\contentsline {paragraph}{What the simulation demonstrates.}{136}{paragraph*.199}%
+\contentsline {section}{\numberline {4.8}Real-Time Dashboard Pipeline and Runtime Monitoring}{137}{section.4.8}%
+\contentsline {paragraph}{The Graph subgraph.}{137}{paragraph*.201}%
+\contentsline {paragraph}{WebSocket event listener.}{137}{paragraph*.202}%
+\contentsline {paragraph}{Tenderly monitoring.}{137}{paragraph*.203}%
+\contentsline {section}{\numberline {4.9}Transaction-State Machine for Frontend UX}{138}{section.4.9}%
+\contentsline {section}{\numberline {4.10}EIP-712 Authentication and API Hardening}{139}{section.4.10}%
+\contentsline {paragraph}{Limitations (prototype and research context).}{139}{paragraph*.205}%
+\contentsline {section}{\numberline {4.11}Evaluation Methodology}{139}{section.4.11}%
+\contentsline {subsection}{\numberline {4.11.1}LLM Assistant Evaluation Protocol}{140}{subsection.4.11.1}%
+\contentsline {section}{\numberline {4.12}Implementation Phase Plan and Deliverables}{141}{section.4.12}%
+\contentsline {subsection}{\numberline {4.12.1}Phase I: Foundation and Infrastructure (Weeks 1--4)}{141}{subsection.4.12.1}%
+\contentsline {subsection}{\numberline {4.12.2}Phase II: Core Banking Features and Agent Baseline (Weeks 5--9)}{143}{subsection.4.12.2}%
+\contentsline {subsection}{\numberline {4.12.3}Phase III: AI/ML Pipeline and Agent Harness (Weeks 10--13)}{145}{subsection.4.12.3}%
+\contentsline {subsection}{\numberline {4.12.4}Phase IV: Verification, Evaluation, and Finalization (Weeks 14--16)}{147}{subsection.4.12.4}%
+\contentsline {section}{\numberline {4.13}SDLC Stage Mapping}{148}{section.4.13}%
+\contentsline {section}{\numberline {4.14}Design Decisions and Alternatives}{149}{section.4.14}%
+\contentsline {subsection}{\numberline {4.14.1}Justification of Selected Technologies}{151}{subsection.4.14.1}%
+\contentsline {section}{\numberline {4.15}Design Patterns}{154}{section.4.15}%
+\contentsline {section}{\numberline {4.16}Software Testing Strategy}{155}{section.4.16}%
+\contentsline {chapter}{\numberline {5}Market Analysis and Feasibility}{156}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Market Sizing}{156}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Target Customer Segment}{156}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Partner Ecosystem}{157}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Competitive Landscape}{157}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Risk Taxonomy}{160}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Technical Feasibility}{161}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Economic Feasibility}{162}{section.5.7}%
+\contentsline {section}{\numberline {5.8}Revenue Projection}{162}{section.5.8}%
+\contentsline {paragraph}{Hard rule: no native CWB governance token in the prototype.}{167}{paragraph*.242}%
+\contentsline {subsection}{\numberline {5.8.1}Transaction Economics: Interest Rates}{167}{subsection.5.8.1}%
+\contentsline {subsection}{\numberline {5.8.2}Global Economic Impact}{168}{subsection.5.8.2}%
+\contentsline {subsection}{\numberline {5.8.3}Value Proposition and Go-to-Market}{169}{subsection.5.8.3}%
+\contentsline {section}{\numberline {5.9}Currency Risk and the Stablecoin Imperative}{169}{section.5.9}%
+\contentsline {section}{\numberline {5.10}MiCA and GENIUS Act Compliance Mapping}{170}{section.5.10}%
+\contentsline {section}{\numberline {5.11}Bangladesh Regulatory Reality}{171}{section.5.11}%
+\contentsline {paragraph}{Crypto remains effectively illegal for retail use as of 2025--2026.}{171}{paragraph*.250}%
+\contentsline {paragraph}{The CBDC trajectory is the credible legal path.}{171}{paragraph*.251}%
+\contentsline {paragraph}{The Regulatory FinTech Facilitation Office is the entry point.}{172}{paragraph*.252}%
+\contentsline {paragraph}{2025 Bangladesh-specific financial-inclusion data.}{172}{paragraph*.253}%
+\contentsline {paragraph}{FATF Travel Rule scoping for Bangladesh.}{172}{paragraph*.254}%
+\contentsline {section}{\numberline {5.12}Bootstrap Funding and the Tier~1 Capitalization Problem}{173}{section.5.12}%
+\contentsline {section}{\numberline {5.13}Prototype Scope and Limitations}{173}{section.5.13}%
+\contentsline {section}{\numberline {5.14}Accessibility Assessment: A Borrower in Rural Sylhet}{174}{section.5.14}%
+\contentsline {chapter}{\numberline {6}Conclusion}{176}{chapter.6}%
+\contentsline {chapter}{\numberline {A}Technology Stack}{181}{appendix.A}%
+\contentsline {section}{\numberline {A.1}In-product assistant: local large language model (LLM) integration (prototype)}{181}{section.A.1}%
+\contentsline {paragraph}{Purpose.}{181}{paragraph*.256}%
+\contentsline {paragraph}{Model and runtime (local development).}{181}{paragraph*.257}%
+\contentsline {paragraph}{End-to-end behavior.}{182}{paragraph*.258}%
+\contentsline {paragraph}{Live on-chain context injection.}{182}{paragraph*.259}%
+\contentsline {paragraph}{Security and limitations (prototype stance).}{183}{paragraph*.260}%
+\contentsline {paragraph}{Architecture diagram.}{183}{paragraph*.261}%
+\contentsline {paragraph}{Implementation analysis (brief).}{187}{paragraph*.266}%
+\contentsline {paragraph}{Relationship to the earlier rule-based assistant (legacy).}{187}{paragraph*.267}%
+\contentsline {chapter}{\numberline {B}Smart Contract Capabilities}{189}{appendix.B}%
+\contentsline {chapter}{Appendix C: Deployed Testnet Contract Addresses}{191}{section*.271}%
+\contentsline {chapter}{Appendix D: WorldBankReserve Contract Interface}{192}{section*.274}%
+\contentsline {chapter}{References}{194}{section*.276}%

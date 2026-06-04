@@ -1,0 +1,26 @@
+---
+title: Tiered Borrower Access Model — USDC Bands and Credit Passport
+---
+flowchart LR
+    classDef tier fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef cap  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef sbt  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    T1["<b>T1 — Wholesale / Sovereign</b><br/>KYC L4 + multisig<br/>Institutional USDC band<br/>Originated at NB / WB"]:::tier
+    T2["<b>T2 — Institutional</b><br/>KYC L3 + entity docs<br/>Large USDC band<br/>Originated at NB / LB"]:::tier
+    T3["<b>T3 — SME</b><br/>KYC L2 + income proof<br/>Mid USDC band<br/>Originated at LB"]:::tier
+    T4["<b>T4 — Retail / Group</b><br/>KYC L1 (zkKYC)<br/>Credit Passport SBT tiers<br/>50 / 250 / 1k / 5k / 25k USDC"]:::tier
+
+    T1 --> T2 --> T3 --> T4
+
+    SBT["Credit Passport SBT<br/>Bronze 50 · Silver 250<br/>Gold 1k · Platinum 5k<br/>Diamond 25k USDC"]:::sbt
+    T4 --> SBT
+
+    subgraph RULES[" Access rules "]
+        direction TB
+        R1["KYC level monotone non-increasing<br/>down the tier ladder"]:::cap
+        R2["Loan band ceiling enforced on-chain<br/>via ICreditPassport.getScore()"]:::cap
+        R3["Stablecoin-first at T4<br/>(USDC numeraire)"]:::cap
+        R4["SBT: openLoans · completedCycles ·<br/>lastDefault · riskTier (non-revocable)"]:::cap
+    end
+    SBT -. "governs" .-> RULES

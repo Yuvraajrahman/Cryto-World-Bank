@@ -1,0 +1,38 @@
+---
+title: Agile / Scrum Process with Phase I–IV Implementation Deliverables
+---
+flowchart TB
+    classDef phase fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef cer  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef art  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef del  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    PB["Product Backlog<br/>(user stories + NFRs)"]:::art
+    PP["Phase Planning<br/>(3–4 weeks / phase)"]:::cer
+    WS["Weekly Sync<br/>(progress · blockers)"]:::cer
+    PR["Phase Review + Retrospective"]:::cer
+    GATE["Phase-submission gate<br/>(report + PRs + CI green)"]:::art
+
+    PB --> PP
+    PP --> P1
+    P1 --> PR --> PP
+
+    subgraph P1[" Phase I — Foundation (Weeks 1–4) "]
+        D1["WB · NB · LB contracts<br/>PG schema (19 entities) · FE shell<br/>PoR · zkEVM Cardona RPC"]:::del
+    end
+
+    subgraph P2[" Phase II — Core banking + agent baseline (Weeks 5–9) "]
+        D2["Lending · installments · limits<br/>17 MCP tools · Qwen3 agent<br/>EIP-7702 · injection scan · Hook 1"]:::del
+    end
+
+    subgraph P3[" Phase III — AI/ML + agent harness (Weeks 10–13) "]
+        D3["Chainlink Functions DON<br/>RF + iForest + stacking · SHAP<br/>Three-tier prompt · toolsets · Hook 2"]:::del
+    end
+
+    subgraph P4[" Phase IV — Verification + evaluation (Weeks 14–16) "]
+        D4["Certora CVL proofs · Foundry fuzz<br/>300-client simulation · LLM eval<br/>AML Hook 3 · thesis finalise"]:::del
+    end
+
+    P1 --> P2 --> P3 --> P4
+    P4 --> GATE
+    PP -.-> WS

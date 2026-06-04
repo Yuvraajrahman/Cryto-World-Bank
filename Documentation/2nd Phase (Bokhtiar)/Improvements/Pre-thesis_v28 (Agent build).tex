@@ -3257,7 +3257,7 @@ The v24 simulation deploys 1~World Bank Reserve, 2--3~National Banks, and 4--6~L
 \paragraph{Simulation script design.}
 Foundry deployment scripts with deterministic seeds (a)~deploy all tier contracts, (b)~fund each bank with testnet USDC from a seed distributor wallet, (c)~generate 300~client wallets, (d)~run the full loan lifecycle for each client (\texttt{applyLoan} $\to$ \texttt{approveRisk} $\to$ \texttt{signLoan} $\to$ \texttt{disburse} $\to$ \texttt{repay} $\times N_\text{installments}$), (e)~introduce the configured fraud rate by selecting clients who default mid-lifecycle, and (f)~export all on-chain transaction hashes to a JSON manifest for Appendix~C.
 
-\begin{lstlisting}[language=JavaScript, caption={Foundry simulation entry-point (structure)}]
+\begin{lstlisting}[language=Solidity, caption={Foundry simulation entry-point (structure)}]
 // Foundry script: script/RunSimulation.s.sol
 function run() public {
   uint256 NUM_CLIENTS = 300;
@@ -3390,8 +3390,7 @@ All Must-have deliverables in this phase are prerequisites for Phase~II.
 
 \begin{table}[H]
 \centering
-\caption{Phase I task register: smart contract and database foundation.%
-\footnotemark}
+\caption[Phase I task register: smart contract and database foundation]{Phase I task register: smart contract and database foundation\footnotemark}
 \label{tab:phaseI-contracts}
 \small
 \begin{tabular}{p{1.8cm}p{1.8cm}p{7.5cm}p{1.5cm}}

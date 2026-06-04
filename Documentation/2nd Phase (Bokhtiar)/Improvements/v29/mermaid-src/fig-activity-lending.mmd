@@ -1,0 +1,47 @@
+---
+title: Lending Activity Flows — SCORE_REVEALED, SBT, USDC
+---
+flowchart TB
+    classDef start  fill:#1F1F1F,color:#FAFAFA,stroke:#1F1F1F
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef finish fill:#FAFAFA,stroke:#1F1F1F,stroke-width:2px,color:#111111
+
+    subgraph A[" (a) Loan request to repayment (USDC) "]
+        direction TB
+        A1((Start)):::start --> A2["Borrower completes KYC"]:::act
+        A2 --> A3["Submit loan request<br/>(amount_usdc, term)"]:::act
+        A3 --> A4{"Borrowing-limit OK?<br/>SBT + tier check"}:::dec
+        A4 -- No --> A5["Reject + log AI_ML_LOG"]:::act --> AE((End)):::finish
+        A4 -- Yes --> A6["ML score via Chainlink Functions<br/>→ SCORE_REVEALED gate"]:::act
+        A6 --> A7{Group pool<br/>branch?}:::dec
+        A7 -- Yes --> A7b["GroupLendingPool consent<br/>+ shared collateral"]:::act --> A8
+        A7 -- No --> A8["Approver review<br/>+ Authority Brief"]:::act
+        A8 --> A9{Approve?}:::dec
+        A9 -- Reject --> A5
+        A9 -- Approve --> A10["Disburse USDC +<br/>create INSTALLMENT rows"]:::act
+        A10 --> A11["Pay installments<br/>(processInstallment)"]:::act
+        A11 --> A12{All paid?}:::dec
+        A12 -- No --> A11
+        A12 -- Yes --> A13["Close loan · update SBT<br/>(completedCycles++)"]:::act --> AE
+    end
+
+    subgraph B[" (b) Hierarchical capital flow "]
+        direction TB
+        B1((Start)):::start --> B2["WB allocates USDC to NB<br/>(reserve ratio check)"]:::act
+        B2 --> B3{NB ratio ≥ min?}:::dec
+        B3 -- No --> B4["Hold + TimeLock review"]:::act --> BE((End)):::finish
+        B3 -- Yes --> B5["NB allocates USDC to LB"]:::act
+        B5 --> B6{LB ratio ≥ min?}:::dec
+        B6 -- No --> B4
+        B6 -- Yes --> B7["LB pool funded for USDC draws"]:::act --> BE
+    end
+
+    subgraph C[" (c) Borrowing-limit enforcement "]
+        direction TB
+        C1((Start)):::start --> C2["Read SBT via ICreditPassport<br/>openLoans + riskTier"]:::act
+        C2 --> C3["Compute USDC ceiling<br/>(50/250/1k/5k/25k)"]:::act
+        C3 --> C4{requested ≤ ceiling<br/>AND openLoans < cap?}:::dec
+        C4 -- No --> C5["Revert BORROW_LIMIT_EXCEEDED"]:::act --> CE((End)):::finish
+        C4 -- Yes --> C6["Proceed to ML scoring"]:::act --> CE
+    end

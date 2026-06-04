@@ -1,0 +1,28 @@
+---
+title: On-Chain Economic Feasibility Simulation — 300 Clients, 6 Banks, SEED=42
+---
+flowchart LR
+    classDef script fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef chain fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef out  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    SEED["SEED = 42<br/>(deterministic · reproducible)"]:::script
+
+    SEED --> S1["Foundry RunSimulation.s.sol"]:::script
+    S1 --> S2["Deploy hierarchy<br/>1 WB · 2–3 NB · 6 LB"]:::step
+    S2 --> S3["Fund banks · testnet USDC"]:::step
+    S3 --> S4["generateClients(300, SEED)"]:::step
+    S4 --> S5["runLoanLifecycles<br/>apply → approveRisk → sign →<br/>disburse → repay × N"]:::step
+    S5 --> S6["Inject 5% fraud rate<br/>mid-lifecycle defaults"]:::step
+    S6 --> CH["Polygon zkEVM Cardona<br/>on-chain tx hashes"]:::chain
+
+    CH --> ML["FastAPI ML ingestion<br/>synthetic features"]:::step
+    CH --> SBT["Credit Passport SBT updates"]:::step
+    CH --> DASH["Reserve-ratio dashboard<br/>The Graph subgraph"]:::step
+
+    S6 --> MAN["exportManifest<br/>simulation-output/manifest.json"]:::out
+    MAN --> RQ["Evaluation outputs<br/>RQ4 gas · RQ5 reserve dynamics<br/>CSV + confidence intervals"]:::out
+
+    PARAM["NUM_CLIENTS=300 · NUM_BANKS=6<br/>FRAUD_RATE=5% · 12-mo compressed lifecycle"]:::script
+    PARAM -.-> S4

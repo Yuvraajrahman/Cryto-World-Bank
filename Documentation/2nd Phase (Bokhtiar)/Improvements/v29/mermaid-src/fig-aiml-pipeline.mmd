@@ -1,0 +1,48 @@
+---
+title: AI / ML Pipeline — BCCC-DeFi Training, Chainlink Functions DON, Stacking Meta-Learner
+---
+flowchart TB
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef out  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef note fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+
+    subgraph A[" (a) Training pipeline — 18 + 4 features "]
+        direction LR
+        DS[("BCCC-DeFiFraudTrans-2025<br/>+ on-chain events")]:::store
+        FE["Feature engineering<br/>18 behavioural + 4 application"]:::step
+        DS --> FE
+        FE --> RF["Random Forest → p_f<br/>(Platt-calibrated)"]:::step
+        FE --> IF["Isolation Forest → a<br/>(anomaly score)"]:::step
+        RF --> SH["SHAP · explainable AI"]:::step
+        IF --> SH
+        SH --> REG["Model registry<br/>(version + hash)"]:::store
+    end
+
+    subgraph B[" (b) On-chain risk score — Functions DON primary "]
+        direction TB
+        REG --> ML["FastAPI ML service<br/>stacking meta-learner"]:::step
+        ML --> STACK["Logistic meta-learner<br/>on p_f + anomaly → s ∈ [0,1]"]:::step
+        STACK --> TH["Threshold bands<br/>s < 0.4 approve · 0.4–0.7 review · s ≥ 0.7 reject"]:::step
+        STACK --> DON["Chainlink Functions DON<br/>(primary · consensus)"]:::chain
+        DON --> SC["LoanController<br/>commitRiskScore · RiskScoreCommitted"]:::chain
+        STACK -. "prototype fallback" .-> CR["Commit-reveal relay<br/>keccak256(s ‖ nonce)"]:::note
+        CR -.-> SC
+        SC --> OUT["Approver gate + disburse<br/>LoanApproved event"]:::out
+    end
+
+    subgraph C[" (c) GNN extension "]
+        direction LR
+        GR[("Wallet–wallet graph")]:::store --> GNN["GraphSAGE embeddings"]:::step
+        GNN --> RF2["Augments RF feature vector"]:::step
+        RF2 --> REG
+    end
+
+    subgraph D[" (d) Federated learning across tiers "]
+        direction LR
+        LBA["LB-A local trainer"]:::step --> AGG["National-Bank FedAvg<br/>+ DP noise (σ, C)"]:::step
+        LBB["LB-B local trainer"]:::step --> AGG
+        LBC["LB-C local trainer"]:::step --> AGG
+        AGG --> GLOB["Global fraud detector"]:::out
+    end

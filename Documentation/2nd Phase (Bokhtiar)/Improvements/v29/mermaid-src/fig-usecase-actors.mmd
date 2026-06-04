@@ -1,0 +1,61 @@
+---
+title: Use-Case Diagram — Nine-Actor Taxonomy (A1–A9)
+---
+flowchart LR
+    classDef actor fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef uc    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef sys   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    A1(("A1<br/>Retail Client")):::actor
+    A2(("A2<br/>Local Bank Admin")):::actor
+    A3(("A3<br/>National Bank Admin")):::actor
+    A4(("A4<br/>World Bank Admin")):::actor
+    A5(("A5<br/>AI Agent")):::actor
+    A6(("A6<br/>Regulatory Authority")):::actor
+    A7(("A7<br/>Chainlink DON")):::actor
+    A8(("A8<br/>Blockchain Validator")):::actor
+    A9(("A9<br/>External Auditor")):::actor
+
+    subgraph SYS[" Crypto World Bank Platform "]
+        direction TB
+        UC1["Register / KYC (tiered)"]:::uc
+        UC2["Connect wallet · ERC-4337 AA"]:::uc
+        UC3["Apply for USDC loan"]:::uc
+        UC4["Pay installment"]:::uc
+        UC5["Agent write with confirmation gate"]:::uc
+        UC6["ML score commit (Functions DON)"]:::uc
+        UC7["Approve / reject loan"]:::uc
+        UC8["Read Proof of Reserve"]:::uc
+        UC9["SAR review · freeze account"]:::uc
+        UC10["Netting batch dispute"]:::uc
+        UC11["Allocate capital · set reserve ratio"]:::uc
+        UC12["Coordinate NettingBatch"]:::uc
+        UC13["Read-only regulator audit feed"]:::uc
+        UC14["Oracle callback · Automation upkeep"]:::uc
+        UC15["Validate zkEVM block"]:::uc
+        UC16["Verify PoR attestation"]:::uc
+    end
+    class SYS sys
+
+    A1 --> UC1
+    A1 --> UC2
+    A1 --> UC3
+    A1 --> UC4
+    A1 --> UC5
+    A5 --> UC5
+    A5 --> UC6
+    A2 --> UC7
+    A2 --> UC9
+    A2 --> UC10
+    A3 --> UC9
+    A3 --> UC11
+    A3 --> UC12
+    A4 --> UC11
+    A4 --> UC12
+    A6 --> UC13
+    A7 --> UC6
+    A7 --> UC8
+    A7 --> UC14
+    A8 --> UC15
+    A9 --> UC8
+    A9 --> UC16

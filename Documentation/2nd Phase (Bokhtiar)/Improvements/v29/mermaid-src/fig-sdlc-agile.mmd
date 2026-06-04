@@ -1,0 +1,43 @@
+---
+title: SDLC Mapping — Pre-thesis 1 Complete; Phase I–IV with Foundry, Certora, Simulation, Tenderly
+---
+flowchart LR
+    classDef done  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef phase fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef sub   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef tool  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111,stroke-dasharray:3 3
+
+    REQ["Requirements<br/><i>Pre-thesis 1 ✓</i>"]:::done
+    ARC["Architecture<br/><i>Pre-thesis 1 ✓</i>"]:::done
+    DES["Design<br/><i>Pre-thesis 1 ✓</i>"]:::done
+    IMP["Implementation"]:::phase
+    VER["Verification"]:::phase
+    VAL["Validation"]:::phase
+    MNT["Maintenance"]:::phase
+
+    REQ --> ARC --> DES --> IMP --> VER --> VAL --> MNT
+
+    REQ -.-> RQ1["7-user taxonomy · 29 use cases"]:::sub
+    ARC -.-> AR1["4-tier · 15 contracts · DiD"]:::sub
+    DES -.-> DE1["ERD/EER · DFD · sequence · state"]:::sub
+
+    subgraph PH[" Final-thesis phases (Agile overlay) "]
+        direction TB
+        PI["<b>Phase I</b><br/>Core contracts · PG · FE shell"]:::phase
+        PII["<b>Phase II</b><br/>Lending · MCP agent · Hook 1"]:::phase
+        PIII["<b>Phase III</b><br/>Functions DON · ML · agent harness"]:::phase
+        PIV["<b>Phase IV</b><br/>Eval · proofs · simulation manifest"]:::phase
+        PI --> PII --> PIII --> PIV
+    end
+
+    IMP --- PH
+
+    VER -.-> FU["Foundry fuzz + invariants<br/>10k runs · replay tests"]:::tool
+    VER -.-> CE["Certora CVL<br/>reserve + allocation proofs"]:::tool
+    VAL -.-> SIM["300-client Foundry simulation<br/>SEED=42 · Cardona manifest"]:::tool
+    MNT -.-> TE["Tenderly runtime · The Graph indexer<br/>Safe key rotation"]:::tool
+
+    FU --- VER
+    CE --- VER
+    SIM --- VAL
+    TE --- MNT

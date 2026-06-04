@@ -1,0 +1,50 @@
+---
+title: Sequence Diagram — Loan Flow (Functions vs Commit-Reveal · Authority Brief)
+---
+sequenceDiagram
+    autonumber
+    participant U as Borrower
+    participant FE as Frontend
+    participant API as Backend API
+    participant ML as FastAPI ML
+    participant DON as Chainlink Functions DON
+    participant SC as LocalBank Contract
+    participant APV as Approver Dashboard
+    participant DB as PostgreSQL
+
+    U->>FE: Submit loan request (USDC amount, term)
+    FE->>API: POST /loans { signed EIP-712 }
+    API->>DB: INSERT loan_request (PENDING)
+    API->>SC: applyLoan(borrower, amount_usdc)
+    SC-->>API: emit LoanApplied
+
+    alt Primary — Chainlink Functions
+        API->>ML: POST /score { borrower features }
+        ML->>ML: RF + iForest + stacking + SHAP
+        ML->>DON: HTTPS score payload
+        DON->>DON: Multi-node consensus
+        DON->>SC: commitRiskScore(requestId, score)
+        SC-->>API: emit RiskScoreCommitted
+    else Fallback — commit-reveal relay
+        ML-->>API: { score, shap, model_version }
+        API->>DB: INSERT ai_ml_log (hash commit)
+        Note over API,SC: Phase I–II: reveal at approval
+    end
+
+    API->>APV: Authority Brief UI<br/>(SHAP · tier · agent rec)
+    APV->>APV: Review ML score + SHAP breakdown
+
+    alt Approver approves
+        APV->>API: POST /loans/{id}/approve
+        API->>SC: approveLoan + revealScore verify
+        SC->>SC: SCORE_REVEALED gate
+        SC-->>API: emit LoanApproved
+        API->>DB: UPDATE loan SET status=ACTIVE
+        API-->>U: Loan approved · USDC disbursed
+    else Approver rejects
+        APV->>API: POST /loans/{id}/reject
+        API->>SC: rejectLoan(requestId, reason)
+        SC-->>API: emit LoanRejected
+        API->>DB: UPDATE loan SET status=REJECTED
+        API-->>U: Loan rejected — see reason
+    end

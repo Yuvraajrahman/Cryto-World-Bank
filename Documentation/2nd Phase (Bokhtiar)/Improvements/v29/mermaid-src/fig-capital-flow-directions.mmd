@@ -1,0 +1,33 @@
+---
+title: Multi-Directional Capital Flows — Downward · Same-Tier · Upward
+---
+flowchart TB
+    classDef tier fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef note fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+    classDef law fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    subgraph DOWN[" ① Downward capital allocation  "]
+        direction TB
+        WB2["T1"]:::tier --> NB2["T2"]:::tier --> LB2["T3"]:::tier --> CL2["T4"]:::tier
+    end
+
+    subgraph SAME[" ② Same-tier interbank lending (IBLP)  "]
+        direction LR
+        NBA["NB-A"]:::tier <-->|"utilization rate"| NBB["NB-B"]:::tier
+        LBA["LB-1"]:::tier <-->|"peer liquidity pool"| LBB["LB-2"]:::tier
+    end
+
+    subgraph UP[" ③ Upward surplus repatriation (UpwardDepositFacility)  "]
+        direction BT
+        CLu["T4"]:::tier
+        LBu["T3"]:::tier
+        NBu["T2"]:::tier
+        WBu["T1"]:::tier
+        LBu -. "excess USDC reserves" .-> NBu
+        NBu -. "standing deposit yield" .-> WBu
+    end
+
+    RATE["<b>Asymmetric rate structure</b><br/>r<sub>up</sub> &lt; r<sub>down</sub> − δ<br/><i>lower risk lending upward in hierarchy</i>"]:::law
+
+    DOWN --> RATE
+    UP --> RATE

@@ -1,0 +1,45 @@
+---
+title: Prototype Scope Matrix — Implementation Status
+---
+flowchart TB
+    classDef done    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef partial fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef planned fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:4 4
+    classDef hdr     fill:#1F1F1F,color:#FAFAFA,stroke:#1F1F1F,stroke-width:1px
+
+    subgraph LEGEND[" Legend "]
+        direction LR
+        L1["✅ Done · testnet-verified"]:::done
+        L2["⏳ Partial · designed/scaffolded"]:::partial
+        L3["○ Planned · final thesis phase"]:::planned
+    end
+
+    subgraph CORE[" Core platform "]
+        direction TB
+        F1["Four-tier RBAC"]:::done
+        F2["WorldBankReserve (Tier 1)"]:::done
+        F3["National / Local Bank contracts"]:::partial
+        F4["Loan request / approval workflow"]:::done
+        F5["Cross-tier fund transfer"]:::partial
+        F6["Testnet · Polygon zkEVM Cardona"]:::done
+    end
+
+    subgraph AGENT[" Agent · oracle · automation "]
+        direction TB
+        F7["Qwen3-8B · MCP (17 tools)"]:::planned
+        F8["EIP-7702 session keys"]:::planned
+        F9["Chainlink Functions (primary oracle)"]:::planned
+        F10["Chainlink Automation · PoR"]:::planned
+        F11["sessions + agent_action_log tables"]:::planned
+        F12["Authority Brief UI (SHAP)"]:::planned
+    end
+
+    subgraph PRODUCTS[" Banking products · compliance "]
+        direction TB
+        F13["SavingsVault · FixedDeposit"]:::planned
+        F14["GroupLendingPool · IBLP"]:::planned
+        F15["AI/ML · SHAP (RF + iForest)"]:::partial
+        F16["ZKP KYC · Groth16 circuit"]:::planned
+        F17["SAR workflow · freezeAccount"]:::planned
+        F18["300-client Foundry simulation"]:::planned
+    end

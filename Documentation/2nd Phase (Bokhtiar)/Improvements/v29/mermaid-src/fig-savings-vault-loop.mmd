@@ -1,0 +1,28 @@
+---
+title: SavingsVault Closed Loop — ERC-4626 Deposit to NetInterest Split
+---
+flowchart LR
+    classDef actor fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef vault fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef pool  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef split fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    DEP(("Depositor")):::actor
+    SV["SavingsVault<br/>ERC-4626 shares<br/>USDC primary"]:::vault
+    FD["FixedDeposit<br/>ERC-7540 async<br/>30/90/180/365 d"]:::vault
+    POOL["Lending pool<br/>LocalBank disbursement"]:::pool
+    BR(("Borrower")):::actor
+    INT["Interest collected<br/>(kinked rate model)"]:::pool
+
+    DEP -- "deposit USDC" --> SV
+    DEP -- "lock term" --> FD
+    SV --> POOL
+    FD --> POOL
+    POOL -- "duration-matched lending" --> BR
+    BR -- "installment + interest" --> INT
+
+    INT --> NI["NetInterest split"]:::split
+    NI --> D1["Depositor yield<br/>(supply-side index)"]:::split
+    NI --> D2["InsuranceFund<br/>premium reserve"]:::split
+    NI --> D3["Protocol revenue<br/>spread capture"]:::split
+    D1 --> SV

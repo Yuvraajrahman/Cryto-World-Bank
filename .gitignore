@@ -48,3 +48,8 @@ backend/.data/
 # Documentation (archived / previous plans)
 Documentation/Previou\ plans/
 
+*.aux
+*.lof
+*.lot
+*.out
+*.toc

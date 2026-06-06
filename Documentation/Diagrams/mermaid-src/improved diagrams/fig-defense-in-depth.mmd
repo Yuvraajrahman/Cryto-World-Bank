@@ -5,44 +5,35 @@ flowchart TB
     classDef layer fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
     classDef ctl   fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
 
-    subgraph L1[" Layer 1 · Smart Contract Security "]
-        SC1["OpenZeppelin v5 · UUPS"]:::ctl
-        SC2["TimelockController (24–48 h)"]:::ctl
-        SC3["RBAC + role expiry"]:::ctl
-        SC4["ReentrancyGuard · CEI"]:::ctl
-        SC5["Slither · Mythril · Echidna"]:::ctl
-        SC6["Foundry fuzz + invariants"]:::ctl
-        SC7["Certora reserve proofs"]:::ctl
-    end
-
-    subgraph L2[" Layer 2 · Application Security "]
-        AS1["EIP-712 signed login"]:::ctl
-        AS2["JWT + Redis blacklist"]:::ctl
-        AS3["Rate-limit · CORS · CSP"]:::ctl
-        AS4["Input validation (zod / pydantic)"]:::ctl
-        AS5["Secrets in HSM / Vault"]:::ctl
-    end
-
-    subgraph L3[" Layer 3 · AI / ML Security "]
-        ML1["Commit-reveal oracle"]:::ctl
-        ML2["Model registry · version pin"]:::ctl
-        ML3["Adversarial input filters"]:::ctl
-        ML4["SHAP explanation log"]:::ctl
-        ML5["LLM hallucination guard"]:::ctl
-    end
-
-    subgraph L4[" Layer 4 · Runtime Monitoring "]
-        RM1["Tenderly · alerts"]:::ctl
-        RM2["The Graph indexer"]:::ctl
-        RM3["WebSocket dashboard"]:::ctl
-        RM4["Anomaly detector (iForest)"]:::ctl
-    end
-
-    subgraph L5[" Layer 5 · Operational Security "]
+    subgraph L5[" Layer 5 · Operations "]
         OP1["Safe 3-of-5 multisig"]:::ctl
-        OP2["Monthly key rotation"]:::ctl
-        OP3["Bug-bounty programme"]:::ctl
-        OP4["Incident-response runbook"]:::ctl
+        OP2["Security Council 4-of-7"]:::ctl
+        OP3["Key rotation · bug bounty"]:::ctl
+    end
+
+    subgraph L4[" Layer 4 · Runtime "]
+        RM1["Tenderly alerts"]:::ctl
+        RM2["The Graph subgraph"]:::ctl
+        RM3["Isolation Forest SAR queue"]:::ctl
+    end
+
+    subgraph L3[" Layer 3 · AI / ML "]
+        ML1["Chainlink Functions DON"]:::ctl
+        ML2["SHAP Authority Brief"]:::ctl
+        ML3["Prompt injection scanner"]:::ctl
+        ML4["Agent confirmation gate"]:::ctl
+    end
+
+    subgraph L2[" Layer 2 · Application "]
+        AS1["EIP-712 · JWT"]:::ctl
+        AS2["Confirmation audit hook"]:::ctl
+        AS3["Rate-limit · CORS"]:::ctl
+    end
+
+    subgraph L1[" Layer 1 · Smart Contract "]
+        SC1["UUPS · TimeLock · RBAC"]:::ctl
+        SC2["ReentrancyGuard · CEI"]:::ctl
+        SC3["Certora · Foundry fuzz"]:::ctl
     end
 
     L5 --> L4 --> L3 --> L2 --> L1

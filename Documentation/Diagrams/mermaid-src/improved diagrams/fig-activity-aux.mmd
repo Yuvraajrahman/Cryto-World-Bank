@@ -1,40 +1,68 @@
 ---
-title: Auxiliary Activity Flows - (a) Chat, (b) AI Chatbot, (c) Market Data
+title: Client Banking Session — Chat, Dashboard, and Optional Agent
 ---
-flowchart TB
-    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F
-    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef finish fill:#FFFFFF,stroke:#1F1F1F,stroke-width:2px,color:#111111
+flowchart LR
+    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F,stroke-width:2.5px
+    classDef finish fill:#FFFFFF,color:#111111,stroke:#1F1F1F,stroke-width:2.5px
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef core   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef opt    fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111,stroke-dasharray:6 4
+    classDef gate   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
 
-    subgraph A[" (a) Borrower–Bank chat "]
+    S(("Start")):::start
+
+    subgraph PRE[" Session bootstrap "]
         direction TB
-        A1((Start)):::start --> A2["User opens chat thread"]:::act
-        A2 --> A3["WebSocket connects<br/>(JWT in handshake)"]:::act
-        A3 --> A4{User sends msg?}:::dec
-        A4 -- No --> A5["Idle / heartbeat"]:::act --> A4
-        A4 -- Yes --> A6["Persist CHAT_MESSAGE<br/>+ broadcast to room"]:::act
-        A6 --> A7{Close?}:::dec
-        A7 -- No --> A4
-        A7 -- Yes --> AE((End)):::finish
+        PRE1["Client authenticates<br/>JWT + wallet context"]:::act
+        PRE2["Prefetch Chainlink fiat/USD<br/>10s cache for loan form"]:::act
+        PRE1 --> PRE2
     end
 
-    subgraph B[" (b) AI Chatbot "]
+    PRE --> ROUTE{Client<br/>channel?}:::dec
+
+    subgraph DASH[" Primary — React dashboard "]
         direction TB
-        B1((Start)):::start --> B2["User asks question"]:::act
-        B2 --> B3["RAG: retrieve top-k chunks<br/>from ChromaDB"]:::act
-        B3 --> B4["QLoRA-tuned LLM<br/>generates answer"]:::act
-        B4 --> B5{Hallucination check<br/>passes?}:::dec
-        B5 -- No --> B6["Fallback: link to docs +<br/>'see human approver'"]:::act --> BE((End)):::finish
-        B5 -- Yes --> B7["Return answer +<br/>cite source chunks"]:::act --> BE
+        D1["Direct REST / EIP-712 call<br/>loan · repay · savings"]:::act
+        D2["Express validates + routes<br/>to smart contract"]:::act
+        D1 --> D2
     end
 
-    subgraph C[" (c) Market data view "]
+    subgraph CHAT[" Human support chat "]
         direction TB
-        C1((Start)):::start --> C2["Authenticated user<br/>opens dashboard"]:::act
-        C2 --> C3["API fetches Chainlink<br/>price feeds (cached 10s)"]:::act
-        C3 --> C4["Render charts<br/>(USDC, ETH, BDT)"]:::act
-        C4 --> C5{User opens<br/>loan sizing?}:::dec
-        C5 -- No --> CE((End)):::finish
-        C5 -- Yes --> C6["Pre-fill loan form<br/>(USDC denom default)"]:::act --> CE
+        C1["Open WebSocket thread<br/>bank officer queue"]:::act
+        C2["Persist CHAT_MESSAGE<br/>off-chain PostgreSQL"]:::act
+        C1 --> C2
     end
+
+    subgraph AGENT[" Optional agent add-on "]
+        direction TB
+        AG0["Phase III–IV · not MVT"]:::opt
+        AG1["Inject on-chain context<br/>loans · SBT · installments"]:::act
+        AG2{Write tool<br/>requested?}:::dec
+        AG3["RAG read-only answer"]:::act
+        AG4["Show confirmation summary"]:::gate
+        AG5{Explicit<br/>Yes?}:::dec
+        AG6["MCP write · EIP-7702 sign<br/>middleware 403 if no confirm"]:::act
+        AG0 --> AG1 --> AG2
+        AG2 -- "No" --> AG3
+        AG2 -- "Yes" --> AG4 --> AG5
+        AG5 -- "Yes" --> AG6
+    end
+
+    subgraph FIN[" Audit & close "]
+        direction TB
+        F1["Log action + correlation ID<br/>AGENT_ACTION_LOG if agent"]:::act
+        F2["Return result to client UI"]:::act
+        F1 --> F2
+    end
+
+    E(("End")):::finish
+
+    ROUTE -- "Dashboard" --> DASH --> FIN
+    ROUTE -- "Live chat" --> CHAT --> FIN
+    ROUTE -- "Agent UI" --> AGENT
+    AG3 --> FIN
+    AG5 -- "No" --> FIN
+    AG6 --> FIN
+    FIN --> E

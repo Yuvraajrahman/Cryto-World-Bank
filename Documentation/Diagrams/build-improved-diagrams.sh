@@ -16,9 +16,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_DIR="${SCRIPT_DIR}/mermaid-src/improved diagrams"
 OUT_DIR="${SCRIPT_DIR}/mermaid-pdf/improved diagrams"
 CFG_FILE="${SCRIPT_DIR}/mmdc-config.json"
+CSS_FILE="${SCRIPT_DIR}/mmdc-fonts.css"
 CHART_CFG="${SCRIPT_DIR}/mmdc-charts-config.json"
 PUPPETEER_CFG="${SCRIPT_DIR}/mmdc-puppeteer.json"
-CHART_DIAGRAMS="fig-revenue-by-tier fig-apr-spread"
+CHART_DIAGRAMS="fig-revenue-by-tier fig-apr-spread fig-kinked-rate-curve"
+# Large canvas + 2× scale keeps label text readable after --pdfFit shrinks to page.
+MMDC_WIDTH="${MMDC_WIDTH:-4000}"
+MMDC_HEIGHT="${MMDC_HEIGHT:-3000}"
+MMDC_SCALE="${MMDC_SCALE:-3}"
+MMDC_ARGS=(-w "${MMDC_WIDTH}" -H "${MMDC_HEIGHT}" -s "${MMDC_SCALE}")
+
+# ER diagrams and flowcharts use Mermaid foreignObject labels. rsvg-convert drops
+# that HTML, so labels render invisible in PDF. Use mmdc --pdfFit (Chromium) instead.
+ER_DIAGRAMS="fig-erd-core fig-erd-extended"
 
 mkdir -p "${OUT_DIR}"
 
@@ -46,7 +56,8 @@ for src in "${SRC_DIR}"/*.mmd; do
     svg_tmp="${OUT_DIR}/${name}.svg"
     printf "  render  %s (chart B&W)\n" "${name}"
     if ! mmdc -i "${src}" -o "${svg_tmp}" \
-        -c "${cfg}" -p "${PUPPETEER_CFG}" \
+        -c "${cfg}" -C "${CSS_FILE}" -p "${PUPPETEER_CFG}" \
+        "${MMDC_ARGS[@]}" \
         -b white --quiet >/dev/null 2>&1; then
       printf "  FAILED  %s (svg)\n" "${name}" >&2
       failed_names+=("${name}")
@@ -67,9 +78,16 @@ for src in "${SRC_DIR}"/*.mmd; do
     fi
     continue
   fi
-  printf "  render  %s\n" "${name}"
+  mmdc_width=("${MMDC_ARGS[@]}")
+  if [[ " ${ER_DIAGRAMS} " == *" ${name} "* ]]; then
+    mmdc_width=(-w 5200 -H 4000 -s "${MMDC_SCALE}")
+    printf "  render  %s (ER diagram)\n" "${name}"
+  else
+    printf "  render  %s\n" "${name}"
+  fi
   if ! mmdc -i "${src}" -o "${out}" \
-      -c "${cfg}" -p "${PUPPETEER_CFG}" \
+      -c "${cfg}" -C "${CSS_FILE}" -p "${PUPPETEER_CFG}" \
+      "${mmdc_width[@]}" \
       -b white --pdfFit \
       --quiet >/dev/null 2>&1; then
     printf "  FAILED  %s\n" "${name}" >&2

@@ -1,0 +1,95 @@
+---
+title: Solidarity Group Lending — Full Lifecycle Activity Flow
+---
+flowchart LR
+    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F,stroke-width:2.5px
+    classDef finish fill:#FFFFFF,color:#111111,stroke:#1F1F1F,stroke-width:2.5px
+    classDef phase  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef ctrl   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:5 4
+    classDef cold   fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:6 4
+    classDef chain  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef exit   fill:#F8F8F8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:4 3
+
+    S(("Start")):::start
+
+    subgraph P1[" ① Group formation "]
+        direction TB
+        P1A["3–20 registered CLIENTs<br/>form LOAN_GROUP on-chain"]:::act
+        P1B{Collateral<br/>available?}:::dec
+        P1C["Each member deposits USDC/ETH<br/>into shared pool contract"]:::chain
+        P1D["Cold-start pathway<br/>≥5 members · L1 KYC · provisional tier<br/>expires 3 months post-disbursement"]:::cold
+        P1A --> P1B
+        P1B -- "Yes" --> P1C
+        P1B -- "No" --> P1D
+    end
+
+    subgraph P2[" ② Over-indebtedness gate "]
+        direction TB
+        P2A["GroupLendingPool.applyGroupLoan()<br/>reads ICreditPassport SBT"]:::chain
+        P2B["Cross-pool query<br/>openLoans across all Local Banks"]:::act
+        P2C["Enforce controls:<br/>≤2 active group loans · 30-day cooling-off<br/>DTI ≤ 40% · income_hash ≤ 90 days"]:::ctrl
+        P2D{All controls<br/>pass?}:::dec
+        P2A --> P2B --> P2C --> P2D
+    end
+
+    subgraph P3[" ③ Collective application "]
+        direction TB
+        P3A["Submit USDC group application<br/>total · term · per-member schedule"]:::act
+        P3B["Every member signs tx<br/>unanimous on-chain consent"]:::act
+        P3C["Persist GROUP_MEMBER<br/>share · consent_sig"]:::act
+        P3A --> P3B --> P3C
+    end
+
+    subgraph P4[" ④ Bank approval "]
+        direction TB
+        P4A["Approver reviews aggregate SBT<br/>income proofs · collateral ratio"]:::act
+        P4B["ML score + SHAP brief<br/>optional for cold-start tier"]:::act
+        P4C{Approve<br/>disbursement?}:::dec
+        P4A --> P4B --> P4C
+    end
+
+    subgraph P5[" ⑤ Disbursement "]
+        direction TB
+        P5A["Share_i = LoanTotal / N_members<br/>USDC to each wallet"]:::act
+        P5B["Increment SBT.openLoans<br/>emit GroupLoanDisbursed"]:::chain
+        P5A --> P5B
+    end
+
+    subgraph P6[" ⑥ Repayment & liability "]
+        direction TB
+        P6A["Per-member INSTALLMENT tracking<br/>transparent to all group members"]:::act
+        P6B{Member default<br/>beyond grace?}:::dec
+        P6C["Mutual liability:<br/>shortfall from shared pool<br/>proportional cost across group"]:::chain
+        P6D["No collateral path:<br/>SBT riskTier downgrade<br/>lastDefault permanently recorded"]:::exit
+        P6E["InsuranceFund covers<br/>residual pool shortfall"]:::chain
+        P6A --> P6B
+        P6B -- "No" --> P6F["On-time repayments<br/>logged per member"]:::act
+        P6B -- "Yes" --> P6C
+        P6C --> P6E
+        P6C -. "no pool" .-> P6D
+    end
+
+    subgraph P7[" ⑦ Credit progression "]
+        direction TB
+        P7A["Update CREDIT_PASSPORT SBT<br/>completedCycles · creditScore"]:::chain
+        P7B{≥3 successful<br/>cycles?}:::dec
+        P7C["Graduate to standard<br/>ML-gated credit model"]:::act
+        P7A --> P7B
+        P7B -- "Yes" --> P7C
+    end
+
+    E(("End")):::finish
+
+    S --> P1
+    P1C & P1D --> P2
+    P2D -- "Reject" --> X1["Application reverted<br/>plain-language reason"]:::exit --> E
+    P2D -- "Pass" --> P3 --> P4
+    P4C -- "Reject" --> X2["rejectGroupLoan()<br/>consent voided"]:::exit --> E
+    P4C -- "Approve" --> P5 --> P6
+    P6F --> P7
+    P6D --> P7
+    P6E --> P7
+    P7B -- "No" --> E
+    P7C --> E

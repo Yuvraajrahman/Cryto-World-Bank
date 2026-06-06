@@ -1,0 +1,18 @@
+---
+title: SAR and AML Compliance Workflow
+---
+flowchart LR
+    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    T1["Transaction stream"]:::step
+    T2["Isolation Forest<br/>anomaly score"]:::step
+    T3["Alert queue<br/>(Kafka / DB)"]:::store
+    T4["Compliance officer<br/>review"]:::step
+    T5["SAR report<br/>generation"]:::step
+    T6["freezeAccount(clientId)<br/>onlyApprover gate"]:::chain
+    T7["Append-only<br/>audit_logs"]:::store
+
+    T1 --> T2 --> T3 --> T4 --> T5
+    T4 --> T6 --> T7

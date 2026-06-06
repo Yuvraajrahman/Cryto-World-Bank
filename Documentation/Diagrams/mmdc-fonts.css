@@ -1,0 +1,37 @@
+/* Force readable label sizes for thesis PDF embedding (Mermaid CLI). */
+foreignObject div,
+foreignObject span,
+foreignObject p,
+.nodeLabel,
+.edgeLabel,
+.label,
+.actor,
+.messageText,
+.loopText,
+.noteText,
+.labelText,
+.cluster-label,
+.er entityLabel,
+.er attributeLabel,
+.er relationshipLabel,
+.entityLabel,
+.attributeLabel,
+title,
+text,
+tspan {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  font-size: 30px !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+}
+
+.edgeLabel,
+.relationshipLabel {
+  font-size: 24px !important;
+}
+
+.cluster-label,
+title {
+  font-size: 26px !important;
+  font-weight: 600 !important;
+}

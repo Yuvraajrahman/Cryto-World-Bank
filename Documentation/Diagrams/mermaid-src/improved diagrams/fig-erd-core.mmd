@@ -1,5 +1,9 @@
 ---
-title: Entity-Relationship Diagram - Core Lending and Governance
+title: Core ERD - Lending, Governance, and Agent Session Entities
+config:
+  er:
+    fontSize: 24
+    entityPadding: 24
 ---
 erDiagram
     WORLD_BANK ||--o{ NATIONAL_BANK : registers
@@ -9,110 +13,60 @@ erDiagram
     BORROWER ||--o{ LOAN_REQUEST : submits
     BANK_USER ||--o{ LOAN_REQUEST : approves
     LOAN_REQUEST ||--|| LOAN : produces
-    LOAN ||--o{ INSTALLMENT : "schedules"
-    INSTALLMENT ||--o| TRANSACTION : "settled by"
+    LOAN ||--o{ INSTALLMENT : schedules
+    INSTALLMENT ||--o| TRANSACTION : settled_by
     BORROWER ||--o{ INCOME_PROOF : provides
     BORROWER ||--o{ CHAT_MESSAGE : sends
-    LOAN ||--o{ AI_ML_LOG : "scored by"
+    LOAN ||--o{ AI_ML_LOG : scored_by
     BORROWER ||--o| CREDIT_PASSPORT : holds
+    BORROWER ||--o{ SESSIONS : has
+    SESSIONS ||--o{ AGENT_ACTION_LOG : audits
+    WORLD_BANK ||--o| INTEREST_RATE_TIER : uses
+    LOAN }o--|| ASSETS : collateral_asset
+    LOAN }o--|| ASSETS : loan_asset
 
     WORLD_BANK {
-        bigint world_bank_id PK
-        string name
-        string admin_wallet
-        numeric total_reserve
-        timestamp created_at
+        bigint bank_id PK
+        string name UK
+        numeric reserve_ratio
     }
     NATIONAL_BANK {
-        bigint national_bank_id PK
-        bigint world_bank_id FK
-        string name
-        string admin_wallet
-        numeric reserve_ratio
-        boolean active
+        bigint bank_id PK
+        bigint parent_id FK
+        numeric allocated_capital
     }
     LOCAL_BANK {
-        bigint local_bank_id PK
-        bigint national_bank_id FK
-        string name
-        string region
-        numeric reserve_ratio
-        boolean active
-    }
-    BANK_USER {
-        bigint user_id PK
-        bigint local_bank_id FK
-        string role
-        string wallet
-        timestamp role_expiry
+        bigint bank_id PK
+        bigint parent_id FK
+        numeric pool_balance
     }
     BORROWER {
         bigint borrower_id PK
-        bigint local_bank_id FK
-        string wallet PK
-        int    kyc_level
-        int    tier
-        timestamp registered_at
+        string wallet UK
+        int kyc_level
+        int tier
     }
     LOAN_REQUEST {
         bigint request_id PK
-        bigint borrower_id FK
         numeric amount
-        int    term_months
         string status
-        timestamp created_at
     }
     LOAN {
         bigint loan_id PK
-        bigint request_id FK
         numeric principal
-        numeric apr_bps
-        string status
-        timestamp disbursed_at
+        int term_months
     }
     INSTALLMENT {
         bigint installment_id PK
-        bigint loan_id FK
-        int seq_no
-        numeric amount_due
         date due_date
-        string status
-    }
-    TRANSACTION {
-        bigint tx_id PK
-        bigint installment_id FK
-        string tx_hash
-        numeric amount
-        timestamp at
-    }
-    INCOME_PROOF {
-        bigint proof_id PK
-        bigint borrower_id FK
-        string doc_hash
-        string method
-        timestamp verified_at
-    }
-    CHAT_MESSAGE {
-        bigint msg_id PK
-        bigint borrower_id FK
-        string thread
-        text body
-        timestamp at
-    }
-    AI_ML_LOG {
-        bigint log_id PK
-        bigint loan_id FK
-        string model
-        numeric score
-        json   shap
-        timestamp at
+        numeric amount_due
     }
     CREDIT_PASSPORT {
-        bigint passport_id PK
-        bigint borrower_id FK
-        int    credit_score
-        int    open_loans
-        int    completed_cycles
-        date   last_default
-        int    risk_tier
+        int risk_tier
+        int open_loans
+        int credit_score
+    }
+    SESSIONS {
+        uuid session_id PK
+        json session_key_scope
     }

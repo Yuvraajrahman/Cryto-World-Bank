@@ -1,82 +1,48 @@
 ---
-title: Component Architecture - Presentation, Smart-Contract, and Off-Chain Layers
+title: Component Architecture (Specified — Planning Phase)
 ---
 flowchart TB
     classDef layer fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
     classDef node  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef ext   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef contract fill:#EAEAEA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef spec fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+    classDef opt   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:5 5
+    classDef ext   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
 
     subgraph FE[" Presentation Layer "]
-        direction LR
-        UI["React 18 + Vite<br/>SPA"]:::node
-        WC["Wallet Connect<br/>(MetaMask / WalletConnect)"]:::node
-        DASH["Real-time Dashboard<br/>(The Graph + WebSocket)"]:::node
+        UI["React SPA<br/>(primary banking UI)"]:::node
+        AA["ERC-4337 smart accounts"]:::node
+        AGUI["Agent chat (optional)"]:::opt
     end
 
     subgraph BE[" Off-Chain Backend "]
-        direction LR
-        API["Express.js REST API<br/>+ EIP-712 Auth"]:::node
-        WS["Node.js Event Listener<br/>(ws + ethers v6)"]:::node
-        PG[("PostgreSQL 16<br/>15+ tables, 3NF")]:::node
-        RD[("Redis 7<br/>cache / JWT blacklist")]:::node
-        ML["FastAPI ML Service<br/>RF · iForest · SHAP · GNN · FL"]:::node
-        LLM["LLM Assistant<br/>QLoRA · RAG · ChromaDB"]:::node
+        API["Express.js REST API"]:::node
+        PG[("PostgreSQL · SESSIONS")]:::node
+        ML["FastAPI · RF · SHAP · GNN"]:::node
+        AG["Qwen3-8B + MCP (optional)"]:::opt
     end
 
-    subgraph SC[" Smart-Contract Layer (15 modular contracts) "]
-        direction TB
-        subgraph CORE[" Core (3) "]
-            direction LR
-            WBR["WorldBankReserve"]:::contract
-            NBC["NationalBank"]:::contract
-            LBC["LocalBank"]:::contract
-        end
-        subgraph PROD[" Banking Products (6) "]
-            direction LR
-            SV["SavingsVault"]:::contract
-            FD["FixedDeposit"]:::contract
-            GLP["GroupLendingPool"]:::contract
-            FX["FXModule"]:::contract
-            IF["InsuranceFund"]:::contract
-            CA["CurrentAccount"]:::contract
-        end
-        subgraph MEO[" Multi-Entity / Cross-Tier Ops (6) "]
-            direction LR
-            IBLP["InterBankLendingPool"]:::contract
-            UDF["UpwardDepositFacility"]:::contract
-            SYN["SyndicatedLoan"]:::contract
-            TP["TranchedPool"]:::contract
-            TS["TreasurySwap"]:::contract
-            NE["NettingEngine"]:::contract
-        end
+    subgraph SC[" Smart-Contract Layer "]
+        CORE["Core WBR · NB · LB"]:::spec
+        PROD["Products SavingsVault · GroupPool · FX …"]:::spec
+        MEO["Multi-entity IBLP · Syndicate · Netting …"]:::spec
     end
 
-    subgraph EXT[" External Systems "]
-        direction LR
-        ORA["Chainlink Functions<br/>+ Price Feeds"]:::ext
-        BR["Chainlink CCIP<br/>Cross-chain bridge"]:::ext
-        IPFS["IPFS<br/>(loan docs)"]:::ext
-        KYC["zkKYC Provider<br/>(DID / VC issuer)"]:::ext
+    subgraph EXT[" Chainlink + External "]
+        CL["Functions · Automation · Feeds · PoR · CCIP"]:::ext
+        KYC["zkKYC / zkAML · DID / VC"]:::ext
     end
 
     UI --> API
-    WC --> UI
-    DASH --> WS
+    AGUI -.-> AG
+    AG -.-> API
     API --> PG
-    API --> RD
     API --> ML
-    API --> LLM
-    WS  --> PG
-    API -- "ethers v6 RPC" --> CORE
+    API --> CORE
     API --> PROD
     API --> MEO
-    ML  -. "commit-reveal oracle" .-> ORA
-    CORE -. "RBAC + UUPS + TimeLock" .-> PROD
+    ML -.-> CL
     CORE --> MEO
-    MEO  -. "cross-chain mirror (SBT, reserves)" .-> BR
-    KYC  -. "ZKP attestation" .-> CORE
-    IPFS -. "doc hash anchor" .-> SYN
+    KYC -.-> CORE
+    CL -.-> CORE
 
     class FE,BE,SC,EXT layer
-    class CORE,PROD,MEO layer

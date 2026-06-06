@@ -1,0 +1,27 @@
+---
+title: Actor Permission Matrix (Primary Actions)
+---
+flowchart TB
+    classDef actor fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef act fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    C(("Client")):::actor
+    LB(("LB Approver")):::actor
+    NB(("NB Admin")):::actor
+    WB(("WB Governance")):::actor
+    AG(("AI Agent†")):::actor
+
+    subgraph PERM[" Key actions "]
+        A1["View loan status"]:::act
+        A2["Submit loan / pay installment"]:::act
+        A3["Approve / reject loan"]:::act
+        A4["Set rates · reserve ratio"]:::act
+        A5["Freeze account · SAR"]:::act
+        A6["Agent write tools†"]:::act
+    end
+
+    C --> A1 & A2
+    LB --> A1 & A3 & A5
+    NB --> A1 & A4 & A5
+    WB --> A1 & A4 & A5
+    AG --> A1 & A6

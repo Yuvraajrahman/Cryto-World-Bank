@@ -2,54 +2,45 @@
 title: Multi-Entity and Cross-Tier Capital Operations
 ---
 flowchart TB
-    classDef bank fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef contract fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef flow fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef note fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+    classDef bank fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef contract fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef note fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
 
-    subgraph A[" (a) InterBankLendingPool · same-tier "]
+    subgraph R1[" "]
         direction LR
-        S1["LB-A (surplus)"]:::bank -- "deposit" --> IBLP["IBLP_LB"]:::contract
-        S2["LB-B (deficit)"]:::bank -- "borrow" --> IBLP
-        IBLP -- "kinked rate r_IB(U) ≤ r_down - δ" --> S2
-        IBLP -. "default cascade<br/>buffer → InsuranceFund → parent" .-> S3["Cascade"]:::note
+        subgraph A[" (a) InterBankLendingPool "]
+            direction TB
+            S1["LB surplus"]:::bank --> IBLP["IBLP_LB"]:::contract
+            S2["LB deficit"]:::bank --> IBLP
+            IBLP -. "r_IB ≤ r_down − δ" .-> NoteA["Kinked rate check"]:::note
+        end
+        subgraph B[" (b) UpwardDepositFacility "]
+            direction TB
+            LB1["LB surplus"]:::bank --> UDF["UDF"]:::contract --> NB1["NB → WB cascade"]:::bank
+        end
+        subgraph C[" (c) SyndicatedLoan "]
+            direction TB
+            LA["Lead Arranger"]:::bank --> SYN["SyndicatedLoan"]:::contract
+            CL["Co-Lenders subscribe"]:::bank --> SYN
+            SYN -- "≥90% funded · 75% confirm" --> BR["Borrower disbursement"]:::bank
+        end
     end
 
-    subgraph B[" (b) UpwardDepositFacility "]
+    subgraph R2[" "]
         direction LR
-        LB1["LB"]:::bank -- "excess reserves" --> UDF1["UDF_NB"]:::contract --> NB1["NB"]:::bank
-        NB1 -- "excess reserves" --> UDF2["UDF_WB"]:::contract --> WB1["WB Reserve"]:::bank
-        UDF1 -. "yield strictly &lt; downward rate" .-> Note1["Asymmetric rate"]:::note
+        subgraph D[" (d) TranchedPool "]
+            direction TB
+            SR["Senior tranche"]:::bank --> TP["TranchedPool"]:::contract
+            JR["Junior tranche"]:::bank --> TP
+        end
+        subgraph E[" (e) TreasurySwap "]
+            direction TB
+            NB2["NB ETH reserve"]:::bank --> TS["TreasurySwap"]:::contract --> LB2["LB USDC liquidity"]:::bank
+        end
+        subgraph F[" (f) NettingEngine "]
+            direction TB
+            Q["Queued bilateral obligations"]:::bank --> NE["NettingEngine"]:::contract --> SET["Single net settlement"]:::bank
+        end
     end
 
-    subgraph C[" (c) SyndicatedLoan "]
-        direction LR
-        LA["Lead Arranger (NB)"]:::bank --> SYN["SyndicatedLoan"]:::contract
-        CL1["Co-Lender 1"]:::bank --> SYN
-        CL2["Co-Lender 2"]:::bank --> SYN
-        CL3["Co-Lender 3 (LB)"]:::bank --> SYN
-        SYN -- "unanimous consent → atomic disbursement" --> BR["Institutional borrower"]:::bank
-        BR -. "pro-rata interest + recovery" .-> SYN
-    end
-
-    subgraph D[" (d) TranchedPool · senior / junior "]
-        direction LR
-        SR["Senior depositors"]:::bank -- "low yield · 1st-loss protected" --> TP["TranchedPool"]:::contract
-        JR["Junior depositors"]:::bank -- "high yield · 1st-loss absorbed" --> TP
-        TP -- "waterfall: snr int → jr int → snr pri → jr pri" --> BR2["Borrower pool"]:::bank
-    end
-
-    subgraph E[" (e) TreasurySwap "]
-        direction LR
-        NB2["NB treasury (ETH)"]:::bank -- "swap(asset_from, asset_to, amount)" --> TS["TreasurySwap"]:::contract
-        TS -- "Chainlink oracle + 5–10 bps spread" --> LB2["LB treasury (USDC)"]:::bank
-        TS -. "post-swap ratio invariant enforced" .-> Note2["ratio check"]:::note
-    end
-
-    subgraph F[" (f) NettingEngine · multilateral "]
-        direction LR
-        Q1["Queued IBLP / TreasurySwap orders"]:::flow --> SC["Settlement Coordinator<br/>(off-chain)"]:::contract
-        SC -- "Merkle root" --> NE["NettingEngine"]:::contract
-        NE -- "settleBatch · single tx" --> RES["Net debit / credit applied"]:::flow
-        RES -. "challenge window for disputeBatch" .-> Note3["O(n) vs O(n²)"]:::note
-    end
+    R1 ~~~ R2

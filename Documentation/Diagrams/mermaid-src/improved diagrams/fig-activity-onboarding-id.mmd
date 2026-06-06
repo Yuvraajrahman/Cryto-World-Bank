@@ -1,41 +1,60 @@
 ---
-title: Onboarding and Identity Activity Flows - (a) Income Verification, (b) Profile Management, (c) Tiered KYC Ladder
+title: Retail Onboarding and Tiered Identity — Activity Flow
 ---
-flowchart TB
-    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F
-    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef finish fill:#FFFFFF,stroke:#1F1F1F,stroke-width:2px,color:#111111
+flowchart LR
+    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F,stroke-width:2.5px
+    classDef finish fill:#FFFFFF,color:#111111,stroke:#1F1F1F,stroke-width:2.5px
+    classDef lane   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef tier   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef chain  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:4 3
 
-    subgraph A[" (a) Income verification "]
+    S(("Start")):::start
+
+    subgraph L1[" Discover "]
         direction TB
-        A1((Start)):::start --> A2["Borrower uploads<br/>income document"]:::act
-        A2 --> A3["Hash to IPFS<br/>+ store doc_hash"]:::act
-        A3 --> A4{Method:<br/>bank API or manual?}:::dec
-        A4 -- Bank API --> A5["Open-Banking pull<br/>(read-only consent)"]:::act
-        A4 -- Manual --> A6["Officer review<br/>(LB Operator)"]:::act
-        A5 --> A7["Store INCOME_PROOF<br/>(method, verified_at)"]:::act
-        A6 --> A7
-        A7 --> A8{Score ≥<br/>threshold?}:::dec
-        A8 -- No --> A9["Flag for re-submission"]:::act --> AE((End)):::finish
-        A8 -- Yes --> A10["Mark verified +<br/>bump SBT.credit_score"]:::act --> AE
+        A1["Browse products · rates<br/>L0 — no wallet required"]:::act
+        A2{Register<br/>account?}:::dec
+        A1 --> A2
     end
 
-    subgraph B[" (b) Profile management "]
+    subgraph L2[" Smart account "]
         direction TB
-        B1((Start)):::start --> B2["User opens profile"]:::act
-        B2 --> B3{Action?}:::dec
-        B3 -- Update --> B4["Sign EIP-712 typed-data"]:::act
-        B3 -- Read --> B5["Render dashboard"]:::act --> BE((End)):::finish
-        B4 --> B6["API verifies sig +<br/>persists row in users"]:::act
-        B6 --> B7["Emit ProfileUpdated event"]:::act --> BE
+        B1["Email / OAuth sign-in<br/>ERC-4337 account deploy"]:::act
+        B2["Paymaster sponsors<br/>bootstrap transactions"]:::act
+        B1 --> B2
     end
 
-    subgraph C[" (c) Tiered, risk-based KYC ladder "]
+    subgraph L3[" Document ladder "]
         direction TB
-        C1((Start)):::start --> CL1["L1 — zkKYC<br/>(loans ≤ 0.5 ETH)"]:::act
-        CL1 --> CL2["L2 — phone + ID hash<br/>(≤ 5 ETH)"]:::act
-        CL2 --> CL3["L3 — full KYC + selfie<br/>(≤ 50 ETH)"]:::act
-        CL3 --> CL4["L4 — entity docs +<br/>source-of-funds (>50 ETH)"]:::act
-        CL4 --> CE((End)):::finish
+        C1["L1 · NID + selfie capture"]:::tier
+        C2["L2 · income proof upload<br/>IPFS hash → INCOME_PROOF"]:::tier
+        C3["L3 · video interview<br/>officer attestation"]:::tier
+        C1 --> C2 --> C3
     end
+
+    subgraph L4[" Compliance proofs "]
+        direction TB
+        D1["Licensed KYC provider<br/>issues W3C VC + DID"]:::act
+        D2["Generate zkKYC proof<br/>Groth16 circuit"]:::act
+        D3["Generate zkAML proof<br/>sanction non-membership"]:::act
+        D1 --> D2 --> D3
+    end
+
+    subgraph L5[" On-chain activation "]
+        direction TB
+        E1["KYCVerifier + AMLVerifier<br/>verify proofs on-chain"]:::chain
+        E2{Proofs<br/>valid?}:::dec
+        E3["Grant CLIENT role<br/>enforce USDC tier limits"]:::chain
+        E1 --> E2
+        E2 -- "Yes" --> E3
+    end
+
+    EN(("End")):::finish
+
+    S --> L1
+    A2 -- "No" --> EN
+    A2 -- "Yes" --> L2 --> L3 --> L4 --> L5
+    E2 -- "No" --> R1["Manual review queue<br/>retry or escalate"]:::act --> D2
+    E3 --> EN

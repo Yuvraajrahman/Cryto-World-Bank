@@ -1,0 +1,38 @@
+---
+title: ML Explainability and Anomaly Detection Flow
+---
+flowchart TB
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef model fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef out  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:3 3
+    classDef human fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    subgraph MODELS[" Scoring stack "]
+        direction LR
+        FE["Feature engineering<br/>22 features"]:::step
+        RF["Random Forest<br/>fraud prob. p_f"]:::model
+        IF["Isolation Forest<br/>anomaly score s"]:::model
+        ST["Stacking meta-learner<br/>composite score"]:::model
+        FE --> RF & IF
+        RF & IF --> ST
+    end
+
+    subgraph EXPLAIN[" Explainability outputs "]
+        direction LR
+        SH["SHAP TreeExplainer<br/>per-feature φ_i"]:::step
+        AD["Anomaly deviation report<br/>percentile vs. training"]:::step
+        LOG[("AI_ML_SECURITY_LOG")]:::out
+        OR["Chainlink Functions<br/>commitRiskScore"]:::step
+    end
+
+    subgraph AUDIENCE[" Human-readable delivery "]
+        direction LR
+        CLIENT["Client:<br/>plain-language decline reasons"]:::human
+        APPROVER["Approver:<br/>Authority Brief + SHAP table"]:::human
+        AUDIT["Auditor:<br/>full JSON + model version + tx hash"]:::human
+    end
+
+    ST --> SH & AD & LOG & OR
+    SH --> CLIENT
+    AD --> APPROVER
+    LOG --> AUDIT

@@ -25,7 +25,7 @@ sequenceDiagram
         U->>API: GET /market
         API->>API: cache miss?
         API->>WB: read Chainlink price feeds (RPC)
-        WB-->>API: USDC/ETH, ETH/USD, BDT/USD
+        WB-->>API: USDC/ETH, ETH/USD, fiat/USD
         API-->>U: prices (cached 10s)
     end
 

@@ -1,31 +1,51 @@
 ---
 title: Key Design Decisions and Alternatives Considered
 ---
-flowchart LR
-    classDef topic fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef pick  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
-    classDef alt   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+flowchart TB
+    classDef topic fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef pick  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef alt   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:3 3
 
-    T1["Smart-contract platform"]:::topic --> C1["EVM (Solidity)<br/>· tooling · audit ecosystem"]:::pick
-    T1 --> C1a["Cosmos SDK"]:::alt
-    T1 --> C1b["Solana / Anchor"]:::alt
+    subgraph LEFT[" "]
+        direction TB
+        T1["Smart-contract platform"]:::topic
+        C1["<b>Chosen:</b> EVM (Solidity)<br/>tooling · audit ecosystem"]:::pick
+        C1a["Cosmos SDK"]:::alt
+        C1b["Solana / Anchor"]:::alt
+        T1 --> C1 & C1a & C1b
 
-    T2["Chain choice"]:::topic --> C2["Polygon (retail) +<br/>Sepolia (institutional)"]:::pick
-    T2 --> C2a["Ethereum L1 only<br/>(gas-prohibitive)"]:::alt
-    T2 --> C2b["Single L2 (Arbitrum)<br/>(deferred until v2)"]:::alt
+        T2["Chain choice"]:::topic
+        C2["<b>Chosen:</b> Polygon (retail) +<br/>Sepolia (institutional)"]:::pick
+        C2a["Ethereum L1 only"]:::alt
+        C2b["Single L2 (Arbitrum)"]:::alt
+        T2 --> C2 & C2a & C2b
 
-    T3["Upgradeability"]:::topic --> C3["UUPS (ERC-1822)<br/>· cheap · RBAC-gated"]:::pick
-    T3 --> C3a["Transparent Proxy<br/>(extra ProxyAdmin)"]:::alt
-    T3 --> C3b["Immutable<br/>(no patch path)"]:::alt
+        T3["Upgradeability"]:::topic
+        C3["<b>Chosen:</b> UUPS (ERC-1822)<br/>cheap · RBAC-gated"]:::pick
+        C3a["Transparent Proxy"]:::alt
+        C3b["Immutable"]:::alt
+        T3 --> C3 & C3a & C3b
+    end
 
-    T4["Identity"]:::topic --> C4["DID / VC + zkKYC<br/>(privacy-preserving)"]:::pick
-    T4 --> C4a["On-chain raw KYC<br/>(regulatory hazard)"]:::alt
-    T4 --> C4b["Off-chain only<br/>(no on-chain audit)"]:::alt
+    subgraph RIGHT[" "]
+        direction TB
+        T4["Identity"]:::topic
+        C4["<b>Chosen:</b> DID / VC + zkKYC<br/>privacy-preserving"]:::pick
+        C4a["On-chain raw KYC"]:::alt
+        C4b["Off-chain only"]:::alt
+        T4 --> C4 & C4a & C4b
 
-    T5["Risk scoring oracle"]:::topic --> C5["Commit-reveal via<br/>Chainlink Functions"]:::pick
-    T5 --> C5a["Trusted backend write<br/>(replay risk)"]:::alt
-    T5 --> C5b["Pure on-chain ML<br/>(infeasible cost)"]:::alt
+        T5["Risk scoring oracle"]:::topic
+        C5["<b>Chosen:</b> Commit-reveal via<br/>Chainlink Functions"]:::pick
+        C5a["Trusted backend write"]:::alt
+        C5b["Pure on-chain ML"]:::alt
+        T5 --> C5 & C5a & C5b
 
-    T6["Bridge"]:::topic --> C6["Chainlink CCIP<br/>(reuse oracle trust)"]:::pick
-    T6 --> C6a["LayerZero"]:::alt
-    T6 --> C6b["Axelar GMP"]:::alt
+        T6["Bridge"]:::topic
+        C6["<b>Chosen:</b> Chainlink CCIP<br/>reuse oracle trust"]:::pick
+        C6a["LayerZero"]:::alt
+        C6b["Axelar GMP"]:::alt
+        T6 --> C6 & C6a & C6b
+    end
+
+    LEFT ~~~ RIGHT

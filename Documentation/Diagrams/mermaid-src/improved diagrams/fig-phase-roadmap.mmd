@@ -1,0 +1,17 @@
+---
+title: Four-Phase Implementation Roadmap (Blockchain-First)
+---
+flowchart LR
+    classDef phase fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef opt   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:5 5
+
+    P1["<b>Phase I</b><br/>Weeks 1–4<br/>Contract foundation<br/>DB schema · React shell"]:::phase
+    P2["<b>Phase II</b><br/>Weeks 5–9<br/>On-chain lending<br/>lifecycle · SBT limits"]:::phase
+    P3["<b>Phase III</b><br/>Weeks 10–13<br/>ML oracle pipeline<br/>dashboard · SAR"]:::phase
+    P4["<b>Phase IV</b><br/>Weeks 14–16<br/>Certora · Foundry<br/>simulation · testnet"]:::phase
+
+    P1 --> P2 --> P3 --> P4
+
+    A1["Optional agent add-on<br/>MCP · prompts · hooks"]:::opt
+    A1 -.-> P3
+    A1 -.-> P4

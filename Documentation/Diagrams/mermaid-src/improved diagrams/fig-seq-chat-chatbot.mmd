@@ -1,37 +1,39 @@
 ---
-title: Sequence Diagrams - (a) Chat System, (b) AI Chatbot (RAG + QLoRA)
+title: Sequence Diagrams - (a) Bank Chat, (b) Optional Agent Add-On
 ---
 sequenceDiagram
     autonumber
-    participant U as User
+    participant U as Client
     participant FE as Frontend
-    participant WS as WebSocket Server
-    participant API as Backend API
-    participant DB as PostgreSQL
-    participant LLM as LLM Service
-    participant V as ChromaDB
+    participant API as Express API
+    participant WS as WebSocket
+    participant LLM as Qwen3-8B
+    participant MCP as MCP Tools
+    participant SC as On-chain Contract
 
     rect rgb(245,245,245)
-        Note over U,DB: (a) Chat system
-        U->>FE: Open thread
-        FE->>WS: connect(JWT)
-        WS->>API: validate JWT (Redis blacklist)
-        API-->>WS: ok · room=loan_42
-        U->>FE: send message
-        FE->>WS: emit('msg', text)
-        WS->>DB: INSERT chat_message
-        WS-->>FE: broadcast to room
+        Note over U,WS: (a) Client–bank chat — core path
+        U->>FE: Open support thread
+        FE->>API: Authenticate + open WS
+        API->>WS: Subscribe thread
+        U->>FE: Message to approver
+        FE->>API: POST /chat
+        API->>API: Persist CHAT_MESSAGE
+        API-->>U: Deliver via WebSocket
     end
 
     rect rgb(238,238,238)
-        Note over U,V: (b) AI chatbot (RAG + QLoRA-tuned LLM)
-        U->>FE: ask question
-        FE->>API: POST /assistant/ask
-        API->>V: top-k similarity search
-        V-->>API: chunks + sources
-        API->>LLM: prompt(user, chunks)
-        LLM->>LLM: QLoRA-tuned 7B + system prompt
-        LLM-->>API: answer + cited sources
-        API->>API: hallucination guard (regex + reg-rule list)
-        API-->>U: answer with citations<br/>(fallback: 'see human approver')
+        Note over U,SC: (b) Optional MCP agent — Phase III–IV add-on (dashed = not MVT)
+        U->>FE: "Apply for 150 USDC loan"
+        FE->>API: Stream message (SSE)
+        API->>API: Inject on-chain context JSON
+        API->>LLM: /v1/chat/completions
+        LLM-->>API: Confirmation summary
+        API-->>U: "Proceed? EMI 26.25 USDC"
+        U->>FE: "Yes, proceed"
+        API->>API: Log confirmation_turn_id
+        API->>MCP: submit_loan_application (write)
+        MCP->>SC: EIP-7702 session key signs tx
+        SC-->>U: Loan submitted L-4821
+        Note over API,MCP: HTTP 403 if write without confirmation
     end

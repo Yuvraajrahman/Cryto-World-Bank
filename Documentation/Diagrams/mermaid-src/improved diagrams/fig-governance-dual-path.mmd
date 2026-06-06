@@ -1,0 +1,28 @@
+---
+title: Governance Dual-Path - TimeLock Standard vs Security Council Emergency
+---
+flowchart LR
+    classDef std  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef emg  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef act  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    PROP["Governance proposal<br/>rates · reserves · upgrades · roles"]:::act
+
+    subgraph STD[" Standard path "]
+        direction TB
+        TL["TimelockController<br/>24–48 h delay"]:::std
+        MS1["Safe 3-of-5<br/>WORLD_BANK_ADMIN"]:::std
+        EX1["Execute on-chain"]:::std
+        TL --> MS1 --> EX1
+    end
+
+    subgraph EMG[" Emergency path "]
+        direction TB
+        SC["Security Council<br/>4-of-7 Safe multisig"]:::emg
+        WIN["2-hour window<br/>pre-approved actions only"]:::emg
+        DISC["48 h mandatory<br/>post-incident disclosure"]:::emg
+        SC --> WIN --> DISC
+    end
+
+    PROP --> TL
+    PROP -. "pause · upgrade · revoke" .-> SC

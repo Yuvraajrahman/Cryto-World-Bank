@@ -1,0 +1,25 @@
+---
+title: Five-Stage Retail Conversion Funnel
+---
+flowchart TB
+    classDef stage fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef hidden fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+
+    subgraph ROW1[" "]
+        direction LR
+        S1["<b>Stage 1</b><br/>Browse product info<br/>Zero friction · no wallet"]:::stage
+        S2["<b>Stage 2</b><br/>Email / phone signup<br/>ERC-4337 account created"]:::stage
+        S3["<b>Stage 3</b><br/>KYC capture<br/>2–5 min AI-assisted verify"]:::stage
+    end
+
+    subgraph ROW2[" "]
+        direction LR
+        S4["<b>Stage 4</b><br/>First USDC loan<br/>Plain-language terms"]:::stage
+        S5["<b>Stage 5</b><br/>Power user<br/>MetaMask · explorer · groups"]:::stage
+    end
+
+    S1 --> S2 --> S3 --> S4 --> S5
+
+    H1["Crypto hidden from UI"]:::hidden -.-> S2
+    H2["Paymaster gas sponsored"]:::hidden -.-> S2
+    H3["Fiat display via Chainlink oracle"]:::hidden -.-> S4

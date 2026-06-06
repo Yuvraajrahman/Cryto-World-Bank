@@ -2,42 +2,57 @@
 title: AI / ML Pipeline - Training, Commit-Reveal Oracle, GNN, Federated Learning
 ---
 flowchart TB
-    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
     classDef out  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
 
-    subgraph A[" (a) Training pipeline "]
+    subgraph TOP[" "]
         direction LR
-        DS[("Loan history + on-chain events")]:::store --> FE["Feature engineering<br/>(amount, tier, income, prior_defaults)"]:::step
-        FE --> RF["Random Forest classifier"]:::step
-        FE --> IF["Isolation Forest<br/>(anomaly)"]:::step
-        RF --> SH["SHAP · explainable AI"]:::step
-        IF --> SH
-        SH --> REG["Model registry<br/>(version + hash)"]:::store
+        subgraph A[" (a) Training pipeline "]
+            direction TB
+            DS[("Loan history +<br/>on-chain events")]:::store
+            FE["Feature engineering<br/>(amount, tier, income, prior_defaults)"]:::step
+            RF["Random Forest classifier"]:::step
+            IF["Isolation Forest (anomaly)"]:::step
+            SH["SHAP · explainable AI"]:::step
+            REG["Model registry<br/>(version + hash)"]:::store
+            DS --> FE --> RF & IF
+            RF & IF --> SH --> REG
+        end
+        subgraph B[" (b) Commit-reveal ML oracle "]
+            direction TB
+            ML["FastAPI ML service"]:::step
+            SC["LocalBank contract"]:::chain
+            OUT["LoanApproved event"]:::out
+            REG --> ML
+            ML -- "commit(hash)" --> SC
+            SC -. "block N+k" .-> ML
+            ML -- "reveal(score, salt)" --> SC
+            SC -- "verify · gate approval" --> OUT
+        end
     end
 
-    subgraph B[" (b) Commit-reveal ML oracle "]
+    subgraph BOT[" "]
         direction LR
-        REG --> ML["FastAPI service"]:::step
-        ML -- "commit(hash(score, salt))" --> SC["LocalBank contract"]:::chain
-        SC -. "block N+k" .-> ML
-        ML -- "reveal(score, salt)" --> SC
-        SC -- "verify hash · gate approval" --> OUT["LoanApproved event"]:::out
+        subgraph C[" (c) GNN extension "]
+            direction TB
+            GR[("Wallet–wallet graph<br/>loans · repayments")]:::store
+            GNN["GraphSAGE embeddings"]:::step
+            RF2["Augments RF feature vector"]:::step
+            GR --> GNN --> RF2 --> REG
+        end
+        subgraph D[" (d) Federated learning across tiers "]
+            direction TB
+            LBA["LB-A local trainer"]:::step
+            LBB["LB-B local trainer"]:::step
+            LBC["LB-C local trainer"]:::step
+            AGG["Federated aggregator (NB tier)"]:::step
+            GLOB["Global fraud detector"]:::out
+            LBA & LBB & LBC --> AGG
+            AGG -- "secure-aggregated weights" --> GLOB
+            AGG -. "no raw data leaves LB" .-> Note["Privacy + locality"]:::out
+        end
     end
 
-    subgraph C[" (c) GNN extension "]
-        direction LR
-        GR[("Wallet–wallet graph<br/>(loans, repayments, transfers)")]:::store --> GNN["GraphSAGE<br/>node + edge embeddings"]:::step
-        GNN --> RF2["Augments RF feature vector<br/>(relational signal)"]:::step
-        RF2 --> REG
-    end
-
-    subgraph D[" (d) Federated learning across tiers "]
-        direction LR
-        LBA["LB-A local trainer"]:::step --> AGG["Federated aggregator<br/>(NB tier)"]:::step
-        LBB["LB-B local trainer"]:::step --> AGG
-        LBC["LB-C local trainer"]:::step --> AGG
-        AGG -- "secure-aggregated weights" --> GLOB["Global fraud detector"]:::out
-        AGG -. "no raw data leaves LB; DP noise added" .-> Note["Privacy + locality"]:::out
-    end
+    TOP ~~~ BOT

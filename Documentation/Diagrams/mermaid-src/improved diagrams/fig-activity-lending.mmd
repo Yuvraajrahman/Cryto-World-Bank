@@ -1,44 +1,63 @@
 ---
-title: Lending Activity Flows - (a) Loan Request, (b) Hierarchical Capital Flow, (c) Borrowing-Limit Check
+title: USDC Loan Lifecycle — End-to-End Activity Flow
 ---
-flowchart TB
-    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F
-    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef finish fill:#FFFFFF,stroke:#1F1F1F,stroke-width:2px,color:#111111
+flowchart LR
+    classDef start  fill:#1F1F1F,color:#FFFFFF,stroke:#1F1F1F,stroke-width:2.5px
+    classDef finish fill:#FFFFFF,color:#111111,stroke:#1F1F1F,stroke-width:2.5px
+    classDef phase  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef act    fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef exit   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:5 4
+    classDef store  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
 
-    subgraph A[" (a) Loan request to repayment "]
+    S(("Start")):::start
+
+    subgraph P1[" ① Eligibility gate "]
         direction TB
-        A1((Start)):::start --> A2["Borrower<br/>completes KYC"]:::act
-        A2 --> A3["Submit loan<br/>request (amount, term)"]:::act
-        A3 --> A4{Borrowing-limit<br/>OK?}:::dec
-        A4 -- No --> A5["Reject + log<br/>AI_ML_LOG"]:::act --> AE((End)):::finish
-        A4 -- Yes --> A6["ML risk score<br/>via oracle"]:::act
-        A6 --> A7{Approver<br/>review}:::dec
-        A7 -- Reject --> A5
-        A7 -- Approve --> A8["Disburse + create<br/>INSTALLMENT rows"]:::act
-        A8 --> A9["Borrower pays installments<br/>(processInstallment)"]:::act
-        A9 --> A10{All paid?}:::dec
-        A10 -- No --> A9
-        A10 -- Yes --> A11["Close loan<br/>+ update SBT"]:::act --> AE
+        P1A["Client opens loan form<br/>JWT + wallet bound"]:::act
+        P1B["Read CREDIT_PASSPORT SBT<br/>tier · openLoans · DTI"]:::act
+        P1C{Within tier<br/>ceiling?}:::dec
+        P1A --> P1B --> P1C
     end
 
-    subgraph B[" (b) Hierarchical capital flow "]
+    subgraph P2[" ② Origination "]
         direction TB
-        B1((Start)):::start --> B2["WB allocates to NB<br/>(reserve ratio check)"]:::act
-        B2 --> B3{NB ratio<br/>≥ min?}:::dec
-        B3 -- No --> B4["Hold + queue<br/>governance review"]:::act --> BE((End)):::finish
-        B3 -- Yes --> B5["NB allocates to LB"]:::act
-        B5 --> B6{LB ratio<br/>≥ min?}:::dec
-        B6 -- No --> B4
-        B6 -- Yes --> B7["LB pool funded<br/>for borrower draws"]:::act --> BE
+        P2A["POST /loans · EIP-712 sign<br/>persist LOAN_REQUEST"]:::act
+        P2B["WB → NB → LB<br/>allocateCapital + RR check"]:::act
+        P2C["applyLoan() on LocalBank"]:::act
+        P2A --> P2B --> P2C
     end
 
-    subgraph C[" (c) Borrowing-limit enforcement "]
+    subgraph P3[" ③ Oracle risk score "]
         direction TB
-        C1((Start)):::start --> C2["Read SBT.openLoans<br/>+ credit_score"]:::act
-        C2 --> C3["Compute tier ceiling<br/>(per Table 3.1)"]:::act
-        C3 --> C4{requested ≤ ceiling<br/>AND openLoans &lt; cap?}:::dec
-        C4 -- No --> C5["Revert with<br/>BORROW_LIMIT_EXCEEDED"]:::act --> CE((End)):::finish
-        C4 -- Yes --> C6["Proceed to ML scoring"]:::act --> CE
+        P3A["FastAPI: RF + iForest<br/>SHAP Authority Brief"]:::act
+        P3B["Chainlink DON<br/>commit → reveal score"]:::act
+        P3C["SCORE_REVEALED on-chain"]:::act
+        P3A --> P3B --> P3C
     end
+
+    subgraph P4[" ④ Human approval "]
+        direction TB
+        P4A["Approver reviews brief<br/>top-3 SHAP features"]:::act
+        P4B{Approve or<br/>reject?}:::dec
+        P4A --> P4B
+    end
+
+    subgraph P5[" ⑤ Disbursement & close "]
+        direction TB
+        P5A["approveLoan() · USDC out<br/>schedule INSTALLMENTs"]:::act
+        P5B["Client repays on schedule<br/>per-installment settle"]:::act
+        P5C["Update SBT · close LOAN<br/>emit audit events"]:::act
+        P5A --> P5B --> P5C
+    end
+
+    E(("End")):::finish
+
+    S --> P1
+    P1C -- "No" --> X1["BORROW_LIMIT_EXCEEDED<br/>plain-language reason"]:::exit --> E
+    P1C -- "Yes" --> P2 --> P3 --> P4
+    P4B -- "Reject" --> X2["rejectLoan() + explanation<br/>log AI_ML_LOG"]:::exit --> E
+    P4B -- "Approve" --> P5 --> E
+
+    P2B -.-> D1[("Capital pool<br/>on-chain")]:::store
+    P3A -.-> D2[("ML scores<br/>PostgreSQL")]:::store

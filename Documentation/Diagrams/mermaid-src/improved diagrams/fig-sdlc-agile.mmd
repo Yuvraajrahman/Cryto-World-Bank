@@ -1,26 +1,47 @@
 ---
 title: SDLC Mapping with Agile / Scrum Sprint Plan
 ---
-flowchart LR
-    classDef phase fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef sub   fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef sprint fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+flowchart TB
+    classDef phase fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef sub   fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef sprint fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
     classDef note  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
 
-    REQ["Requirements"]:::phase --> ARC["Architecture"]:::phase --> DES["Design"]:::phase --> IMP["Implementation"]:::phase --> VER["Verification"]:::phase --> VAL["Validation"]:::phase --> MNT["Maintenance"]:::phase
+    subgraph PHASES[" SDLC phases "]
+        direction LR
+        REQ["Requirements"]:::phase
+        ARC["Architecture"]:::phase
+        DES["Design"]:::phase
+        IMP["Implementation"]:::phase
+        VER["Verification"]:::phase
+        VAL["Validation"]:::phase
+        MNT["Maintenance"]:::phase
+        REQ --> ARC --> DES --> IMP --> VER --> VAL --> MNT
+    end
 
-    REQ -.-> RQ1["7-user taxonomy · 29 use cases ·<br/>functional / non-functional NFRs"]:::sub
-    ARC -.-> AR1["4-tier hierarchy · 15 contracts ·<br/>3-layer system + 5-layer DiD"]:::sub
-    DES -.-> DE1["ERD / EER · DFD L0–L1 ·<br/>Activity + Sequence + State"]:::sub
+    subgraph DETAIL[" Phase deliverables "]
+        direction LR
+        RQ1["7-user taxonomy · 29 use cases<br/>functional + non-functional NFRs"]:::sub
+        AR1["4-tier hierarchy · 15 contracts<br/>3-layer system + 5-layer DiD"]:::sub
+        DE1["ERD / EER · DFD L0–L1<br/>Activity + Sequence + State"]:::sub
+        VE1["Foundry fuzz + invariant suite<br/>Slither / Mythril / Echidna"]:::sub
+        VA1["ABM economic simulation (Mesa)<br/>LLM eval · regulator dashboard"]:::sub
+        MN1["Tenderly runtime · The Graph<br/>monthly Safe key rotation"]:::sub
+    end
 
-    subgraph SPR[" Final-thesis sprints "]
-        direction TB
-        S1["<b>Sprint 1</b><br/>Core contracts (WB · NB · LB) ·<br/>wallet auth · FE skeleton · PG schema"]:::sprint
-        S2["<b>Sprint 2</b><br/>Lending services · SavingsVault ·<br/>FixedDeposit · GroupLendingPool ·<br/>InterBankPool · UpwardDeposit · TreasurySwap"]:::sprint
-        S3["<b>Sprint 3</b><br/>ML wiring (RF · iForest · SHAP · GNN · FL) ·<br/>SyndicatedLoan · TranchedPool · NettingEngine ·<br/>Foundry invariants · Certora reserve proofs"]:::sprint
+    REQ -.-> RQ1
+    ARC -.-> AR1
+    DES -.-> DE1
+    VER -.-> VE1
+    VAL -.-> VA1
+    MNT -.-> MN1
+
+    subgraph SPR[" Final-thesis sprints (Implementation phase) "]
+        direction LR
+        S1["<b>Sprint 1</b><br/>Core contracts (WB · NB · LB)<br/>wallet auth · FE skeleton · PG schema"]:::sprint
+        S2["<b>Sprint 2</b><br/>Lending · SavingsVault · FixedDeposit<br/>GroupLendingPool · IBLP · UpwardDeposit"]:::sprint
+        S3["<b>Sprint 3</b><br/>ML wiring (RF · iForest · SHAP · GNN · FL)<br/>SyndicatedLoan · TranchedPool · Certora"]:::sprint
         S1 --> S2 --> S3
     end
-    IMP --- SPR
-    VER -.-> VE1["Foundry fuzz + invariant suite ·<br/>Slither / Mythril / Echidna · pytest"]:::sub
-    VAL -.-> VA1["ABM economic simulation (Mesa) ·<br/>LLM eval protocol · regulator dashboard"]:::sub
-    MNT -.-> MN1["Tenderly runtime · The Graph indexer ·<br/>monthly Safe key rotation"]:::sub
+
+    IMP -.-> SPR

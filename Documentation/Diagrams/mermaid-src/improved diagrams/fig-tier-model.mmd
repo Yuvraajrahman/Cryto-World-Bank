@@ -1,22 +1,28 @@
 ---
-title: Tiered Borrower Access Model (T1–T4 with KYC level and loan band)
+title: Tiered Borrower Access and Credit Passport Tiers (USDC-first)
 ---
 flowchart LR
     classDef tier fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef cap  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef sbt  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef rule fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
 
-    T1["<b>Tier 1 — Wholesale / Sovereign</b><br/>KYC L4 + multisig<br/>1,000+ ETH band<br/>Originated at NB / WB"]:::tier
-    T2["<b>Tier 2 — Institutional</b><br/>KYC L3 + entity docs<br/>100–1,000 ETH<br/>Originated at NB / LB"]:::tier
-    T3["<b>Tier 3 — SME</b><br/>KYC L2 + income proof<br/>10–100 ETH<br/>Originated at LB"]:::tier
-    T4["<b>Tier 4 — Retail / Group</b><br/>KYC L1 (zkKYC, optional)<br/>0.1–10 ETH (USDC denominated)<br/>Originated at LB (Group pool)"]:::tier
+    T4["<b>Tier 4 Retail / Group</b><br/>USDC loans · KYC L1+<br/>GroupLendingPool"]:::tier
+    T3["<b>Tier 3 SME</b><br/>KYC L2 · LB originator"]:::tier
+    T2["<b>Tier 2 Institutional</b><br/>KYC L3 · NB / LB"]:::tier
+    T1["<b>Tier 1 Wholesale</b><br/>KYC L4 · WB / NB"]:::tier
 
     T1 --> T2 --> T3 --> T4
 
-    subgraph RULES[" Access rules "]
-        direction TB
-        R1["KYC level monotone non-increasing<br/>down the tier ladder"]:::cap
-        R2["Loan band ceiling enforced on-chain<br/>via borrowerLevel[wallet]"]:::cap
-        R3["Stablecoin-first at T4<br/>(USDC, per §1.2)"]:::cap
-        R4["SBT carries openLoans, completedCycles,<br/>simultaneous-loan cap"]:::cap
+    subgraph SBT[" Credit Passport SBT tiers "]
+        B["Bronze 50"]:::sbt --> S["Silver 250"]:::sbt --> G["Gold 1k"]:::sbt
+        G --> P["Platinum 5k"]:::sbt --> D["Diamond 25k USDC"]:::sbt
     end
-    T4 -. "borrows under" .-> RULES
+
+    subgraph RULES[" On-chain rules "]
+        R1["kycLevel[wallet] gates band"]:::rule
+        R2["openLoans cap via SBT"]:::rule
+        R3["Stablecoin-first at T4"]:::rule
+    end
+
+    T4 -.-> SBT
+    T4 -.-> RULES

@@ -1,0 +1,15 @@
+flowchart TD
+    T1["TIER 1 - WORLD BANK RESERVE\n   Programmable Reserve Authority\n   System-level capital allocation"]
+    T1 -->|"Wholesale capital\n    downward"| T2
+    T2["TIER 2 - NATIONAL BANKS\n   Jurisdiction-aware governance\n   Wholesale lending intermediary"]
+    T2 -->|"Regional capital\n    allocation"| T3
+    T3["TIER 3 - LOCAL BANKS\n   Retail intermediaries\n   Client-facing operations"]
+    T3 -->|"Loans, savings\n    group credit"| T4
+    T4["TIER 4 - CLIENTS\n   Retail borrowers and depositors\n   1.4B underserved globally"]
+    T4 -.->|"Repayments\n    and surplus"| T3
+    T3 -.->|"Surplus\n    repatriation"| T2
+    T2 -.->|"Excess\n    reserves"| T1
+    style T1 fill:#111,stroke:#000,color:#fff
+    style T2 fill:#444,stroke:#000,color:#fff
+    style T3 fill:#888,stroke:#000,color:#fff
+    style T4 fill:#e0e0e0,stroke:#333,color:#000

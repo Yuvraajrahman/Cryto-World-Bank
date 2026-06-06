@@ -1,0 +1,23 @@
+flowchart TD
+    SYS["SYSTEM DESIGN\nScope and Challenges"]
+    SYS --> SCOPE["PROTOTYPE SCOPE"]
+    SYS --> CHALL["KEY CHALLENGES"]
+    SCOPE --> S1["4-tier lending architecture\n    with on-chain enforcement"]
+    SCOPE --> S2["Random Forest and Isolation Forest\n    with SHAP explainability"]
+    SCOPE --> S3["Dual-currency ETH and USDC\n    per-pool parameter design"]
+    SCOPE --> S4["Testnet only deployment\n    Polygon zkEVM and Sepolia"]
+    CHALL --> C1["Unlabeled DeFi fraud data\n    requires synthetic data"]
+    CHALL --> C2["Regulatory uncertainty\n    jurisdictional restrictions"]
+    CHALL --> C3["Gas cost sensitivity\n    AI work done off-chain"]
+    CHALL --> C4["Economic sustainability\n    interest revenue vs gas costs"]
+    style SYS fill:#111,stroke:#000,color:#fff
+    style SCOPE fill:#555,stroke:#000,color:#fff
+    style CHALL fill:#888,stroke:#000,color:#fff
+    style S1 fill:#f5f5f5,stroke:#777,color:#000
+    style S2 fill:#f5f5f5,stroke:#777,color:#000
+    style S3 fill:#f0f0f0,stroke:#777,color:#000
+    style S4 fill:#f0f0f0,stroke:#777,color:#000
+    style C1 fill:#e5e5e5,stroke:#777,color:#000
+    style C2 fill:#e5e5e5,stroke:#777,color:#000
+    style C3 fill:#e0e0e0,stroke:#777,color:#000
+    style C4 fill:#e0e0e0,stroke:#777,color:#000

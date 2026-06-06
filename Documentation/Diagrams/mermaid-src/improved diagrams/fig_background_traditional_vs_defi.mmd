@@ -1,0 +1,32 @@
+flowchart LR
+    subgraph TF["Traditional Finance Hierarchy"]
+        direction TB
+        WB["World Bank / IMF"]
+        NB["National Bank"]
+        LB["Local Bank"]
+        CL["Client"]
+        WB --> NB --> LB --> CL
+    end
+    subgraph DeFi["Existing DeFi Protocols"]
+        direction TB
+        POOL["Single Liquidity Pool"]
+        DEP["Depositors"] --> POOL
+        POOL --> BOR["Borrowers"]
+    end
+    subgraph GAP["Structural Gap"]
+        G1["No institutional hierarchy"]
+        G2["1.4B unbanked adults"]
+        G3["No AI risk analytics"]
+    end
+    TF --> GAP
+    DeFi --> GAP
+    style TF fill:#f5f5f5,stroke:#333,color:#000
+    style DeFi fill:#e8e8e8,stroke:#333,color:#000
+    style GAP fill:#c0c0c0,stroke:#000,color:#000
+    style WB fill:#ddd,stroke:#555,color:#000
+    style NB fill:#e8e8e8,stroke:#555,color:#000
+    style LB fill:#f0f0f0,stroke:#555,color:#000
+    style CL fill:#fff,stroke:#555,color:#000
+    style POOL fill:#ddd,stroke:#555,color:#000
+    style DEP fill:#f0f0f0,stroke:#555,color:#000
+    style BOR fill:#f0f0f0,stroke:#555,color:#000

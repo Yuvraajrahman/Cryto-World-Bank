@@ -1,17 +1,84 @@
 ---
-title: Four-Phase Implementation Roadmap (Blockchain-First)
+title: Four-Phase Implementation Roadmap — SDLC Mapping and Deliverables
 ---
-flowchart LR
-    classDef phase fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef opt   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:5 5
+flowchart TB
+    classDef sdlc fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef pre fill:#F6F6F6,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:4 4
+    classDef ph fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef del fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef opt fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:5 5
+    classDef prog fill:#DDDDDD,stroke:#1F1F1F,stroke-width:1px,color:#111111
 
-    P1["<b>Phase I</b><br/>Weeks 1–4<br/>Contract foundation<br/>DB schema · React shell"]:::phase
-    P2["<b>Phase II</b><br/>Weeks 5–9<br/>On-chain lending<br/>lifecycle · SBT limits"]:::phase
-    P3["<b>Phase III</b><br/>Weeks 10–13<br/>ML oracle pipeline<br/>dashboard · SAR"]:::phase
-    P4["<b>Phase IV</b><br/>Weeks 14–16<br/>Certora · Foundry<br/>simulation · testnet"]:::phase
+    subgraph SDLC[" SDLC stage mapping "]
+        direction LR
+        P1["1 Planning"]:::sdlc
+        P2["2 Requirements"]:::sdlc
+        P3["3 Design"]:::sdlc
+        P4["4 Development"]:::sdlc
+        P5["5 Testing"]:::sdlc
+        P6["6 Deployment"]:::sdlc
+        P7["7 Maintenance"]:::sdlc
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
+    end
 
-    P1 --> P2 --> P3 --> P4
+    subgraph PRE[" Pre-thesis (this report) "]
+        direction LR
+        PR["Use cases · ERD/DFD · 15 contracts<br/>threat model · ML workload plan"]:::pre
+        PD["Architecture + data model + governance"]:::pre
+    end
 
-    A1["Optional agent add-on<br/>MCP · prompts · hooks"]:::opt
-    A1 -.-> P3
-    A1 -.-> P4
+    P1 -.-> PR
+    P2 -.-> PR
+    P3 -.-> PD
+
+    subgraph PHASES[" Final-thesis implementation phases (16 weeks) "]
+        direction TB
+        subgraph PH1[" Phase I · Weeks 1–4 · Foundation "]
+            direction LR
+            I1["WB · NB · LB contracts"]:::ph
+            I2["20-entity PG schema"]:::ph
+            I3["React shell + WalletConnect"]:::ph
+            I4["Chainlink PoR + price feeds"]:::ph
+        end
+        subgraph PH2[" Phase II · Weeks 5–9 · Core banking "]
+            direction LR
+            II1["Loan apply → approve → repay"]:::ph
+            II2["SBT limits + installments"]:::ph
+            II3["Authority Brief UI"]:::ph
+            II4["IBLP / upward deposit (stretch)"]:::ph
+        end
+        subgraph PH3[" Phase III · Weeks 10–13 · AI/ML oracle "]
+            direction LR
+            III1["RF + IF + SHAP FastAPI"]:::ph
+            III2["Chainlink Functions commit"]:::ph
+            III3["Graph subgraph + dashboard"]:::ph
+            III4["SAR / aml-alert workflow"]:::ph
+        end
+        subgraph PH4[" Phase IV · Weeks 14–16 · Verification "]
+            direction LR
+            IV1["300-client Foundry sim"]:::ph
+            IV2["Foundry fuzz + invariants"]:::ph
+            IV3["Certora reserve proofs"]:::ph
+            IV4["Testnet manifest + paper"]:::ph
+        end
+        PH1 --> PH2 --> PH3 --> PH4
+    end
+
+    P4 -.-> PH1
+    P4 -.-> PH2
+    P4 -.-> PH3
+    P5 -.-> PH4
+    P6 -.-> PH4
+    P7 -.-> IV4
+
+    AGT["Optional agent add-on<br/>MCP · Qwen3-8B · hooks"]:::opt
+    AGT -.-> PH3
+    AGT -.-> PH4
+
+    subgraph PROG[" Pre-thesis progress vs MVT target "]
+        direction LR
+        G1["Spec / design<br/>██████████ 100%"]:::prog
+        G2["Contracts deploy<br/>██░░░░░░░░ 20%"]:::prog
+        G3["ML train + score<br/>███░░░░░░░ 30%"]:::prog
+        G4["E2E testnet demo<br/>█░░░░░░░░░ 10%"]:::prog
+    end

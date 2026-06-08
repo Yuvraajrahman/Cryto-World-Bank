@@ -2,32 +2,33 @@
 title: Optional AI Agent Add-On — Six-Step Pipeline (Phase III–IV)
 ---
 flowchart TB
-    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
-    classDef gate  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef gate  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
     classDef safe  fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef banner fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,stroke-dasharray:6 4,color:#111111
+    classDef opt   fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:5 4
 
-    BAN["OPTIONAL ADD-ON — excluded from MVT<br/>React dashboard is the primary banking interface"]:::banner
-
-    subgraph MAIN[" Six-step pipeline "]
-        direction TB
-        U["Client message (web UI)"]:::step
-        S1["1 · Message arrives via SSE"]:::step
-        S2["2 · Inject on-chain context JSON<br/>(loans · SBT tier · installments)"]:::step
-        S3{"3 · Intent classification"}:::gate
-        S4["4a · RAG answer<br/>(read tools only)"]:::safe
-        S5["4b · Assemble write-tool params<br/>+ confirmation summary"]:::step
-        S6{"5 · Human confirmation gate<br/>explicit Yes required"}:::gate
-        S7["6 · MCP write tool → Express API<br/>EIP-7702 session key signs tx"]:::step
-        LOG["AGENT_ACTION_LOG<br/>confirmation_turn_id + tx hash"]:::safe
-        PAUSE["Pause 10 min on No / ambiguous ×3"]:::safe
-
-        U --> S1 --> S2 --> S3
-        S3 -- "Q&A" --> S4
-        S3 -- "Action" --> S5 --> S6
-        S6 -- "No / ambiguous" --> PAUSE
-        S6 -- "Yes, proceed" --> S7 --> LOG
+    subgraph INGEST[" Context assembly "]
+        direction LR
+        S1["SSE message"]:::step
+        S2["Inject on-chain JSON"]:::step
+        S3{"Intent?"}:::gate
+        S1 --> S2 --> S3
     end
 
-    MW["Middleware HTTP 403<br/>if no confirmation in history"]:::gate -.-> S7
-    BAN --> MAIN
+    subgraph ROUTE[" Read vs write path "]
+        direction LR
+        S4["RAG read answer"]:::safe
+        S5["Assemble write params"]:::step
+        S3 -- Q&A --> S4
+        S3 -- Action --> S5
+    end
+
+    subgraph EXEC[" Confirmation and audit "]
+        direction LR
+        S6{"User confirms?"}:::gate
+        S7["MCP write + sign"]:::step
+        LOG["AGENT_ACTION_LOG"]:::safe
+        S5 --> S6 -- Yes --> S7 --> LOG
+    end
+
+    OPT["Optional add-on · not MVT"]:::opt --> INGEST

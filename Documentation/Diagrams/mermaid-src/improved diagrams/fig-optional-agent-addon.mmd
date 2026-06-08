@@ -1,16 +1,16 @@
 ---
-title: Optional Conversational Agent Add-On
+title: Optional Conversational Agent Add-On (compact)
 ---
-flowchart TB
-    classDef primary fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef opt     fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:5 5
+flowchart LR
+    classDef primary fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef opt     fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:4 4
     classDef core    fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111
 
-    UI["React UI<br/>(primary path)"]:::primary
-    AG["Qwen3-8B + MCP agent<br/>(optional add-on)"]:::opt
-    API["Express.js REST API"]:::core
-    SC["Smart contracts<br/>WBR · NB · LB"]:::core
+    UI["React UI<br/>(primary)"]:::primary
+    AG["MCP agent<br/>(optional)"]:::opt
+    API["Express.js API"]:::core
+    SC["Smart contracts"]:::core
 
-    UI -->|"form + wallet sign"| API
-    AG -.->|"write tools + human gate"| API
+    UI -->|"wallet sign"| API
+    AG -.->|"human gate"| API
     API --> SC

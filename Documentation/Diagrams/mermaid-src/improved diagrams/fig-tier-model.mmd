@@ -1,28 +1,40 @@
 ---
-title: Tiered Borrower Access and Credit Passport Tiers (USDC-first)
+title: Client Entry, KYC Limits, and Bank-Level Syndication (USDC-first)
 ---
-flowchart LR
-    classDef tier fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef sbt  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef rule fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+flowchart TB
+    classDef entry fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef sbt  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef rule fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef bank fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
 
-    T4["<b>Tier 4 Retail / Group</b><br/>USDC loans · KYC L1+<br/>GroupLendingPool"]:::tier
-    T3["<b>Tier 3 SME</b><br/>KYC L2 · LB originator"]:::tier
-    T2["<b>Tier 2 Institutional</b><br/>KYC L3 · NB / LB"]:::tier
-    T1["<b>Tier 1 Wholesale</b><br/>KYC L4 · WB / NB"]:::tier
-
-    T1 --> T2 --> T3 --> T4
-
-    subgraph SBT[" Credit Passport SBT tiers "]
-        B["Bronze 50"]:::sbt --> S["Silver 250"]:::sbt --> G["Gold 1k"]:::sbt
-        G --> P["Platinum 5k"]:::sbt --> D["Diamond 25k USDC"]:::sbt
+    subgraph ENTRY[" Client entry (Tier 4) "]
+        direction LR
+        C["All end clients apply<br/>through Local Bank only"]:::entry
     end
 
-    subgraph RULES[" On-chain rules "]
-        R1["kycLevel[wallet] gates band"]:::rule
-        R2["openLoans cap via SBT"]:::rule
-        R3["Stablecoin-first at T4"]:::rule
+    subgraph KYC[" Risk-based KYC ladder "]
+        direction LR
+        L0["L0 View only"]:::rule --> L1["L1 Basic cap"]:::rule --> L2["L2 Standard cap"]:::rule --> L3["L3 Enhanced cap"]:::rule
     end
 
-    T4 -.-> SBT
-    T4 -.-> RULES
+    subgraph SBT[" Credit Passport tiers "]
+        direction LR
+        B["Bronze"]:::sbt --> S["Silver"]:::sbt --> G["Gold"]:::sbt --> P["Platinum"]:::sbt --> D["Diamond"]:::sbt
+    end
+
+    subgraph RULES[" On-chain enforcement "]
+        direction LR
+        R1["kycLevel caps loan"]:::rule
+        R2["SBT openLoans cap"]:::rule
+        R3["USDC at Tier 4"]:::rule
+    end
+
+    subgraph SYND[" Large exposure (bank tier) "]
+        direction LR
+        SL["SyndicatedLoan<br/>Lead Arranger + Co-Lenders"]:::bank
+    end
+
+    ENTRY --> KYC
+    KYC --> SBT
+    ENTRY -.-> RULES
+    SL -.->|"when bank exposure<br/>exceeds ceiling"| ENTRY

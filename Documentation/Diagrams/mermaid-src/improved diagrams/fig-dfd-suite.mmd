@@ -2,54 +2,40 @@
 title: Data-Flow Diagrams - Context and Level-1 Decomposition
 ---
 flowchart TB
-    classDef ext   fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef ext   fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
     classDef proc  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:2 2
-    classDef sys   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef sys   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
 
-    subgraph L0[" Level-0 Context Diagram "]
+    subgraph L0[" Level-0 context "]
         direction LR
-        BORR(("Client<br/>Borrower")):::ext
+        BORR(("Client")):::ext
         APV(("Approver")):::ext
-        REG(("Regulator<br/>read-only")):::ext
-        CL(("Chainlink<br/>DON + Feeds")):::ext
-        AGT(("AI Agent<br/>optional")):::ext
-        CWB["<b>CWB Platform</b><br/>on-chain + off-chain banking"]:::sys
-
-        BORR -- "loan · repay · KYC" --> CWB
-        AGT -- "MCP tools" --> CWB
-        CWB -- "Authority Brief · SAR" --> APV
-        CWB -- "PoR · audit trail" --> REG
+        CL(("Chainlink")):::ext
+        CWB["CWB Platform"]:::sys
+        BORR & APV --> CWB
         CL <--> CWB
-        CWB -- "disburse · limits" --> BORR
     end
 
-    subgraph L1ROW[" Level-1 Decomposition "]
+    subgraph L1A[" Level-1 lending "]
         direction LR
-        subgraph L1A[" Core lending pipeline "]
-            direction TB
-            P1["1.0 Loan origination<br/>validate · EIP-712"]:::proc
-            P2["2.0 ML + DON oracle<br/>RF · SHAP · commit-reveal"]:::proc
-            P3["3.0 Disbursement<br/>LocalBank contract"]:::proc
-            P4["4.0 Installment settlement<br/>SBT update"]:::proc
-            D1[("D1 PostgreSQL<br/>requests · logs")]:::store
-            D2[("D2 On-chain state<br/>loans · RBAC")]:::store
-            P1 --> P2 --> P3 --> P4
-            P1 & P2 --> D1
-            P3 & P4 --> D2
-        end
-        subgraph L1B[" Deposits · interbank · agent "]
-            direction TB
-            Q1["5.0 SavingsVault /<br/>FixedDeposit"]:::proc
-            Q2["6.0 IBLP · Syndicate<br/>· UpwardDeposit"]:::proc
-            Q3["7.0 NettingEngine<br/>multilateral settle"]:::proc
-            Q4["8.0 Agent MCP gate<br/>confirm + audit"]:::proc
-            E1[("D3 Capital pools<br/>on-chain balances")]:::store
-            E2[("D4 Agent logs<br/>session scope")]:::store
-            Q1 & Q2 & Q3 --> E1
-            Q4 --> E2
-            BORR2(("Client")):::ext -.-> Q4
-        end
+        P1["Origination"]:::proc
+        P2["ML + DON"]:::proc
+        P3["Disbursement"]:::proc
+        D1[("PostgreSQL")]:::store
+        D2[("On-chain")]:::store
+        P1 --> P2 --> P3 --> D2
+        P1 & P2 --> D1
     end
 
-    L0 --> L1ROW
+    subgraph L1B[" Level-1 treasury "]
+        direction LR
+        Q1["SavingsVault"]:::proc
+        Q2["IBLP · Syndicate"]:::proc
+        Q3["NettingEngine"]:::proc
+        E1[("Capital pools")]:::store
+        Q1 & Q2 & Q3 --> E1
+    end
+
+    L0 --> L1A
+    L0 --> L1B

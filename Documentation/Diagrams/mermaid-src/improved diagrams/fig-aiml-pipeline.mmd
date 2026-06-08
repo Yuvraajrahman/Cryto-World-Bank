@@ -1,58 +1,47 @@
 ---
-title: AI / ML Pipeline - Training, Commit-Reveal Oracle, GNN, Federated Learning
+title: AI / ML Pipeline - Training, Oracle, GNN, Federated Learning
 ---
 flowchart TB
-    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
     classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
-    classDef out  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
 
-    subgraph TOP[" "]
+    subgraph A[" Training pipeline "]
         direction LR
-        subgraph A[" (a) Training pipeline "]
-            direction TB
-            DS[("Loan history +<br/>on-chain events")]:::store
-            FE["Feature engineering<br/>(amount, tier, income, prior_defaults)"]:::step
-            RF["Random Forest classifier"]:::step
-            IF["Isolation Forest (anomaly)"]:::step
-            SH["SHAP · explainable AI"]:::step
-            REG["Model registry<br/>(version + hash)"]:::store
-            DS --> FE --> RF & IF
-            RF & IF --> SH --> REG
-        end
-        subgraph B[" (b) Commit-reveal ML oracle "]
-            direction TB
-            ML["FastAPI ML service"]:::step
-            SC["LocalBank contract"]:::chain
-            OUT["LoanApproved event"]:::out
-            REG --> ML
-            ML -- "commit(hash)" --> SC
-            SC -. "block N+k" .-> ML
-            ML -- "reveal(score, salt)" --> SC
-            SC -- "verify · gate approval" --> OUT
-        end
+        DS[("Loan history")]:::store
+        FE["Feature engineering"]:::step
+        RF["Random Forest"]:::step
+        IF["Isolation Forest"]:::step
+        SH["SHAP explainability"]:::step
+        REG["Model registry"]:::store
+        DS --> FE --> RF & IF --> SH --> REG
     end
 
-    subgraph BOT[" "]
+    subgraph B[" Commit-reveal oracle "]
         direction LR
-        subgraph C[" (c) GNN extension "]
-            direction TB
-            GR[("Wallet–wallet graph<br/>loans · repayments")]:::store
-            GNN["GraphSAGE embeddings"]:::step
-            RF2["Augments RF feature vector"]:::step
-            GR --> GNN --> RF2 --> REG
-        end
-        subgraph D[" (d) Federated learning across tiers "]
-            direction TB
-            LBA["LB-A local trainer"]:::step
-            LBB["LB-B local trainer"]:::step
-            LBC["LB-C local trainer"]:::step
-            AGG["Federated aggregator (NB tier)"]:::step
-            GLOB["Global fraud detector"]:::out
-            LBA & LBB & LBC --> AGG
-            AGG -- "secure-aggregated weights" --> GLOB
-            AGG -. "no raw data leaves LB" .-> Note["Privacy + locality"]:::out
-        end
+        ML["FastAPI service"]:::step
+        CM["commit(hash)"]:::chain
+        RV["reveal(score, salt)"]:::chain
+        OUT["LoanApproved event"]:::chain
+        REG --> ML --> CM --> RV --> OUT
     end
 
-    TOP ~~~ BOT
+    subgraph C[" GNN extension "]
+        direction LR
+        GR[("Wallet graph")]:::store
+        GNN["GraphSAGE"]:::step
+        RF2["Augment RF features"]:::step
+        GR --> GNN --> RF2 --> REG
+    end
+
+    subgraph D[" Federated learning "]
+        direction LR
+        LB["LB local trainers"]:::step
+        AGG["NB aggregator"]:::step
+        GLOB["Global fraud model"]:::chain
+        LB --> AGG --> GLOB
+    end
+
+    A --> B
+    C -.-> A
+    D -.-> A

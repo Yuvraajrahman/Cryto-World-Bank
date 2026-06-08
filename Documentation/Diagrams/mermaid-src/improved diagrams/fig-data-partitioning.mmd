@@ -3,31 +3,28 @@ title: On-Chain vs Off-Chain Data Partitioning
 ---
 flowchart TB
     classDef on  fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef off fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef both fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef off fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef hyb fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
 
-    subgraph ON[" On-chain (EVM) "]
-        direction TB
-        O1["Reserve balances · tier ratios"]:::on
-        O2["Loan lifecycle state machine"]:::on
-        O3["Role bindings · RBAC gates"]:::on
-        O4["SBT credit passport · limits"]:::on
+    subgraph ON[" On-chain "]
+        direction LR
+        O1["Reserve balances"]:::on
+        O2["Loan state"]:::on
+        O3["RBAC · SBT"]:::on
     end
 
-    subgraph OFF[" Off-chain (PostgreSQL + IPFS) "]
-        direction TB
-        F1["KYC documents · income proofs"]:::off
-        F2["Chat · agent action logs"]:::off
-        F3["ML scores · SHAP vectors"]:::off
-        F4["Session keys · market cache"]:::off
+    subgraph OFF[" Off-chain "]
+        direction LR
+        F1["KYC documents"]:::off
+        F2["ML · chat logs"]:::off
+        F3["Session cache"]:::off
     end
 
-    subgraph HYB[" Hybrid enforcement "]
-        direction TB
-        H1["Borrowing limits computed off-chain<br/>(SBT tier · openLoans · DTI)"]:::both
-        H2["Enforced on-chain at disbursement<br/>(revert if cap exceeded)"]:::both
+    subgraph HYB[" Hybrid limits "]
+        direction LR
+        H1["Compute off-chain"]:::hyb
+        H2["Enforce on-chain"]:::hyb
         H1 --> H2
     end
 
-    ON ~~~ OFF
-    OFF ~~~ HYB
+    ON --> OFF --> HYB

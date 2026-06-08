@@ -1,0 +1,22 @@
+---
+title: Crypto World Bank — Whole-System Overview
+---
+flowchart TB
+    classDef tier fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef layer fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+
+    subgraph TIER[" Four-tier hierarchy "]
+        direction LR
+        T1["WBR Reserve"]:::tier --> T2["National Bank"]:::tier --> T3["Local Bank"]:::tier --> T4["Retail Client"]:::tier
+    end
+
+    subgraph STACK[" Technology stack "]
+        direction TB
+        L1["Presentation · React · ERC-4337"]:::layer
+        L2["Off-chain · Express · PostgreSQL · FastAPI ML"]:::layer
+        L3["Smart contracts · Solidity · OpenZeppelin · RBAC"]:::layer
+        L4["Infrastructure · Chainlink · Polygon zkEVM · Sepolia"]:::layer
+        L1 --> L2 --> L3 --> L4
+    end
+
+    TIER --> STACK

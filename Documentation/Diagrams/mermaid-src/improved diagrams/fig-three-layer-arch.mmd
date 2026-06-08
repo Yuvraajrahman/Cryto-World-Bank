@@ -2,45 +2,29 @@
 title: Four-Layer Decentralised Application Architecture (Planning Phase)
 ---
 flowchart TB
-    classDef layer fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
-    classDef tech  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef spec fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
-    classDef opt   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:5 5
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef opt fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:5 4
 
-    subgraph ROW1[" "]
+    subgraph L12[" Presentation and contracts "]
         direction LR
-        subgraph PRES[" Presentation Layer "]
-            direction TB
-            P1["React 18 + TypeScript<br/>(primary path)"]:::tech
-            P2["Wagmi / Viem · ERC-4337 AA"]:::tech
-            P3["Dashboard · Loan · Admin UI"]:::tech
-            P4["Agent chat UI (optional)"]:::opt
-        end
-        subgraph SC[" Smart-Contract Layer (Polygon zkEVM Cardona) "]
-            direction TB
-            S1["WorldBankReserve"]:::spec
-            S2["NationalBank · LocalBank"]:::spec
-            S3["+ 12 planned contracts<br/>(SavingsVault · GroupPool · IBLP …)"]:::spec
-        end
+        P1["React · Wagmi · Viem"]:::step
+        P2["Dashboard · Admin UI"]:::step
+        S1["WorldBankReserve"]:::chain
+        S2["National · Local Bank"]:::chain
+        P1 --> P2
+        S1 --> S2
     end
 
-    subgraph ROW2[" "]
+    subgraph L34[" Services and Chainlink "]
         direction LR
-        subgraph OFF[" Off-Chain Services Layer "]
-            direction TB
-            O1["Express.js REST + SSE"]:::tech
-            O2["PostgreSQL 20 entities · Redis"]:::tech
-            O3["FastAPI ML · Event listener"]:::tech
-            O4["Qwen3-8B + MCP (optional)"]:::opt
-        end
-        subgraph CL[" Chainlink Infrastructure Layer "]
-            direction TB
-            C1["Functions DON"]:::tech
-            C2["Automation · Price Feeds"]:::tech
-            C3["Proof of Reserve · CCIP"]:::tech
-        end
+        O1["Express · PostgreSQL"]:::step
+        O2["FastAPI ML"]:::step
+        C1["Functions DON"]:::chain
+        C2["Feeds · PoR · CCIP"]:::chain
+        O1 --> O2
+        C1 --> C2
     end
 
-    ROW1 --> ROW2
-
-    class PRES,SC,OFF,CL layer
+    AG["Agent UI (optional)"]:::opt -.-> O1
+    L12 --> L34

@@ -1,18 +1,32 @@
 ---
 title: SAR and AML Compliance Workflow
 ---
-flowchart LR
-    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+flowchart TB
+    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
     classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
 
-    T1["Transaction stream"]:::step
-    T2["Isolation Forest<br/>anomaly score"]:::step
-    T3["Alert queue<br/>(Kafka / DB)"]:::store
-    T4["Compliance officer<br/>review"]:::step
-    T5["SAR report<br/>generation"]:::step
-    T6["freezeAccount(clientId)<br/>onlyApprover gate"]:::chain
-    T7["Append-only<br/>audit_logs"]:::store
+    subgraph DETECT[" Anomaly detection "]
+        direction LR
+        T1["Transaction stream"]:::step
+        T2["Isolation Forest score"]:::step
+        T3["Alert queue"]:::store
+        T1 --> T2 --> T3
+    end
 
-    T1 --> T2 --> T3 --> T4 --> T5
-    T4 --> T6 --> T7
+    subgraph REVIEW[" Officer review "]
+        direction LR
+        T4["Compliance review"]:::step
+        T5["SAR generation"]:::step
+        T4 --> T5
+    end
+
+    subgraph ENFORCE[" On-chain enforcement "]
+        direction LR
+        T6["freezeAccount()"]:::chain
+        T7["audit_logs append"]:::store
+        T6 --> T7
+    end
+
+    DETECT --> REVIEW --> ENFORCE
+    T4 --> T6

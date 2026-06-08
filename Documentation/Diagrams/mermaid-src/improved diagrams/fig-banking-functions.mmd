@@ -1,0 +1,20 @@
+---
+title: Six Banking Functions
+---
+flowchart TB
+    classDef fn fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef core fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+
+    subgraph R1[" "]
+        direction LR
+        F1["1 · Deposits"]:::fn --> F2["2 · Credit"]:::fn --> F3["3 · Settlement"]:::fn
+    end
+
+    subgraph R2[" "]
+        direction LR
+        F4["4 · Risk"]:::fn --> F5["5 · Liquidity"]:::fn --> F6["6 · Ancillary"]:::fn
+    end
+
+    CORE["Four-tier banking core"]:::core
+
+    R1 --> R2 --> CORE

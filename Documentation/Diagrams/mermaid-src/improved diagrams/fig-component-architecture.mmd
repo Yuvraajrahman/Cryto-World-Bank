@@ -2,47 +2,38 @@
 title: Component Architecture (Specified — Planning Phase)
 ---
 flowchart TB
-    classDef layer fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef node  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef spec fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
-    classDef opt   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:5 5
-    classDef ext   fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef opt fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:5 4
 
-    subgraph FE[" Presentation Layer "]
-        UI["React SPA<br/>(primary banking UI)"]:::node
-        AA["ERC-4337 smart accounts"]:::node
-        AGUI["Agent chat (optional)"]:::opt
+    subgraph TOP[" Client and API tier "]
+        direction LR
+        UI["React SPA<br/>primary UI"]:::step
+        AA["ERC-4337 accounts"]:::step
+        API["Express REST API"]:::step
+        PG[("PostgreSQL")]:::store
+        UI --> API --> PG
+        AGUI["Agent UI (optional)"]:::opt -.-> API
     end
 
-    subgraph BE[" Off-Chain Backend "]
-        API["Express.js REST API"]:::node
-        PG[("PostgreSQL · SESSIONS")]:::node
-        ML["FastAPI · RF · SHAP · GNN"]:::node
-        AG["Qwen3-8B + MCP (optional)"]:::opt
+    subgraph MID[" Analytics and ML "]
+        direction LR
+        ML["FastAPI · RF · SHAP"]:::step
+        AG["Qwen3 + MCP (optional)"]:::opt
+        CL["Chainlink Functions"]:::chain
+        ML --> CL
+        AG -.-> ML
     end
 
-    subgraph SC[" Smart-Contract Layer "]
-        CORE["Core WBR · NB · LB"]:::spec
-        PROD["Products SavingsVault · GroupPool · FX …"]:::spec
-        MEO["Multi-entity IBLP · Syndicate · Netting …"]:::spec
+    subgraph BOT[" Smart contracts "]
+        direction LR
+        CORE["WBR · NB · LB"]:::chain
+        PROD["SavingsVault · GroupPool"]:::chain
+        MEO["IBLP · Syndicate · Netting"]:::chain
+        ZK["zkKYC · DID / VC"]:::chain
+        CORE --> PROD --> MEO
+        ZK -.-> CORE
     end
 
-    subgraph EXT[" Chainlink + External "]
-        CL["Functions · Automation · Feeds · PoR · CCIP"]:::ext
-        KYC["zkKYC / zkAML · DID / VC"]:::ext
-    end
-
-    UI --> API
-    AGUI -.-> AG
-    AG -.-> API
-    API --> PG
-    API --> ML
-    API --> CORE
-    API --> PROD
-    API --> MEO
-    ML -.-> CL
-    CORE --> MEO
-    KYC -.-> CORE
-    CL -.-> CORE
-
-    class FE,BE,SC,EXT layer
+    TOP --> MID --> BOT

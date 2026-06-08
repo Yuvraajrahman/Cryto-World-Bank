@@ -2,39 +2,37 @@
 title: Chainlink Oracle Architecture - Off-Chain AI to On-Chain Decision
 ---
 flowchart TB
-    classDef proc  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef step  fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef store fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
     classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef note  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
 
-    subgraph ML[" Off-chain ML service "]
-        FEAT["Feature engineering<br/>18 behavioral + 4 app features"]:::proc
-        RF["Random Forest + Isolation Forest<br/>+ stacking meta-learner"]:::proc
-        SHAP["SHAP vector + Authority Brief"]:::proc
+    subgraph ML[" Off-chain ML scoring "]
+        direction LR
+        FEAT["Feature engineering<br/>22 features"]:::step
+        RF["RF + iForest + stacker"]:::step
+        SHAP["SHAP + Authority Brief"]:::step
         FEAT --> RF --> SHAP
     end
 
-    subgraph DON[" Chainlink Functions DON (primary) "]
-        N1["Node 1"]:::proc
-        N2["Node 2"]:::proc
-        N3["Node 3"]:::proc
-        CONS["DON consensus<br/>before on-chain commit"]:::proc
+    subgraph DON[" Chainlink Functions DON "]
+        direction LR
+        N1["Node 1"]:::step
+        N2["Node 2"]:::step
+        N3["Node 3"]:::step
+        CONS["DON consensus"]:::step
         N1 & N2 & N3 --> CONS
     end
 
     subgraph CHAIN[" On-chain contracts "]
-        LC["LoanController<br/>commitRiskScore → revealScore"]:::chain
-        LB["LocalBankPool<br/>approve gated on SCORE_REVEALED"]:::chain
-        FX["FXModule<br/>BDT/USD · ETH/USD feeds"]:::chain
-        AUTO["Chainlink Automation<br/>checkUpkeep / performUpkeep"]:::chain
-        POR["Proof of Reserve<br/>WorldBankReserve balance"]:::chain
+        direction LR
+        LC["LoanController<br/>commit → reveal"]:::chain
+        LB["LocalBankPool<br/>SCORE_REVEALED gate"]:::chain
+        FX["FXModule · price feeds"]:::chain
+        AUTO["Automation upkeep"]:::chain
+        POR["Proof of Reserve"]:::chain
     end
 
-    SHAP -->|"HTTP score request"| DON
-    CONS -->|"encodeUint256(score)"| LC
-    LC --> LB
-    ML -. "prototype fallback:<br/>commit-reveal relay" .-> LC
-
-    PF["Chainlink Price Feeds"]:::proc --> FX
-    AUTO -->|"overdue installments"| LB
-    POR -. "external auditor verify" .-> Note1["No trust in admin claims"]:::note
+    ML --> DON
+    SHAP --> CONS
+    CONS --> LC --> LB
+    LC -.-> FX & AUTO & POR

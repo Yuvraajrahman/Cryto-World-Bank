@@ -19,11 +19,13 @@ CFG_FILE="${SCRIPT_DIR}/mmdc-config.json"
 CSS_FILE="${SCRIPT_DIR}/mmdc-fonts.css"
 CHART_CFG="${SCRIPT_DIR}/mmdc-charts-config.json"
 PUPPETEER_CFG="${SCRIPT_DIR}/mmdc-puppeteer.json"
-CHART_DIAGRAMS="fig-revenue-by-tier fig-apr-spread fig-kinked-rate-curve"
+CHART_DIAGRAMS="fig-revenue-by-tier fig-apr-spread fig-kinked-rate-curve fig-phase-effort-bar fig-revenue-mix-pie fig-market-tam-pie"
+COMPACT_DIAGRAMS="fig-optional-agent-addon fig-intro-system-overview fig-banking-functions fig-cross-tier-lending"
+COMPACT_CFG="${SCRIPT_DIR}/mmdc-config-compact.json"
 # Large canvas + 2× scale keeps label text readable after --pdfFit shrinks to page.
-MMDC_WIDTH="${MMDC_WIDTH:-4000}"
-MMDC_HEIGHT="${MMDC_HEIGHT:-3000}"
-MMDC_SCALE="${MMDC_SCALE:-3}"
+MMDC_WIDTH="${MMDC_WIDTH:-3600}"
+MMDC_HEIGHT="${MMDC_HEIGHT:-2800}"
+MMDC_SCALE="${MMDC_SCALE:-2}"
 MMDC_ARGS=(-w "${MMDC_WIDTH}" -H "${MMDC_HEIGHT}" -s "${MMDC_SCALE}")
 
 # ER diagrams and flowcharts use Mermaid foreignObject labels. rsvg-convert drops
@@ -79,8 +81,12 @@ for src in "${SRC_DIR}"/*.mmd; do
     continue
   fi
   mmdc_width=("${MMDC_ARGS[@]}")
-  if [[ " ${ER_DIAGRAMS} " == *" ${name} "* ]]; then
-    mmdc_width=(-w 5200 -H 4000 -s "${MMDC_SCALE}")
+  if [[ " ${COMPACT_DIAGRAMS} " == *" ${name} "* ]]; then
+    cfg="${COMPACT_CFG}"
+    mmdc_width=(-w 1800 -H 1400 -s 1)
+    printf "  render  %s (compact)\n" "${name}"
+  elif [[ " ${ER_DIAGRAMS} " == *" ${name} "* ]]; then
+    mmdc_width=(-w 4400 -H 3400 -s "${MMDC_SCALE}")
     printf "  render  %s (ER diagram)\n" "${name}"
   else
     printf "  render  %s\n" "${name}"

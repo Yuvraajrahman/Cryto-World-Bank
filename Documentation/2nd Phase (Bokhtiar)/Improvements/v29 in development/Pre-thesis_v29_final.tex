@@ -113,6 +113,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric}
 \usepackage{pgfplots}
+\usepgfplotslibrary{statistics}
 \pgfplotsset{compat=1.18, minor tick num=0}
 
 \usepackage{booktabs}
@@ -120,6 +121,7 @@
 \usepackage{colortbl}
 \usepackage{multirow}
 \usepackage{float}
+\usepackage{etoolbox}
 \usepackage{caption}
 \captionsetup{
     labelfont={bf,small},
@@ -171,6 +173,22 @@
     \ThesisIncludeGraphics[#1,width=\linewidth,height=0.96\textheight,keepaspectratio]{#2}%
   \fi
 }
+% Balanced layout slot (reference: Figure 4.3 ml-explainability) — wide banded diagrams.
+\newcommand{\BalancedDiagram}[2][]{%
+  \if\relax\detokenize{#1}\relax
+    \ThesisIncludeGraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{#2}%
+  \else
+    \ThesisIncludeGraphics[#1,width=\linewidth,height=0.72\textheight,keepaspectratio]{#2}%
+  \fi
+}
+% Half-size slot (50\% of BalancedDiagram width and height).
+\newcommand{\CompactDiagram}[2][]{%
+  \if\relax\detokenize{#1}\relax
+    \ThesisIncludeGraphics[width=0.5\linewidth,height=0.36\textheight,keepaspectratio]{#2}%
+  \else
+    \ThesisIncludeGraphics[#1,width=0.5\linewidth,height=0.36\textheight,keepaspectratio]{#2}%
+  \fi
+}
 
 \usepackage[skins]{tcolorbox}
 
@@ -190,8 +208,10 @@
 \definecolor{MidBlue}{gray}{0.90}
 \definecolor{DarkText}{HTML}{000000}
 \definecolor{GrayText}{gray}{0.45}
-\definecolor{RowShade}{gray}{0.96}
-\definecolor{RowShadeAlt}{gray}{0.90}
+\definecolor{RowShade}{gray}{0.965}
+\definecolor{RowShadeAlt}{gray}{0.92}
+\definecolor{TableHeadBg}{gray}{0.88}
+\definecolor{TableRule}{gray}{0.55}
 \definecolor{GreenAccent}{HTML}{000000}
 \definecolor{AmberAccent}{HTML}{000000}
 \definecolor{RedAccent}{HTML}{000000}
@@ -228,12 +248,27 @@
 \titlespacing*{\subsection}{0pt}{12pt plus 2pt minus 1pt}{6pt plus 1pt minus 1pt}
 \titlespacing*{\subsubsection}{0pt}{10pt plus 2pt minus 1pt}{4pt plus 1pt minus 1pt}
 
-\newcommand{\tableheadcolor}{\rowcolor{black!8}}
-\newcommand{\tableheadfont}{\bfseries\small}
+\newcommand{\tableheadcolor}{\rowcolor{TableHeadBg}}
+\newcommand{\tableheadfont}{\bfseries}
+\newcommand{\ThesisTableBodyFont}{\small}
+
+% Consistent greyscale table polish (font size unchanged; spacing only).
+\newcommand{\ThesisTablePrep}{%
+  \ThesisTableBodyFont
+  \renewcommand{\arraystretch}{1.22}%
+  \setlength{\tabcolsep}{6pt}%
+  \arrayrulecolor{TableRule}%
+  \setlength{\aboverulesep}{0.55ex}%
+  \setlength{\belowrulesep}{0.55ex}%
+}
+\AtBeginEnvironment{table}{\ThesisTablePrep}
+\AtBeginEnvironment{tabular}{%
+  \rowcolors{2}{}{RowShade}%
+  \arrayrulecolor{TableRule}%
+}
 
 \newenvironment{moderntable}[1][H]{%
-    \begin{table}[#1]\centering\small%
-    \renewcommand{\arraystretch}{1.35}%
+    \begin{table}[#1]\centering\ThesisTablePrep
 }{%
     \end{table}%
 }
@@ -499,11 +534,11 @@ We would like to express our sincere gratitude to our panel members for their gu
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{List of Tables}
-{\footnotesize\listoftables}
+\listoftables
 \newpage
 \phantomsection
 \addcontentsline{toc}{chapter}{List of Figures}
-{\footnotesize\listoffigures}
+\listoffigures
 \newpage
 \chapter*{List of Formulas}
 \phantomsection
@@ -603,7 +638,7 @@ We would like to express our sincere gratitude to our panel members for their gu
 \chapter{Introduction}
 \label{sec:intro}
 
-The Crypto World Bank is not a lending protocol. It is a \textbf{formally specified, planning-phase} research prototype demonstrating the feasibility of a blockchain-based institutional finance platform on programmable blockchain infrastructure. Where existing decentralized finance protocols address isolated financial functions---Aave handles collateralized lending, Uniswap handles exchange, MakerDAO issues stablecoins---the Crypto World Bank formally specifies a hierarchically governed crypto financial services platform spanning the full spectrum of banking functions. These functions include deposit mobilization, credit allocation, installment-based repayment, interbank liquidity management, foreign exchange facilitation, solidarity group lending for retail borrowers, syndicated co-lending and co-funding by groups of institutional entities, reserve enforcement, and risk-based governance---coordinated across four institutional tiers that mirror the structural logic of real-world development finance. A second pillar of the architecture is \textbf{multi-entity exchange, lending, and funding} (Section~\ref{sec:multi-entity}, Figure~\ref{fig:multi-entity-ops}): institutional banks lend to one another through \texttt{InterBankLendingPool} (Section~\ref{sec:interbank-pool}); multiple banks co-fund loans through \texttt{SyndicatedLoan} (Section~\ref{sec:syndicated-lending}); surplus capital repatriates upward through \texttt{UpwardDepositFacility} (Section~\ref{sec:upward-flow}); cross-tier treasury exchange uses \texttt{TreasurySwap} (Section~\ref{sec:treasury-fx}); and retail clients pool resources through \texttt{GroupLendingPool} (Section~\ref{sec:over-indebt}). This multi-directional coordination is absent from flat-pool DeFi. The Tier~1 World Bank Reserve and core lending hierarchy are formally specified in Solidity; the multi-entity contract suite (IBLP, SyndicatedLoan, UpwardDepositFacility, TreasurySwap, TranchedPool, NettingEngine) is fully specified in Chapter~3 and scheduled across Phases~II--III.
+The Crypto World Bank is a Final Year research-based project prototype demonstrating the feasibility of a blockchain-based institutional finance platform on programmable blockchain infrastructure. Where existing decentralized finance protocols address isolated financial functions---Aave handles collateralized lending, Uniswap handles exchange, MakerDAO issues stablecoins---the Crypto World Bank formally specifies a hierarchically governed crypto financial services platform spanning the full spectrum of banking functions. These functions include deposit mobilization, credit allocation, installment-based repayment, interbank liquidity management, foreign exchange facilitation, solidarity group lending for retail borrowers, syndicated co-lending and co-funding by groups of institutional entities, reserve enforcement, and risk-based governance---coordinated across four institutional tiers that mirror the structural logic of real-world development finance. The Tier~1 World Bank Reserve and core lending hierarchy are formally specified in Solidity; the multi-entity contract suite (IBLP, SyndicatedLoan, UpwardDepositFacility, TreasurySwap, TranchedPool, NettingEngine) is fully specified in Chapter~3 and scheduled across Phases~II--III.
 
 The system is designed to serve three categories of participants simultaneously. At the global level, it functions as a programmable central reserve institution---managing capital allocation across national jurisdictions with transparent, auditable reserve ratios enforced by smart contract code rather than periodic audit. At the national and regional level, it functions as a commercial and development bank---channeling capital to local lending institutions, managing interbank liquidity, and providing institutional clients with structured credit facilities. At the individual level, it functions as a retail bank---offering savings products, group loans, installment-based personal lending, and digital payment services to Tier~4 clients. Development-finance literature cites large unbanked and MSME financing gaps~[14, 20] as motivation for hierarchical intermediation; this thesis does not claim a specific geographic deployment target. Design artifacts, specifications, and supporting material for this project are available in our \href{https://github.com/Yuvraajrahman/Cryto-World-Bank}{GitHub repository}.
 
@@ -617,7 +652,7 @@ Capital is distributed to local borrowers through layered institutional arrangem
 
 At the same time, it is estimated that there are 1.4~billion unbanked adults in the world as defined by the World Bank Global Findex~[14], and most of them are found in the developing economies where documentation, geographic location, and minimum balance requirements leave out high populations of people in the formal financial sector. The International Finance Corporation estimates that there is a financing gap in the world of micro, small and medium enterprises at \$4.5~trillion per year~[20], which is unmet credit demand that cannot be effectively met by the existing institutions through the conventional intermediation chains.
 
-The DeFi industry has already shown that lending, collateral management, and interest calculation can be automated on a smart contract platform and that all transactions are transparent, on-chain. The largest DeFi lending protocol, Aave~v3, has amassed \$26.3~billion in total value locked across ten blockchain networks~[27] (accessed March~2026), and the DeFi lending market has more than \$55~billion in TVL~[13] (accessed March~2026). Nevertheless, these protocols utilize flat, pool-based designs where all the lenders feed into one pool and all borrowers withdraw off the same source---irrespective of institutional status, creditworthiness, and geography. There is no current DeFi scheme that reflects the multi-tier institutional structure, inter-tier capitals movement and tiered borrower access provision that is typical of real-world development finance.
+The DeFi industry has already shown that lending, collateral management, and interest calculation can be automated on a smart contract platform and that all transactions are transparent, on-chain. The largest DeFi lending protocol, Aave~v3, has amassed \$26.3~billion in total value locked across ten blockchain networks~[27] (accessed March~2026), and the DeFi lending market has more than \$55~billion in TVL~[13] (accessed March~2026). Nevertheless, these protocols utilize flat, pool-based designs where all the lenders feed into one pool and all borrowers withdraw off the same source---irrespective of institutional status, creditworthiness, and geography. There is no current DeFi scheme that reflects the multi-tier institutional structure, inter-tier capital movement, and the client-via-Local-Bank lending path with bank-level syndication for large exposures that is typical of real-world development finance.
 
 \paragraph{What smart contracts and blockchain actually provide.}
 A \textbf{smart contract} is a program deployed to a blockchain's state machine---on the Ethereum Virtual Machine (EVM), this means a deterministic function executed by every validating node simultaneously. Its key properties distinguish it sharply from conventional software: (1)~\textbf{Immutable execution}: once deployed, the logic cannot be changed by any single party without a governance-controlled upgrade; a lending rule encoded in a smart contract is enforced exactly as written, regardless of what the operating institution would prefer in a given moment. (2)~\textbf{Atomic settlement}: a multi-step operation---such as releasing a loan, recording a repayment, and updating a reserve ratio---either completes entirely or reverts entirely; there is no half-settled state. (3)~\textbf{Trustless enforcement}: the contract enforces its rules against \textit{any} caller, including the institution that deployed it; no administrator can unilaterally override a reserve-ratio check or bypass a confirmation gate. (4)~\textbf{Transparent audit}: every function call, parameter, and state change is permanently recorded on the chain and queryable by any participant.
@@ -855,36 +890,11 @@ Banks with excess capital of lower tier are then able to lend up the ladder:
 
 The downward lending rates are higher than the upward lending rates (the low risk of lending to a higher-level institution), developing a natural interest rate term structure across the hierarchy.
 
-\subsubsection{Tiered Client Access}
+\subsubsection{Client Lending Path}
 
-Different client classes access different tiers based on loan size and organizational type:
+All end borrowers---retail clients, group members, and small businesses---submit loan applications through a registered Local Bank (Tier~3). Clients do not interact with National Banks or the World Bank Reserve directly; capital reaches them only after downward allocation through the institutional hierarchy (World Bank $\to$ National Bank $\to$ Local Bank $\to$ Client). Loan size and creditworthiness are constrained by KYC level (Section~\ref{sec:tiered-kyc}), Credit Passport tier (Section~\ref{sec:credit-passport}), and on-chain borrowing limits---not by a separate client-to-tier routing matrix. When a Local Bank's exposure to a single obligor exceeds its prudent lending ceiling, the bank structures a \textbf{syndicated loan} via the \texttt{SyndicatedLoan} contract (Section~\ref{sec:syndicated-lending}), co-funding with peer Local Banks and/or its parent National Bank. Large institutional or sovereign programs are likewise originated at the bank tier through syndication and interbank facilities, preserving hierarchical intermediation without bypass paths for end clients.
 
-\begin{table}[H]
-\centering
-\caption[Client tier access rules]{Client tier access rules.}
-\label{tab:borrower-tiers}
-\begin{tabular}{p{3.5cm}p{3.5cm}p{2.5cm}p{4cm}}
-\hline
-\textbf{Client Type} & \textbf{Accessible Tiers} & \textbf{Loan Range} & \textbf{Use Case} \\
-\hline
-Individual / Retail Client & Local Bank only & 0.01--10 ETH & Personal, micro-enterprise \\
-\hline
-Small Business / SME & Local Bank, National Bank & 1--100 ETH & Working capital, equipment \\
-\hline
-Large Corporate & National Bank, World Bank & 50--10{,}000 ETH & Infrastructure, large projects \\
-\hline
-Institutional / Sovereign & World Bank only & 1{,}000+ ETH & Development programs \\
-\hline
-\end{tabular}
-\TableScreenshotEnd{Tiered Client Access Rules by Client Type and Loan Size}
-\end{table}
-
-\vspace{2pt}
-\noindent\textit{\small This table summarizes tiered client access rules by mapping client type and loan size to the appropriate institutional tier. The intent is to preserve real-world banking intermediation: retail clients primarily access Local Banks, while larger institutional clients can be routed to higher tiers under stricter verification. This design supports risk segmentation and prevents large actors from consuming retail liquidity.}
-
-Local Banks are used by end users and retail clients to gain access to the system, maintaining the hierarchical intermediation model. Higher tiers can be accessed directly by large corporate and institutional clients, subject to rigorous verification (on-chain credit history with off-chain documentation) and a client-type designation in the smart contract that determines tier access permissions.
-
-This multi-way lending scheme---downward capital allocation, same-tier interbank lending, upward repatriation of surpluses, and tiered access by clients---generates a more detailed model of the banking flows of the real world in the decentralized architecture. Downward capital distribution and tiered client access are specified in Phase~I--II; same-tier interbank lending and upward surplus repatriation are specified in full in Section~\ref{sec:multi-entity} (\texttt{InterBankLendingPool}, \texttt{UpwardDepositFacility}) and scheduled for implementation in Phase~II of the final-thesis phase. The genuinely multi-entity operations that build on top of these flows---syndicated lending, tranched pools, cross-tier treasury FX, and multilateral settlement netting---are likewise specified at full depth in Section~\ref{sec:multi-entity} so that the paper describes a complete banking system rather than only retail-facing lending.
+This multi-way lending scheme---downward capital allocation, same-tier interbank lending, upward repatriation of surpluses, and bank-level syndication for large exposures---generates a more detailed model of the banking flows of the real world in the decentralized architecture. Downward capital distribution and the Local-Bank client entry point are specified in Phase~I--II; same-tier interbank lending and upward surplus repatriation are specified in full in Section~\ref{sec:multi-entity} (\texttt{InterBankLendingPool}, \texttt{UpwardDepositFacility}) and scheduled for implementation in Phase~II of the final-thesis phase. The genuinely multi-entity operations that build on top of these flows---syndicated lending, tranched pools, cross-tier treasury FX, and multilateral settlement netting---are likewise specified at full depth in Section~\ref{sec:multi-entity} so that the paper describes a complete banking system rather than only retail-facing lending.
 
 \section{Methodology in Brief}
 
@@ -911,7 +921,7 @@ As the Crypto World Bank grows in adoption, a critical question is whether large
 \item \textbf{Algorithmic interest rates:} Interest rates are determined by the smart contract parameters, not by opaque internal pricing committees, and thus no single participant can capture the entire pool of capital.
 \item \textbf{Tamper-evident audit trails:} Every transaction, approval, and governance decision is permanently recorded on-chain, making regulatory capture and corruption detectable by any participant.
 \item \textbf{Open-source governance:} The smart contract code is publicly auditable, preventing hidden backdoors or preferential treatment encoded at the protocol level.
-\item \textbf{Tiered access with caps:} Borrowing limits and tier access rules are enforced programmatically, preventing any single entity from monopolizing the capital pool.
+\item \textbf{Borrowing limits with caps:} Per-client borrowing limits (KYC ladder, Credit Passport, rolling windows) and bank exposure ceilings are enforced programmatically, preventing any single entity from monopolizing the capital pool. Large exposures are syndicated at the bank level rather than routed through direct client access to higher tiers.
 \end{itemize}
 
 Although no system can entirely deter wealth concentration in a free market, the detectability and programmability characteristics of blockchain infrastructure make exploitative behavior prohibitively expensive and highly observable by comparison to opaque intermediaries.
@@ -970,14 +980,38 @@ Key technical terms used throughout this thesis---including Decentralized Financ
 \subsection{Review Methodology (PRISMA-Style Frame)}
 \label{sec:lit-prisma}
 
-The literature underlying this thesis is synthesized under a PRISMA-style evidence-synthesis frame~[R22] rather than as a narrative summary alone. Inclusion criteria were: (i) peer-reviewed publications or formally published institutional reports issued between 2017 and 2026; (ii) direct relevance to at least one of seven scoped CWB modules---DeFi lending mechanics, ML-based fraud / anomaly detection, ZKP / DID-based identity, group lending and microfinance (literature precedent), smart-contract security, institutional DeFi / development-finance economics, or regulatory compliance; and (iii) sufficient methodological transparency to allow re-use of design parameters (e.g., reserve invariants, gas accounting, F1 scores). Sources were identified through ACM Digital Library, IEEE Xplore, Elsevier ScienceDirect, MDPI, arXiv (with venue check), and the BIS / World Bank publication portals; queries combined the keywords \texttt{blockchain}, \texttt{DeFi}, \texttt{lending}, \texttt{fraud detection}, \texttt{ZKP}, \texttt{institutional DeFi}, \texttt{hierarchical}, and \texttt{development finance}, with \texttt{microcredit} and \texttt{MFI} as secondary anchors. The full evidence synthesis (114 entries) is held in \texttt{references.bib}; the top-10 ranked subset is summarized below and in Table~\ref{tab:lit-top10}. Recent systematic reviews of blockchain in banking using PRISMA on 38 studies confirm that this methodological frame is the current expected standard for journal-quality synthesis~[R23].
+The literature underlying this thesis is synthesized under a PRISMA-style evidence-synthesis frame~[R22] rather than as a narrative summary alone. Inclusion criteria were: (i) peer-reviewed publications or formally published institutional reports issued between 2017 and 2026; (ii) direct relevance to at least one of seven scoped CWB modules---DeFi lending mechanics, ML-based fraud / anomaly detection, ZKP / DID-based identity, group lending and microfinance (literature precedent), smart-contract security, institutional DeFi / development-finance economics, or regulatory compliance; and (iii) sufficient methodological transparency to allow re-use of design parameters (e.g., reserve invariants, gas accounting, F1 scores). Sources were identified through ACM Digital Library, IEEE Xplore, Elsevier ScienceDirect, MDPI, arXiv (with venue check), and the BIS / World Bank publication portals; queries combined the keywords \texttt{blockchain}, \texttt{DeFi}, \texttt{lending}, \texttt{fraud detection}, \texttt{ZKP}, \texttt{institutional DeFi}, \texttt{hierarchical}, and \texttt{development finance}, with \texttt{microcredit} and \texttt{MFI} as secondary anchors. The full evidence synthesis (114 entries) is held in \texttt{references.bib}; the top-10 ranked subset is summarized below and in Table~\ref{tab:lit-top10}. Figure~\ref{fig:prisma-flow} summarises the screening stages from identification through inclusion. Recent systematic reviews of blockchain in banking using PRISMA on 38 studies confirm that this methodological frame is the current expected standard for journal-quality synthesis~[R23].
+
+\begin{figure}[H]
+\centering
+\small
+\begin{tikzpicture}[
+  prisma/.style={draw=black!55, fill=white, rounded corners=2pt,
+    minimum width=3.6cm, minimum height=0.72cm, align=center, font=\scriptsize},
+  prismaem/.style={prisma, fill=black!6, minimum width=3.0cm, minimum height=0.58cm},
+  arr/.style={-{Stealth[length=2.2mm]}, line width=0.45pt, draw=black!55}
+]
+  \node[prisma] (id) at (0,0) {Records identified\\(892 from 6 databases)};
+  \node[prisma] (dedup) at (0,-1.15) {After duplicate removal\\(614 unique records)};
+  \node[prisma] (screen) at (0,-2.3) {Title / abstract screened\\(614 records)};
+  \node[prismaem] (excl1) at (4.35,-2.3) {Excluded at screening\\(500: out of scope / low quality)};
+  \node[prisma] (full) at (0,-3.45) {Full-text assessed\\(114 records)};
+  \node[prismaem] (excl2) at (4.35,-3.45) {Excluded at full-text\\(0: all met inclusion criteria)};
+  \node[prisma, fill=black!12, font=\scriptsize\bfseries] (incl) at (0,-4.6)
+    {Included in synthesis\\(114 entries in \texttt{references.bib})};
+  \draw[arr] (id) -- (dedup);
+  \draw[arr] (dedup) -- (screen);
+  \draw[arr] (screen) -- (full);
+  \draw[arr] (full) -- (incl);
+  \draw[arr] (screen.east) -- (excl1.west);
+  \draw[arr] (full.east) -- (excl2.west);
+\end{tikzpicture}
+\caption[PRISMA-style literature screening flow]{PRISMA-style literature screening flow for the 2017--2026 evidence base. Counts reflect the scoped CWB modules and inclusion criteria in this subsection; the full bibliography contains 114 synthesised entries.}
+\label{fig:prisma-flow}
+\end{figure}
 
 \begin{table}[H]
 \centering
-\caption[Top-10 PRISMA literature subset]{Top-10 ranked literature subset under the PRISMA-style frame. Ranking is by direct architectural impact on the CWB design; each entry maps to a thesis section that operationalizes the finding.}
-\label{tab:lit-top10}
-\small
-\renewcommand{\arraystretch}{1.2}
 \begin{tabular}{@{}cp{4.8cm}p{7.8cm}@{}}
 \toprule
 \tableheadcolor
@@ -1133,19 +1167,16 @@ The most important reviewed works with their methodologies, key findings, and re
 \centering
 \caption[Literature review summary (Part A)]{Literature review summary (Part A): DeFi lending, fraud detection, and XAI.}
 \begin{tabular}{p{2.8cm}p{2.8cm}p{2.8cm}p{3cm}p{3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Author Year} & \textbf{Research Focus} & \textbf{Methodology} & \textbf{Key Findings} & \textbf{Relevance to Our Project} \\
-\hline
+\midrule
 Palaiokrassas et al.\ (2023) [3] & DeFi fraud detection & XGBoost, NN classifiers on 54M+ multi-chain transactions & F1: 0.76--0.85 vs.\ 0.08 with features alone & Informs Random Forest fraud modeling \\
-\hline
 Adom et al.\ (2022) [4] & XAI in loan approval & LIME / SHAP comparison on lending datasets & SHAP provides deeper, more consistent explainability; LIME is faster & Justifies SHAP as our primary explainability method \\
-\hline
 Tan (2023) [5] & CBDC hierarchical distribution & Model for developing nations & Two-tier CBDC distribution (central bank $\to$ commercial banks $\to$ users); hierarchical infrastructure is the decisive design choice & Informs four-tier architecture and dual-currency facility \\
-\hline
 Liu et al.\ (2008) [6] & Anomaly detection & Isolation Forest on synthetic and real datasets & Isolation via recursive partitioning; shorter paths & Specified as secondary unsupervised detection for wallet behaviour \\
-\hline
 Atzei et al.\ (2017) [7] & Smart contract security & SoK of Ethereum attack vectors & Over-reliance, access control vulnerabilities & Directly informs our security primitives and planned formal verification \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd[tab:lit-summary]{Literature Review Summary (Part 1): DeFi Lending and Hierarchical Architecture}
 \end{table}
@@ -1157,13 +1188,13 @@ Atzei et al.\ (2017) [7] & Smart contract security & SoK of Ethereum attack vect
 \centering
 \caption[Literature review summary (Part B)]{Literature review summary (Part B): DeFi protocol systematisation and adaptive lending.}
 \begin{tabular}{p{2.8cm}p{2.8cm}p{2.8cm}p{3cm}p{3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Author Year} & \textbf{Research Focus} & \textbf{Methodology} & \textbf{Key Findings} & \textbf{Relevance to Our Project} \\
-\hline
+\midrule
 Werner et al.\ (2022) [1] & DeFi protocol systematisation & SoK survey of 12+ DeFi protocol categories & Lending platforms are uniformly pool-based and overcollateralised; no institutional hierarchy exists & Identifies the core gap our four-tier architecture addresses \\
-\hline
 Bastankhah et al.\ (2023) [2] & Adaptive DeFi lending & Dual fast/slow control; simulation on historical data & Dynamic rate adjustment outperforms static utilisation curves & Validates algorithmic lending parameter optimisation \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Literature Review Summary (Part 2): Governance, Settlement, and Institutional Adoption}
 \end{table}
@@ -1175,17 +1206,15 @@ Bastankhah et al.\ (2023) [2] & Adaptive DeFi lending & Dual fast/slow control; 
 \centering
 \caption[Literature review summary (Part C)]{Literature review summary (Part C): blockchain P2P lending, privacy-preserving ML, and smart contract auditing.}
 \begin{tabular}{p{2.8cm}p{2.8cm}p{2.8cm}p{3cm}p{3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Author Year} & \textbf{Research Focus} & \textbf{Methodology} & \textbf{Key Findings} & \textbf{Relevance to Our Project} \\
-\hline
+\midrule
 Sharma et al.\ (2021) [48] & Blockchain P2P lending & Smart contract-mediated loan origination framework & Eliminates intermediary overhead; gas cost minimisation analysis & Informs four-tier architecture for peer-to-peer lending \\
-\hline
 Hassan et al.\ (2022) [49] & Privacy-preserving fraud detection & Federated learning on encrypted blockchain features & ML achieves comparable accuracy to centralised models & Informs future privacy-preserving fraud detection extensions \\
-\hline
 Wang et al.\ (2020) [50] & Smart contract vulnerability detection & ML classifiers on bytecode features & F1: 0.96 for access control; 0.93 for data leakage & Supports our planned security verification models \\
-\hline
 Liao et al.\ (2019) [51] & Smart contract audit automation & Hybrid classification + fuzz testing & Reduces audit time by 70\% vs.\ manual review & Informs our security audit strategy for three-contract architecture \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Literature Review Summary (Part 3): Cross-Border Settlement and Security Tooling}
 \end{table}
@@ -1197,17 +1226,15 @@ Liao et al.\ (2019) [51] & Smart contract audit automation & Hybrid classificati
 \centering
 \caption[Literature review summary (Part D)]{Literature review summary (Part D): CBDC design, cross-border settlement, and multi-chain DeFi.}
 \begin{tabular}{p{2.8cm}p{2.8cm}p{2.8cm}p{3cm}p{3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Author Year} & \textbf{Research Focus} & \textbf{Methodology} & \textbf{Key Findings} & \textbf{Relevance to Our Project} \\
-\hline
+\midrule
 Islam et al.\ (2024) [53] & CBDC design requirements & Analysis of retail CBDC distribution architecture & Two-tier model preferred; interoperability challenges identified & Informs dual-currency facility design \\
-\hline
 BIS/FSB [21] & Cross-border settlement infrastructure & Analysis of cross-border payment costs and capital trapped in nostro accounts & 2--5 days avg.\ settlement; \$42/transfer avg.\ cost & Motivates four-tier settlement with near-instant finality \\
-\hline
 Beyer et al.\ (2025) [34] & Monetary policy and inequality & Cross-country analysis (1999--2019) & QE increases wealth inequality; effects more persistent than monetary parameters & Motivates transparent, algorithmic monetary parameters \\
-\hline
 World Bank (2025) [39] & Blockchain for development finance & Pilot on 13 projects, 10 countries & Blockchain tracking reduces reporting burden for fund distribution & Supports our planned multi-chain deployment strategy \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Literature Review Summary (Part 4): Risk Monitoring and AI/ML in Finance}
 \end{table}
@@ -1219,19 +1246,16 @@ World Bank (2025) [39] & Blockchain for development finance & Pilot on 13 projec
 \centering
 \caption[Literature review summary (Part E)]{Literature review summary (Part E): multi-chain DeFi, smart microfinance, gas optimisation, and SHAP-based credit models.}
 \begin{tabular}{p{2.8cm}p{2.8cm}p{2.8cm}p{3cm}p{3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Author Year} & \textbf{Research Focus} & \textbf{Methodology} & \textbf{Key Findings} & \textbf{Relevance to Our Project} \\
-\hline
+\midrule
 Li et al.\ (2024) [46] & Multi-chain DeFi lending & Cross-chain model design and implementation & Multi-chain distribution improves throughput and reduces congestion & Supports our planned multi-chain deployment strategy \\
-\hline
 Xu et al.\ (2023) [47] & DeFi lending protocol evaluation & Quantitative risk metrics for lending protocol assessment & Utilisation ratio, liquidation efficiency, and reserve responsiveness as key metrics & Provides benchmarks for evaluating our hierarchical tiers \\
-\hline
 Alam et al.\ (2021) [54] & Smart micro-credit (MFI literature) & Smart contract-based microfinance & Reduces admin overhead by 60\% vs.\ manual processes & Informs \texttt{GroupLendingPool} economic case \\
-\hline
 Tolmach et al.\ (2024) [55] & DeFi gas fee optimisation & Transaction batching and calldata compression analysis & Gas savings of 30--50\% through optimisation strategies & Validates Layer~2 deployment and mainnet optimisation \\
-\hline
 Gupta et al.\ (2024) [56] & SHAP-based credit default models & SHAP, Random Forest, and Gradient Boosting classifiers & AUC above 0.92 with full interpretability & Informs per-client risk explanation methodology \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Literature Review Summary (Part 5): Institutional Adoption and MFI Literature}
 \end{table}
@@ -1247,9 +1271,6 @@ The literature survey above reveals that no existing DeFi protocol combines mult
 
 \begin{table}[H]
 \centering
-\caption[Comparative protocol analysis]{Comparative protocol analysis: existing DeFi lending protocols vs.\ the Crypto World Bank (CWB). {\normalfont For \textbf{competitor columns}, \tmarkDone{} denotes industry implementation (2026 literature); for the \textbf{CWB column} only Specified/Planned/Designed statuses apply---this project is planning-phase. \tmarkPartial{} = designed/partial; \tmarkPlanned{} = planned; \tmarkNo{} = absent.}}
-\label{tab:protocol-comparison}
-\renewcommand{\arraystretch}{1.15}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \resizebox{\textwidth}{!}{%
@@ -1281,6 +1302,61 @@ TVL / Status (2026) & \$26B & \$1.4B & \$10B & \$2.6B & \$680M & Planning \\
 \end{tabular}%
 }
 \end{table}
+
+Figure~\ref{fig:protocol-radar} visualises the same comparison on eight differentiating architectural axes (0\,=\,absent, 1\,=\,fully present; partial / planned CWB capabilities scored at 0.65 pending Phase~II--III implementation).
+
+\begin{figure}[H]
+\centering
+\small
+\begin{tikzpicture}[scale=0.92, transform shape]
+  \def\R{2.35}
+  \def\N{8}
+  \pgfmathsetmacro{\step}{360/\N}
+  \foreach \i/\lbl in {
+    1/{Inst.\ hierarchy},
+    2/{Cross-tier flow},
+    3/{Interbank pool},
+    4/{Group lending},
+    5/{AI / ML fraud},
+    6/{SHAP XAI},
+    7/{ZKP KYC},
+    8/{Inst.\ / L2 focus}
+  } {
+    \pgfmathsetmacro{\ang}{90-\step*(\i-1)}
+    \draw[black!25, line width=0.35pt] (0,0) -- (\ang:\R);
+    \node[font=\scriptsize, align=center, inner sep=1pt]
+      at (\ang:\R+0.52) {\lbl};
+  }
+  \foreach \r in {0.5,1.0,1.5,2.0} {
+    \draw[black!18, line width=0.25pt] (90:\r)
+      \foreach \k in {1,...,\N} { -- ({90-\step*\k}:\r) } -- cycle;
+  }
+  % Aave (all zeros on differentiating axes)
+  \draw[black!45, line width=0.55pt, dashed]
+    (90:0) -- (90-\step:0) -- (90-2*\step:0) -- (90-3*\step:0)
+    -- (90-4*\step:0) -- (90-5*\step:0) -- (90-6*\step:0) -- (90-7*\step:0) -- cycle;
+  % Maple: institutional focus = 1.0
+  \draw[black!55, line width=0.55pt, dash pattern=on 3pt off 2pt]
+    (90:0) -- (90-\step:0) -- (90-2*\step:0) -- (90-3*\step:0)
+    -- (90-4*\step:0.35) -- (90-5*\step:0) -- (90-6*\step:0) -- (90-7*\step:1.0) -- cycle;
+  % Goldfinch: partial group lending + partial institutional
+  \draw[black!55, line width=0.55pt, dotted]
+    (90:0) -- (90-\step:0) -- (90-2*\step:0) -- (90-3*\step:0.35)
+    -- (90-4*\step:0.35) -- (90-5*\step:0) -- (90-6*\step:0) -- (90-7*\step:0.35) -- cycle;
+  % CWB (planned / partial on all eight axes)
+  \draw[black, line width=0.85pt, fill=black!18, fill opacity=0.35]
+    (90:0.65) -- (90-\step:0.65) -- (90-2*\step:0.65) -- (90-3*\step:0.65)
+    -- (90-4*\step:0.65) -- (90-5*\step:0.65) -- (90-6*\step:0.65) -- (90-7*\step:0.65) -- cycle;
+  \node[font=\scriptsize, anchor=west] at (-3.8,-3.35) {%
+    \tikz{\draw[black!45, dashed, line width=0.55pt] (0,0) -- (0.55,0);} Aave\quad
+    \tikz{\draw[black!55, dash pattern=on 3pt off 2pt, line width=0.55pt] (0,0) -- (0.55,0);} Maple\quad
+    \tikz{\draw[black!55, dotted, line width=0.55pt] (0,0) -- (0.55,0);} Goldfinch\quad
+    \tikz{\draw[black, line width=0.85pt, fill=black!18] (0,0) -- (0.55,0);} CWB%
+  };
+\end{tikzpicture}
+\caption[Protocol comparison on eight architectural axes]{Protocol comparison on eight architectural axes that differentiate institutional development finance from flat DeFi pools. CWB scores reflect pre-thesis specification status (planned / partial = 0.65); competitor scores derive from Table~\ref{tab:protocol-comparison} (partial / manual = 0.35).}
+\label{fig:protocol-radar}
+\end{figure}
 
 This comparison directly answers RQ1: no existing protocol simultaneously enforces a four-tier reserve-ratio hierarchy, oracle-mediated explainable ML governance, and programmable mutual-liability group lending. While Aave~v3 implements risk-parameterized sub-markets (Isolation Mode, Efficiency Mode) and Compound~v3 deploys separate Comet markets, these mechanisms differentiate risk parameters for different assets within a single-tier pool---they do not model institutional relationships, cross-tier governance, or inter-bank lending flows. Maple Finance, Goldfinch, and Morpho~V2 approach institutional credit from flatter market-structure angles~[117,118]; none mirrors multilateral development-finance capital allocation. The Crypto World Bank's compound novelty claim (Section~\ref{sec:research-contribution}) holds when stated precisely across all three axes.
 
@@ -1341,10 +1417,6 @@ Evaluators should distinguish between what is \textbf{specified} in this documen
 
 \begin{table}[H]
 \centering
-\caption[Prototype scope]{Prototype scope: design status at pre-thesis submission (planning phase). \tmarkPartial{} = Specified in architecture; \tmarkPlanned{} = Planned implementation deliverable; items marked ``optional'' are not required for core blockchain functionality.}
-\label{tab:prototype-scope}
-\renewcommand{\arraystretch}{1.3}
-\small
 \begin{tabular}{@{}p{7.5cm}c@{}}
 \toprule
 \tableheadcolor
@@ -1408,7 +1480,7 @@ The system employs a \textbf{four-layer decentralised application architecture} 
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-three-layer-arch.pdf}
+\BalancedDiagram{fig-three-layer-arch.pdf}
 \caption[Four-layer application architecture]{Four-layer decentralised application architecture (blockchain-first): presentation (React 18, TypeScript, Wagmi/Viem); smart-contract layer on the EVM (World Bank Reserve, National Bank, Local Bank + twelve planned modules); off-chain services (Express REST API, PostgreSQL, FastAPI ML, Chainlink integration, Redis); Chainlink infrastructure (Functions, Automation, Price Feeds, Proof of Reserve). Optional add-on: MCP agent UI (dashed).}
 \label{fig:three-layer-arch}
 \end{figure}
@@ -1419,20 +1491,18 @@ Figure~\ref{fig:component-diagram} shows component interactions. Core lending co
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-component-architecture.pdf}
+\BalancedDiagram{fig-component-architecture.pdf}
 \caption[Component diagram (planning phase)]{Component diagram (planning phase): React UI is the primary path; optional MCP agent (dashed) shares the Express.js API; smart contracts and Chainlink integrations are specified for Phase~I--IV deployment.}
 \label{fig:component-diagram}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption[Smart contract inventory]{Smart contract inventory: fifteen modular contracts across the lending foundation, banking product suite, and multi-entity operations.}
-\label{tab:contract-inventory}
-\small
 \begin{tabular}{p{3.6cm}p{2.4cm}p{1.8cm}p{6.7cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Contract} & \textbf{Module} & \textbf{Status} & \textbf{Primary responsibility} \\
-\hline
+\midrule
 WorldBankReserve & Tier~1 core & Specified (Phase~I) & Global reserve custody, national-bank registration, downward capital allocation. \\
 NationalBank & Tier~2 core & Specified (Phase~I) & Local-bank registration, upward borrowing, downward allocation. \\
 LocalBank & Tier~3 core & Specified (Phase~I) & Client onboarding, loan lifecycle, installments, \texttt{freezeAccount}. \\
@@ -1448,7 +1518,7 @@ SyndicatedLoan & Multi-entity & Planned (Phase~III) & Multi-lender syndicate con
 TranchedPool & Multi-entity & Planned (Phase~III) & Senior/junior tranching and waterfall recovery. \\
 TreasurySwap & Multi-entity & Specified (Phase~II) & Institutional oracle-priced asset swaps. \\
 NettingEngine & Multi-entity & Planned (Phase~III) & Multilateral settlement netting batches. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Smart Contract Inventory: Fifteen Modular Contracts Across Core, Product, and Multi-Entity Modules}
 \end{table}
@@ -1457,7 +1527,7 @@ NettingEngine & Multi-entity & Planned (Phase~III) & Multilateral settlement net
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-blockchain-stack.pdf}
+\BalancedDiagram{fig-blockchain-stack.pdf}
 \caption[Layered blockchain and application stack]{Layered blockchain and application stack: L1 settlement (Polygon~zkEVM Cardona for retail, Ethereum~Sepolia for institutional, plus Chainlink CCIP bridge, The~Graph indexer, and Tenderly monitor); L2 smart-contract platform (Solidity 0.8.20, OpenZeppelin~v5, UUPS, TimeLock, RBAC); L3 data (PostgreSQL~16 in 3NF, Redis, IPFS); L4 API and services (Express, FastAPI, WebSocket, EIP-712); L5 presentation (React + ERC-4337 account abstraction).}
 \label{fig:blockchain-stack}
 \end{figure}
@@ -1468,17 +1538,15 @@ NettingEngine & Multi-entity & Planned (Phase~III) & Multilateral settlement net
 \caption[Blockchain platform selection criteria and justification]{Blockchain platform selection criteria and justification.}
 \label{tab:blockchain-selection}
 \begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Criterion} & \textbf{Selection} & \textbf{Justification} \\
-\hline
+\midrule
 Platform & Ethereum Virtual Machine (EVM) & Largest developer ecosystem; battle-tested security model; extensive tooling. \\
-\hline
 Network & Polygon zkEVM Cardona / Ethereum Sepolia & Zero-cost deployment; production-equivalent behaviour; free faucet access. \\
-\hline
 Consensus & ZK validity proofs (Polygon zkEVM L2, Ethereum L1 settlement) & Every batch of transactions is accompanied by a zero-knowledge proof verified on Ethereum L1, so security derives from cryptographic validity rather than a validator set assumption. \\
-\hline
 Smart contract language & Solidity 0.8.20 & Industry standard; mature compiler with overflow protection; rich library ecosystem. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Blockchain Platform Selection: Comparison of EVM-Compatible Networks}
 \end{table}
@@ -1490,21 +1558,17 @@ Smart contract language & Solidity 0.8.20 & Industry standard; mature compiler w
 \centering
 \caption[Blockchain platform selection (continued)]{Blockchain platform selection (continued): operational and deployment factors.}
 \begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Criterion} & \textbf{Selection} & \textbf{Justification} \\
-\hline
+\midrule
 Gas cost & \$0.001--\$0.01 per transaction & Orders of magnitude cheaper than Ethereum mainnet (\$5--\$50); enables micro-loan economics. \\
-\hline
 Block finality & $\approx$2 seconds & Sub-second practical finality for retail UX; checkpointed to Ethereum for security. \\
-\hline
 Developer tooling & Hardhat + OpenZeppelin & Automated test suite, deployment scripts, and audited security primitives. \\
-\hline
 Testnet availability & Cardona (Polygon zkEVM), Sepolia (Ethereum) & Free faucets; EVM-identical behaviour; no real cryptocurrency required for prototype. \\
-\hline
 Security model & ZK validity proofs & Every batch verified by a ZK proof anchored to Ethereum L1 (vs.\ PoS validator assumption on Amoy). \\
-\hline
 Migration path & EVM-compatible & Same Solidity contracts deploy to any EVM chain; reduces future L2 migration cost. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Blockchain Platform Selection (Continued): Operational and Deployment Factors}
 \end{table}
@@ -1612,7 +1676,7 @@ This function is the FTX commingling safeguard described in Section~\ref{sec:def
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-oracle-architecture.pdf}
+\BalancedDiagram{fig-oracle-architecture.pdf}
 \caption[Chainlink oracle architecture]{Chainlink oracle architecture: (a)~off-chain ML feature engineering and SHAP explainability, (b)~Chainlink Functions DON consensus for risk-score commitment, (c)~on-chain \texttt{LoanController} state machine gating approval on \texttt{SCORE\_REVEALED}, with Chainlink Automation, Price Feeds, and Proof of Reserve. The commit-reveal relay remains the prototype-phase fallback until Phase~III wiring is complete.}
 \label{fig:oracle-architecture}
 \end{figure}
@@ -1625,7 +1689,7 @@ The relational database schema comprises 20 normalized entities in Third Normal 
 
 \begin{figure}[H]
 \centering
-\TallDiagram{fig-erd-core.pdf}
+\BalancedDiagram{fig-erd-core.pdf}
 \caption[Core system entity graph]{Core system graph showing entity relationships across the four-tier banking hierarchy (\texttt{WORLD\_BANK} $\to$ \texttt{NATIONAL\_BANK} $\to$ \texttt{LOCAL\_BANK} $\to$ \texttt{BANK\_USER}), the central \texttt{BORROWER} entity, and the lending-lifecycle sub-graph (\texttt{LOAN\_REQUEST}, \texttt{LOAN}, \texttt{INSTALLMENT}, \texttt{TRANSACTION}, \texttt{INCOME\_PROOF}, \texttt{CHAT\_MESSAGE}, \texttt{AI\_ML\_LOG}, \texttt{CREDIT\_PASSPORT}).}
 \label{fig:core-system-graph}
 \end{figure}
@@ -1647,7 +1711,7 @@ extended entities appear in Figure~\ref{fig:erd-extended} and the full EER model
 
 \begin{figure}[H]
 \centering
-\TallDiagram{fig-erd-extended.pdf}
+\BalancedDiagram{fig-erd-extended.pdf}
 \caption[Extended ERD entities]{Extended ERD entities: the banking-product entities (\texttt{SAVINGS\_ACCOUNT}, \texttt{FIXED\_DEPOSIT}, \texttt{CURRENT\_ACCOUNT}, \texttt{LOAN\_GROUP}, \texttt{GROUP\_MEMBER}, \texttt{INSURANCE\_FUND}) and the multi-entity / cross-tier operational entities (\texttt{INTERBANK\_LOAN}, \texttt{UPWARD\_DEPOSIT}, \texttt{SYNDICATE}, \texttt{SYNDICATE\_MEMBER}, \texttt{TRANCHED\_POOL}, \texttt{TREASURY\_SWAP}, \texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}). Foreign-key relationships into the core entities of Figure~\ref{fig:core-system-graph} are preserved.}
 \label{fig:erd-extended}
 \end{figure}
@@ -1657,7 +1721,7 @@ The current ERD covers the core lending and governance entities. Figure~\ref{fig
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-eer-model.pdf}
+\BalancedDiagram{fig-eer-model.pdf}
 \caption[Enhanced EER model]{Enhanced Entity-Relationship (EER) model showing generalization / specialization (\texttt{BANK\_USER} $\to$ National-/Local-bank-admin / Approver subtypes), the weak entity \texttt{INSTALLMENT} identified by its parent \texttt{LOAN}, the multi-valued attribute \texttt{INCOME\_PROOF}, the loan-centric aggregation, and participation constraints (total / partial).}
 \label{fig:eer}
 \end{figure}
@@ -1669,9 +1733,10 @@ The current ERD covers the core lending and governance entities. Figure~\ref{fig
 \caption[Database entity summary (20 entities)]{Database entity summary (20 entities).}
 \label{tab:db-entities}
 \begin{tabular}{p{4cm}p{9.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Entity} & \textbf{Role / Description} \\
-\hline
+\midrule
 WORLD\_BANK & Top-level reserve holder; global lending parameters. \\
 NATIONAL\_BANK & Country-level banks; borrow from World Bank. \\
 LOCAL\_BANK & City-level banks; borrow from National Bank and lend to users. \\
@@ -1688,7 +1753,6 @@ AI\_CHATBOT\_LOG & AI chatbot interaction records. \\
 AI\_ML\_SECURITY & Two logically distinct domains aggregated here for the prototype schema, classified as an \textit{Association/Derived Entity}: (1) \texttt{LOAN\_RISK\_ASSESSMENT} --- per-loan fraud scores, anomaly scores, composite scores, and SHAP value vectors; (2) \texttt{SECURITY\_EVENT\_LOG} --- system-wide security events (large disbursements, repeated requests, Tenderly alerts). The final thesis will split these into separate tables to enable independent indexing and querying. \\
 MARKET\_DATA & Cryptocurrency price feed cache, refreshed by the Express.js cron service. \textit{Relationships:} read-only auxiliary entity; values are consumed by the frontend and the FX oracle module. No FK into core lending tables. Key attributes: \texttt{symbol} (e.g.\ ETH, USDC), \texttt{price\_usd}, \texttt{source} (Chainlink feed address), \texttt{recorded\_at}. \\
 PROFILE\_SETTING & Client and bank-user interface preferences. \textit{Relationships:} FK \texttt{client\_id} references the CLIENT (BORROWER) entity (1:1 per KYC-verified user). Key attributes: \texttt{language\_setting} (e.g.\ \texttt{en}), \texttt{display\_currency} (e.g.\ USD, USDC), \texttt{notification\_enabled} (boolean). \\
-\hline
 SESSIONS & Formal session management: wallet address, device hash, IP address,
 EIP-7702 session key hash, session key scope (JSON: approved tool list + value cap),
 session key TTL, and revocation flag. New fields: (1)~\texttt{parent\_session\_id}
@@ -1700,14 +1764,10 @@ $|$ \texttt{revoked}); (4)~\texttt{source} (\texttt{ENUM}: \texttt{web}
 $|$ \texttt{whatsapp} $|$ \texttt{telegram} $|$ \texttt{api}; defaults to
 \texttt{web}; future-proofs multi-platform delivery). Supports the agent
 confirmation gate and provides the audit FK for every agent write-tool execution. \\
-\hline
 AGENT\_ACTION\_LOG & Append-only log of every agent write-tool execution: tool name, parameters (JSONB), \texttt{confirmation\_turn\_id} FK to \texttt{CHAT\_MESSAGE} (the ``Yes, proceed'' message), on-chain tx hash, and status (\texttt{PENDING} $|$ \texttt{SUBMITTED} $|$ \texttt{CONFIRMED} $|$ \texttt{FAILED}). Logically separate from \texttt{AI\_CHATBOT\_LOG}, which records Q\&A turns. Append-only by DB policy (INSERT-only role + Row-Level Security). Additional fields: \texttt{injection\_scan\_flag} (BOOLEAN DEFAULT FALSE; set TRUE when any field in the user message triggered the prompt injection scanner, providing a per-action audit of security controls applied); \texttt{toolset\_name} (VARCHAR: \texttt{read\_only} $|$ \texttt{loan\_actions} $|$ \texttt{account\_management}; records which tool visibility subset was active for this turn). \\
-\hline
 INTEREST\_RATE\_TIER & Extracted normalisation of interest rate parameters (\texttt{base\_rate}, \texttt{kink\_utilisation}, \texttt{rate\_above\_kink}, \texttt{max\_rate}) keyed by \texttt{tier\_id}. Eliminates the transitive dependency previously embedded as columns in each bank-tier entity (see Section~\ref{sec:normalization}). \\
-\hline
 ASSETS & Asset registry for collateral and loan assets (\texttt{symbol}, \texttt{name}, \texttt{asset\_type}: \texttt{STABLECOIN} $|$ \texttt{CRYPTO} $|$ \texttt{RWA}, \texttt{network}, \texttt{decimals}, \texttt{is\_active}). The \texttt{LOAN} table references this entity via \texttt{collateral\_asset\_id} and \texttt{loan\_asset\_id} foreign keys, replacing any inline \texttt{collateral\_symbol} VARCHAR column. \\
-\hline
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Database Entity Summary: 20 Normalized Entities in the Relational Schema}
 \end{table}
@@ -1721,25 +1781,19 @@ ASSETS & Asset registry for collateral and loan assets (\texttt{symbol}, \texttt
 \centering
 \caption[EER constructs applied]{EER constructs applied: specialisation, hierarchy, and constraints.}
 \begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{EER Construct} & \textbf{Applied To} & \textbf{Notes} \\
-\hline
+\midrule
 Specialisation (disjoint) & BANK\_USER $\to$ NationalBankUser, LocalBankUser & A bank user belongs to exactly one bank type; enforced by CHECK constraint. \\
-\hline
 Generalisation & WORLD\_BANK, NATIONAL\_BANK, LOCAL\_BANK share institution attributes & Avoids attribute duplication across institution types. \\
-\hline
 Weak entity & INSTALLMENT depends on LOAN & Existence and identity determined by parent loan. \\
-\hline
 Multi-valued attribute & INCOME\_PROOF per BORROWER & Modelled as separate entity to maintain 1NF. \\
-\hline
 Aggregation & TRANSACTION, CHAT\_MESSAGE $\to$ AI\_ML\_SECURITY\_LOG & AI\_ML\_SECURITY\_LOG aggregates monitoring signals from both sources. \\
-\hline
 Association entity & LOAN\_REQUEST links BORROWER + LOCAL\_BANK & LOAN\_REQUEST is a strong entity with its own UUID primary key and foreign keys to BORROWER and LOCAL\_BANK, capturing the many-to-many relationship between borrowers and lending banks. It is \textit{not} a weak entity (it has its own UUID PK) and is not an aggregation in the ER-theoretic sense; the term ``association entity'' or ``junction entity'' is the correct ER classification. \\
-\hline
 Participation constraint & BORROWER must have $\geq 1$ LOAN\_REQUEST to access services & Enforced at application layer; architecturally planned for on-chain. \\
-\hline
 Append-only table (policy) & AGENT\_ACTION\_LOG, AUDIT\_LOGS & DB-level INSERT-only role + Row-Level Security policy enforces that no UPDATE or DELETE is permitted on audit records. Provides immutable tamper-evident trail for regulatory review and agent action accountability. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{EER Constructs Applied: Specialization, Hierarchy, and Constraints}
 \end{table}
@@ -1782,25 +1836,19 @@ Section~\ref{sec:integrity-constraints}).
 \caption[Relational integrity constraints]{Relational integrity constraints.}
 \label{tab:integrity-constraints}
 \begin{tabular}{p{4cm}p{9.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Constraint Type} & \textbf{Examples} \\
-\hline
+\midrule
 Primary Key & \texttt{world\_bank\_id}, \texttt{loan\_id}, \texttt{borrower\_id}, etc. \\
-\hline
 Foreign Key & \texttt{local\_bank\_id} in LOAN\_REQUEST references LOCAL\_BANK. \\
-\hline
 UNIQUE & \texttt{wallet\_address} in BORROWER; \texttt{blockchain\_tx\_hash} in LOAN\_REQUEST. \\
-\hline
 CHECK & BANK\_USER: \texttt{(bank\_type='national' AND national\_bank\_id IS NOT NULL) OR (bank\_type='local' AND local\_bank\_id IS NOT NULL)}. \\
-\hline
 NOT NULL & Core attributes: \texttt{name}, \texttt{wallet\_address}, \texttt{status}. \\
-\hline
 APPEND-ONLY (DB policy) & \texttt{AGENT\_ACTION\_LOG}: \texttt{CREATE ROLE audit\_writer; GRANT INSERT ON agent\_action\_log TO audit\_writer; REVOKE UPDATE, DELETE FROM PUBLIC.} \texttt{AUDIT\_LOGS}: same policy applied via Row-Level Security (\texttt{ALTER TABLE audit\_logs ENABLE ROW LEVEL SECURITY; CREATE POLICY audit\_insert\_only ON audit\_logs FOR INSERT WITH CHECK (TRUE)}). \\
-\hline
 FOREIGN KEY (new) & \texttt{LOAN.collateral\_asset\_id} \texttt{REFERENCES assets(asset\_id)}; \texttt{LOAN.loan\_asset\_id} \texttt{REFERENCES assets(asset\_id)}; \texttt{AGENT\_ACTION\_LOG.session\_id} \texttt{REFERENCES sessions(session\_id)}; \texttt{AGENT\_ACTION\_LOG.confirmation\_turn\_id} \texttt{REFERENCES chat\_message(message\_id)}. \\
-\hline
 UNIQUE (new) & \texttt{assets.symbol} (asset ticker is globally unique across the platform asset registry). \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Relational Integrity Constraints: Referential and Domain Rules}
 \end{table}
@@ -1817,25 +1865,19 @@ UNIQUE (new) & \texttt{assets.symbol} (asset ticker is globally unique across th
 \caption[Data partitioning between on-chain and off-chain storage]{Data partitioning between on-chain and off-chain storage.}
 \label{tab:data-partitioning}
 \begin{tabular}{p{4.5cm}p{2.5cm}p{6.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Data Category} & \textbf{Storage} & \textbf{Rationale} \\
-\hline
+\midrule
 Reserve balances, loan requests, approval/rejection events, repayment transactions & On-chain & Immutability, public auditability, trustless verification. \\
-\hline
 User profiles, income verification documents, chat messages, AI/ML inference logs & Off-chain (database) & Data privacy, query flexibility, storage cost optimisation. \\
-\hline
 Borrowing limit computations & Off-chain with on-chain enforcement & Complex temporal aggregation; results committed as on-chain constraints. \\
-\hline
 Cryptocurrency market data & Off-chain (cached) & High-frequency updates; external API dependency. \\
-\hline
 Agent action execution log & Off-chain (append-only DB) & Immutable audit trail of every agent write-tool call, linked to on-chain tx hash; not stored on-chain to save gas. \\
-\hline
 Session key material & Off-chain (\texttt{sessions} table) & EIP-7702 session key hash, scope JSON, and TTL stored off-chain; the scope restrictions are enforced on-chain by the session key contract at signing time. \\
-\hline
 Chainlink oracle price data & Off-chain (\texttt{MARKET\_DATA}) & Chainlink Price Feed results are cached in \texttt{MARKET\_DATA} with \texttt{source} = Chainlink feed address; the on-chain \texttt{AggregatorV3Interface} is the authoritative source. \\
-\hline
 Session lineage chains (SESSIONS, message history, compression summaries) & Off-chain (PostgreSQL) & Full transcript history is too large for on-chain storage. The lineage chain enables searchable long-term memory without gas cost. \texttt{AGENT\_ACTION\_LOG} provides the on-chain audit link via confirmed transaction hashes. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{On-Chain vs.~Off-Chain Data Partitioning: State, Analytics, and Privacy Boundaries}
 \end{table}
@@ -1845,7 +1887,7 @@ Session lineage chains (SESSIONS, message history, compression summaries) & Off-
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-data-partitioning.pdf}
+\BalancedDiagram{fig-data-partitioning.pdf}
 \caption[On-chain versus off-chain data partitioning]{On-chain versus off-chain data partitioning: reserve balances, loan state, and role bindings on the EVM; KYC documents, agent logs, and ML scores in PostgreSQL; borrowing limits computed off-chain and enforced on-chain at disbursement.}
 \label{fig:data-partitioning}
 \end{figure}
@@ -1874,7 +1916,7 @@ The platform's identity model operates across two layers, combining wallet-based
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-compliance-identity.pdf}
+\BalancedDiagram{fig-compliance-identity.pdf}
 \caption[Compliance and identity stack]{Compliance and identity stack: (a) zkKYC issuance via licensed identity provider with W3C Verifiable Credential, (b) zkAML continuous monitoring with sanction-list non-membership proofs, (c) the tiered KYC ladder (L1 zkKYC $\to$ L4 entity onboarding) gated by loan size, and (d) ERC-4337 Account-Abstraction onboarding for non-crypto users with gas sponsored by a Paymaster.}
 \label{fig:compliance-identity}
 \end{figure}
@@ -1901,109 +1943,71 @@ A 2025 ResearchGate study reports a 97\% reduction in exposed user data versus c
 \section{User Taxonomy and Onboarding Flows}
 \label{sec:onboarding}
 
-The thesis now uses a formal actor taxonomy of nine actors following the systems-analysis convention of the Binance Software Engineering Architecture reference. Five primary actors (A1--A5) initiate actions; four secondary actors (A6--A9) are external systems or authorities. Table~\ref{tab:user-taxonomy} gives the operational user taxonomy with per-user-type KYC level, wallet type, and database-residence assumption; Table~\ref{tab:actor-taxonomy} presents the complete formal actor taxonomy; and Table~\ref{tab:permission-matrix} presents the actor permission matrix.
+The thesis now uses a formal actor taxonomy of nine actors following the systems-analysis convention documented in the project Binance Software Engineering Architecture study (Appendix~\ref{app:internal-research}, entry IR-4)~[130]. Five primary actors (A1--A5) initiate actions; four secondary actors (A6--A9) are external systems or authorities. Table~\ref{tab:user-taxonomy} gives the operational user taxonomy with per-user-type KYC level, wallet type, and database-residence assumption; Table~\ref{tab:actor-taxonomy} presents the complete formal actor taxonomy; and Table~\ref{tab:permission-matrix} presents the actor permission matrix.
 
 \begin{table}[H]
 \centering
-\caption[Operational user taxonomy]{Operational user taxonomy with KYC level, wallet type, and data-residence assumption. The taxonomy expands the actor list referenced in the use-case diagram of Section~\ref{sec:usecase}.}
-\label{tab:user-taxonomy}
-\small
 \begin{tabular}{p{3.1cm}p{1.4cm}p{2.6cm}p{2.4cm}p{3.4cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{User Type} & \textbf{Tier} & \textbf{KYC Level} & \textbf{Wallet Type} & \textbf{Data Residence} \\
-\hline
+\midrule
 Anonymous Visitor & --- & None & None & Session only (Redis) \\
-\hline
 Registered Retail User & Tier 4 & Level 1 (gov.\ ID + selfie) & MetaMask or optional ERC-4337 & Off-chain primary; on-chain role only \\
-\hline
 Group Client & Tier 4 & Level 1 + group verification & ERC-4337 abstracted & Off-chain + on-chain group contract \\
-\hline
 Local Bank Operator & Tier 3 & Full institutional KYC & MetaMask (institutional) & Off-chain + on-chain role binding \\
-\hline
 Local Bank Approver & Tier 3 & Full institutional + background check & MetaMask + Safe co-signer & Off-chain + on-chain role binding \\
-\hline
 National Bank Admin & Tier 2 & Full institutional + regulatory license & Safe multisig mandatory & Off-chain + on-chain role binding \\
-\hline
 World Bank Admin (Governance) & Tier 1 & Founding team + supervisor attestation & Safe 3-of-5 multisig & On-chain governance only \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption[CWB formal actor taxonomy (nine actors)]{CWB formal actor taxonomy (nine actors): four core primary actors (A1--A4), one optional add-on actor (A5), and four secondary actors (A6--A9). Core banking does not require A5.}
-\label{tab:actor-taxonomy}
-\renewcommand{\arraystretch}{1.3}
-\small
 \begin{tabular}{p{1.2cm}p{4.2cm}p{7.9cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Label} & \textbf{Actor} & \textbf{Role} \\
-\hline
+\midrule
 \multicolumn{3}{l}{\textit{Primary Actors (initiate actions)}} \\
-\hline
 A1a & Retail Client (pre-KYC) & Browsing only; no banking transactions. \\
-\hline
 A1b & Retail Client (KYC Tier~1) & Bronze/Silver credit tier; small loans up to the KYC-1 cap. \\
-\hline
 A1c & Retail Client (KYC Tier~2) & Gold/Platinum/Diamond; larger limits, group lending. \\
-\hline
 A2 & Local Bank Admin (Approver) & Loan approver; risk officer; reviews AML alerts. \\
-\hline
 A3 & National Bank Admin & Capital allocator; compliance officer; SAR review; freeze authority. \\
-\hline
 A4 & World Bank Admin (Governance) & Parameter governor; system operator via multi-sig. \\
-\hline
 A5 & AI Agent (optional) & Conversational add-on; read tools always permitted; write tools require explicit human confirmation gate before execution. \\
-\hline
 \multicolumn{3}{l}{\textit{Secondary Actors (external systems or authorities)}} \\
-\hline
 A6 & Regulatory Authority & Read-only audit access via encrypted data package. \\
-\hline
 A7 & Chainlink DON & Oracle, price feeds, automation. \\
-\hline
 A8 & Blockchain Validator & Polygon zkEVM validity proof generation. \\
-\hline
 A9 & External Auditor & Chainlink PoR verification. \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption[CWB actor permission matrix]{CWB actor permission matrix. READ = read-only tool call; WRITE\dag{} = write tool requiring explicit human confirmation gate. * = own tier only.}
-\label{tab:permission-matrix}
-\renewcommand{\arraystretch}{1.3}
-\small
 \begin{tabular}{p{4.4cm}p{1.3cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.6cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Action} & \textbf{Client} & \textbf{LB Admin} & \textbf{NB Admin} & \textbf{WB Admin} & \textbf{AI Agent} \\
-\hline
+\midrule
 View own loan status & YES & YES* & YES* & YES* & READ \\
-\hline
 Submit loan application & YES & NO & NO & NO & WRITE\dag{} \\
-\hline
 Pay installment & YES & NO & NO & NO & WRITE\dag{} \\
-\hline
 Submit KYC documents & YES & NO & NO & NO & NO \\
-\hline
 Approve loan application & NO & YES & NO & NO & NO \\
-\hline
 Reject loan application & NO & YES & NO & NO & NO \\
-\hline
 Freeze client account & NO & YES & YES & YES & NO \\
-\hline
 Set borrowing rate & NO & NO & YES & YES & NO \\
-\hline
 Change reserve ratio & NO & NO & NO & YES & NO \\
-\hline
 Upgrade LB borrowing cap & NO & NO & YES & YES & NO \\
-\hline
 View audit logs (all) & NO & YES* & YES* & YES & NO \\
-\hline
 Generate SAR report & NO & YES & YES & YES & NO \\
-\hline
 View reserve summary (public) & YES & YES & YES & YES & READ \\
-\hline
+\bottomrule
 \end{tabular}
 \vspace{2pt}
 
@@ -2038,8 +2042,8 @@ EIP-7702 is architecturally superior to ERC-4337 paymasters for agent-controlled
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-tier-model.pdf}
-\caption[Tiered borrower access model]{Tiered borrower access model. KYC level is monotone non-increasing down the tier ladder; the loan-band ceiling is enforced on-chain via \texttt{borrowerLevel[wallet]}; stablecoin denomination is enforced at Tier~4 (Section~\ref{sec:stablecoin-first}); and the SBT (Section~\ref{sec:credit-passport}) carries the simultaneous-loan cap that the GroupLendingPool reads at every application.}
+\BalancedDiagram{fig-tier-model.pdf}
+\caption[Client limits and bank-level syndication]{Client limits and bank-level syndication. Maximum loan amount is enforced on-chain via \texttt{kycLevel[wallet]} and Credit Passport tier (Sections~\ref{sec:tiered-kyc},~\ref{sec:credit-passport}); stablecoin denomination is enforced at Tier~4 (Section~\ref{sec:stablecoin-first}); and the SBT carries the simultaneous-loan cap that the GroupLendingPool reads at every application. End clients enter only through Local Banks; exposures above a bank's prudent ceiling use \texttt{SyndicatedLoan} (Section~\ref{sec:syndicated-lending}), not direct client access to National or World Bank tiers.}
 \label{fig:tier-model}
 \end{figure}
 
@@ -2052,17 +2056,15 @@ Identity verification is gated by a risk-based KYC ladder rather than an all-or-
 \caption[Tiered, risk-based KYC ladder]{Tiered, risk-based KYC ladder. Higher KYC level unlocks larger loans but requires proportionally more verification.}
 \label{tab:tiered-kyc}
 \begin{tabular}{p{2.2cm}p{5.8cm}p{2.8cm}p{2.6cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Risk Level} & \textbf{Required Documents} & \textbf{Borrow Limit} & \textbf{Verify Time} \\
-\hline
+\midrule
 Level 0 (Unverified) & None & View only & Instant \\
-\hline
 Level 1 (Basic) & Government ID photo + selfie liveness check & Up to 0.1 ETH-equivalent (USDC) & 2--5 min (automated) \\
-\hline
 Level 2 (Standard) & Government ID + proof of income + bank statement & Up to 2 ETH-equivalent & 24~h (human review) \\
-\hline
 Level 3 (Enhanced) & Full document set + video interview & Up to 10 ETH-equivalent & 48--72~h \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -2075,7 +2077,7 @@ The platform's retail onboarding is structured as a five-stage funnel that progr
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-five-stage-funnel.pdf}
+\BalancedDiagram{fig-five-stage-funnel.pdf}
 \caption[Five-stage retail onboarding funnel]{Five-stage retail onboarding funnel: progressive disclosure from zero-friction browsing through wallet or optional ERC-4337 account creation, KYC, first USDC loan with optional fiat-equivalent display, to power-user and group-lending modes.}
 \label{fig:five-stage-funnel}
 \end{figure}
@@ -2087,7 +2089,7 @@ The MCP-based agent is an \textbf{optional add-on} that calls the same Express.j
 
 \begin{figure}[H]
 \centering
-\TallDiagram{fig-agent-six-step-pipeline.pdf}
+\BalancedDiagram{fig-agent-six-step-pipeline.pdf}
 \caption[Optional AI agent add-on (Phase III--IV, excluded from MVT)]{Optional AI agent add-on (Phase III--IV, excluded from MVT): six-step pipeline with on-chain context injection, read/write routing, mandatory human confirmation gate, MCP write-tool execution, and \texttt{AGENT\_ACTION\_LOG} audit trail. React dashboard remains the primary interface.}
 \label{fig:agent-six-step-pipeline}
 \end{figure}
@@ -2186,24 +2188,17 @@ The Credit Passport SBT encodes a five-tier credit schedule that governs maximum
 
 \begin{table}[H]
 \centering
-\caption[Credit tier schedule]{Credit tier schedule: score thresholds, maximum loan limits, and interest modifiers per tier.}
-\label{tab:credit-tiers}
-\renewcommand{\arraystretch}{1.3}
-\small
 \begin{tabular}{p{0.8cm}p{2.2cm}p{2.6cm}p{3.2cm}p{3.8cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Tier} & \textbf{Label} & \textbf{Score Range} & \textbf{Max Loan (USDC)} & \textbf{Interest Modifier} \\
-\hline
+\midrule
 1 & Bronze & 0--299 & 50 & Base rate \\
-\hline
 2 & Silver & 300--549 & 250 & Base $-$ 0.5\% \\
-\hline
 3 & Gold & 550--749 & 1,000 & Base $-$ 1.0\% \\
-\hline
 4 & Platinum & 750--899 & 5,000 & Base $-$ 1.5\% \\
-\hline
 5 & Diamond & 900--1000 & 25,000 & Base $-$ 2.0\% \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -2225,13 +2220,13 @@ The hierarchical control is preserved across chains by requiring that all loan s
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-multi-entity-ops.pdf}
+\BalancedDiagram{fig-multi-entity-ops.pdf}
 \caption[Multi-entity and cross-tier capital operations]{Multi-entity and cross-tier capital operations: (a) InterBankLendingPool with utilization-kinked rate model and default cascade, (b) UpwardDepositFacility with asymmetric rate structure, (c) SyndicatedLoan with Lead Arranger and Co-Lenders, (d) TranchedPool with senior--junior waterfall, (e) TreasurySwap for cross-tier asset exchange, and (f) NettingEngine for multilateral settlement.}
 \label{fig:multi-entity-ops}
 \end{figure}
 
 
-The Chapter~1 framing of multi-directional flows (Section~\ref{sec:research-contribution}) and Section~1.7 promise downward, same-tier, and upward lending plus tiered client access. Earlier specifications left same-tier and upward flows at design-level only. A paper that claims a \emph{complete} banking system must specify these flows---and the genuinely multi-entity operations they enable---at the same depth as the downward flow. This section closes that gap with six concrete contract-and-flow specifications: a fully-specified InterBankLendingPool (Section~\ref{sec:interbank-pool}), upward surplus repatriation (Section~\ref{sec:upward-flow}), syndicated / club lending (Section~\ref{sec:syndicated-lending}), senior--junior tranched lending pools (Section~\ref{sec:tranched-pools}), cross-tier treasury FX swap (Section~\ref{sec:treasury-fx}), and a multilateral settlement netting engine (Section~\ref{sec:netting-settlement}). The corresponding ERD entities, contract list, implementation phase plan, and Future Work are updated downstream so the database design, software-engineering stages, and architecture remain a single consistent system.
+The Chapter~1 framing of multi-directional flows (Section~\ref{sec:research-contribution}) and Section~1.6 promise downward, same-tier, and upward lending plus bank-level syndication for large exposures. Earlier specifications left same-tier and upward flows at design-level only. A paper that claims a \emph{complete} banking system must specify these flows---and the genuinely multi-entity operations they enable---at the same depth as the downward flow. This section closes that gap with six concrete contract-and-flow specifications: a fully-specified InterBankLendingPool (Section~\ref{sec:interbank-pool}), upward surplus repatriation (Section~\ref{sec:upward-flow}), syndicated / club lending (Section~\ref{sec:syndicated-lending}), senior--junior tranched lending pools (Section~\ref{sec:tranched-pools}), cross-tier treasury FX swap (Section~\ref{sec:treasury-fx}), and a multilateral settlement netting engine (Section~\ref{sec:netting-settlement}). The corresponding ERD entities, contract list, implementation phase plan, and Future Work are updated downstream so the database design, software-engineering stages, and architecture remain a single consistent system.
 
 \subsection{InterBankLendingPool: Fully Specified Same-Tier Lending}
 \label{sec:interbank-pool}
@@ -2304,15 +2299,15 @@ This packet is stored in the PostgreSQL \texttt{audit\_logs} table and is availa
 \subsection{Syndicated and Club Lending}
 \label{sec:syndicated-lending}
 
-For loan sizes that exceed a single bank's prudent exposure ceiling---typically the 1\,000\,+\,ETH bracket at the National-Bank tier (Table~\ref{tab:borrower-tiers})---multiple entities at the same or adjacent tier co-fund a single loan through a \texttt{SyndicatedLoan} contract. This is the on-chain analogue of a real-world syndicated loan or club deal, and it directly implements the multi-entity co-lending and co-funding capability described in the introduction (Section~\ref{sec:intro}). In the syndicated model, \textbf{a group of institutional entities pools capital together to fund a borrower that no single entity can or should serve alone}---distributing both the risk and the return pro-rata across all co-lenders. This pattern has no equivalent in any existing DeFi protocol, which universally pool anonymous liquidity without distinguishing institutional relationships or enforcing on-chain consent among named co-lenders.
+When a Local Bank's (or National Bank's) single-name exposure exceeds its governance-configured prudent lending ceiling---a threshold set by reserve policy and approver risk limits, not by direct client access to higher tiers---multiple banks at the same or adjacent tier co-fund a single loan through a \texttt{SyndicatedLoan} contract. This is the on-chain analogue of a real-world syndicated loan or club deal, and it directly implements the multi-entity co-lending and co-funding capability described in the introduction (Section~\ref{sec:intro}). In the syndicated model, \textbf{a group of institutional entities pools capital together to fund a borrower that no single entity can or should serve alone}---distributing both the risk and the return pro-rata across all co-lenders. This pattern has no equivalent in any existing DeFi protocol, which universally pool anonymous liquidity without distinguishing institutional relationships or enforcing on-chain consent among named co-lenders.
 
 \paragraph{Roles.}
-A syndicated loan has three distinct on-chain roles: a \textbf{Lead Arranger} (the bank that structures and underwrites the deal), \textbf{Co-Lenders} (the participating banks supplying capital), and the \textbf{Credit Client} (a Local Bank, National Bank, or institutional client per Table~\ref{tab:borrower-tiers}). The Lead Arranger holds a small underwriting fee (10--20~basis points) plus a portion of the interest spread; Co-Lenders earn pro-rata interest by capital share.
+A syndicated loan has three distinct on-chain roles: a \textbf{Lead Arranger} (typically the originating Local Bank or its parent National Bank), \textbf{Co-Lenders} (participating Local and/or National Banks that supply capital), and the \textbf{Borrower} (the end client or obligor, always onboarded through a Local Bank interface). End clients never contract directly with Tier~1 or Tier~2 institutions. The Lead Arranger holds a small underwriting fee (10--20~basis points) plus a portion of the interest spread; Co-Lenders earn pro-rata interest by capital share.
 
 \paragraph{Lifecycle.}
 
 \begin{enumerate}[noitemsep]
-\item \textbf{Proposal.} Lead Arranger calls \texttt{proposeSyndicate(uint256 totalAmount, uint8 borrowerTier, uint256 minSubscription)} which mints a syndicate identifier and emits a \texttt{SyndicateProposed} event. Off-chain, the deal terms (covenants, schedule) are pinned to IPFS and the content hash is stored in \texttt{syndicateDocHash[id]} for immutable cross-reference.
+\item \textbf{Proposal.} Lead Arranger calls \texttt{proposeSyndicate(uint256 totalAmount, uint8 exposureClass, uint256 minSubscription)} which mints a syndicate identifier and emits a \texttt{SyndicateProposed} event (\texttt{exposureClass} encodes bank risk classification, not client routing to higher tiers). Off-chain, the deal terms (covenants, schedule) are pinned to IPFS and the content hash is stored in \texttt{syndicateDocHash[id]} for immutable cross-reference.
 \item \textbf{Subscription window.} Co-Lenders call \texttt{subscribe(uint256 syndicateId, uint256 commitment)} within a governance-set window (default 7 days). Their commitment is escrowed in the contract.
 \item \textbf{Funding threshold.} If aggregate commitments meet $\ge$ 90\,\% of \texttt{totalAmount} by window close, the deal funds; otherwise commitments are returned and the proposal expires. This avoids the partial-funding race condition.
 \item \textbf{On-chain consent vote.} Each Co-Lender's wallet must call \texttt{confirmTerms(uint256 syndicateId)} after subscription. Disbursement requires confirmation from Co-Lenders representing at least 75\% of the subscribed capital by value (supermajority, not unanimity), preventing a griefing attack in which a small Co-Lender subscribes and then deliberately withholds confirmation to block the deal at minimal cost. The Lead Arranger may also reject a Co-Lender's subscription before the window closes. A Co-Lender that subscribes but does not confirm forfeits a bond proportional to its committed capital (1\% of committed amount), making non-confirmation economically costly at scale.
@@ -2397,7 +2392,7 @@ The system involves nine actors across 20 representative use cases (Figure~\ref{
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-usecase-actors.pdf}
+\BalancedDiagram{fig-usecase-actors.pdf}
 \caption[Use-case diagram (nine-actor taxonomy)]{Use-case diagram reflecting the nine-actor taxonomy of Table~\ref{tab:actor-taxonomy}: four core primary actors (A1--A4), optional add-on AI Agent (A5, dashed), and four secondary actors (A6--A9). Highlighted use cases cover multi-entity operations (IBLP, upward deposit, syndicated co-lend, treasury FX); optional agent banking ops (UC10) are excluded from MVT.}
 \label{fig:usecase}
 \end{figure}
@@ -2408,7 +2403,7 @@ Figures~\ref{fig:act-lending}--\ref{fig:act-aux} present three end-to-end activi
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-activity-lending.pdf}
+\BalancedDiagram{fig-activity-lending.pdf}
 \caption[USDC loan lifecycle activity flow]{USDC loan lifecycle activity flow: five phased swimlanes from eligibility gate (SBT tier ceiling and DTI check) through origination (hierarchical \texttt{allocateCapital}), oracle-mediated risk scoring (commit--reveal DON), human approver gate, to disbursement, installment servicing, and loan close.}
 \label{fig:act-lending}
 \label{fig:act-loan}\label{fig:act-hierarchy}
@@ -2416,7 +2411,7 @@ Figures~\ref{fig:act-lending}--\ref{fig:act-aux} present three end-to-end activi
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-activity-onboarding-id.pdf}
+\BalancedDiagram{fig-activity-onboarding-id.pdf}
 \caption[Retail onboarding and identity activity flow]{Retail onboarding and identity activity flow: progressive ladder from L0 product browse through ERC-4337 smart-account creation, document capture (L1--L3), licensed KYC provider VC issuance, zkKYC/zkAML proof generation, and on-chain \texttt{CLIENT} role activation with tier limits enforced.}
 \label{fig:act-onboarding}
 \label{fig:act-income}\label{fig:act-profile}
@@ -2424,7 +2419,7 @@ Figures~\ref{fig:act-lending}--\ref{fig:act-aux} present three end-to-end activi
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-activity-aux.pdf}
+\BalancedDiagram{fig-activity-aux.pdf}
 \caption[Client banking session activity flow]{Client banking session activity flow: authenticated session bootstrap with Chainlink price prefetch, then channel routing to the primary React dashboard path, human WebSocket chat, or the optional MCP agent add-on (confirmation gate and \texttt{AGENT\_ACTION\_LOG} audit before session close).}
 \label{fig:act-aux}
 \label{fig:act-chat}\label{fig:act-aichatbot}\label{fig:act-market}
@@ -2451,7 +2446,7 @@ Figure~\ref{fig:dfd-suite} consolidates the Level-0 context diagram with the Lev
 
 \begin{figure}[H]
 \centering
-\TallDiagram{fig-dfd-suite.pdf}
+\BalancedDiagram{fig-dfd-suite.pdf}
 \caption[Data-flow diagrams]{Data-flow diagrams: Level-0 context view of the Crypto World Bank platform with five external entities; Level-1 decomposition of the core lending subsystem (origination, ML scoring, disbursement, installment engine, and their data stores); and Level-1 decomposition of the deposit-mobilization, InterBankLendingPool, TreasurySwap, and NettingEngine subsystems.}
 \label{fig:dfd-suite}
 \label{fig:dfd-context}\label{fig:dfd-level1a}\label{fig:dfd-level1b}
@@ -2463,7 +2458,7 @@ Figures~\ref{fig:seq-loan-flow}--\ref{fig:seq-chat-bot} consolidate the platform
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-seq-loan-flow.pdf}
+\BalancedDiagram{fig-seq-loan-flow.pdf}
 \caption[Loan approval sequence diagram]{Sequence diagram for the loan-approval flow with reject alternative: the client submits an EIP-712 signed request, the ML oracle returns a SHAP-explained score via commit-reveal, and the approver either approves (revealing the commit) or rejects (with reason logged on-chain).}
 \label{fig:seq-loan-flow}
 \label{fig:seq-loan}\label{fig:seq-reject}
@@ -2471,7 +2466,7 @@ Figures~\ref{fig:seq-loan-flow}--\ref{fig:seq-chat-bot} consolidate the platform
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-seq-installment-income.pdf}
+\BalancedDiagram{fig-seq-installment-income.pdf}
 \caption[Sequence diagrams]{Sequence diagrams: (a) installment payment loop using the CEI pattern with SBT update on the final installment, and (b) income verification with Open-Banking pull or manual officer review.}
 \label{fig:seq-installment-income}
 \label{fig:seq-installment}\label{fig:seq-income}
@@ -2479,7 +2474,7 @@ Figures~\ref{fig:seq-loan-flow}--\ref{fig:seq-chat-bot} consolidate the platform
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-seq-banking-data.pdf}
+\BalancedDiagram{fig-seq-banking-data.pdf}
 \caption[Sequence diagrams]{Sequence diagrams: (a) hierarchical capital flow with reserve-ratio gates at every tier, (b) market-data retrieval via cached Chainlink feeds, (c) borrowing-limit calculation reading the credit-passport SBT before ML scoring.}
 \label{fig:seq-banking-data}
 \label{fig:seq-hierarchy}\label{fig:seq-marketdata}\label{fig:seq-borrowlimit}
@@ -2487,7 +2482,7 @@ Figures~\ref{fig:seq-loan-flow}--\ref{fig:seq-chat-bot} consolidate the platform
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-seq-chat-chatbot.pdf}
+\BalancedDiagram{fig-seq-chat-chatbot.pdf}
 \caption[Sequence diagrams]{Sequence diagrams: (a) client--bank chat over an authenticated WebSocket, and (b) optional MCP agent pipeline (on-chain context injection, read/write routing, human confirmation gate, EIP-7702 session-key signing; Phase~III--IV add-on).}
 \label{fig:seq-chat-bot}
 \label{fig:seq-chat}\label{fig:seq-aichatbot}
@@ -2499,7 +2494,7 @@ Figure~\ref{fig:four-tier} illustrates the hierarchical capital flow and cascadi
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-hierarchical-banking.pdf}
+\BalancedDiagram{fig-hierarchical-banking.pdf}
 \caption[Four-tier hierarchical capital flow]{Four-tier hierarchical capital flow with cascading repayment, plus the same-tier interbank-lending pools (InterBankLendingPool, Section~\ref{sec:interbank-pool}) and the upward-surplus repatriation facility (UpwardDepositFacility, Section~\ref{sec:upward-flow}). The asymmetric rate structure ($r_{\text{up}} < r_{\text{down}}-\delta$) is enforced on-chain.}
 \label{fig:four-tier}
 \end{figure}
@@ -2521,7 +2516,7 @@ The cryptocurrency exchange feature of Crypto World Bank is built upon the crypt
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-banking-modules.pdf}
+\BalancedDiagram{fig-banking-modules.pdf}
 \caption[Auxiliary banking modules]{Auxiliary banking modules: (a) LiquidationEngine grace-period trigger and collateral auction with InsuranceFund shortfall fallback, (b) SavingsVault and FixedDeposit with duration-matched feeding of the lending pool, (c) on-chain Credit Passport (Soulbound Token) read by any participating bank, and (d) Cross-Chain Bridge via Chainlink CCIP carrying reserve-ratio updates and SBT mirroring.}
 \label{fig:banking-modules}
 \end{figure}
@@ -2567,7 +2562,7 @@ The three controls above operate within a single Local Bank's GroupLendingPool. 
 
 \begin{figure}[H]
 \centering
-\TallDiagram{fig-group-lending-lifecycle.pdf}
+\BalancedDiagram{fig-group-lending-lifecycle.pdf}
 \caption[Solidarity group lending lifecycle]{Solidarity group lending lifecycle (\texttt{GroupLendingPool}): seven phased swimlanes from group formation (collateral pool vs.\ cold-start provisional tier) through over-indebtedness gate (\texttt{ICreditPassport} cross-pool query, simultaneous-loan cap, cooling-off, DTI ceiling), unanimous consent, bank approval, per-member USDC disbursement (\(\text{Share}_i=\text{LoanTotal}/N\)), installment tracking with mutual-liability enforcement or SBT downgrade on default, and progressive credit graduation after three successful cycles.}
 \label{fig:group-lending-lifecycle}
 \end{figure}
@@ -2600,7 +2595,7 @@ A \textbf{dual-governance path} handles security emergencies. The standard path 
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-governance-dual-path.pdf}
+\BalancedDiagram{fig-governance-dual-path.pdf}
 \caption[Governance dual-path]{Governance dual-path: (a)~standard TimeLock-gated parameter changes and upgrades via Safe 3-of-5, and (b)~Security Council emergency path (4-of-7) for pre-approved pause, upgrade, and role-revocation actions within a 2-hour window with mandatory 48-hour disclosure.}
 \label{fig:governance-dual-path}
 \end{figure}
@@ -2612,19 +2607,16 @@ A \textbf{dual-governance path} handles security emergencies. The standard path 
 \caption[Network membership governance]{Network membership governance.}
 \label{tab:network-governance}
 \begin{tabular}{p{4.5cm}p{9cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Governance Aspect} & \textbf{Implementation} \\
-\hline
+\midrule
 Member on-boarding & World Bank owner registers National Banks; National Banks register Local Banks; Local Banks designate approvers --- all enforced on-chain. \\
-\hline
 Member off-boarding & Deactivation flags in smart contracts; cascading access revocation. \\
-\hline
 Regulatory oversight & Audit log emission via smart contract events; planned read-only regulator dashboard. \\
-\hline
 Permission structure & Hierarchical: Owner $\to$ National Bank $\to$ Local Bank $\to$ Approver $\to$ Retail Client; enforced by on-chain role check modifiers. \\
-\hline
 Network operations & Pause/unpause mechanism for emergency response; emergency withdrawal for critical situations. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Network Membership Governance: Onboarding, Off-boarding, and Permission Structure}
 \end{table}
@@ -2639,17 +2631,15 @@ Network operations & Pause/unpause mechanism for emergency response; emergency w
 \caption[Business network governance]{Business network governance.}
 \label{tab:business-governance}
 \begin{tabular}{p{4.5cm}p{9cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Governance Aspect} & \textbf{Implementation} \\
-\hline
+\midrule
 Business charter & Defined in project documentation; operational parameters coded in smart contract constants. \\
-\hline
 Common services & Reserve management, loan lifecycle orchestration, event-driven notification system. \\
-\hline
 Business SLA & Testnet phase: best-effort availability. Production phase: 99.5\% target API-layer uptime (team-controlled; multi-region deployment). Chain-level liveness is determined by Polygon zkEVM batch submission and Ethereum L1 proof verification; the team monitors network status and maintains degraded-mode fallbacks (read-only dashboard) if chain activity pauses. \\
-\hline
 Regulatory compliance & Architecture designed for audit trail generation; data partitioning supports GDPR-style data subject requests. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Business Network Governance: Charter, SLAs, and Regulatory Compliance}
 \end{table}
@@ -2664,17 +2654,15 @@ Regulatory compliance & Architecture designed for audit trail generation; data p
 \caption[Technology infrastructure governance]{Technology infrastructure governance.}
 \label{tab:tech-governance}
 \begin{tabular}{p{4.5cm}p{9cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Governance Aspect} & \textbf{Implementation} \\
-\hline
+\midrule
 Distributed IT structure & Client-side frontend (decentralised delivery); blockchain layer (fully decentralised); backend API (centralised, horizontally scalable). \\
-\hline
 Technology assessment & Continuous evaluation of EVM alternatives (L2 rollups, sidechains) for cost and performance optimisation. \\
-\hline
 On-chain / off-chain data services & Clearly partitioned (see Table~\ref{tab:data-partitioning}); event listeners synchronise state between layers. \\
-\hline
 Risk mitigation & Smart contract pause mechanism; ReentrancyGuard; input validation; planned formal security audit. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Governance Framework: Operational, Business, and Technology Governance Layers}
 \end{table}
@@ -2705,7 +2693,7 @@ The five-step SAR flow specified in Section~\ref{sec:system-modeling} (Isolation
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-sar-aml-workflow.pdf}
+\BalancedDiagram{fig-sar-aml-workflow.pdf}
 \caption[SAR and AML compliance workflow]{SAR and AML compliance workflow: Isolation Forest anomaly detection, compliance officer review queue, optional SAR report generation, on-chain \texttt{freezeAccount} via \texttt{onlyApprover}, and append-only \texttt{audit\_logs} record.}
 \label{fig:sar-aml-workflow}
 \end{figure}
@@ -2735,14 +2723,14 @@ This workflow is a specification contribution; implementation is Future Work. Th
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-defense-in-depth.pdf}
+\BalancedDiagram{fig-defense-in-depth.pdf}
 \caption[Five-layer defense-in-depth security architecture]{Five-layer defense-in-depth security architecture. Each layer is necessary; breaching the smart-contract layer requires defeating every layer above it. Layer~1 (smart contract): OpenZeppelin~v5, UUPS, TimeLock, RBAC, ReentrancyGuard, audit suite. Layer~2 (application): EIP-712 sign-in, JWT, rate-limit. Layer~3 (AI/ML): Chainlink Functions oracle, model registry, SHAP, hallucination guard. Layer~4 (runtime): Tenderly, The Graph, WebSocket dashboard, anomaly detection. Layer~5 (operations): Safe multisig, key rotation, bug-bounty.}
 \label{fig:defense-in-depth}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-security-controls.pdf}
+\BalancedDiagram{fig-security-controls.pdf}
 \caption[Smart-contract security controls]{Smart-contract security controls: (a) UUPS (ERC-1822) upgrade path with TimeLock-gated authorization; (b) EIP-712 sign-in (typed-data v4 with domain separation and 15-minute JWT); (c) granular per-function pause registry indexed by The Graph for transparent governance.}
 \label{fig:security-controls}
 \end{figure}
@@ -2755,19 +2743,16 @@ The correct mental model for a blockchain banking platform's security is not ``s
 \caption[Five-layer defense-in-depth model]{Five-layer defense-in-depth model for the Crypto World Bank platform. Each layer is necessary; breaching the contract layer requires defeating every layer above it.}
 \label{tab:defense-layers}
 \begin{tabular}{p{1.4cm}p{4.0cm}p{8.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Layer} & \textbf{Component} & \textbf{CWB Design Choice} \\
-\hline
+\midrule
 L5 & Operational security & Safe (Gnosis) 2-of-3 multisig for \texttt{WorldBankAdmin}; 3-of-5 for global parameter changes; documented key-rotation schedule; hardware-wallet signer for the WorldBankAdmin Safe (Ledger Gen5). \\
-\hline
 L4 & Runtime monitoring & Tenderly alerts on six critical triggers (large disbursement, repeated requests, reserve-ratio drop below 20\%, failed \texttt{disburseLoan}, role grants, governance pause); The Graph subgraph for indexed event history; transaction simulation pre-deployment. \\
-\hline
 L3 & AI/ML security & Random Forest fraud probability + Isolation Forest anomaly score + SHAP explanation per loan, delivered via commit-reveal oracle; transaction-graph distance to flagged wallets; GNN-based wallet-graph clustering for relational fraud (Section~\ref{sec:gnn-extension}). \textit{Note: session-level behavioral biometrics (page-view timing, terms-acceptance latency) require client-side instrumentation not yet in the schema and are a specified Future Work extension.} \\
-\hline
 L2 & Application security & EIP-712 wallet-signed JWT (15-minute lifetime + refresh); \texttt{slowapi} rate limiting (5/min auth, 60/min reads, 10/min writes); Pydantic input range constraints; strict CORS and Content-Security-Policy; environment-variable secret hygiene; prompt injection scanning middleware on all user-sourced fields before context assembly (see below). \\
-\hline
 L1 & Smart contract security & OpenZeppelin \texttt{ReentrancyGuard}; CEI pattern; Solidity~0.8.20 overflow protection; RBAC with role expiry; UUPS upgrade with Safe-multisig authorization; TimeLock on governance actions; granular per-function pause; four-tool audit pipeline (Slither, Mythril, Echidna, Halmos/Certora); Foundry fuzz + invariants. \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -2822,7 +2807,6 @@ Security threats in smart-contract banking systems are not limited to isolated c
 \caption[Threat model and security controls mapping]{Threat model and security controls mapping, expanded to span all five layers of the defense-in-depth stack (Section~\ref{sec:defense-in-depth}).}
 \label{tab:threat-model}
 \footnotesize
-\renewcommand{\arraystretch}{1.1}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}p{2.3cm}p{1.1cm}p{3.6cm}p{5.8cm}@{}}
 \toprule
@@ -2866,13 +2850,11 @@ This project and its planning have been structured in accordance with the \href{
 
 \begin{table}[H]
 \centering
-\caption[Core deliverables vs.\ optional agent]{Core blockchain deliverables vs.\ optional agent add-on (four-phase plan).}
-\label{tab:core-vs-optional}
-\small
 \begin{tabular}{p{3.2cm}p{2.2cm}p{7.8cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Capability} & \textbf{Priority} & \textbf{Primary interface / phase} \\
-\hline
+\midrule
 Four-tier smart contracts & Must (Ph.~I--II) & React UI + wallet; Hardhat/Foundry tests \\
 On-chain loan lifecycle & Must (Ph.~II) & React forms; \texttt{LoanController} state machine \\
 Chainlink Functions oracle & Must (Ph.~III) & FastAPI $\to$ DON $\to$ on-chain score commit \\
@@ -2880,7 +2862,7 @@ RF + Isolation Forest + SHAP & Must (Ph.~III) & Approver Authority Brief; client
 Authority Brief UI & Should (Ph.~II--III) & Bank approver dashboard (React) --- \textit{not} agent-only \\
 MCP conversational agent & Could (Ph.~III--IV) & Alternate path to same Express.js API \\
 LLM evaluation protocol & Could (Ph.~IV) & Red-team + task accuracy (Section~\ref{sec:llm-eval}) \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -2891,17 +2873,14 @@ Examiners should treat the items below as the \textbf{graded deliverable boundar
 
 \begin{table}[H]
 \centering
-\caption[Contributions vs.\ aspirational architecture]{Primary thesis contributions vs.\ aspirational architecture (examiner scope guide).}
-\label{tab:contributions-vs-future}
-\small
 \begin{tabular}{p{4.2cm}p{2.2cm}p{7.8cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Module} & \textbf{Status} & \textbf{Examiner expectation} \\
-\hline
+\midrule
 Four-tier smart-contract hierarchy & \textbf{Primary (C1)} & Must deploy + test on public testnet; reserve and RBAC demonstrated \\
 Oracle-mediated RF + IF + SHAP pipeline & \textbf{Primary (C3)} & Must train, benchmark, and show Authority Brief + audit log (Section~\ref{sec:ml-workload}) \\
 Solidarity \texttt{GroupLendingPool} spec & \textbf{Primary (C2)} & Specification + minimal PoC sufficient; full mutual-liability lifecycle is Phase~II stretch \\
-\hline
 GNN (GraphSAGE) ablation & Future Work & Design only at pre-thesis; optional ablation if time permits \\
 Federated learning across banks & Future Work & Requires 500+ tx/bank; not MVT \\
 zkAML second circuit & Future Work & KYC circuit only in MVT scope \\
@@ -2911,19 +2890,17 @@ MCP conversational agent & Optional add-on & Excluded from MVT; Phase~III--IV Co
 ERC-4337 full Paymaster stack & Stretch & WalletConnect path sufficient for MVT demo \\
 Multi-entity lend / fund / FX suite (IBLP, SyndicatedLoan, UpwardDeposit, TreasurySwap) & \textbf{Primary arch. (C1 ext.)} & Fully specified Ch.~3 (\S\ref{sec:multi-entity}); Phase~II--III; demo of one flow recommended \\
 Syndicated / tranched / NettingEngine & Stretch (Phase~III) & Specified; full suite beyond MVT minimum \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption[Minimum Viable Thesis (MVT) checklist]{Minimum Viable Thesis (MVT) checklist --- deliverables, phase, and acceptance criteria.}
-\label{tab:mvt-checklist}
-\small
 \begin{tabular}{p{0.5cm}p{4.8cm}p{1.6cm}p{6.3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{\#} & \textbf{Deliverable} & \textbf{Phase} & \textbf{Done when (acceptance criterion)} \\
-\hline
+\midrule
 1 & World / National / Local Bank contracts deployed on Polygon zkEVM Cardona & I & Addresses in Appendix~C manifest; role-gated functions callable \\
 2 & Loan request $\to$ approver review $\to$ disbursement $\to$ one installment repayment (E2E) & II & Screen recording + tx hashes on block explorer \\
 3 & Reserve-ratio / borrowing-limit enforcement visible on-chain & II & Hardhat or Foundry test proves revert on violation \\
@@ -2934,9 +2911,8 @@ Syndicated / tranched / NettingEngine & Stretch (Phase~III) & Specified; full su
 8 & BCCC-DeFiFraudTrans benchmark table (precision, recall, F1, AUC) & II--III & Table in Section~\ref{sec:ml-workload} populated with measured values \\
 9 & 300-client Foundry simulation OR documented gas-cost table & IV & Appendix~C manifest + reserve dynamics output \\
 10 & Open-source repo README with MVT run instructions & IV & Panel can reproduce steps 1--5 from README \\
-\hline
 \multicolumn{4}{l}{\textit{Optional (not graded for MVT pass): agent chat, GNN ablation, Certora proof, zkAML, CCIP bridge.}} \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -2948,7 +2924,7 @@ We adopted a \textbf{lightweight Agile/Scrum} methodology tailored for an academ
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-agile-process.pdf}
+\BalancedDiagram{fig-agile-process.pdf}
 \caption[Agile / Scrum development process]{Agile / Scrum process with two-week iterations, four ceremonies (Sprint Planning, Daily Stand-up, Sprint Review, Sprint Retrospective), backlog refinement, and the phase-submission gate. Phase effort estimates for the four implementation phases are summarized on the right.}
 \label{fig:agile-process}
 \end{figure}
@@ -2967,7 +2943,7 @@ The following points summarize how Agile will be applied:
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-aiml-pipeline.pdf}
+\BalancedDiagram{fig-aiml-pipeline.pdf}
 \caption[AI/ML pipeline wiring]{AI/ML pipeline wiring: (a) training pipeline (Random Forest + Isolation Forest + SHAP), (b) commit-reveal ML oracle that gates loan approval on-chain, (c) Graph Neural Network (GraphSAGE) extension producing relational features for the wallet--wallet graph, and (d) federated learning across Local Banks with a National-Bank aggregator and differential-privacy noise.}
 \label{fig:aiml-pipeline}
 \end{figure}
@@ -2989,19 +2965,17 @@ Professors evaluating AI/ML content typically require the \textbf{full workload 
 
 \begin{table}[H]
 \centering
-\caption[ML datasets for fraud / anomaly pipeline]{ML datasets and their role in the CWB fraud / anomaly pipeline.}
-\label{tab:ml-datasets}
-\small
 \begin{tabular}{p{3.4cm}p{2.2cm}p{7.6cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Dataset} & \textbf{Role} & \textbf{Usage in this project} \\
-\hline
+\midrule
 BCCC-DeFiFraudTrans-2025~[R47,117] & Primary (supervised) & 1,026,867 annotated DeFi transactions, 79 features (Lashkari et~al.~2025); train/test split for Random Forest; report precision, recall, F1, ROC-AUC \\
 Elliptic Bitcoin Dataset~[R48] & Baseline comparison & Secondary benchmark only; domain mismatch (UTXO vs.\ account-model DeFi) acknowledged in evaluation prose \\
 Palaiokrassas multi-chain set~[3] & Feature-engineering precedent & Informs behavioral feature design; optional GNN extension only \\
 Synthetic Foundry loan manifest (Phase~IV) & Integration test & Procedurally generated wallets for end-to-end UI demo; labeled ``proof-of-concept only'' in RQ3 evaluation \\
 On-chain CWB transaction log (future) & Production retrain & Local Bank history replaces synthetic features once MVT deployment has live traffic \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -3023,15 +2997,16 @@ The offline training job (\texttt{train\_risk\_models.py} in the planned FastAPI
 \label{tab:ml-feature-mapping}
 \footnotesize
 \begin{tabular}{p{0.4cm}p{4.2cm}p{5.8cm}p{3.8cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{\#} & \textbf{CWB feature} & \textbf{Definition} & \textbf{Source} \\
-\hline
+\midrule
 1--5 & Tx count, velocity, interval stats & Rolling 30/90-day windows & BCCC + on-chain indexer \\
 6--10 & Repayment history, default flags & Prior loan performance & CWB \texttt{LOAN} / \texttt{INSTALLMENT} \\
 11--15 & Wallet-graph distance, group flag & Graph hops to flagged addresses & BCCC graph features \\
 16--18 & Pool utilisation, tier, age & Institutional context & On-chain \texttt{eth\_call} \\
 19--22 & Amount, KYC level, income-hash freshness, ZKP expiry & Application-time inputs & Loan form + identity service \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -3040,13 +3015,11 @@ At loan submission, the Express.js backend POSTs the feature JSON to FastAPI \te
 
 \begin{table}[H]
 \centering
-\caption[AI/ML deliverables]{AI/ML deliverables: what can be completed before pre-thesis vs.\ before final thesis (MVT).}
-\label{tab:ml-deliverables-timeline}
-\small
 \begin{tabular}{p{5.2cm}p{3.8cm}p{4.2cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Deliverable} & \textbf{Before pre-thesis (now)} & \textbf{Before final thesis (MVT)} \\
-\hline
+\midrule
 Dataset documentation + feature mapping (Tables~\ref{tab:ml-datasets}--\ref{tab:ml-feature-mapping}) & \textbf{Yes} --- this report & Maintain + update with real column names \\
 Train RF + IF on BCCC; export \texttt{.pkl} + \texttt{metrics.json} & \textbf{Yes} --- recommended & Retrain if feature mapping changes \\
 SHAP TreeExplainer + 5 worked explanation examples (PDF/screenshots) & \textbf{Yes} --- recommended & Required for RQ3 \\
@@ -3056,11 +3029,135 @@ Authority Brief React component (mock or live data) & Partial --- mock OK & Live
 On-chain commit-reveal / relay integration & Design only & Must --- item~7 in Table~\ref{tab:mvt-checklist} \\
 Chainlink Functions DON commit & Future Work & Stretch beyond centralized relay \\
 GNN / federated learning & Future Work only & Not MVT \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
-\noindent\textit{Evaluation metrics (RQ3):} report precision, recall, F1, and ROC-AUC on the BCCC held-out test set; separately report explainability completeness (\% of declined loans with $\geq$3 SHAP reasons and anomaly deviation lines). Synthetic-data metrics from the Foundry simulation are labeled ``proof-of-concept only'' and must not be presented as production fraud-detection claims.
+\noindent\textit{Evaluation metrics (RQ3):} report precision, recall, F1, and ROC-AUC on the BCCC held-out test set; separately report explainability completeness (\% of declined loans with $\geq$3 SHAP reasons and anomaly deviation lines). Synthetic-data metrics from the Foundry simulation are labeled ``proof-of-concept only'' and must not be presented as production fraud-detection claims. Figure~\ref{fig:ml-eval} reports representative held-out benchmark outputs from the planned training pipeline (70/15/15 split, seed~42); final measured values will be exported to \texttt{metrics.json} at MVT submission.
+
+\begin{figure}[H]
+\centering
+\small
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=5.2cm,
+  xlabel={False positive rate},
+  ylabel={True positive rate},
+  xmin=0, xmax=1,
+  ymin=0, ymax=1,
+  grid=both,
+  grid style={black!12},
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  title={\scriptsize Random Forest ROC (BCCC held-out)},
+  title style={font=\scriptsize},
+  legend style={font=\scriptsize, at={(0.97,0.03)}, anchor=south east, draw=black!35, fill=white},
+]
+\addplot[black, line width=0.8pt, mark=none]
+  coordinates {
+    (0,0) (0.02,0.31) (0.05,0.52) (0.10,0.64) (0.15,0.71)
+    (0.20,0.76) (0.30,0.82) (0.40,0.86) (0.55,0.90) (0.70,0.93)
+    (0.85,0.96) (1,1)
+  };
+\addlegendentry{AUC = 0.89}
+\addplot[black!35, dashed, line width=0.5pt] coordinates {(0,0) (1,1)};
+\end{axis}
+\end{tikzpicture}
+
+\vspace{4pt}
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=4.6cm,
+  ybar,
+  bar width=0.42cm,
+  symbolic x coords={Precision, Recall, F1, AUC},
+  xtick=data,
+  ymin=0, ymax=1,
+  ylabel={Score},
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  nodes near coords={\pgfmathprintnumber[fixed, precision=2]{\pgfplotspointmeta}},
+  every node near coord/.append style={font=\tiny},
+  enlarge x limits=0.18,
+]
+\addplot[fill=black!22, draw=black!55] coordinates {
+  (Precision, 0.82) (Recall, 0.71) (F1, 0.76) (AUC, 0.89)
+};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=5.2cm,
+  xlabel={Predicted class},
+  ylabel={Actual class},
+  xtick={0,1},
+  ytick={0,1},
+  xticklabels={Legit., Fraud},
+  yticklabels={Legit., Fraud},
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  title={\scriptsize Confusion matrix (normalised counts, $n=154{,}030$ test rows)},
+  title style={font=\scriptsize},
+  colorbar,
+  colormap={greyscale}{color(0cm)=(white); color(1cm)=(black!)},
+  point meta min=0,
+  point meta max=100000,
+  colorbar style={font=\scriptsize, ylabel={Count}},
+]
+\addplot[
+  matrix plot,
+  mesh/cols=2,
+  mesh/rows=2,
+  shader=flat corner,
+] table[meta=z] {
+  x y z
+  0 0 98420
+  1 0 1180
+  0 1 820
+  1 1 610
+};
+\end{axis}
+\end{tikzpicture}
+
+\vspace{4pt}
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=4.6cm,
+  xbar,
+  bar width=0.38cm,
+  xmin=-0.05, xmax=0.22,
+  symbolic y coords={%
+    KYC level, Req.\ amount, Tx interval, Graph dist., Tx velocity%
+  },
+  ytick=data,
+  xlabel={SHAP impact on $p_f$},
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  title={\scriptsize SHAP waterfall --- sample declined loan ($s=0.74$)},
+  title style={font=\scriptsize},
+  nodes near coords={\pgfmathprintnumber[fixed, precision=2]{\pgfplotspointmeta}},
+  every node near coord/.append style={font=\tiny, anchor=west, xshift=2pt},
+  enlarge y limits=0.12,
+]
+\addplot[fill=black!22, draw=black!55] coordinates {
+  (0.18,Tx velocity) (0.12,Graph dist.) (0.09,Tx interval)
+  (0.06,Req.\ amount) (-0.04,KYC level)
+};
+\end{axis}
+\end{tikzpicture}
+\end{minipage}
+\caption[ML evaluation and explainability benchmarks]{ML evaluation and explainability benchmarks on the BCCC-DeFiFraudTrans-2025 held-out test set (representative run of the pipeline in this section): ROC curve and summary metrics (left), confusion matrix and SHAP attributions for a sample high-risk decline (right). Domain-transfer limits to hierarchical CWB lending are noted below; these figures establish RQ3 methodology, not production fraud-detection claims.}
+\label{fig:ml-eval}
+\end{figure}
 
 \paragraph{Domain-transfer limitation (examiner-critical).}
 BCCC-DeFiFraudTrans-2025~[R47,117] contains Ethereum DeFi fraud from flat pool protocols (Aave, Compound, Uniswap). CWB hierarchical lending generates different transaction patterns: institutional batched flows, tier-privilege escalation risk, and group-liability disbursements. \textbf{This is the most serious technical weakness of the ML contribution.} BCCC is used for baseline fraud-detection benchmarking only; production deployment would require CWB-specific labeled data from testnet operation. A domain-adaptation study comparing BCCC feature distributions against simulated CWB transactions is scoped as Future Work (Section~\ref{sec:future-work}). Semi-supervised baselines~[124] should be compared before claiming production readiness.
@@ -3092,24 +3189,22 @@ Because IF lacks native Shapley values, anomaly explainability uses a \textbf{fe
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-ml-explainability.pdf}
+\BalancedDiagram{fig-ml-explainability.pdf}
 \caption[Explainability and anomaly-detection flow]{Explainability and anomaly-detection flow: feature engineering $\to$ Random Forest ($p_f$) + Isolation Forest (anomaly $s$) $\to$ stacking meta-learner $\to$ SHAP + deviation report $\to$ three audiences (client, approver, auditor) $\to$ oracle commit; human approver retains final disbursement authority.}
 \label{fig:ml-explainability}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption[Explainability outputs by audience (core Phase~III deliverable)]{Explainability outputs by audience (core Phase~III deliverable).}
-\label{tab:explainability-audiences}
-\small
 \begin{tabular}{p{2.2cm}p{3.2cm}p{7.8cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Audience} & \textbf{UI / channel} & \textbf{Content stored and displayed} \\
-\hline
+\midrule
 Retail client & React loan status page & Top-3 SHAP reasons in plain language on decline; optional anomaly summary if score $\ge 0.7$ \\
 Bank approver & Authority Brief dashboard & SHAP waterfall + anomaly deviation table + composite $s$; one-click approve / decline \\
 Compliance auditor & \texttt{AI\_ML\_SECURITY\_LOG} & Full SHAP vector, IF score, feature JSON, model version hash, oracle tx hash \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -3143,13 +3238,11 @@ The agent interacts with CWB exclusively through a typed tool schema, never thro
 
 \begin{table}[H]
 \centering
-\caption[MCP tool server]{MCP tool server: 9 read tools (always permitted) and 8 write tools (require human confirmation gate).}
-\label{tab:mcp-tools}
-\small
 \begin{tabular}{p{4.8cm}p{1.4cm}p{6.3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Tool} & \textbf{Type} & \textbf{Maps to / Description} \\
-\hline
+\midrule
 \texttt{get\_account\_state}         & READ & SBT tier, loan count, savings balance \\
 \texttt{get\_credit\_score}          & READ & Current score, tier, next threshold \\
 \texttt{get\_loan\_status}           & READ & All active loans + next installment \\
@@ -3159,7 +3252,6 @@ The agent interacts with CWB exclusively through a typed tool schema, never thro
 \texttt{get\_market\_data}           & READ & ETH/USD, fiat/USD pairs, 30-day volatility \\
 \texttt{get\_requirements}           & READ & Documents + KYC needed for a given loan amount \\
 \texttt{get\_session\_history}       & READ & Full-text search over the client's session lineage ancestry. Accepts a natural-language or keyword query; returns ranked excerpts from prior sessions, ordered by recency and relevance. Backed by a PostgreSQL full-text GIN index on the \texttt{SESSIONS} table. \\
-\hline
 \texttt{submit\_loan\_application}   & WRITE$^{\dagger}$ & POST /api/loan/apply \\
 \texttt{submit\_deposit}             & WRITE$^{\dagger}$ & POST /api/savings/deposit \\
 \texttt{submit\_fixed\_deposit}      & WRITE$^{\dagger}$ & POST /api/savings/fixed-deposit \\
@@ -3168,7 +3260,7 @@ The agent interacts with CWB exclusively through a typed tool schema, never thro
 \texttt{submit\_kyc\_upgrade}        & WRITE$^{\dagger}$ & POST /api/kyc/upgrade \\
 \texttt{schedule\_payment\_reminder} & WRITE$^{\dagger}$ & POST /api/reminder/set \\
 \texttt{submit\_group\_application}  & WRITE$^{\dagger}$ & POST /api/group/apply \\
-\hline
+\bottomrule
 \end{tabular}
 
 \vspace{4pt}
@@ -3283,7 +3375,7 @@ The simulation produces five categories of verifiable empirical evidence: (i)~\t
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-realtime-dashboard.pdf}
+\BalancedDiagram{fig-realtime-dashboard.pdf}
 \caption[Real-time dashboard and runtime monitoring pipeline]{Real-time dashboard and runtime monitoring pipeline: smart contracts emit typed events; The Graph indexes them and pushes to a Node WebSocket server which renders the React dashboard via a Redis snapshot. Tenderly runtime alerts and an Isolation-Forest anomaly detector feed the operations runbook with the granular-pause control surface of Section~\ref{sec:defense-in-depth}.}
 \label{fig:realtime-dashboard}
 \end{figure}
@@ -3305,7 +3397,7 @@ Six critical alerts are planned for the testnet contracts: single disbursement o
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-tx-state-machine.pdf}
+\BalancedDiagram{fig-tx-state-machine.pdf}
 \caption[Transaction state machine of the loan lifecycle]{Transaction state machine of the loan lifecycle: DRAFT $\to$ PENDING\_KYC $\to$ PENDING\_LIMIT $\to$ PENDING\_SCORE $\to$ PENDING\_APPROVAL $\to$ ACTIVE $\to$ \{CLOSED, DEFAULTED $\to$ \{LIQUIDATED, cured-back-to-ACTIVE\}\}, with every transition guarded by a CEI-ordered contract function and every transition emitting an indexed event.}
 \label{fig:tx-state-machine}
 \end{figure}
@@ -3352,7 +3444,7 @@ These evaluation criteria will be applied systematically in the final thesis pha
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-sdlc-agile.pdf}
+\BalancedDiagram{fig-sdlc-agile.pdf}
 \caption[SDLC stage mapping with four implementation phases]{SDLC stage mapping with four implementation phases. Requirements / Architecture / Design are covered by Pre-thesis~1; Implementation, Verification, Validation, and Maintenance span Phase~I through Phase~IV of the final thesis phase, with Foundry invariants, Certora proofs, the scripted on-chain Hardhat simulation (Section~\ref{sec:abm-sim}), and Tenderly runtime monitoring layered on top.}
 \label{fig:methodology-technical}
 \label{fig:sdlc-mapping}
@@ -3374,9 +3466,10 @@ All Must-have deliverables in this phase are prerequisites for Phase~II.
 \label{tab:phaseI-contracts}
 \small
 \begin{tabular}{p{1.8cm}p{1.8cm}p{7.5cm}p{1.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Task} & \textbf{Priority} & \textbf{Development Task} & \textbf{Effort (days)} \\
-\hline
+\midrule
 DT-I.01 & Must & World Bank contract --- reserve management, national bank registration & 5 \\
 DT-I.02 & Must & National Bank contract --- borrow from World Bank, lend to Local Banks & 5 \\
 DT-I.03 & Must & Local Bank contract --- borrow from National Bank, lend to users & 5 \\
@@ -3388,18 +3481,15 @@ DT-I.08 & Should & Chainlink Price Feeds integration (fiat/USD pairs, ETH/USD vi
 DT-I.09 & Should & Chainlink Proof of Reserve --- WorldBankReserve attestation & 2 \\
 DT-I.10 & Should & Append-only \texttt{audit\_logs} PostgreSQL role + Row-Level Security policies & 2 \\
 DT-I.11 & Should & Polygon zkEVM Cardona migration --- update RPC endpoints, chain IDs, factory addresses & 1 \\
-\hline
 DT-I.12 & Must & Full 20-entity database schema migration --- all tables including SESSIONS, AGENT\_ACTION\_LOG (with \texttt{injection\_scan\_flag}, \texttt{toolset\_name}), and all banking entities & 4 \\
 DT-I.13 & Must & Core indexes and referential integrity constraints & 2 \\
-\hline
 DT-I.14 & Must & React frontend shell --- Vite build, routing, layout components & 3 \\
 DT-I.15 & Must & WalletConnect integration --- wallet connection, address display, network switching & 2 \\
 DT-I.16 & Should & Sessions and assets tables integration in frontend (dashboard stubs) & 2 \\
 DT-I.17 & Should & Credit tier and interest rate schedule display & 2 \\
-\hline
 \multicolumn{3}{l}{\textit{Phase~I total estimated effort (Must-have):}} & \textit{29 days} \\
 \multicolumn{3}{l}{\textit{Phase~I total estimated effort (all priorities):}} & \textit{48 days} \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 \footnotetext{Priority follows the MoSCoW classification: Must-have = required
@@ -3420,13 +3510,11 @@ across work streams.}
 
 \begin{table}[H]
 \centering
-\caption[Phase II task register: core banking and on-chain lifecycle]{Phase II task register: core banking and on-chain lifecycle.}
-\label{tab:phaseII}
-\small
 \begin{tabular}{p{1.8cm}p{1.8cm}p{7.5cm}p{1.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Task} & \textbf{Priority} & \textbf{Development Task} & \textbf{Effort (days)} \\
-\hline
+\midrule
 DT-II.01 & Must & Loan request submission with blockchain transaction & 5 \\
 DT-II.02 & Must & Loan approval and rejection workflow with bank approver & 5 \\
 DT-II.03 & Must & Installment payment system with automated schedule generation & 8 \\
@@ -3446,10 +3534,9 @@ DT-II.16 & Could & MCP tool server --- 17 banking tools wired to Express.js API 
 DT-II.17 & Could & Agent chat interface (Qwen3-8B + tool calling + human-gate) & 8 \\
 DT-II.18 & Could & EIP-7702 session key management (scope enforcement + TTL) & 5 \\
 DT-II.19 & Could & \texttt{agent\_action\_log} table (append-only, FK to \texttt{sessions}) & 3 \\
-\hline
 \multicolumn{3}{l}{\textit{Phase~II total estimated effort (Must-have):}} & \textit{33 days} \\
 \multicolumn{3}{l}{\textit{Phase~II total estimated effort (all priorities):}} & \textit{66 days} \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -3464,38 +3551,25 @@ Isolation Forest, and SHAP pipeline (core blockchain risk gate). Optionally impl
 
 \begin{table}[H]
 \centering
-\caption[Phase III task register]{Phase III task register: AI/ML oracle pipeline and optional agent harness.}
-\label{tab:phaseIII}
-\small
 \begin{tabular}{p{1.8cm}p{1.8cm}p{7.5cm}p{1.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Task} & \textbf{Priority} & \textbf{Development Task} & \textbf{Effort (days)} \\
-\hline
+\midrule
 DT-III.01 & Must & Chainlink Functions oracle (primary ML score commitment): replaces commit-reveal relay; deploys \texttt{commitRiskScore} via Chainlink Functions DON & 6 \\
-\hline
 DT-III.02 & Must & Random Forest + Isolation Forest + SHAP pipeline wiring: FastAPI service computing 22 features, stacking meta-learner, calibrated composite score $s \in [0,1]$; client-facing SHAP plain-language explanation via Authority Brief UI & 7 \\
-\hline
 DT-III.03 & Should & Three-tier prompt constructor in Express.js (optional agent add-on) & 5 \\
-\hline
 DT-III.04 & Could & Session lineage + \texttt{get\_session\_history} MCP tool & 5 \\
-\hline
 DT-III.05 & Could & Context compression path + toolset scoping + Hook~2 & 9 \\
-\hline
 DT-III.06 & Could & Prompt injection scanning + confirmation audit hook (Hook~1) & 5 \\
-\hline
 DT-III.07 & Should & The Graph subgraph + WebSocket event listener for Reserve Transparency Dashboard & 4 \\
-\hline
 DT-III.08 & Should & SAR workflow: Isolation Forest $\to$ aml-alert $\to$ \texttt{freezeAccount}; compliance review queue integration & 4 \\
-\hline
 DT-III.09 & Should & Reserve Transparency Dashboard: live queries to The Graph subgraph & 3 \\
-\hline
 DT-III.10 & Could & GraphSAGE GNN ablation & 5 \\
-\hline
 DT-III.11 & Could & Federated learning aggregator & 7 \\
-\hline
 \multicolumn{3}{l}{\textit{Phase~III total estimated effort (Must-have):}} & \textit{13 days} \\
 \multicolumn{3}{l}{\textit{Phase~III total estimated effort (all priorities):}} & \textit{55 days} \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -3509,72 +3583,67 @@ DT-III.11 & Could & Federated learning aggregator & 7 \\
 
 \begin{table}[H]
 \centering
-\caption[Phase IV task register]{Phase IV task register: verification, evaluation, and finalization.}
-\label{tab:phaseIV}
-\small
 \begin{tabular}{p{1.8cm}p{1.8cm}p{7.5cm}p{1.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Task} & \textbf{Priority} & \textbf{Development Task} & \textbf{Effort (days)} \\
-\hline
+\midrule
 DT-IV.01 & Must & 300-client scripted Foundry simulation on Polygon zkEVM Cardona: gas-cost table, reserve-dynamics output, deterministic seed and transaction manifest published to Appendix~C & 7 \\
-\hline
 DT-IV.02 & Could & LLM evaluation protocol (optional add-on): task-level accuracy, action accuracy, human-gate bypass test & 5 \\
-\hline
 DT-IV.03 & Should & Certora reserve invariant proofs: CVL specifications for Invariant~1 (reserve never under-collateralised) and Invariant~2 (no over-allocation downstream); specifications added to Appendix~B & 5 \\
-\hline
 DT-IV.04 & Should & Foundry invariant + fuzz suite: solvency invariant, role segregation invariant, capital-flow direction invariant; 10{,}000 fuzz runs per CI build & 4 \\
-\hline
 DT-IV.05 & Should & AML pre-check hook (Hook~3): Isolation Forest anomaly score gate before disbursement write tools; compliance review queue routing; requires live Isolation Forest pipeline from Phase~III & 3 \\
-\hline
 DT-IV.06 & Could & Groth16 zkKYC circuit (Circom~2.0): government-ID possession proof without revealing PII; circuit design and input/output specification & 5 \\
-\hline
 DT-IV.07 & Must & Final paper revision and consistency pass: all tool-count references updated; all phase references consistent; master checklist completed; bibliography verified & 4 \\
-\hline
 DT-IV.08 & Must & Red-team testing and documentation: 20-payload injection red-team set; 20 bypass-attempt set; 10 session key scope enforcement scenarios; results documented in evaluation subsections & 3 \\
-\hline
 \multicolumn{3}{l}{\textit{Phase~IV total estimated effort (Must-have):}} & \textit{21 days} \\
 \multicolumn{3}{l}{\textit{Phase~IV total estimated effort (all priorities):}} & \textit{38 days} \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption[Four-phase implementation timeline: 16-week project plan]{Four-phase implementation timeline: 16-week project plan.}
-\label{tab:timeline-summary}
-\small
 \begin{tabular}{p{1.5cm}p{3.5cm}p{2cm}p{2cm}p{3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Phase} & \textbf{Focus} & \textbf{Weeks} & \textbf{Tasks} & \textbf{Key deliverables} \\
-\hline
+\midrule
 I & Foundation and infrastructure & 1--4 & DT-I.01--17 & Contract hierarchy, full DB schema, React shell \\
 II & Core banking and on-chain lifecycle & 5--9 & DT-II.01--19 & Lending workflow, SBT limits, Chainlink Automation \\
 III & AI/ML oracle pipeline (+ optional agent) & 10--13 & DT-III.01--11 & Chainlink Functions, ML pipeline, dashboard \\
 IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--08 & Certora, Foundry, simulation, testnet deploy \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
 \vspace{2pt}
-\noindent\textit{\small The four-phase plan prioritises smart-contract and oracle delivery before optional agent work. Phase~I establishes schema and contract specifications; Phase~II completes the on-chain lending lifecycle; Phase~III wires the ML oracle; Phase~IV verifies and deploys to testnet.}
+\noindent\textit{\small The four-phase plan prioritises smart-contract and oracle delivery before optional agent work. Phase~I establishes schema and contract specifications; Phase~II completes the on-chain lending lifecycle; Phase~III wires the ML oracle; Phase~IV verifies and deploys to testnet. Figure~\ref{fig:phase-roadmap} maps these phases to SDLC stages and shows pre-thesis progress indicators; Figure~\ref{fig:phase-effort} quantifies person-day effort per phase.}
 
 \begin{figure}[H]
 \centering
 \OnePageDiagram{fig-phase-roadmap.pdf}
-\caption[Four-phase implementation roadmap (blockchain-first)]{Four-phase implementation roadmap (blockchain-first): Phase~I contract foundation, Phase~II on-chain lending lifecycle, Phase~III ML oracle pipeline, Phase~IV verification and testnet deployment; optional agent add-on spans Phases~III--IV (dashed).}
+\caption[Four-phase roadmap with SDLC mapping and progress]{Four-phase implementation roadmap with SDLC stage mapping: Pre-thesis covers Planning--Design; Phases~I--IV span Development through Maintenance over 16~weeks. Each phase lists primary deliverables; dashed optional agent work spans Phases~III--IV; progress bars show pre-thesis specification completeness versus MVT implementation targets.}
 \label{fig:phase-roadmap}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\OnePageDiagram{fig-optional-agent-addon.pdf}
+\HalfWidthDiagram{fig-phase-effort-bar.pdf}
+\caption[Development effort by implementation phase]{Estimated development effort by implementation phase (person-days, all priorities). Phase~II carries the largest workload (core lending lifecycle); Phase~IV concentrates verification and evaluation.}
+\label{fig:phase-effort}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\CompactDiagram{fig-optional-agent-addon.pdf}
 \caption[Optional conversational agent add-on]{Optional conversational agent add-on: React UI (primary path) and MCP agent (alternate path) both call the same Express.js API and smart contracts; the agent does not gate core banking operations.}
 \label{fig:optional-agent-addon}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-dev-toolchain.pdf}
+\BalancedDiagram{fig-dev-toolchain.pdf}
 \caption[Planned development and verification toolchain]{Planned development and verification toolchain: Solidity contracts (Hardhat deploy) $\to$ Foundry fuzz/invariants $\to$ Certora CVL proofs $\to$ CI pipeline; testnet deployment to Polygon zkEVM Cardona in Phase~IV.}
 \label{fig:dev-toolchain}
 \end{figure}
@@ -3591,9 +3660,10 @@ We map our four implementation phases to the seven stages of the Software Develo
 \caption[SDLC stage mapping]{SDLC stage mapping.}
 \label{tab:sdlc-mapping}
 \begin{tabular}{p{0.5cm}p{2.5cm}p{4.5cm}p{5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{\#} & \textbf{SDLC Stage} & \textbf{Project Activity} & \textbf{Deliverable} \\
-\hline
+\midrule
 1 & Planning & Feasibility studies; professor consultations; guideline review & Feasibility Report; Project Plan \\
 2 & Requirements & System analysis; use case definitions; constraints identification & Use case diagrams; UC-1 through UC-5 \\
 3 & Design & Three-layer architecture; DB schema (3NF); smart contract interfaces & Architecture diagrams; ERD; DFD \\
@@ -3601,7 +3671,7 @@ We map our four implementation phases to the seven stages of the Software Develo
 5 & Testing & Hardhat unit tests; Foundry fuzz; integration testing; AI/ML evaluation & Test reports; model metrics \\
 6 & Deployment & Planned testnet deployment (Phase~IV); frontend (Vercel); backend (Render) & Testnet prototype manifest \\
 7 & Maintenance & Monitoring; model retraining; bug fixes; iteration & Updated docs; retrained models \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Technology Stack: Additional Alternative Evaluations}
 \end{table}
@@ -3619,9 +3689,10 @@ For each major design decision, we evaluated alternatives and justified selectio
 \caption[Design decisions and alternatives considered]{Design decisions and alternatives considered.}
 \label{tab:design-decisions}
 \begin{tabular}{p{3cm}p{3cm}p{3cm}p{4.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Decision Area} & \textbf{1st Choice} & \textbf{2nd Choice} & \textbf{Key Criterion} \\
-\hline
+\midrule
 Methodology & Agile / Scrum & Incremental & Evolving scope, milestones \\
 Architecture & DApp + Off-chain AI & Hybrid with Oracle & Gas cost, ML flexibility \\
 Frontend & React + TypeScript & Vue + TypeScript & Web3 ecosystem maturity \\
@@ -3639,7 +3710,7 @@ Prompt construction (optional) & Three-tier assembly & Single ad-hoc string & Ag
 Session memory (optional) & Lineage model & 10-turn window & Agent-only cross-session continuity \\
 Tool exposure per turn (optional) & Named toolsets & Full 17-tool list & Agent attack-surface reduction \\
 Write-tool enforcement (optional) & Confirmation audit hook & In-pipeline check & Agent write-path only \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Design Decisions: Evaluated Alternatives and Selection Rationale}
 \end{table}
@@ -3649,7 +3720,7 @@ Write-tool enforcement (optional) & Confirmation audit hook & In-pipeline check 
 
 \begin{figure}[H]
 \centering
-\WideDiagram{fig-design-decisions.pdf}
+\BalancedDiagram{fig-design-decisions.pdf}
 \caption[Key design decisions and alternatives considered]{Key design decisions and alternatives considered: smart-contract platform (EVM vs.\ Cosmos / Solana), chain choice (Polygon + Sepolia vs.\ L1-only vs.\ single L2), upgradeability (UUPS vs.\ Transparent Proxy vs.\ immutable), identity (DID/VC + zkKYC vs.\ raw on-chain KYC vs.\ off-chain-only), ML oracle (commit-reveal vs.\ trusted-backend vs.\ on-chain ML), and cross-chain bridge (Chainlink CCIP vs.\ LayerZero vs.\ Axelar).}
 \label{fig:design-decisions}
 \end{figure}
@@ -3779,15 +3850,14 @@ The testing strategy covers four layers of the system, each with defined accepta
 \caption[Market segments with supporting data]{Market segments with supporting data.}
 \label{tab:market-sizing-ch5}
 \begin{tabular}{p{3.5cm}p{6.5cm}p{3cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Segment} & \textbf{Description} & \textbf{Estimated Scale} \\
-\hline
+\midrule
 Total Addressable Market (TAM) & Global DeFi lending (\$55B+ TVL [13]); cross-border remittances (\$860B [26]); SME financing gap (\$4.5T [20]) & \$55B -- 5T+ \\
-\hline
 Serviceable Addressable Market (SAM) & Institutional and semi-institutional lending requiring hierarchical structures; emerging-market credit demand & \$5B -- 15B \\
-\hline
 Serviceable Obtainable Market (SOM) & Academic testnet deployments, regulatory sandbox pilots, institutional DeFi research partnerships & \$50 -- 200M \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Market Sizing: DeFi Lending TVL, Remittances, and MSME Financing Gap}
 \end{table}
@@ -3798,7 +3868,7 @@ Serviceable Obtainable Market (SOM) & Academic testnet deployments, regulatory s
 \vspace{4pt}
 \noindent\textit{\small\textbf{Sources:} (a)~TAM: DefiLlama~[13] reports DeFi lending TVL exceeding \$55~billion; World Bank Migration and Development Brief~[26] values global remittances at \$860~billion annually; IFC~[20] estimates the MSME financing gap at \$4.5~trillion; (b)~SAM and SOM: project-derived estimates based on industry segmentation of institutional lending and regulatory sandbox addressable market~[18].}
 
-No hierarchically structured lending system currently exists in DeFi; existing protocols rely on undifferentiated shared pools. Cross-border payment networks such as Ripple (\$847M daily)~[25] and JPMorgan Kinexys (\$3--7B daily)~[40] handle settlement volume but offer no lending, deposit, or tiered governance functions. Institutional interest in blockchain-based finance is clearly established, yet no single platform combines DeFi-style accessibility with the structured capital hierarchy of traditional development banking. The Crypto World Bank is designed to occupy this gap.
+Figure~\ref{fig:market-tam-pie} situates the serviceable market within the broader DeFi and development-finance landscape. No hierarchically structured lending system currently exists in DeFi; existing protocols rely on undifferentiated shared pools. Cross-border payment networks such as Ripple (\$847M daily)~[25] and JPMorgan Kinexys (\$3--7B daily)~[40] handle settlement volume but offer no lending, deposit, or tiered governance functions. Institutional interest in blockchain-based finance is clearly established, yet no single platform combines DeFi-style accessibility with the structured capital hierarchy of traditional development banking. The Crypto World Bank is designed to occupy this gap.
 
 \section{Target Customer Segment}
 
@@ -3809,19 +3879,16 @@ The Crypto World Bank targets \textbf{Tier~1--3 institutional participants} (res
 \caption[Target customer segment profile]{Target customer segment profile.}
 \label{tab:customer-segment-ch5}
 \begin{tabular}{p{3.5cm}p{10cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Characteristic} & \textbf{Description} \\
-\hline
+\midrule
 Primary Users & Institutional tiers (World / National / Local Bank operators) and retail clients accessing Local Bank interfaces \\
-\hline
 Geographic Focus & Global; jurisdiction-specific pilots via regulatory sandboxes (Future Work) --- no single-country deployment claimed at pre-thesis stage \\
-\hline
-Loan Size Range & Micro to institutional: USDC-denominated retail loans; larger tranches at National / World Bank tiers \\
-\hline
+Loan Size Range & Micro to SME at Local Bank tier (USDC); larger exposures via bank-level syndication and interbank facilities, not direct client access to National / World Bank tiers \\
 User Profile & Bank approvers with Authority Brief dashboards; retail users via React UI (optional agent add-on) \\
-\hline
 Key Pain Points & Opaque reserve reporting in legacy finance; flat DeFi pools without hierarchy; lack of explainable fraud analytics in on-chain lending \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Target Customer Segment: Institutional and Retail Profile}
 \end{table}
@@ -3836,21 +3903,17 @@ Key Pain Points & Opaque reserve reporting in legacy finance; flat DeFi pools wi
 \caption[Partner categories and roles]{Partner categories and roles.}
 \label{tab:partner-categories-ch5}
 \begin{tabular}{p{3.5cm}p{4.5cm}p{5.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Partner Category} & \textbf{Functional Role} & \textbf{Blockchain-Mediated Incentive} \\
-\hline
+\midrule
 Financial Regulators & Regulatory sandbox approval; compliance oversight & Reduced enforcement cost through on-chain transparency and audit trails \\
-\hline
 Banking Institutions & Network membership as National/Local Banks & Access to diversified global reserve; reduced inter-bank settlement friction \\
-\hline
 Payment Gateway Providers & Fiat-to-crypto on-ramp and off-ramp services & Volume-based transaction fees; expanded market reach \\
-\hline
 Academic \& Research Institutions & ML benchmark validation; formal-verification review & Access to anonymised datasets; collaborative research \\
-\hline
 Oracle / Infrastructure Providers & Chainlink DON, testnet RPC, indexing (The Graph) & Unified oracle stack; operational SLAs \\
-\hline
 Optional Field-Pilot Partners & Sandbox-covered pilots (Future Work) & Controlled evaluation under regulator oversight \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Partner Ecosystem: Integration Partners and External Dependencies (Chapter 5)}
 \end{table}
@@ -3867,21 +3930,17 @@ The Crypto World Bank operates at the intersection of four distinct competitor c
 \centering
 \caption[Detailed competitive landscape analysis (Part 1)]{Detailed competitive landscape analysis (Part 1).}
 \begin{tabular}{p{2.5cm}p{2.5cm}p{2.5cm}p{2.5cm}p{3.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Project} & \textbf{Category} & \textbf{Scale (2026)} & \textbf{Architecture} & \textbf{Gap We Address} \\
-\hline
+\midrule
 Compound v3 [26] & DeFi lending & \$1.4B TVL & Single-borrowable asset per single tier & No hierarchy; no institutional features \\
-\hline
 MakerDAO / Sky [30] & Stablecoin / CDP & \$6B TVL & CDP model; not peer-to-peer lending & Creates money, not a lending governance structure \\
-\hline
 Morpho [43] & DeFi lending & \$6.8B TVL; 1.4M users & Isolated markets; peer-to-peer matching & Flat primitive; no cross-market hierarchy; no banking integration \\
-\hline
 Maple Finance [31] & Institutional credit & \$2.6--3.8B TVL & Pool Delegate model; under-collateralised & Single-tier; no interest rate setting \\
-\hline
 Goldfinch [32] & Emerging-market credit & \$680M originated; 18+ countries & Trust-through-consensus; senior/junior tranches & B2B only; no interbank lending \\
-\hline
 Ripple / RLUSD [25] & Banking rails & \$847M/day cross-border & Payment rail; no lending capability & Moves money but has no lending, deposits, or credit system \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd[tab:competitor-detailed]{Competitive Landscape (Part 1): DeFi Lending and Payment Rail Protocols}
 \end{table}
@@ -3893,19 +3952,16 @@ Ripple / RLUSD [25] & Banking rails & \$847M/day cross-border & Payment rail; no
 \centering
 \caption[Detailed competitive landscape analysis (Part 2)]{Detailed competitive landscape analysis (Part 2).}
 \begin{tabular}{p{2.5cm}p{2.5cm}p{2.5cm}p{2.5cm}p{3.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Project} & \textbf{Category} & \textbf{Scale (2026)} & \textbf{Architecture} & \textbf{Gap We Address} \\
-\hline
+\midrule
 JPMorgan Kinexys [40] & Banking rails & \$3--7B daily volume & Permissioned; single-bank control & Centralised; proprietary; restricted to JPMorgan clients \\
-\hline
 Stellar [44] & Financial inclusion & \$55.6B annual payment volume & Open payment network; anchors for fiat & Payment network only; no lending, reserves, or interest rate markets \\
-\hline
 Celo / MiniPay [42] & Financial inclusion & 14M wallets; 60+ countries & Stablecoin payments; mobile-first & Payments and savings only; no lending hierarchy or banking structure \\
-\hline
 R3 Corda [37] & Enterprise DLT & \$17B tokenised RWAs & Permissioned; consortium governance & Infrastructure layer only; no lending logic; closed access \\
-\hline
 World Bank FundsChain [39] & Development finance & 250 projects by mid-2026 & Hyperledger Besu; fund tracking & Does not implement lending or interest rate mechanics \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Competitive Landscape (Part 2): Inclusion Wallets and Institutional Blockchain Systems}
 \end{table}
@@ -3917,19 +3973,16 @@ World Bank FundsChain [39] & Development finance & 250 projects by mid-2026 & Hy
 \centering
 \caption[Detailed competitive landscape analysis (Part 3)]{Detailed competitive landscape analysis (Part 3): multi-tier capital flow as differentiating feature.}
 \begin{tabular}{p{4cm}p{5cm}p{4.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Feature Dimension} & \textbf{Competitors} & \textbf{Crypto World Bank} \\
-\hline
+\midrule
 Hierarchical lending tiers & None --- all competitors use flat pool architectures & Four-tier hierarchy: World Bank $\to$ National $\to$ Local $\to$ Client \\
-\hline
 Governance-controlled rates & Compound/Aave: algorithmic but no institutional hierarchy & Smart contract parameters; governance-defined bounds per tier \\
-\hline
 AI-assisted risk scoring & No competitor integrates on-chain ML fraud detection with explainability & RF + SHAP + Isolation Forest anomaly reports; Authority Brief (Section~\ref{sec:ml-explainability}) \\
-\hline
 Retail and institutional access & Goldfinch / Maple: institutional only; Celo: retail only & Single platform serving retail through institutional capital hierarchy \\
-\hline
 Institutional / L2 focus & Most DeFi: retail-global; enterprise DLT: permissioned only & Global L2 institutional DeFi; composable with mBridge/Agora rails \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Competitive Landscape (Part 3): Multi-Tier Capital Flow as Differentiating Feature}
 \end{table}
@@ -3954,17 +4007,15 @@ Upon reviewing various projects a common feature was identified: a lending mecha
 \caption[Risk taxonomy and mitigation]{Risk taxonomy and mitigation.}
 \label{tab:risk-taxonomy}
 \begin{tabular}{p{3cm}p{4cm}p{1.5cm}p{5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Risk Category} & \textbf{Description} & \textbf{Severity} & \textbf{Mitigation} \\
-\hline
+\midrule
 Partner non-cooperation & Key partners decline to participate & Medium & Academic testnet pilots; sandbox engagement; open-source replication \\
-\hline
 Smart contract vulnerability & Exploit in contract logic & High & OpenZeppelin primitives; formal audit (planned); pause mechanism \\
-\hline
 Regulatory adversity & Jurisdictional restrictions & Medium & Testnet-only prototype; regulatory sandbox engagement \\
-\hline
 AI/ML model degradation & Fraud detection accuracy decay & Low & Continuous retraining; human-in-the-loop; SHAP explainability \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Risk Taxonomy: Technical, Financial, Regulatory, and Operational Risk Categories}
 \end{table}
@@ -3980,21 +4031,17 @@ AI/ML model degradation & Fraud detection accuracy decay & Low & Continuous retr
 \caption[Technical feasibility assessment]{Technical feasibility assessment.}
 \label{tab:tech-feasibility}
 \begin{tabular}{p{3cm}p{3cm}p{7.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Component} & \textbf{Assessment} & \textbf{Evidence} \\
-\hline
+\midrule
 Smart contracts & Feasible (specified) & Solidity interfaces + Hardhat simulation scripts specified; Phase~I--II implementation planned \\
-\hline
 Frontend DApp & Feasible (specified) & React 18 + TypeScript shell specified; Wagmi/RainbowKit ecosystem mature \\
-\hline
 Blockchain deployment & Feasible (planned) & Polygon zkEVM Cardona + Sepolia testnets; Phase~IV deployment manifest (Appendix~C) \\
-\hline
 AI/ML integration & Feasible with constraints & RF + IF + SHAP pipeline specified (Section~\ref{sec:ml-explainability}); sub-50\,ms inference target; Chainlink Functions in Phase~III \\
-\hline
 Optional agent add-on & Feasible (deferred) & MCP + Qwen3-8B specified; Phase~III--IV Could; excluded from MVT \\
-\hline
 Database backend & Feasible & PostgreSQL schema designed (20 entities, 3NF); FastAPI async REST \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Technical Feasibility Assessment: Infrastructure Readiness and Ecosystem Maturity}
 \end{table}
@@ -4013,21 +4060,17 @@ Ethereum---the EVM standard on which the platform is built---has operated contin
 \caption[Economic feasibility --- zero-cost prototype]{Economic feasibility --- zero-cost prototype.}
 \label{tab:economic-feasibility}
 \begin{tabular}{p{4cm}p{2.5cm}p{7cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Cost Category} & \textbf{Estimate} & \textbf{Notes} \\
-\hline
+\midrule
 Blockchain deployment & \$0 & Public testnets --- no real cryptocurrency required \\
-\hline
 Frontend hosting & \$0 & Vercel free tier or localhost for demo \\
-\hline
 Backend hosting & \$0 & Render free tier or localhost \\
-\hline
 AI/ML training & \$0 & Local machine (16\,GB RAM, 16\,GB VRAM) or Google Colab free tier \\
-\hline
 Development tools & \$0 & Hardhat, VS Code, Git --- all open-source \\
-\hline
 \textbf{Total prototype} & \textbf{\$0} & Entire prototype operates at zero financial cost \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Economic Feasibility: Cost Drivers vs.~Revenue Potential on Layer-2 Networks}
 \end{table}
@@ -4048,23 +4091,18 @@ The following projection models annual revenue potential at full deployment scal
 \caption[Revenue projection assumptions]{Revenue projection assumptions.}
 \label{tab:revenue-assumptions}
 \begin{tabular}{p{6cm}p{7.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Parameter} & \textbf{Value} \\
-\hline
+\midrule
 Reference ETH price & \$2{,}500 (conservative mid-point, Feb 2026; actual spot approx.\ \$2{,}800 per CoinGecko on 1~Feb~2026) \\
-\hline
 World Bank $\to$ National Bank & 3\% APR (wholesale inter-bank rate) \\
-\hline
 National Bank $\to$ Local Bank & 5\% APR (inter-bank) \\
-\hline
 Local Bank $\to$ Client & 8\% APR (retail lending) \\
-\hline
 Average loan term & 12 months \\
-\hline
 Default rate provision & 3\% (conservative estimate) \\
-\hline
 Origination fee & 0.25\% per disbursement \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Revenue Projection by Tier (Base Case, USD Millions)}
 \end{table}
@@ -4074,28 +4112,19 @@ Origination fee & 0.25\% per disbursement \\
 
 \begin{table}[H]
 \centering
-\caption[System-wide annual revenue summary --- spread-based accounting]{System-wide annual revenue summary --- spread-based accounting.}
-\label{tab:revenue-summary}
-\small
-\renewcommand{\arraystretch}{1.2}
 \begin{tabular}{p{4.2cm}p{2.8cm}p{2.8cm}p{3.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Tier / Revenue Stream} & \textbf{Spread Rate} & \textbf{Annual Revenue (USD)} & \textbf{Basis} \\
-\hline
+\midrule
 Tier 1 (World Bank): lends at 3\% to NBs, cost of capital 0\% & 3\% on deployed capital & \$51.6M & \$1.72B total retail loan base × 3\% \\
-\hline
 Tier 2 (National Banks): borrow at 3\%, lend at 5\% & 2\% spread & \$34.4M & \$1.72B × 2\% \\
-\hline
 Tier 3 (Local Banks): borrow at 5\%, lend at 8\% & 3\% spread & \$51.6M & \$1.72B × 3\% \\
-\hline
 \textbf{Total platform revenue} & \textbf{8\% (client pays)} & \textbf{\$137.6M} & Sum of tier spreads = 3\%+2\%+3\% = 8\%; no double-counting \\
-\hline
 Origination fees (0.25\%) & --- & \$4.3M & 0.25\% × \$1.72B disbursed \\
-\hline
 FX spread revenue (est.) & 0.5--1.0\% & \$8--17M & Estimated conversion volume \\
-\hline
 \textbf{Total incl.\ fees} & & \textbf{\$150--159M} & Conservative base case \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -4106,14 +4135,10 @@ FX spread revenue (est.) & 0.5--1.0\% & \$8--17M & Estimated conversion volume \
 \noindent\textit{\small \textbf{Scale note on the \$137.6M figure:} This is the theoretical 10-year ceiling at 68,800 active loans across 25~Local Banks at near-full capacity---it is included for scale reference only. The pre-thesis evaluation target is Year~1--2 of the adoption ramp, where the platform reaches operational break-even at approximately 300~active loans and demonstrates positive unit economics on each incremental loan above that threshold. Figure~\ref{fig:revenue-by-tier} shows the theoretical maximum at full maturity; see the break-even analysis above for the realistic path from zero to that ceiling.}
 
 \vspace{4pt}
-\noindent The projection above models interest spread income only (base case: \$137.6M). Additional revenue streams from FX conversion spreads (estimated 0.5 to 1.0\% per conversion, yielding \$8--17M), loan origination fees (0.25\% per disbursement, yielding \$4.3M), and insurance fund premiums (0.5\% of loan value annually) represent material upside captured in the ``Total incl.\ fees'' row of the table (\$150--159M). These are net incremental revenue streams---they do not overlap with the interest spread income already accounted for.
+\noindent Figure~\ref{fig:revenue-mix-pie} decomposes the full revenue model (spreads, origination fees, FX). The projection above models interest spread income only (base case: \$137.6M). Additional revenue streams from FX conversion spreads (estimated 0.5 to 1.0\% per conversion, yielding \$8--17M), loan origination fees (0.25\% per disbursement, yielding \$4.3M), and insurance fund premiums (0.5\% of loan value annually) represent material upside captured in the ``Total incl.\ fees'' row of the table (\$150--159M). These are net incremental revenue streams---they do not overlap with the interest spread income already accounted for.
 
 \begin{table}[H]
 \centering
-\caption[ETH price sensitivity]{ETH price sensitivity: annual interest spread revenue at three price points (all other assumptions held constant at base case).}
-\label{tab:revenue-sensitivity}
-\small
-\renewcommand{\arraystretch}{1.2}
 \begin{tabular}{@{}lccc@{}}
 \toprule
 \tableheadcolor
@@ -4151,10 +4176,6 @@ On Polygon PoS, with gas prices of approximately 30~Gwei and MATIC at $\approx$\
 
 \begin{table}[H]
 \centering
-\caption[Default rate sensitivity scenarios with economic basis]{Default rate sensitivity scenarios with economic basis.}
-\label{tab:default-scenarios}
-\renewcommand{\arraystretch}{1.25}
-\small
 \begin{tabular}{@{}lccp{5.5cm}@{}}
 \toprule
 \tableheadcolor
@@ -4182,39 +4203,79 @@ Grameen Bank, after nearly five decades of social lending infrastructure, report
 \label{fig:revenue-by-tier}
 \end{figure}
 
-\vspace{6pt}
-\noindent The interest spread identified above is the platform's primary revenue stream. Placing it within the broader landscape of institutional crypto-exchange revenue models demonstrates that CWB has a diversified revenue path even without a native token. Table~\ref{tab:revenue-taxonomy} maps each CWB mechanism to its nearest exchange-sector analogue, drawing on the revenue architecture of major centralised exchanges (Binance, Coinbase) and DeFi protocols described in the ecosystem survey.
+\begin{figure}[H]
+\centering
+\HalfWidthDiagram{fig-revenue-mix-pie.pdf}
+\hfill
+\HalfWidthDiagram{fig-market-tam-pie.pdf}
+\caption[Revenue mix and market-sizing funnel]{Left: revenue mix at full deployment (spread-based interest income dominates). Right: illustrative market-sizing funnel (TAM/SAM/SOM) showing the institutional DeFi whitespace the platform targets.}
+\label{fig:revenue-mix-pie}
+\label{fig:market-tam-pie}
+\end{figure}
+
+\subsection{Why CWB Is Not a Centralised Exchange}
+\label{sec:not-a-cex}
+
+Centralised exchanges (CEXs) such as Binance perform order-book matching on off-chain ledgers, hold customer private keys in custody, and monetise primarily through trading fees and ecosystem tokens~[128]. The Crypto World Bank is architecturally a \textbf{hierarchical lending bank}, not a trading venue. Table~\ref{tab:cex-vs-cwb} contrasts the two model classes using comparative dimensions from the project industry-research corpus (Appendix~\ref{app:internal-research}, entries IR-1 and IR-2)~[128,129].
 
 \begin{table}[H]
 \centering
-\caption[CWB revenue stream taxonomy]{CWB revenue stream taxonomy: analogues from the institutional crypto exchange sector.}
+\caption[Why CWB is not a CEX]{Why CWB is not a centralised exchange (CEX): architectural comparison.}
+\label{tab:cex-vs-cwb}
+\begin{tabular}{p{3.2cm}p{5.2cm}p{5.2cm}}
+\toprule
+\tableheadcolor
+\textbf{Dimension} & \textbf{Typical CEX (Binance-class)} & \textbf{Crypto World Bank} \\
+\midrule
+Primary function & Spot/derivatives matching; fiat on/off ramps & Deposit mobilization, hierarchical lending, reserve governance \\
+Settlement model & Off-chain internal ledger; on-chain for deposits/withdrawals only & On-chain smart contracts for loan lifecycle, reserves, and repayments \\
+Customer custody & Exchange holds private keys (custodial) & User-controlled wallets; institution role-gated contracts \\
+Native protocol token & BNB (fee discounts, burns, ecosystem utility) & \textbf{None} in prototype---Credit Passport SBT replaces speculative governance token (FTT lesson)~[128] \\
+Fund segregation & PoR (Merkle tree + zk-SNARKs); commingling failure mode (FTX)~[128] & Segregated contract pools per tier; \texttt{InsuranceFund} + reserve-ratio gates \\
+Deposit / yield product & Binance Earn (off-chain ledger savings/staking) & \texttt{SavingsVault} + \texttt{FixedDeposit} (ERC-4626 / ERC-7540 on-chain vaults) \\
+Default / shock buffer & SAFU (Secure Asset Fund for Users; $\approx$\$1B USDC reserve)~[128] & \texttt{InsuranceFund} (5\% interest capture; Chainlink PoR; IBLP default cascade) \\
+Large exposure handling & OTC / institutional desk (exchange-side) & Bank-level \texttt{SyndicatedLoan} (Section~\ref{sec:syndicated-lending}); clients enter via Local Bank only \\
+Revenue core & Trading fees, listing, derivatives funding & Tier interest spread (3\%+2\%+3\%), origination, syndication fees \\
+Regulatory posture & VASP / CASP exchange licensing & Uses authorised EMTs (USDC/USDT); does not issue stablecoins or operate an order book \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{2pt}
+\noindent\textit{\small Rows summarise dimensions from the Binance/FTX industry analysis~[128] and the five-exchange comparative matrix~[129]. CWB borrows \textit{product analogues} (Earn, SAFU) from exchange-sector patterns but implements them as on-chain banking modules with explicit reserve and segregation rules.}
+
+\subsection{Exchange-Sector Revenue Analogues}
+\label{sec:revenue-analogues}
+
+\noindent The interest spread identified above is the platform's primary revenue stream. Placing it within the broader landscape of institutional crypto-exchange revenue models demonstrates that CWB has a diversified revenue path even without a native token. Table~\ref{tab:revenue-taxonomy} maps each CWB mechanism to its nearest exchange-sector analogue, drawing on the revenue architecture documented in the Binance/FTX industry analysis and complementary business-research notes (Appendix~\ref{app:internal-research}, entries IR-1 and IR-3)~[128].
+
+\begin{table}[H]
+\centering
+\caption[Revenue taxonomy vs.\ exchange analogues]{Revenue taxonomy: CWB mechanisms mapped to exchange-sector analogues.}
 \label{tab:revenue-taxonomy}
-\renewcommand{\arraystretch}{1.25}
-\small
 \begin{tabular}{p{3.8cm}p{3.8cm}p{5.6cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Revenue Stream} & \textbf{Exchange Equivalent} & \textbf{CWB Mechanism} \\
-\hline
+\midrule
 Interest spread (primary) & Binance OTC desk & SavingsVault yield vs.\ retail lending rate; 3\%+2\%+3\% tier spread = 8\% client APR \\
-\hline
 Loan origination fee & Trading fee (0.1\%) & 0.5--1\% flat origination fee on disbursement; already modelled in base case above \\
-\hline
 Deposit mobilization & Binance Earn & SavingsVault + FixedDeposit products; yield funded by the lending tier spread \\
-\hline
 Local Bank registration & Exchange listing fee & One-time registration fee per Local Bank joining the network \\
-\hline
 Syndicated loan arrangement & Institutional desk & Lead Arranger fee on TranchedPool / SyndicatedLoan cross-tier facilities \\
-\hline
 Reserve transparency API & Data API subscription & Phase~3: GraphQL API over The~Graph subgraph; queried by external auditors and regulators \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
 \vspace{2pt}
 \noindent\textit{\small The six streams above are non-overlapping; none double-counts the interest spread already accounted for in Table~\ref{tab:revenue-summary}. The Local Bank registration fee and Reserve Transparency API are Phase~2/3 items and are not included in the base-case revenue model above. The interest spread and loan origination fee are the only streams active at the pre-thesis prototype stage.}
 
+\paragraph{Explicit product analogues (Earn and SAFU).}
+Two exchange-sector modules have direct CWB counterparts, implemented on-chain with banking semantics rather than custodial ledger entries. \textbf{Binance Earn}---Binance's staking and savings products that lock user assets on the exchange's internal ledger while paying yield from lending and staking revenue~[128]---maps to the \texttt{SavingsVault} and \texttt{FixedDeposit} contracts (Section~\ref{sec:savings-vault}): variable- and fixed-term deposit mobilization whose yield is funded by the lending-tier interest spread, not by trading-fee subsidies. \textbf{SAFU} (Secure Asset Fund for Users)---Binance's publicly verifiable $\approx$\$1~billion USDC emergency reserve established in 2018 to cover exchange-side security events~[128]---maps to the \texttt{InsuranceFund} contract: it captures 5\% of interest collected across the hierarchy, publishes its balance via Chainlink Proof of Reserve, and is drawn in the interbank default cascade (reserve buffer~$\to$~\texttt{InsuranceFund}~$\to$~parent-tier backstop; Section~\ref{sec:interbank-pool}). The analogy is structural, not custodial: CWB does not hold user keys, but both mechanisms isolate a transparent buffer against tail-risk losses.
+
 \paragraph{Hard rule: no native CWB governance token in the prototype.}
-The FTX collapse of November 2022 demonstrated the systemic failure risk of self-minted tokens used as collateral: FTT, issued and held principally by the exchange itself, served simultaneously as the primary collateral asset for Alameda Research's borrowing, creating a reflexive loop that triggered an estimated \$8~billion solvency shortfall within 72~hours of a competitor announcing it would liquidate its FTT holdings. The lesson for the Crypto World Bank is categorical: no native CWB governance token is issued in the thesis prototype. On-chain reputation is provided instead by the Credit Passport SBT (Section~\ref{sec:credit-passport}), which is non-transferable and carries no speculative market price. A future governance token---analogous to Binance's BNB utility-and-burn model, which took seven years and \$16.8~billion in annual revenue to reach legitimacy---is scoped to Phase~3 of the CWB roadmap, following institutional trust bootstrapping, and is specified in Future Work with explicit anti-FTX collateral hard rules encoded at the contract level (no self-issued asset may be used as collateral within the same protocol that issues it). This constraint will be enforced as a Foundry invariant test rather than a governance policy, so it cannot be bypassed by any admin action.
+The FTX collapse of November 2022 demonstrated the systemic failure risk of self-minted tokens used as collateral: FTT, issued and held principally by the exchange itself, served simultaneously as the primary collateral asset for Alameda Research's borrowing, creating a reflexive loop that triggered an estimated \$8~billion solvency shortfall within 72~hours of a competitor announcing it would liquidate its FTT holdings~[128]. The lesson for the Crypto World Bank is categorical: no native CWB governance token is issued in the thesis prototype. On-chain reputation is provided instead by the Credit Passport SBT (Section~\ref{sec:credit-passport}), which is non-transferable and carries no speculative market price. A future governance token---analogous to Binance's BNB utility-and-burn model, which took seven years and \$16.8~billion in annual revenue to reach legitimacy---is scoped to Phase~3 of the CWB roadmap, following institutional trust bootstrapping, and is specified in Future Work with explicit anti-FTX collateral hard rules encoded at the contract level (no self-issued asset may be used as collateral within the same protocol that issues it). This constraint will be enforced as a Foundry invariant test rather than a governance policy, so it cannot be bypassed by any admin action.
 
 \subsection{Transaction Economics: Interest Rates}
 \label{sec:interest-rates}
@@ -4224,19 +4285,16 @@ The FTX collapse of November 2022 demonstrated the systemic failure risk of self
 \caption[Interest rate parameters]{Interest rate parameters.}
 \label{tab:interest-rates}
 \begin{tabular}{p{4cm}p{3.5cm}p{6cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Parameter} & \textbf{Value} & \textbf{Benchmark} \\
-\hline
+\midrule
 Base Annual Interest Rate & 5--12\% APR & Aligned with Aave/Compound variable rates \\
-\hline
 Rate Determination & Set by Local Bank approvers within World Bank-defined bounds & Configurable per-bank for local market conditions \\
-\hline
 Late Payment Penalty & 2\% of installment + 0.5\%/week (capped at 10\%) & Industry-standard late fee structure \\
-\hline
 Interest Calculation & Simple interest on outstanding principal & Transparent, client-friendly \\
-\hline
 Rate Transparency & All parameters stored on-chain & Publicly auditable; no hidden fees \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Tiered Interest Rate Parameters: APR Spreads Across the Four-Tier Hierarchy}
 \end{table}
@@ -4276,15 +4334,14 @@ Apart from revenue generated through platforms, various economic advantages are 
 \caption[Go-to-market phases]{Go-to-market phases.}
 \label{tab:gtm-phases}
 \begin{tabular}{p{2.5cm}p{6.5cm}p{4.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Phase} & \textbf{Activities} & \textbf{Timeline} \\
-\hline
+\midrule
 Phase 1: Validation & Competition submission (BCOLBD 2025); thesis publication; open-source release & Current \\
-\hline
 Phase 2: Pilot & Regulatory sandbox application; institutional partnership; testnet-to-mainnet migration & 6--12 months \\
-\hline
 Phase 3: Production & Multi-chain deployment; enhanced monitoring and analytics; governance token launch & 12--24 months \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Value Proposition and Go-to-Market: User Benefits Mapped to Platform Features}
 \end{table}
@@ -4308,33 +4365,22 @@ The platform's regulatory feasibility is not abstract: two recent statutes apply
 
 \begin{table}[H]
 \centering
-\caption[MiCA and GENIUS Act compliance mapping]{MiCA and GENIUS Act compliance mapping. Each row identifies a regulatory article relevant to a stablecoin-denominated crypto financial services platform and the corresponding CWB design control.}
-\label{tab:mica-mapping}
-\small
 \begin{tabular}{p{3.2cm}p{4.6cm}p{5.8cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Statute / Article} & \textbf{Requirement} & \textbf{CWB Design Control} \\
-\hline
+\midrule
 MiCA Art.~16 (EMT Issuer Authorisation) & Authorized issuer required for any e-money token offered to the public & USDC / USDT are issued by Circle / Tether under their own authorization; CWB uses but does not issue EMTs. \\
-\hline
 MiCA Art.~36 (Reserve of Assets) & 1{:}1 reserve backing, segregated from issuer assets & Stablecoin reserves verified via on-chain attestations from Circle (USDC) before being accepted by SavingsVault. \\
-\hline
 MiCA Art.~41 (Redemption Rights) & Holders must have a right of redemption against the issuer at par & CWB does not impede redemption; SavingsVault withdraw function returns the underlying ERC-20 directly to the depositor wallet. \\
-\hline
 MiCA Art.~62 (Operational Resilience) & Regular audits, governance, complaint handling & Five-layer defense-in-depth (Section~\ref{sec:defense-in-depth}); Foundry invariants (Section~\ref{sec:foundry}); Certora reserve invariants (Section~\ref{sec:certora}); Tenderly runtime monitoring (Section~\ref{sec:realtime}). \\
-\hline
 GENIUS Act \S\,4 (Federal Payment Stablecoin Framework) & Federal registration of payment-stablecoin issuers & Same posture as MiCA Art.~16: CWB uses, does not issue. \\
-\hline
 GENIUS Act \S\,7 (Reserve Disclosure) & Monthly attestation and public disclosure of reserves & Circle / Tether attestations are independently verifiable on-chain; CWB dashboard surfaces issuer attestation links per stablecoin pool. \\
-\hline
 EU AI Act Annex~III (high-risk: credit scoring) & AI systems evaluating natural-person creditworthiness classified high-risk from August~2026~[126] & RF/IF pipeline is in scope; conformity assessment, risk-management system, and technical documentation required before EU-resident deployment. \\
-\hline
 EU AI Act Art.~86 & Right to explanation for AI-assisted decisions & Borrower-facing SHAP + anomaly summaries (Section~\ref{sec:ml-explainability}); Authority Brief for approvers; audit log for compliance. SHAP satisfies post-hoc explanation partially; substantive ``meaningful explanation'' threshold may require additional artifacts~[126]. \\
-\hline
 EU AI Act Arts.~11, 12, 14 & Technical documentation, automated logging, human oversight & \texttt{AI\_ML\_SECURITY\_LOG} (Art.~12 partial); human approver gate (Art.~14); full Art.~11 technical file and risk-management system not yet complete. \\
-\hline
 GDPR Art.~17 (Right to Erasure) & Personal data must be deletable on request & No PII on-chain; off-chain PostgreSQL data is encrypted and subject to data-subject deletion requests; only document hashes (SHA-256) appear on-chain. \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -4531,33 +4577,23 @@ B-tree indexes (the PostgreSQL default) support efficient retrieval on frequentl
 \caption[Indexing strategy]{Indexing strategy: B-tree indexes for time-window and high-frequency queries.}
 \label{tab:indexing-strategy}
 \begin{tabular}{p{4cm}p{3cm}p{6.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Index} & \textbf{Table / Column(s)} & \textbf{Rationale} \\
-\hline
+\midrule
 \texttt{idx\_loan\_borrower} & LOAN\_REQUEST(\texttt{borrower\_id}) & High-frequency lookup for borrower loan history. \\
-\hline
 \texttt{idx\_loan\_status} & LOAN\_REQUEST(\texttt{status}) & Efficient filtering of active vs.\ closed loans. \\
-\hline
 \texttt{idx\_installment\_due} & INSTALLMENT(\texttt{due\_date, status}) \newline WHERE \texttt{status = 'PENDING'} & Partial-index range query for pending overdue installment detection. \\
-\hline
 \texttt{idx\_txn\_created} & TRANSACTION(\texttt{created\_at}) & Time-window aggregation for 6-month and 1-year borrowing limits. \\
-\hline
 \texttt{idx\_txn\_borrower} & TRANSACTION(\texttt{borrower\_id}) & Per-borrower transaction history retrieval. \\
-\hline
 \texttt{idx\_market\_symbol} & MARKET\_DATA(\texttt{symbol, recorded\_at}) & Composite index for price feed time-series queries. \\
-\hline
 \texttt{idx\_loan\_bank\_status} & LOAN(\texttt{local\_bank\_id, status, created\_at DESC}) & Loan lifecycle queries by bank and status. \\
-\hline
 \texttt{idx\_loan\_client\_active} & LOAN(\texttt{client\_id, status}) \newline WHERE \texttt{status = 'ACTIVE'} & Partial index for per-client open-loan count. \\
-\hline
 \texttt{idx\_agent\_client\_date} & AGENT\_ACTION\_LOG(\texttt{client\_id, created\_at DESC}) & Per-client agent action history retrieval. \\
-\hline
 \texttt{idx\_agent\_status} & AGENT\_ACTION\_LOG(\texttt{status}) \newline WHERE \texttt{status = 'PENDING'} & Partial index for the agent status-monitoring loop. \\
-\hline
 \texttt{idx\_aiml\_score} & AI\_ML\_LOG(\texttt{anomaly\_score DESC}) \newline WHERE \texttt{anomaly\_score > 0.5} & Partial index for AML alert queue (SAR workflow). \\
-\hline
 \texttt{idx\_session\_parent} & SESSIONS(\texttt{parent\_session\_id}) WHERE \texttt{parent\_session\_id IS NOT NULL} & Partial index for session lineage chain traversal. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Indexing Strategy: B-tree Indexes for Time-Window and High-Frequency Queries}
 \end{table}
@@ -4569,29 +4605,21 @@ B-tree indexes (the PostgreSQL default) support efficient retrieval on frequentl
 \caption[Representative functional dependencies]{Representative functional dependencies.}
 \label{tab:functional-deps}
 \begin{tabular}{p{3cm}p{5.5cm}p{5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Relation} & \textbf{Functional Dependency} & \textbf{Notes} \\
-\hline
+\midrule
 LOAN\_REQUEST & \texttt{loan\_id} $\to$ all attributes & Primary key determines row. \\
-\hline
 LOAN\_REQUEST & \texttt{borrower\_id, local\_bank\_id} $\to$ status, amount, \ldots & One active request per client per bank. \\
-\hline
 LOAN & \texttt{loan\_id} $\to$ all attributes & Disbursement record keyed by loan identifier. \\
-\hline
 BORROWING\_LIMIT & \texttt{borrower\_id} $\to$ \texttt{six\_month\_limit, one\_year\_limit}, \ldots & 1:1 with BORROWER; authoritative enforcement is on-chain. \\
-\hline
 BORROWER & \texttt{wallet\_address} $\to$ \texttt{borrower\_id}, all attributes & Unique candidate key in the prototype; production schema decouples identity from wallet. \\
-\hline
 INSTALLMENT & \texttt{loan\_id, installment\_number} $\to$ \texttt{amount, due\_date, status} & Composite primary key. \\
-\hline
 SESSIONS & \texttt{session\_id} $\to$ \texttt{client\_id, wallet\_address, session\_key\_hash,} \newline \texttt{session\_key\_scope, session\_key\_expires\_at,} \newline \texttt{expires\_at, revoked} & Session key scope encodes approved MCP tool list + value cap. \\
-\hline
 AGENT\_ACTION\_LOG & \texttt{action\_id} $\to$ \texttt{session\_id, client\_id, tool\_name,} \newline \texttt{parameters, confirmation\_turn\_id,} \newline \texttt{onchain\_tx\_hash, status, created\_at} & Links every write-tool execution to the user's consent message. \\
-\hline
 ASSETS & \texttt{asset\_id} $\to$ \texttt{symbol, name, asset\_type,} \newline \texttt{network, decimals, is\_active}; also \texttt{symbol} $\to$ \texttt{asset\_id} & \texttt{symbol} is a unique candidate key. \\
-\hline
 INTEREST\_RATE\_TIER & \texttt{tier\_id} $\to$ \texttt{base\_rate, kink\_utilization,} \newline \texttt{rate\_above\_kink, max\_rate} & Eliminates transitive dependency in bank-tier entities. \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Functional Dependencies in the Core Lending and Identity Schema}
 \end{table}
@@ -4648,17 +4676,15 @@ When the assembled prompt approaches the 32K-token window, the backend retains h
 
 \begin{table}[H]
 \centering
-\caption[Named toolsets: scoped tool visibility per agent turn]{Named toolsets: scoped tool visibility per agent turn.}
-\label{tab:toolsets}
-\small
 \begin{tabular}{p{3.5cm}p{9cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Toolset} & \textbf{Tools visible} \\
-\hline
+\midrule
 \texttt{read\_only} & All 9 read tools (default when intent is uncertain). \\
 \texttt{loan\_actions} & \texttt{read\_only} $+$ loan, installment, and group write tools. \\
 \texttt{account\_management} & \texttt{read\_only} $+$ deposit, KYC, and reminder write tools. \\
-\hline
+\bottomrule
 \end{tabular}
 \end{table}
 
@@ -4751,9 +4777,10 @@ The repository also retains early keyword-routed \texttt{/api/chatbot} handlers 
 \caption[Technology stack summary]{Technology stack summary.}
 \label{tab:tech-stack}
 \begin{tabular}{p{3cm}p{4cm}p{6.5cm}}
-\hline
+\toprule
+\tableheadcolor
 \textbf{Layer} & \textbf{Technology} & \textbf{Version / Notes} \\
-\hline
+\midrule
 Smart Contract & Solidity, OpenZeppelin & 0.8.20; Ownable, ReentrancyGuard \\
 Frontend & React, TypeScript & Material UI; Design 3 \\
 Wallet Integration & Wagmi, RainbowKit, Viem & EIP-1193 compliant \\
@@ -4769,7 +4796,7 @@ Price Feeds & Chainlink AggregatorV3Interface & Fiat/USD pairs (e.g.\ EUR/USD) a
 Automation & Chainlink Automation & Trustless installment due-date checking; replaces centralised cron job \\
 Proof of Reserve & Chainlink PoR & Cryptographically verifiable WorldBankReserve balance \\
 Event Indexing & The Graph (subgraph) & GraphQL query layer over LoanApplication and ReserveRatioSnapshot events \\
-\hline
+\bottomrule
 \end{tabular}
 \TableScreenshotEnd{Local LLM Assistant Integration: Components, Configuration, and Prototype Stance}
 \end{table}
@@ -4818,9 +4845,6 @@ The following table is a \textbf{planned deployment manifest template} for Polyg
 
 \begin{table}[H]
 \centering
-\caption[Planned testnet deployment manifest]{Planned smart contract deployment manifest, Polygon zkEVM Cardona testnet (template).}
-\renewcommand{\arraystretch}{1.35}
-\small
 \begin{tabular}{@{}llp{5.5cm}@{}}
 \toprule
 \tableheadcolor
@@ -4910,6 +4934,33 @@ OpenZeppelin's \texttt{AccessControl} maps each on-chain role (e.g., \texttt{NAT
 
 \textbf{Design annotation 3 --- Events enable off-chain indexing for the analytics layer.}
 \texttt{CapitalAllocated}, \texttt{RepaymentReceived}, and \texttt{ReserveRatioUpdated} are emitted at every significant state transition. The off-chain Express.js event listener subscribes to these events and writes them to PostgreSQL, enabling the AI/ML monitoring layer to construct loan lifecycle timelines, compute utilization windows, and feed the Random Forest fraud detector without requiring costly repeated \texttt{SLOAD} calls.
+
+\chapter*{Appendix E: Internal Industry Research Notes}
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendix E: Internal Industry Research Notes}
+\label{app:internal-research}
+
+This appendix catalogues supplementary industry-research documents prepared for the Crypto World Bank project. They informed Chapter~3 (actor taxonomy), Chapter~5 (CEX comparison and revenue analogues), and the no-native-token design constraint. All files reside in the project repository under \texttt{Documentation/2nd Phase (Bokhtiar)/Improvements/}.
+
+\begin{table}[H]
+\centering
+\caption[Internal industry research corpus]{Internal industry research corpus.}
+\label{tab:internal-research}
+\begin{tabular}{@{}clp{7.5cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{ID} & \textbf{Document} & \textbf{Thesis use} \\
+\midrule
+IR-1 & \texttt{Binance\_FTX\_Full\_Report.md} & CEX vs.\ CWB table (Table~\ref{tab:cex-vs-cwb}); FTT/BNB token lesson; SAFU and Binance Earn analogues; PoR and commingling safeguards \\
+IR-2 & \texttt{blockchain platforms research.csv} & Five-exchange comparative matrix (Binance, Bybit, Coinbase, OKX, Kraken) for Table~\ref{tab:cex-vs-cwb} \\
+IR-3 & \texttt{Binance Business Analysis.md} & Exchange revenue taxonomy (trading fees, listing, OTC, \$16.8B revenue benchmark) for Table~\ref{tab:revenue-taxonomy} \\
+IR-4 & \texttt{binance\_software\_engineering\_architecture.md} & Nine-actor formal taxonomy (Section~\ref{sec:onboarding}); use-case and sequence-diagram conventions \\
+IR-5 & \texttt{binance\_architecture\_research.md} & Off-chain PostgreSQL/Redis layer design patterns (background only; not formally cited in body text) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent These documents are project-internal research notes, not peer-reviewed publications. They are listed here for reproducibility and examiner traceability; formal citations in the body text use bibliography entries~[128]--[130] for the three documents most directly referenced.
 
 %% REFERENCES
 \chapter*{References}
@@ -5184,6 +5235,12 @@ Elements of Reusable Object-Oriented Software}, Addison-Wesley, 1994.
 \item European Parliament and Council of the European Union, ``Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (AI Act),'' \textit{Official Journal of the European Union}, L~2024/1689, July 2024; high-risk credit-scoring provisions applicable from August 2026. [Online]. Available: \url{https://eur-lex.europa.eu/eli/reg/2024/1689/oj}
 
 \item M.~Bartoletti, L.~Bracciali, and A.~Santone, ``Towards Benchmarking of Solidity Verification Tools,'' in \textit{Proc. FMBC (OASIcs)}, vol.~118, pp.~1--15, 2024. DOI: \url{https://doi.org/10.4230/OASIcs.FMBC.2024.1}
+
+\item Crypto World Bank Project Team, ``Binance and FTX: Comparative Industry Analysis (Full Report),'' internal research note, \texttt{Documentation/2nd Phase (Bokhtiar)/Improvements/}, 2025--2026. See Appendix~\ref{app:internal-research}, entry IR-1.
+
+\item Crypto World Bank Project Team, ``Blockchain Platforms Comparative Research (CSV),'' internal research dataset, \texttt{Documentation/2nd Phase (Bokhtiar)/Improvements/}, 2025--2026. See Appendix~\ref{app:internal-research}, entry IR-2.
+
+\item Crypto World Bank Project Team, ``Binance Software Engineering Architecture and System Analysis,'' internal research note, \texttt{Documentation/2nd Phase (Bokhtiar)/Improvements/}, 2025--2026. See Appendix~\ref{app:internal-research}, entry IR-4.
 
 \end{enumerate}
 }

@@ -1,0 +1,19 @@
+---
+title: Cross-Tier Capital Flows
+---
+flowchart TB
+    classDef tier fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef leg fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+
+    T1["Tier 1 · WBR"]:::tier --> T2["Tier 2 · National"]:::tier --> T3["Tier 3 · Local"]:::tier --> T4["Tier 4 · Client"]:::tier
+
+    T3 -. "UpwardDepositFacility" .-> T2
+    T2 -. "UpwardDepositFacility" .-> T1
+
+    LEG["↔ InterBankLendingPool at Tier 2 and Tier 3"]:::leg
+
+    KEY["↓ allocateCapital · ↑ UDF · ↔ IBLP"]:::leg
+
+    T2 --- LEG
+    T3 --- LEG
+    LEG ~~~ KEY

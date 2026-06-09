@@ -1,0 +1,27 @@
+---
+title: On-Chain Credit Passport (Soulbound Token)
+---
+flowchart TB
+    classDef contract fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef read fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    KYC["KYC-verified client"]:::step
+    MINT["Issue non-transferable SBT<br/>creditScore · riskTier · openLoans"]:::contract
+    PAY["Installment repaid"]:::step
+    UPD["Update score / tier<br/>completedCycles++"]:::step
+    DEF["Missed installments"]:::step
+    DWN["Permanent riskTier downgrade<br/>lastDefault set · never revoked"]:::step
+
+    KYC --> MINT
+    PAY --> UPD --> MINT
+    DEF --> DWN --> MINT
+
+    subgraph READERS["ICreditPassport.getScore() readers"]
+        direction LR
+        GP["GroupLendingPool<br/>simultaneous-loan cap"]:::read
+        LB["Any Local Bank<br/>progressive lending"]:::read
+        EXT["External protocols<br/>composable read"]:::read
+    end
+
+    MINT -.-> READERS

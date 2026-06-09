@@ -1,0 +1,39 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "200px",
+    "fontFamily": "Inter, Helvetica Neue, Helvetica, Arial, sans-serif",
+    "background": "#FFFFFF",
+    "primaryColor": "#F2F2F2",
+    "primaryBorderColor": "#1F1F1F",
+    "primaryTextColor": "#111111",
+    "secondaryColor": "#E2E2E2",
+    "secondaryBorderColor": "#1F1F1F",
+    "secondaryTextColor": "#111111",
+    "tertiaryColor": "#FAFAFA",
+    "tertiaryBorderColor": "#1F1F1F",
+    "tertiaryTextColor": "#111111",
+    "lineColor": "#3F3F3F",
+    "textColor": "#111111",
+    "mainBkg": "#F2F2F2",
+    "secondBkg": "#E2E2E2",
+    "tertiaryBkg": "#FAFAFA",
+    "clusterBkg": "#FAFAFA",
+    "clusterBorder": "#1F1F1F",
+    "titleColor": "#111111",
+    "labelBoxBkgColor": "#F2F2F2",
+    "labelBoxBorderColor": "#1F1F1F",
+    "labelTextColor": "#111111"
+  },
+  "themeCSS": ".label, .nodeLabel, .edgeLabel, text, tspan, foreignObject div, foreignObject span { font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif !important; font-size: 200px !important; font-weight: 500 !important; line-height: 1.18 !important; overflow-wrap: break-word !important; word-break: normal !important; } .cluster-label { font-size: 170px !important; font-weight: 600 !important; } .edgePath .path, .flowchart-link { stroke: #1F1F1F !important; }",
+  "deterministicIds": true,
+  "flowchart": {
+    "curve": "basis",
+    "htmlLabels": true,
+    "useMaxWidth": false,
+    "padding": 56,
+    "nodeSpacing": 220,
+    "rankSpacing": 230
+  },
+  "fontFamily": "Inter, Helvetica Neue, Helvetica, Arial, sans-serif"
+}

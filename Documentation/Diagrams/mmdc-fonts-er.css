@@ -1,0 +1,30 @@
+/* ER diagram typography — 50% larger than standard thesis diagrams (20px → 30px). */
+foreignObject div,
+foreignObject span,
+foreignObject p,
+.nodeLabel,
+.label,
+.er entityLabel,
+.er attributeLabel,
+.entityLabel,
+.attributeLabel,
+title,
+text,
+tspan {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  font-size: 30px !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+}
+
+.edgeLabel,
+.relationshipLabel,
+.er relationshipLabel {
+  font-size: 26px !important;
+}
+
+.cluster-label,
+title {
+  font-size: 27px !important;
+  font-weight: 600 !important;
+}

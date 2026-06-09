@@ -1,0 +1,24 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "background": "#FFFFFF",
+    "primaryColor": "#888888",
+    "primaryBorderColor": "#000000",
+    "primaryTextColor": "#000000",
+    "secondaryColor": "#888888",
+    "secondaryBorderColor": "#000000",
+    "secondaryTextColor": "#000000",
+    "tertiaryColor": "#FFFFFF",
+    "tertiaryBorderColor": "#000000",
+    "tertiaryTextColor": "#000000",
+    "lineColor": "#000000",
+    "textColor": "#000000",
+    "mainBkg": "#FFFFFF",
+    "fontSize": "200px",
+    "pieTitleTextSize": "170px",
+    "pieSectionTextSize": "200px",
+    "pieLegendTextSize": "170px"
+  },
+  "themeCSS": "text, tspan, .tick text, .axis-label, .chart-title, .title text, .label text, .pieTitleText, .slice, .legend, .legend text, .pieCircle text { font-family: 'Linux Libertine O', 'Libertine', 'Times New Roman', Times, serif !important; font-size: 200px !important; fill: #000000 !important; } .pieTitleText { font-size: 170px !important; font-weight: 600 !important; } .legend text, .legend { font-size: 170px !important; } .bar-plot-0 rect, .plot rect, g.plot rect { fill: #888888 !important; stroke: #000000 !important; stroke-width: 0.8px !important; } .axis-line path, .ticks path { stroke: #000000 !important; }",
+  "fontFamily": "Linux Libertine O, Libertine, Times New Roman, Times, serif"
+}

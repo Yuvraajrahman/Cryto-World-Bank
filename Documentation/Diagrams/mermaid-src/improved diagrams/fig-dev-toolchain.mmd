@@ -6,10 +6,10 @@ flowchart TB
 
     subgraph PIPE[" Verification pipeline "]
         direction LR
-        S1["Solidity contracts<br/>Hardhat deploy scripts"]:::step
-        S2["Foundry fuzz<br/>+ invariant tests"]:::step
-        S3["Certora CVL<br/>reserve proofs"]:::step
-        S4["CI pipeline<br/>10k fuzz runs"]:::step
-        S5["Polygon zkEVM Cardona<br/>testnet deploy (Phase IV)"]:::step
+        S1["Solidity<br/>contracts<br/>Hardhat<br/>deploy"]:::step
+        S2["Foundry<br/>fuzz<br/>invariant<br/>tests"]:::step
+        S3["Certora<br/>CVL<br/>reserve<br/>proofs"]:::step
+        S4["CI<br/>pipeline<br/>10k fuzz<br/>runs"]:::step
+        S5["Polygon<br/>zkEVM<br/>Cardona<br/>testnet<br/>(Phase IV)"]:::step
         S1 --> S2 --> S3 --> S4 --> S5
     end

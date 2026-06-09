@@ -2,8 +2,8 @@
 title: Core ERD - Lending, Governance, and Agent Session Entities
 config:
   er:
-    fontSize: 20
-    entityPadding: 20
+    fontSize: 30
+    entityPadding: 30
 ---
 erDiagram
     WORLD_BANK ||--o{ NATIONAL_BANK : registers
@@ -53,11 +53,13 @@ erDiagram
     }
     LOAN {
         bigint loan_id PK
+        bigint loan_request_id FK
         numeric principal
         int term_months
     }
     INSTALLMENT {
-        bigint installment_id PK
+        bigint loan_id FK
+        int installment_number PK
         date due_date
         numeric amount_due
     }

@@ -40,10 +40,10 @@ flowchart LR
         AG0["Phase III–IV · not MVT"]:::opt
         AG1["Inject on-chain context<br/>loans · SBT · installments"]:::act
         AG2{Write tool<br/>requested?}:::dec
-        AG3["RAG read-only answer"]:::act
-        AG4["Show confirmation summary"]:::gate
+        AG3["RAG read-only<br/>answer"]:::act
+        AG4["Show confirmation<br/>summary"]:::gate
         AG5{Explicit<br/>Yes?}:::dec
-        AG6["MCP write · EIP-7702 sign<br/>middleware 403 if no confirm"]:::act
+        AG6["MCP write<br/>EIP-7702 sign<br/>403 if no confirm"]:::act
         AG0 --> AG1 --> AG2
         AG2 -- "No" --> AG3
         AG2 -- "Yes" --> AG4 --> AG5
@@ -53,7 +53,7 @@ flowchart LR
     subgraph FIN[" Audit & close "]
         direction TB
         F1["Log action + correlation ID<br/>AGENT_ACTION_LOG if agent"]:::act
-        F2["Return result to client UI"]:::act
+        F2["Return result<br/>to client UI"]:::act
         F1 --> F2
     end
 

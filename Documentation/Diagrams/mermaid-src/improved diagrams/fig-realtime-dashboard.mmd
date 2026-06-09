@@ -9,9 +9,9 @@ flowchart LR
 
     subgraph LEFT[" Ingestion & indexing "]
         direction TB
-        SC["Smart contracts<br/>emit typed events"]:::chain
-        GRP["The Graph subgraph<br/>(indexer)"]:::step
-        TEN["Tenderly<br/>(runtime alerts)"]:::step
+        SC["Smart contracts<br/>emit typed<br/>events"]:::chain
+        GRP["The Graph<br/>subgraph<br/>(indexer)"]:::step
+        TEN["Tenderly<br/>(runtime<br/>alerts)"]:::step
         SC --> GRP
         SC --> TEN
     end
@@ -19,19 +19,19 @@ flowchart LR
     subgraph MID[" Processing & detection "]
         direction TB
         WS["WebSocket server<br/>(Node 20)"]:::step
-        ANL["Anomaly detector<br/>(Isolation Forest)"]:::step
-        OPS["Ops runbook +<br/>function pause"]:::store
+        ANL["Anomaly detector<br/>(Isolation<br/>Forest)"]:::step
+        OPS["Ops runbook<br/>function pause"]:::store
         GRP --> WS
         GRP --> ANL
-        TEN -. "incident webhook" .-> OPS
+        TEN -. "incident<br/>webhook" .-> OPS
         ANL -. "alert" .-> OPS
     end
 
     subgraph RIGHT[" Consumer views "]
         direction TB
-        CACHE[("Redis cache<br/>latest snapshot")]:::store
-        DASH["React dashboard<br/>charts + alerts"]:::view
-        REG["Read-only<br/>regulator view"]:::view
+        CACHE[("Redis cache<br/>latest<br/>snapshot")]:::store
+        DASH["React dashboard<br/>charts +<br/>alerts"]:::view
+        REG["Read-only<br/>regulator<br/>view"]:::view
         WS --> CACHE --> DASH --> REG
     end
 

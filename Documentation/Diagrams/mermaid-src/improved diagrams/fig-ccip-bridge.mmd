@@ -1,0 +1,48 @@
+---
+title: Cross-Chain Bridge — Chainlink CCIP and Hierarchy Invariant
+---
+flowchart TB
+    classDef chain fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.5px,color:#111111
+    classDef local fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef allowed fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef forbidden fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,stroke-dasharray:4 3,color:#111111
+    classDef ccip fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef inv fill:#F6F6F6,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+
+    subgraph POL["Polygon zkEVM Cardona — retail origin"]
+        direction TB
+        PLB["Local Bank + loan state<br/>(authoritative)"]:::chain
+        PSBT["Credit Passport SBT<br/>(origin copy)"]:::local
+        PLB --- PSBT
+    end
+
+    CCIP["Chainlink CCIP<br/>unified oracle stack"]:::ccip
+
+    subgraph ETH["Ethereum Sepolia — institutional tier"]
+        direction TB
+        WBR["World / National Bank<br/>reserve ratios"]:::chain
+        ESBT["SBT mirror<br/>(read-only)"]:::local
+        WBR --- ESBT
+    end
+
+    POL <-->|"allowed messages"| CCIP
+    CCIP <-->|"allowed messages"| ETH
+
+    subgraph MSG["Permitted CCIP payloads only"]
+        direction LR
+        A1["Reserve-ratio updates<br/>WB → NB across chains"]:::allowed
+        A2["SBT credential mirror<br/>read-only sync"]:::allowed
+    end
+
+    subgraph BLOCK["Not bridged — single-chain enforcement"]
+        direction LR
+        B1["Loan disbursement state"]:::forbidden
+        B2["Borrowing-limit bypass"]:::forbidden
+        B3["Cross-chain debt consensus"]:::forbidden
+    end
+
+    CCIP --> MSG
+    INV["Hierarchy invariant:<br/>all loan state lives on the originating Local Bank chain"]:::inv
+
+    MSG ~~~ BLOCK
+    BLOCK ~~~ INV

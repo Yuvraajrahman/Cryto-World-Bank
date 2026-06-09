@@ -1,0 +1,28 @@
+/* Activity diagrams — 3× label size (84px) with safe wrapping. */
+foreignObject div,
+foreignObject span,
+foreignObject p,
+.nodeLabel,
+.edgeLabel,
+.label,
+.cluster-label,
+title,
+text,
+tspan {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  font-size: 84px !important;
+  font-weight: 500 !important;
+  line-height: 1.25 !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+.edgeLabel {
+  font-size: 72px !important;
+}
+
+.cluster-label,
+title {
+  font-size: 72px !important;
+  font-weight: 600 !important;
+}

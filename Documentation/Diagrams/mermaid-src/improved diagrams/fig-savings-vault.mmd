@@ -1,0 +1,24 @@
+---
+title: SavingsVault and FixedDeposit — Closed-Loop Deposit Mobilization
+---
+flowchart LR
+    classDef contract fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef out fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+
+    DEP["Depositor USDC"]:::step
+    SV["SavingsVault<br/>ERC-4626 · variable yield"]:::contract
+    FD["FixedDeposit<br/>ERC-7540 · term lock"]:::contract
+    POOL["Local Bank<br/>lending pool"]:::step
+    LOAN["Retail / group loans"]:::step
+    INT["Interest collected"]:::step
+    YLD["Depositor yield"]:::out
+    INS["InsuranceFund 5%"]:::out
+    REV["Protocol revenue"]:::out
+
+    DEP --> SV
+    DEP --> FD
+    SV & FD --> POOL --> LOAN --> INT
+    INT --> YLD
+    INT --> INS
+    INT --> REV

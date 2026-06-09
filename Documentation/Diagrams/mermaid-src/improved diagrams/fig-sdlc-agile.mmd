@@ -21,12 +21,12 @@ flowchart TB
 
     subgraph DETAIL[" Phase deliverables "]
         direction LR
-        RQ1["7-user taxonomy · 29 use cases<br/>functional + non-functional NFRs"]:::sub
-        AR1["4-tier hierarchy · 15 contracts<br/>3-layer system + 5-layer DiD"]:::sub
-        DE1["ERD / EER · DFD L0–L1<br/>Activity + Sequence + State"]:::sub
-        VE1["Foundry fuzz + invariant suite<br/>Slither / Mythril / Echidna"]:::sub
-        VA1["ABM economic simulation (Mesa)<br/>LLM eval · regulator dashboard"]:::sub
-        MN1["Tenderly runtime · The Graph<br/>monthly Safe key rotation"]:::sub
+        RQ1["7-user taxonomy<br/>29 use cases<br/>functional + NFRs"]:::sub
+        AR1["4-tier hierarchy<br/>15 contracts<br/>3-layer + 5-layer DiD"]:::sub
+        DE1["ERD / EER<br/>DFD L0–L1<br/>Activity + Sequence"]:::sub
+        VE1["Foundry fuzz<br/>invariant suite<br/>Slither / Mythril"]:::sub
+        VA1["ABM simulation<br/>(Mesa)<br/>LLM eval · dashboard"]:::sub
+        MN1["Tenderly runtime<br/>The Graph<br/>Safe key rotation"]:::sub
     end
 
     REQ -.-> RQ1
@@ -38,9 +38,9 @@ flowchart TB
 
     subgraph SPR[" Final-thesis sprints (Implementation phase) "]
         direction LR
-        S1["<b>Sprint 1</b><br/>Core contracts (WB · NB · LB)<br/>wallet auth · FE skeleton · PG schema"]:::sprint
-        S2["<b>Sprint 2</b><br/>Lending · SavingsVault · FixedDeposit<br/>GroupLendingPool · IBLP · UpwardDeposit"]:::sprint
-        S3["<b>Sprint 3</b><br/>ML wiring (RF · iForest · SHAP · GNN · FL)<br/>SyndicatedLoan · TranchedPool · Certora"]:::sprint
+        S1["<b>Sprint 1</b><br/>Core contracts<br/>(WB · NB · LB)<br/>wallet auth · FE shell<br/>PG schema"]:::sprint
+        S2["<b>Sprint 2</b><br/>Lending · SavingsVault<br/>FixedDeposit<br/>GroupLendingPool<br/>IBLP · UpwardDeposit"]:::sprint
+        S3["<b>Sprint 3</b><br/>ML wiring<br/>(RF · iForest · SHAP)<br/>GNN · FL<br/>SyndicatedLoan · Certora"]:::sprint
         S1 --> S2 --> S3
     end
 

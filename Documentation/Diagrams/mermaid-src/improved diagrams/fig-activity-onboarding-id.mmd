@@ -28,17 +28,17 @@ flowchart LR
 
     subgraph L3[" Document ladder "]
         direction TB
-        C1["L1 · NID + selfie capture"]:::tier
-        C2["L2 · income proof upload<br/>IPFS hash → INCOME_PROOF"]:::tier
+        C1["L1 · NID<br/>+ selfie capture"]:::tier
+        C2["L2 · income proof<br/>upload<br/>IPFS → INCOME_PROOF"]:::tier
         C3["L3 · video interview<br/>officer attestation"]:::tier
         C1 --> C2 --> C3
     end
 
     subgraph L4[" Compliance proofs "]
         direction TB
-        D1["Licensed KYC provider<br/>issues W3C VC + DID"]:::act
+        D1["Licensed KYC provider<br/>issues W3C VC<br/>+ DID"]:::act
         D2["Generate zkKYC proof<br/>Groth16 circuit"]:::act
-        D3["Generate zkAML proof<br/>sanction non-membership"]:::act
+        D3["Generate zkAML proof<br/>sanction<br/>non-membership"]:::act
         D1 --> D2 --> D3
     end
 
@@ -46,7 +46,7 @@ flowchart LR
         direction TB
         E1["KYCVerifier + AMLVerifier<br/>verify proofs on-chain"]:::chain
         E2{Proofs<br/>valid?}:::dec
-        E3["Grant CLIENT role<br/>enforce USDC tier limits"]:::chain
+        E3["Grant CLIENT role<br/>enforce USDC<br/>tier limits"]:::chain
         E1 --> E2
         E2 -- "Yes" --> E3
     end

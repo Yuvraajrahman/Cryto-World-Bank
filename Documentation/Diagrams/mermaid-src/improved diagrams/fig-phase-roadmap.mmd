@@ -23,8 +23,8 @@ flowchart TB
 
     subgraph PRE[" Pre-thesis (this report) "]
         direction LR
-        PR["Use cases · ERD/DFD · 15 contracts<br/>threat model · ML workload plan"]:::pre
-        PD["Architecture + data model + governance"]:::pre
+        PR["Use cases<br/>ERD/DFD · 15 contracts<br/>threat model · ML plan"]:::pre
+        PD["Architecture<br/>data model<br/>governance"]:::pre
     end
 
     P1 -.-> PR
@@ -35,31 +35,31 @@ flowchart TB
         direction TB
         subgraph PH1[" Phase I · Weeks 1–4 · Foundation "]
             direction LR
-            I1["WB · NB · LB contracts"]:::ph
-            I2["20-entity PG schema"]:::ph
-            I3["React shell + WalletConnect"]:::ph
-            I4["Chainlink PoR + price feeds"]:::ph
+            I1["WB · NB · LB<br/>contracts"]:::ph
+            I2["20-entity<br/>PG schema"]:::ph
+            I3["React shell<br/>WalletConnect"]:::ph
+            I4["Chainlink PoR<br/>price feeds"]:::ph
         end
         subgraph PH2[" Phase II · Weeks 5–9 · Core banking "]
             direction LR
-            II1["Loan apply → approve → repay"]:::ph
-            II2["SBT limits + installments"]:::ph
-            II3["Authority Brief UI"]:::ph
-            II4["IBLP / upward deposit (stretch)"]:::ph
+            II1["Loan apply<br/>approve · repay"]:::ph
+            II2["SBT limits<br/>installments"]:::ph
+            II3["Authority<br/>Brief UI"]:::ph
+            II4["IBLP / upward<br/>deposit"]:::ph
         end
         subgraph PH3[" Phase III · Weeks 10–13 · AI/ML oracle "]
             direction LR
-            III1["RF + IF + SHAP FastAPI"]:::ph
-            III2["Chainlink Functions commit"]:::ph
-            III3["Graph subgraph + dashboard"]:::ph
-            III4["SAR / aml-alert workflow"]:::ph
+            III1["RF + IF<br/>SHAP FastAPI"]:::ph
+            III2["Chainlink<br/>Functions commit"]:::ph
+            III3["Graph subgraph<br/>dashboard"]:::ph
+            III4["SAR / aml-alert<br/>workflow"]:::ph
         end
         subgraph PH4[" Phase IV · Weeks 14–16 · Verification "]
             direction LR
-            IV1["300-client Foundry sim"]:::ph
-            IV2["Foundry fuzz + invariants"]:::ph
-            IV3["Certora reserve proofs"]:::ph
-            IV4["Testnet manifest + paper"]:::ph
+            IV1["300-client<br/>Foundry sim"]:::ph
+            IV2["Foundry fuzz<br/>invariants"]:::ph
+            IV3["Certora<br/>reserve proofs"]:::ph
+            IV4["Testnet manifest<br/>paper"]:::ph
         end
         PH1 --> PH2 --> PH3 --> PH4
     end
@@ -71,14 +71,14 @@ flowchart TB
     P6 -.-> PH4
     P7 -.-> IV4
 
-    AGT["Optional agent add-on<br/>MCP · Qwen3-8B · hooks"]:::opt
+    AGT["Optional agent<br/>MCP · Qwen3-8B<br/>hooks"]:::opt
     AGT -.-> PH3
     AGT -.-> PH4
 
     subgraph PROG[" Pre-thesis progress vs MVT target "]
         direction LR
-        G1["Spec / design<br/>██████████ 100%"]:::prog
-        G2["Contracts deploy<br/>██░░░░░░░░ 20%"]:::prog
-        G3["ML train + score<br/>███░░░░░░░ 30%"]:::prog
-        G4["E2E testnet demo<br/>█░░░░░░░░░ 10%"]:::prog
+        G1["Spec / design<br/>100%"]:::prog
+        G2["Contracts deploy<br/>20%"]:::prog
+        G3["ML train + score<br/>30%"]:::prog
+        G4["E2E testnet demo<br/>10%"]:::prog
     end

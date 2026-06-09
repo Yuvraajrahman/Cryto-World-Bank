@@ -1,0 +1,30 @@
+---
+title: LiquidationEngine — Tier-Specific Health Factor and Lifecycle
+---
+flowchart TB
+    classDef contract fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
+    classDef step fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef tier fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef note fill:#FFFFFF,stroke:#FFFFFF,color:#555555
+
+    subgraph TIERS["HF model by loan type"]
+        direction LR
+        T1["Tier 4 retail<br/>HF = C×LT/D"]:::tier
+        T2["Tier 4 group pool<br/>HF_group"]:::tier
+        T3["Tier 4 credit-based<br/>SBT downgrade only"]:::tier
+        T4["Tier 1–3 institutional<br/>HF_inst"]:::tier
+    end
+
+    subgraph FLOW["LiquidationEngine lifecycle"]
+        direction TB
+        L1["Chainlink price feed<br/>HF recomputed each block"]:::step
+        L2{HF < 1.0?}:::step
+        L3["liquidate(loanId)<br/>bonus 5–8% to caller"]:::contract
+        L4["LoanLiquidated event<br/>The Graph index"]:::step
+        L5["Hierarchical queue<br/>if portfolio RR < 15%"]:::step
+        L1 --> L2
+        L2 -- Yes --> L3 --> L4 --> L5
+        L2 -- No --> L6["Monitor next block"]:::step
+    end
+
+    TIERS ~~~ FLOW

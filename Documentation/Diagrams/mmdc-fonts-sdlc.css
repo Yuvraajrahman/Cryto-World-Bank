@@ -1,0 +1,28 @@
+/* SDLC diagram (Fig 4.7) — 6× label size (120px) with safe wrapping. */
+foreignObject div,
+foreignObject span,
+foreignObject p,
+.nodeLabel,
+.edgeLabel,
+.label,
+.cluster-label,
+title,
+text,
+tspan {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  font-size: 120px !important;
+  font-weight: 500 !important;
+  line-height: 1.22 !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+.edgeLabel {
+  font-size: 102px !important;
+}
+
+.cluster-label,
+title {
+  font-size: 102px !important;
+  font-weight: 600 !important;
+}

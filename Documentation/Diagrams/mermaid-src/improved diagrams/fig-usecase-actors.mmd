@@ -1,44 +1,69 @@
 ---
-title: Use-Case Diagram - Core Actors + Multi-Entity Operations
+title: Use-Case Diagram — Nine-Actor Taxonomy
 ---
-flowchart LR
-    classDef primary fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.4px,color:#111111
-    classDef optional fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,stroke-dasharray:6 4,color:#111111
-    classDef secondary fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef uc    fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1px,color:#111111
-    classDef ucME  fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
-    classDef sys   fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+flowchart TB
+    classDef primary fill:#F2F2F2,stroke:#1F1F1F,stroke-width:1.5px,color:#111111
+    classDef optional fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,stroke-dasharray:5 3,color:#111111
+    classDef secondary fill:#FAFAFA,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
+    classDef uc fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111
+    classDef ucME fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.3px,color:#111111
+    classDef ucOpt fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,stroke-dasharray:4 3,color:#111111
+    classDef boundary fill:#F6F6F6,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
+    classDef note fill:#FFFFFF,stroke:#FFFFFF,color:#555555
 
-    A1(("A1 Retail Client<br/>L0–L3 KYC")):::primary
-    A2(("A2 LB Approver")):::primary
-    A3(("A3 NB Admin")):::primary
-    A4(("A4 WB Governance")):::primary
-    A5(("A5 AI Agent<br/>OPTIONAL add-on")):::optional
-    A6(("A6 Regulator")):::secondary
-    A7(("A7 Chainlink DON")):::secondary
-    A8(("A8 zkEVM Validator")):::secondary
-    A9(("A9 External Auditor")):::secondary
-
-    subgraph SYS[" Crypto World Bank "]
-        UC1["KYC / ERC-4337 onboarding"]:::uc
-        UC2["Apply / pay installment"]:::uc
-        UC3["Group lending"]:::uc
-        UC4["Approve loan + SHAP brief"]:::uc
-        UC5["InterBank lending (IBLP)"]:::ucME
-        UC6["Upward deposit / repatriation"]:::ucME
-        UC7["Syndicated co-lend / co-fund"]:::ucME
-        UC8["Treasury FX swap"]:::ucME
-        UC9["Reserve ratio governance"]:::uc
-        UC10["Agent banking ops†<br/>(optional)"]:::uc
-        UC11["Regulator audit read"]:::uc
+    subgraph ACT["Actors (A1–A9)"]
+        direction LR
+        A1(("A1 · Retail Client")):::primary
+        A2(("A2 · LB Approver")):::primary
+        A3(("A3 · NB Admin")):::primary
+        A4(("A4 · WB Governance")):::primary
+        A5(("A5 · AI Agent†")):::optional
+        A6(("A6 · Regulator")):::secondary
+        A7(("A7 · Chainlink DON")):::secondary
+        A8(("A8 · zkEVM Validator")):::secondary
+        A9(("A9 · Ext. Auditor")):::secondary
     end
-    class SYS sys
 
-    A1 --> UC1 & UC2 & UC3
+    subgraph SYS["Crypto World Bank"]
+        direction TB
+        subgraph R1["Retail & local banking"]
+            direction LR
+            UC1(["UC1 · KYC onboarding"]):::uc
+            UC2(["UC2 · Apply / repay loan"]):::uc
+            UC3(["UC3 · Group lending"]):::uc
+            UC4(["UC4 · Approve loan + SHAP brief"]):::uc
+        end
+        subgraph R2["Multi-entity operations"]
+            direction LR
+            UC5(["UC5 · InterBank lending"]):::ucME
+            UC6(["UC6 · Upward deposit"]):::ucME
+            UC7(["UC7 · Syndicated co-lend"]):::ucME
+            UC8(["UC8 · Treasury FX swap"]):::ucME
+        end
+        subgraph R3["Governance, agent & compliance"]
+            direction LR
+            UC9(["UC9 · Reserve governance"]):::uc
+            UC10(["UC10 · Agent banking ops†"]):::ucOpt
+            UC11(["UC11 · Regulator audit read"]):::uc
+        end
+    end
+    class SYS boundary
+
+    NOTE["† Optional add-on (A5, UC10) — excluded from MVT scope"]:::note
+
+    A1 --> UC1
+    A1 --> UC2
+    A1 --> UC3
     A2 --> UC4
-    A3 --> UC5 & UC6 & UC7
-    A4 --> UC8 & UC9
-    A5 -. optional .-> UC10
+    A3 --> UC5
+    A3 --> UC6
+    A3 --> UC7
+    A4 --> UC8
+    A4 --> UC9
+    A5 -.-> UC10
     A6 --> UC11
-    A7 -. oracle .-> UC4
-    A9 -. PoR verify .-> UC9
+    A7 -.-> UC4
+    A8 -.-> UC9
+    A9 -.-> UC9
+
+    SYS ~~~ NOTE

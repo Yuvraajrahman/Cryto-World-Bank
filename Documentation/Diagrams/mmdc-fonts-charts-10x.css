@@ -1,0 +1,24 @@
+/* Figure 5.2 pie charts — 10× label size (200px). */
+text,
+tspan,
+.pieTitleText,
+.slice,
+.legend,
+.legend text,
+.title text,
+.chart-title {
+  font-family: 'Linux Libertine O', 'Libertine', 'Times New Roman', Times, serif !important;
+  font-size: 200px !important;
+  fill: #000000 !important;
+}
+
+.pieTitleText,
+.title text {
+  font-size: 170px !important;
+  font-weight: 600 !important;
+}
+
+.legend,
+.legend text {
+  font-size: 170px !important;
+}

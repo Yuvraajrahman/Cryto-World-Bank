@@ -628,6 +628,7 @@ The system serves three participant categories: a programmable global reserve (T
 \end{figure}
 
 \section{Background}
+\label{sec:background}
 
 Development finance channels capital through layered institutions---supranational bodies, national intermediaries, and local lenders---but this model carries structural costs. Correspondent banking locks idle capital in pre-funded nostro/vostro accounts~[18], settles cross-border payments in two to five days at roughly \$42 per transaction~[19], and charges remittance corridors 6.49\% on average---above the UN SDG target of 3\%~[20]. Meanwhile, 1.4~billion adults remain unbanked~[9] and MSMEs face a \$4.5~trillion annual financing gap~[15].
 
@@ -638,6 +639,11 @@ DeFi has shown that lending, collateral, and interest can be automated transpare
 
 \paragraph{Optional conversational interface.}
 Primary interaction is through the React UI and wallet signing. An optional locally hosted agent (Qwen3-8B + MCP, 17 banking tools) provides an alternate path with mandatory human confirmation; it does not gate core banking (Chapter~4).
+
+\section{Rationale and Motivation}
+\label{sec:rationale}
+
+Real development finance depends on layered institutions, yet settlement friction, opaque reserves, and correspondent-banking idle capital leave both intermediaries and unbanked clients underserved~[9, 15, 18, 20]. Flat DeFi protocols automate lending at scale but ignore institutional hierarchy, cross-tier flows, and the Local-Bank-to-client path that microfinance and development banks use in practice~[1]. This study is motivated by the opportunity to encode that hierarchy on a programmable ledger---with enforced reserves, role-based governance, and auditable capital movement---while supporting (not replacing) human credit judgment through lightweight analytics and an optional conversational interface. The thesis specifies a reusable architecture; it does not claim a particular national deployment target.
 
 \section{Problem Statement}
 
@@ -710,7 +716,7 @@ A two-circuit architecture combines zk-SNARK KYC verification (Groth16 via Circo
 \paragraph{Positioning against institutional DeFi.}
 Sygnum's \textit{Institutional DeFi in 2025} report notes that allocators require \textit{legal enforceability}, not just technology~[65]. CWB is a planning-phase prototype for development-finance and MFI use cases, positioned as a composable lending layer compatible with emerging CBDC and tokenized-deposit rails (Section~\ref{sec:stablecoin-first}) rather than a replacement for traditional banking.
 
-Chapter~2 surveys the literature under a PRISMA-style frame. Chapter~3 presents architecture, banking products, data model, identity, and governance. Chapter~4 covers methodology, the MVT checklist (Section~\ref{sec:mvt-checklist}), ML workload (Section~\ref{sec:ml-workload}), explainability (Section~\ref{sec:ml-explainability}), and optional agent (Section~\ref{sec:optional-agent}; Appendix~\ref{app:agent-harness}). Chapter~5 evaluates feasibility; Chapter~6 concludes.
+Section~\ref{sec:thesis-organization} maps where each topic introduced in this chapter is expanded across Chapters~2--6 and the appendices.
 
 \section{Blockchain Justification}
 
@@ -795,18 +801,32 @@ ETH-denominated micro-loans expose borrowers to liability-side volatility~[60, 6
 
 TAM spans DeFi lending ($>$ \$55B TVL~[8]) plus correspondent-banking inefficiencies~[16, 20]; SAM covers hierarchical institutional lending (\$5--15B); SOM covers sandbox pilots (\$50--200M)---full sizing in Table~\ref{tab:market-sizing-ch5}. CWB targets Tier~1--3 institutions and Tier~4 retail clients (Table~\ref{tab:customer-segment-ch5}), with five partner categories: regulators, banks, oracle providers, academics, and field pilots (Table~\ref{tab:partner-categories-ch5}). On-chain incentives include tamper-evident repayment records, transparent reserve verification, and programmable fee distribution.
 
+\section{Thesis Organization}
+\label{sec:thesis-organization}
+
+Chapter~1 states the problem, objectives, and proposed approach at overview level. Subsequent chapters expand each thread as follows:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Chapter~2 --- Literature Review:} PRISMA methodology and evidence base (Section~\ref{sec:preliminaries}); domain survey across DeFi, ML, hierarchy, security, and retail rails (Section~\ref{sec:review-existing}); protocol comparison (Section~\ref{sec:comparative-protocol}); design implications (Section~\ref{sec:lit-key-findings}).
+\item \textbf{Chapter~3 --- System Architecture:} four-tier contracts, oracle stack, and platform selection (Section~\ref{sec:high-level-arch}); data model and on/off-chain partitioning (Sections~\ref{sec:data-model},~\ref{sec:data-partitioning}); ZKP identity and tiered onboarding (Sections~\ref{sec:identity},~\ref{sec:tiered-kyc}); cross-tier and multi-entity lending (Section~\ref{sec:multi-entity}); banking products and group lending (Section~\ref{sec:banking-products}); governance and defense-in-depth security (Sections~\ref{sec:governance-framework},~\ref{sec:defense-in-depth}).
+\item \textbf{Chapter~4 --- Methodology:} Agile SDLC phase plan; MVT deliverable boundary (Section~\ref{sec:mvt-checklist}); oracle-mediated ML pipeline (Sections~\ref{sec:aiml-support},~\ref{sec:ml-workload},~\ref{sec:ml-explainability}); optional MCP agent (Section~\ref{sec:optional-agent}; Appendix~\ref{app:agent-harness}).
+\item \textbf{Chapter~5 --- Feasibility:} market sizing, customer segments, and partner ecosystem (Tables~\ref{tab:market-sizing-ch5}--\ref{tab:partner-categories-ch5}); economic, technical, and regulatory analysis including MiCA/GENIUS mapping (Section~\ref{sec:mica-compliance}).
+\item \textbf{Chapter~6 --- Conclusion:} contribution summary, limitations, and post-MVT future work (Section~\ref{sec:future-work}). Smart-contract interfaces and deployment manifest appear in Appendices~B--D.
+\end{itemize}
+
 
 %% CHAPTER 2: LITERATURE REVIEW
 \chapter{Literature Review}
 
 \section{Preliminaries}
+\label{sec:preliminaries}
 
-Key technical terms used throughout this thesis---including Decentralized Finance (DeFi), smart contracts, over-collateralization, Explainable AI (XAI), Proof of Stake (PoS), CBDC, Solidarity/Group Lending, Asset-Liability Management (ALM), Flash Loans, Zero-Knowledge Proofs (ZKP), and Health Factor (HF)---are defined in the \textbf{Glossary} appendix (labelled Appendix D in the final thesis; the current pre-thesis build carries the WorldBankReserve interface as Appendix D pending the final assembly pass). The Glossary also includes platform-specific terminology introduced in this thesis (e.g., \textit{Platform Solvency Ratio (PSR)}, \textit{Provisional Credit Tier}, \textit{Cold-Start Credit Pathway}). This chapter assumes familiarity with blockchain fundamentals at the level of Section~\ref{sec:blockchain-fundamentals}; other terms are defined on first use.
+Core terms---DeFi, smart contracts, over-collateralization, XAI, PoS, CBDC, solidarity/group lending, ALM, flash loans, ZKP, and Health Factor---are defined in the \textbf{Glossary} appendix (Appendix~D in the final thesis assembly; the current pre-thesis build temporarily carries the WorldBankReserve interface as Appendix~D). Platform-specific terms (\textit{Platform Solvency Ratio}, \textit{Provisional Credit Tier}, \textit{Cold-Start Credit Pathway}) appear there as well. Readers may skip to Section~\ref{sec:review-existing} if already familiar with blockchain fundamentals (Section~\ref{sec:blockchain-fundamentals}).
 
 \subsection{Review Methodology (PRISMA-Style Frame)}
 \label{sec:lit-prisma}
 
-The literature underlying this thesis is synthesized under a PRISMA-style evidence-synthesis frame~[66] rather than as a narrative summary alone. Inclusion criteria were: (i) peer-reviewed publications or formally published institutional reports issued between 2017 and 2026; (ii) direct relevance to at least one of eight scoped CWB modules---DeFi lending mechanics, ML-based fraud / anomaly detection, ZKP / DID-based identity, group lending and microfinance (literature precedent), smart-contract security, institutional DeFi / development-finance economics, regulatory compliance, or retail payments / remittance / fiat on/off-ramp rails; and (iii) sufficient methodological transparency to allow re-use of design parameters (e.g., reserve invariants, gas accounting, F1 scores). Sources were identified through ACM Digital Library, IEEE Xplore, Elsevier ScienceDirect, MDPI, arXiv (with venue check), and the BIS / World Bank publication portals; queries combined the keywords \texttt{blockchain}, \texttt{DeFi}, \texttt{lending}, \texttt{fraud detection}, \texttt{ZKP}, \texttt{institutional DeFi}, \texttt{hierarchical}, and \texttt{development finance}, with \texttt{microcredit}, \texttt{MFI}, \texttt{remittance}, \texttt{retail payment}, and \texttt{on-ramp} as secondary anchors. The full evidence synthesis (120 entries) is held in \texttt{references.bib}; the top-10 ranked subset is summarized below and in Table~\ref{tab:lit-top10}. Figure~\ref{fig:prisma-flow} summarises the screening stages from identification through inclusion. Recent systematic reviews of blockchain in banking using PRISMA on 38 studies confirm that this methodological frame is the current expected standard for journal-quality synthesis~[17].
+Evidence is synthesized under a PRISMA-style frame~[66], not a narrative summary alone. Inclusion required: (i)~peer-reviewed or formal institutional reports (2017--2026); (ii)~relevance to at least one of eight CWB modules---DeFi lending, ML fraud/anomaly detection, ZKP/DID identity, group/microfinance literature, smart-contract security, institutional DeFi, regulation, or retail payments/remittance/on-ramps; and (iii)~methodological transparency sufficient to reuse design parameters (reserve invariants, gas accounting, F1 scores). Databases searched: ACM, IEEE, Elsevier, MDPI, arXiv (venue-checked), and BIS/World Bank portals, using \texttt{blockchain}, \texttt{DeFi}, \texttt{lending}, \texttt{fraud detection}, \texttt{ZKP}, \texttt{institutional DeFi}, \texttt{hierarchical}, \texttt{development finance}, plus \texttt{microcredit}, \texttt{remittance}, and \texttt{on-ramp}. The bibliography contains 120 entries; Table~\ref{tab:lit-top10} ranks the top ten. Figure~\ref{fig:prisma-flow} shows screening counts. PRISMA-based banking reviews~[17] confirm this as the expected synthesis standard.
 
 \begin{figure}[H]
 \centering
@@ -866,157 +886,69 @@ The literature underlying this thesis is synthesized under a PRISMA-style eviden
 \end{table}
 
 \section{Review of Existing Research}
+\label{sec:review-existing}
 
-The idea of the Crypto World Bank is designed based on the examination of peer-reviewed materials, institutional reports, and industry figures covering more than one sphere of direct interest to our architecture: decentralized lending and hierarchical institutional DeFi, smart contract security and formal verification, ML-based fraud detection and explainable AI, oracle-mediated risk analytics, group lending and microfinance literature, correspondent banking economics, retail payments and remittance rails, stablecoin regulation, institutional settlement rails (mBridge/Agora), and optional conversational interfaces (LLM/MCP).
+This chapter surveys peer-reviewed work, institutional reports, and industry data across twelve domains that shape the Crypto World Bank design: DeFi lending, ML fraud detection and explainable AI, hierarchical development finance and cross-tier flows, group/microfinance literature, smart-contract security, gas and Layer~2 scalability, correspondent banking, retail payments and remittance, monetary-policy distributional effects, real-world asset tokenization, stablecoin regulation and institutional settlement rails, and optional LLM/MCP interfaces.
 
 \subsection{Decentralized Lending and DeFi Protocol Design}
 
-To understand the gap this thesis addresses, it is necessary to be precise about what DeFi lending protocols actually do and where their structural limits lie. A DeFi lending protocol is a system of smart contracts that automates the deposit-funding and credit-allocation functions of a bank without requiring a licensed intermediary to hold assets or enforce rules. The contracts are deployed to a public blockchain, so any address in the world can deposit or borrow without permission, KYC gating, or a relationship with a traditional financial institution. Interest rates are set algorithmically by a utilization curve---as more of the pool is borrowed, rates rise to attract more depositors---and liquidations of undercollateralized positions are triggered automatically by price oracle updates.
+DeFi lending automates deposit funding and credit allocation through public smart contracts: utilization curves set rates, oracles trigger liquidations, and settlement is atomic. The model's strengths---real-time auditability, per-block interest, reduced loan-officer discretion---come with structural limits for development finance: participants are fungible (no institutional roles), borrowing is over-collateralized (excluding many unbanked adults), and capital flows one way through flat pools with no inter-tier allocation or multi-entity co-funding.
 
-This model produces several genuine innovations over traditional lending: settlement is atomic and near-instant; interest accrues per block rather than monthly; the entire loan book is publicly auditable in real time; and there is no loan officer capable of applying discriminatory judgment. However, the model also has structural limits that are directly relevant to this thesis. First, all participants are \textit{anonymous and fungible}: the protocol makes no distinction between a national bank with \$10~billion in assets and an individual retail borrower---both access the same pool under the same rules. Second, borrowing is universally \textit{over-collateralized}: since there is no identity layer and no recourse in default, protocols require collateral exceeding the loan value, which excludes the estimated 1.4~billion adults with no digital assets. Third, capital flows in \textit{one direction only}: depositors fund a pool and borrowers draw from it; there is no institutional hierarchy, no inter-tier capital allocation, and no mechanism for groups of entities to co-fund a single loan.
+Werner et al.~[1] systematize DeFi as homogeneous, pool-based, and over-collateralized with no institutional hierarchy---the core gap this thesis addresses. Bastankhah et al.~[2] show adaptive dual fast/slow rate control outperforming static Aave/Compound curves~[51], informing the kinked-rate model (Section~\ref{sec:kinked-rate}). Chen et al.~[39] validate multi-chain lending for throughput; Yang and Cui~[40] supply evaluation metrics (utilization stability, liquidation efficiency, rate responsiveness). Hartmann and Hasan~[41] analyse gas and identity in P2P lending; Dao et al.~[52] adapt credit scoring to DeFi borrowing limits.
 
-In their SoK paper, Werner et al.~[1] systematize DeFi protocol design and confirm that current lending markets are homogeneous, pool-based, and over-collateralized, with no institutional hierarchy---a gap which is directly addressed by this project. Their taxonomy demonstrates that no current DeFi system can represent multi-tier capital flow in the manner of development finance, establishing the design space this thesis enters.
+\subsection{Machine Learning, Explainable AI, and Extended AI Security}
 
-Bastankhah et al.~[2] present a data-driven DeFi lending protocol with an adaptive dual fast/slow control architecture, demonstrating that dynamic interest rate adjustment outperforms the static utilization curves used by Aave and Compound~[51]. Their approach validates the algorithmic interest rate model adopted in the CWB's kinked-rate design (Section~\ref{sec:kinked-rate}).
+Palaiokrassas et al.~[3] achieve F1 0.76--0.85 on 54M multi-chain DeFi transactions using behavioral features versus 0.08 with raw transaction data alone---direct input to Random Forest feature engineering. Liu et al.~[6] supply Isolation Forest for unsupervised detection when labeled fraud is scarce. Hasan et al.~[42] train fraud classifiers via federated learning on encrypted features, informing cross-bank intelligence without raw data sharing.
 
-Chen et al.~[39] introduce a multi-chain lending model that allocates lending activity across blockchain networks to improve throughput and reduce congestion. Their cross-chain settlement system validates the technical feasibility of executing lending protocols in heterogeneous blockchain settings, directly informing the CWB's multi-chain deployment approach on Ethereum and Polygon.
+Adom et al.~[4] find SHAP more consistent than LIME for loan explanations; Yuan~[49] reaches AUC $>$0.92 with SHAP on credit-default models---motivating SHAP waterfall review before approvals. Beyond the core pipeline, graph features from Palaiokrassas et al.~[3] support GNN ring detection; federated learning~[42] suits National/Local Bank boundaries; ContractWard~[43] and SoliAudit~[44] enable real-time exploit monitoring; RL rate tuning and NLP income extraction remain future-work options.
 
-Yang and Cui~[40] present a DeFi lending protocol evaluation framework quantifying risk through utilization ratio stability, liquidation efficiency, and interest rate responsiveness. Their methodology provides a benchmark structure applicable to comparing the performance of the CWB's hierarchical lending layers against existing flat-pool protocols.
-
-Hartmann and Hasan~[41] introduce a peer-to-peer blockchain lending framework that eliminates intermediary overhead through smart contract-mediated loan origination and repayment. Though single-tier in architecture, their gas analysis and on-chain identity management strategies inform the CWB's transaction cost optimization approach. Dao et al.~[52] demonstrate that credit scoring models can be adapted for DeFi lending environments, validating the feasibility of data-informed borrowing limits within decentralized protocols.
-
-\subsection{Machine Learning for Blockchain Security}
-
-Palaiokrassas et al.~[3] use machine learning on multichain DeFi fraud over 54~million transactions in 23 protocols which show a demonstration that the behavioral characteristics of DeFi enhance Neural Network and XGBoost classifiers to F1-scores of 0.76--0.85 versus 0.08 using transactional features only. Their finding that the behavioral features are superior to raw transaction data directly informs the planned feature engineering for the Random Forest fraud detection model.
-
-The algorithm of unsupervised anomaly detection presented by Liu et al.~[6] is the Isolation Forest algorithm. The algorithm identifies anomalies using recursive partitioning of data, which assigns shorter distances to outliers. Isolation Forest is specified as the secondary detection model when labeled fraud data are limited, enabling detection of attack patterns not present in the training set.
-
-Hasan et al.~[42] introduce blockchain and machine learning to detect fraud with the help of a privacy-protecting and adjustment-flexible incentive-based method. Their framework trains ML classifiers on encrypted transaction characteristics via federated learning, whereby the operators of the detection model never get to see the individual transaction data. Our future extensions of our AI/ML layer involve the privacy-preserving paradigm, in which the histories of client transactions should be confidential and at the same time allow system-wide fraud pattern recognition.
-
-\subsection{Explainable AI in Financial Decision Systems}
-
-Direct comparison of LIME and SHAP on loan approval is given by Adom et al.~[4], SHAP offers more consistent and in-depth feature attributions, which are found to be deeper via Shapley values whereas LIME provides quicker running time but less sure descriptions across repeated evaluations. Their comparison motivates the specification of SHAP as the primary explainability technique for loan risk measurement, trading off interpretability depth with regulatory compliance requirements.
-
-Yuan~[49] use interpretable models that are based on SHAP on credit default assessment proving that SHAP feature attributions on Gradient Boosting and Random Forest classifiers are able to score over 0.92 with complete interpretability of individual predictions. Their approach to causing per-client risk explanations tells our intended credit risk dashboard, where the approvers of loans look at SHAP waterfall plots before lending decisions are made.
-
-\subsection{Hierarchical Distribution and Development Finance}
-
-Tan~[5] constructs an IMF model in which CBDCs use a two-tier distribution architecture (central bank $\to$ commercial banks $\to$ users) that parallels the CWB four-tier hierarchy. The paper shows that distributed digital-currency infrastructure can leverage existing institutional channels---informing the platform's hierarchical capital-flow design rather than a flat DeFi pool model.
-
-The article by Asaduzzaman et al.~[47] examines blockchain in the microcredit industry, showing that smart contract-based loan management can reduce administrative overhead by up to 60\% compared to manual microfinance processes. This result validates the economic case for programmable group lending; microfinance geography citations inform module design only and do not define a deployment jurisdiction for this thesis.
-
-The joint BIS report~[46] examines retail CBDC design requirements, identifying a two-level distribution model (central bank to commercial banks to end users) as the preferred architecture. Their analysis of interoperability between CBDC systems and existing payment infrastructure informs the planned dual-currency facility that bridges fiat and cryptocurrency within participating banks.
-
-\subsection{Cross-Tier Capital Flows and Programmable Multi-Directional Lending}
+\subsection{Hierarchical Distribution, Cross-Tier Flows, and Group Lending}
 \label{sec:lit-cross-tier}
 
-While Tan~[5] and the BIS foundational CBDC report~[46] establish two-tier CBDC distribution as the prevailing institutional pattern, the academic and policy literature on \emph{multi-directional} capital coordination---same-tier interbank lending, upward surplus repatriation, and syndicated co-funding---within a programmable ledger remains sparse relative to settlement-only CBDC pilots.
+Tan~[5] models two-tier CBDC distribution (central bank $\to$ commercial banks $\to$ users), paralleling the four-tier hierarchy. BIS~[46] prefers two-level retail CBDC with interoperability constraints, informing the dual-currency facility. Asaduzzaman et al.~[47] report up to 60\% admin-cost reduction from smart-contract microcredit---literature precedent for \texttt{GroupLendingPool}, not a deployment-jurisdiction claim.
 
-Kiff et al.~[106] survey retail CBDC operating models and distinguish single-tier from multi-tier architectures in which the central bank issues CBDC but delegates wallet and payment services to supervised intermediaries---the institutional analogue of downward allocation with retained wholesale oversight. Bindseil~[105] analyses tiered CBDC remuneration as a mechanism to preserve bank intermediation while granting the public access to central-bank liabilities, informing the asymmetric upward/downward rate structure planned for the \texttt{UpwardDepositFacility} (Section~\ref{sec:upward-flow}). Auer and B\"{o}hme~[107] propose hybrid CBDC architectures that combine direct central-bank claims with intermediary-delivered payment services, paralleling the CWB pattern in which retail clients access credit only through Local Banks while reserve authority remains at Tier~1.
+Policy literature establishes hierarchical distribution but sparse programmable \emph{multi-directional} coordination. Kiff et al.~[106] distinguish multi-tier CBDC with supervised intermediaries; Bindseil~[105] analyses tiered remuneration for \texttt{UpwardDepositFacility} rate spreads (Section~\ref{sec:upward-flow}); Auer and B\"{o}hme~[107] hybrid CBDC mirrors client-via-Local-Bank access with Tier~1 reserve authority. \textit{Project Pine}~[103] validates layered contract factories for reserve and collateral dependencies extended by \texttt{InterBankLendingPool} and \texttt{SyndicatedLoan}. Dong et al.~[104] model cross-tier direct financing in supply chains---parallel to downward allocation to capital-constrained retail clients (Figure~\ref{fig:cross-tier-lending}).
 
-On programmable implementation, the New York Fed / BIS \textit{Project Pine} prototype~[103] demonstrates a hierarchy of smart contracts---facility factories, exchange contracts, and collateral pools---for central-bank market operations in tokenized wholesale markets. Although Project Pine targets monetary-policy implementation rather than development-finance lending, its layered contract-factory pattern validates encoding cross-contract dependencies (reserve checks, collateral eligibility, rate bounds) that the CWB \texttt{InterBankLendingPool} and \texttt{SyndicatedLoan} modules extend to multi-entity lending.
+Grameen/BRAC solidarity groups achieve $>$95\% repayment through social monitoring that on-chain mutual liability cannot fully replicate; \texttt{GroupLendingPool} encodes multi-signature consent and pool claims at pre-thesis stage. G\"{u}\c{c}\"uk et al.~[53] review privacy and trust in blockchain microlending.
 
-Dong, Qiu, and Xu~[104] model blockchain-enabled \emph{cross-tier direct financing} in a three-tier supply chain, showing that transparent ledger visibility enables capital to reach deep-tier, capital-constrained participants when traditional delegate financing fails---a structural parallel to downward allocation reaching retail clients who cannot access wholesale tiers directly. Together, these sources support the claim that hierarchical, multi-directional capital flows are established in policy and operations research but not yet composed into a single DeFi lending specification; the gap the CWB architecture addresses (Figure~\ref{fig:cross-tier-lending}).
+\subsection{Smart Contract Security and Layer~2 Scalability}
 
-\subsection{Group Lending and Microfinance Digitization}
+Atzei et al.~[7] catalogue reentrancy, access-control, and overflow vectors---motivating OpenZeppelin guards, Solidity~0.8.20, RBAC, Slither, Mythril, and Phase~IV formal verification. Wang et al.~[43] (ContractWard) reach F1 0.96/0.93 on bytecode vulnerability classes; Liao et al.~[44] (SoliAudit) cut audit time $\approx$70\% via ML-prioritized fuzzing; So et al.~[45] (VERISMART) report 98.4\% precision with zero false positives on arithmetic safety---candidate for reserve-ratio invariants.
 
-The solidarity group lending model, pioneered by Grameen Bank and scaled by BRAC into one of the world's largest microfinance institutions, demonstrates that peer-monitored mutual liability can achieve repayment rates exceeding 95\% among borrowers with no individual collateral or formal credit history. These rates are attributable to social pressure mechanisms---weekly group meetings, field officer oversight, community reputation, and progressive loan eligibility---that are preventive in nature. The blockchain extension encodes mutual liability in programmable contract logic (multi-signature consent, on-chain group formation, automatic collateral pool claims), but cannot replicate the preventive social pressure that drives analogue MFI outcomes. The CWB \texttt{GroupLendingPool} module is specified at pre-thesis stage; on-chain repayment rates are expected to be lower initially until credit history accumulates. Güçük et al.~[53] provide a broader literature review of privacy and trust in blockchain-based microlending, reinforcing privacy-preserving mechanisms in the group lending architecture.
+Kim and Kim~[48] show batching and calldata compression save 30--50\% mainnet gas, supporting Polygon zkEVM Cardona deployment where multi-step four-tier lifecycles multiply savings.
 
-\subsection{Smart Contract Security and Governance}
-
-Atzei et al.~[7] list Ethereum smart contract attack vectors such as reentrancy, access control vulnerabilities, and integer overflow. Their taxonomy informs the planned use of OpenZeppelin \texttt{ReentrancyGuard}, Solidity~0.8.20 overflow protection, and role-based access control modifiers. Their defense-in-depth strategy motivates combining security primitives with formal verification, static analysis (Slither), and symbolic execution (Mythril) in Phase~IV.
-
-The article by Wang et al.~[43] introduces ContractWard which is an automated vulnerability detection system that uses machine learning classifiers (Random Forest, SVM, k-NN) to classify six types of smart contract vulnerabilities based on the features of bytecodes. ContractWard scores F1-reentrancy and F1-access control with 0.96 and 0.93 respectively, proving that security auditing using ML can be used to supplement traditional static analysis tools. Our proposed security verification pipeline will utilize the use of machine learning-based static analysis tools.
-
-Liao et al.~[44] present SoliAudit, that is an integration of machine learning classification and vulnerability assessment of smart contracts fuzz testing. Their hybrid approach---using ML to first prioritize probable vulnerable code paths then target fuzz testing---reduces audit time by an estimated 70\% of that spent on manual review. SoliAudit's methodology informs the planned security audit plan on the specified three-contract core and its extensions toward the full modular architecture.
-
-So et al.~[45] come up with VERISMART, an extremely accurate Ethereum safety verifier which employs constraint-based abstract interpretation to detect arithmetic overflow, division-by-zero and array out-of-bound errors. VERISMART achieves 98.4\% accuracy on benchmark data, but has zero false positives, so it is a candidate tool to formally verify our smart contract invariants (e.g., reserve ratio maintenance, cascading interest rate limits).
-
-\subsection{AI Security Features for Blockchain Lending}
-
-In addition to the planned fraud detection and anomaly identification pipeline, other AI-based security features can enhance the Crypto World Bank's resilience to evolving threats:
-
-\begin{itemize}[noitemsep]
-\item \textbf{Graph Neural Network (GNN) transaction analysis:} GNN-based models are able to analyze the graph structure of transaction to identify coordinated rings of fraud---groups of wallets which conspire to rig the borrowing limits or make circular lending patterns. A study by Palaiokrassas et al.~[3] proves that graph-based features are much superior to flat transaction features as an indicator of DeFi fraud detection.
-
-\item \textbf{Federated learning for cross-bank fraud intelligence:} Hasan et al.~[42] demonstrate that federated learning allows the collaboration between several institutions to detect and train fraud models without distributing raw transaction information. Deploying federated learning of the Crypto World Bank's National and Local Banks would allow detecting threats system wide without compromising the privacy of the per-bank data.
-
-\item \textbf{Reinforcement learning for adaptive interest rates (Future Work):} RL agents could dynamically modify interest rate parameters to match market conditions and utilization rates, decreasing the lag of manual parameter governance.
-
-\item \textbf{Real-time smart contract monitoring:} ML-based monitoring agents (informed by ContractWard~[43] and SoliAudit~[44]) can continuously analyze incoming transactions for patterns matching known exploit signatures, triggering the platform's pause mechanism before significant losses occur.
-
-\item \textbf{Natural language processing for income verification:} NLP models are able to extract and validate income information in uploaded documents, saving the bank officers the manual review load but not eliminating verification accuracy.
-\end{itemize}
-
-\subsection{Gas Cost Optimization and Layer~2 Scalability}
-
-In DeFi, Kim and Kim~[48] examine the optimal approaches to minimization of gas fees, demonstrating that transaction batching, calldata compression, and tactical timing of on-chain operations can save 30--50\% of gas costs on Ethereum mainnet. Their findings support the planned deployment to Polygon zkEVM Cardona (sub-cent fees on testnet) and inform optimization strategies for any future mainnet deployment. Complicated multi-step operations (analogous to the four-tier loan lifecycle) benefit disproportionately from Layer~2 deployment due to multiplicative gas savings across sequential contract calls.
-
-\subsection{Correspondent Banking and Cross-Border Settlement}
-
-The Bank of International Settlement~[16] and Financial Stability Board~[27] have extensively documented the structural inefficiencies of the correspondent banking network. In the traditional model, the banks are required to have pre-funded nostro accounts in every currency corridor, establishing a world pool of idle capital which can not be put into effective productive lending. SWIFT settlements and respondent banks involves routing of messages using MT103 payment directions, screening of compliance at all intermediates, and settlement time extensions to two--five business days. According to the World Bank Migration and Development Brief~[20] it is stated that the cost of transferring \$200 on cross-border is 6.49\% on average, with Sub-Saharan African corridors averaging more than 8\%. Cerutti, Firat, and P\'{e}rez-Saiz~[116] model how digital-money cost reductions could raise cross-border volumes in high-cost remittance corridors, while Du, Huang, and Scharfstein~[110] compare correspondent-banking, fintech money-transmitter, and stablecoin ``sandwich'' rails with harmonized all-in cost measures---finding that on-chain legs can undercut legacy rails but remain dependent on fiat on/off-ramp depth at corridor endpoints. These results encourage our development of on-chain settlement with close to instant finality and sub-cent transaction costs on Layer~2 networks, while honestly scoping fiat conversion as a separate infrastructure layer (Section~\ref{sec:future-retail-payments}).
-
-\subsection{Retail Payments, Remittance, and Fiat On/Off-Ramps}
+\subsection{Correspondent Banking, Retail Payments, and Settlement Rails}
 \label{sec:lit-retail-payments}
 
-Beyond institutional lending, a parallel literature examines whether stablecoin-denominated rails can support everyday retail flows---client-to-client remittance, merchant checkout, and cash-like deposit/withdrawal---under compliance constraints. This body of work is directly relevant to the \texttt{CurrentAccount}, \texttt{P2PTransfer}, and merchant-checkout modules scoped as post-MVT future work (Section~\ref{sec:future-retail-payments}).
+BIS~[16] and FSB~[27] document nostro/vostro idle capital, MT103 routing, and 2--5-day settlement. World Bank remittance data~[20] average 6.49\% on a \$200 transfer (Sub-Saharan Africa $>$8\%). Cerutti et al.~[116] and Du et al.~[110] show digital and stablecoin rails can undercut legacy costs but depend on corridor off-ramp depth---scoped separately (Section~\ref{sec:future-retail-payments}).
 
-Ante~[108] surveys 866 U.S.\ remittance users and finds that approximately 26\% have adopted stablecoins for cross-border transfers, with digital and financial literacy as significant adoption drivers and continuance tied to perceived usefulness---supporting the CWB design choice to gate retail transfers behind a tiered KYC ladder rather than open anonymous wallets. Du et al.~[110] document the dominant operational pattern: fiat $\to$ stablecoin $\to$ on-chain transfer $\to$ fiat off-ramp (the ``stablecoin sandwich''), showing that settlement speed gains are often negated where local off-ramp liquidity is thin---the binding constraint the planned PSP integration must address.
+Retail literature examines stablecoin remittance, merchant checkout, and on/off-ramps for post-MVT modules (\texttt{CurrentAccount}, \texttt{P2PTransfer}). Ante~[108] finds 26\% U.S.\ remittance-user stablecoin adoption, supporting tiered KYC gating. Du et al.~[110] document the fiat--stablecoin--fiat ``sandwich'' pattern. Li et al.~[109] (\textbf{CLEAR} framework) find programmable settlement advantages but weak open-loop dispute recourse; Zhang et al.~[112] warn on refund volatility; Fr\"{o}hlich et al.~[111] show on-ramp friction dominates POS UX. Lin et al.~[113] (\textit{SecurePay}) and BIS \textit{Project Sela}~[119] validate Local-Bank--sponsored multi-intermediary flows; Cimaszewski et al.~[118] blueprint jurisdictional DLT settlement. CPMI~[114], BIS Papers~170~[115], and FATF~[117] define ramp and VASP compliance for platform-mediated \texttt{P2PTransfer}---not permissionless unhosted-wallet remittance. No prior work composes four-tier development-finance lending with closed-loop retail rails in one architecture.
 
-For merchant acceptance, Li et al.~[109] systematize stablecoin retail payments against card networks through the \textbf{CLEAR} framework (cost, legality, experience, architecture, reach), concluding that stablecoins offer programmable settlement and lower rail fees but externalize dispute resolution and consumer protection relative to Visa/Mastercard---a gap the CWB \texttt{InsuranceFund} and Local-Bank reconciliation workflow are intended to close in closed-loop form. Zhang et al.~[112] analytically model retailer adoption of stablecoin checkout with blockchain traceability, finding trade-offs between refund volatility and information disclosure; their results caution that merchant USDC acceptance without fiat auto-conversion may deter risk-averse consumers. Fr\"{o}hlich et al.~[111] evaluate a Lightning-network point-of-sale prototype and show that checkout friction concentrates at the on-ramp (acquiring crypto), not at tap-to-pay itself---informing the UX priority of fiat-funded \texttt{CurrentAccount} balances over raw wallet-to-wallet payment.
-
-Platform-economy payment architectures offer the closest analogue to CWB's Local-Bank--sponsored retail model. Lin et al.~[113] propose \textit{SecurePay}, combining permissioned blockchain escrow with regulated money for buyer--merchant--platform settlement at $\approx$256~TPS, validating multi-intermediary payment flows rather than open DEX checkout. The BIS \textit{Project Sela}~[119] prototype similarly assigns compliance and customer-facing services to private intermediaries atop a central-bank-operated ledger---paralleling Tier~1 reserve authority with Local Bank retail distribution. Cimaszewski et al.~[118] blueprint DLT cross-border settlement with jurisdictional interconnection, reinforcing that P2P ledger transfer is only one layer of a compliant remittance stack.
-
-Policy sources define the regulatory envelope. The CPMI report on stablecoin arrangements in cross-border payments~[114] identifies exchanges, custodial wallets, and PSPs as the primary on/off-ramps without which stablecoins cannot achieve domestic or global acceptance. BIS Papers No.~170~[115] analyses reserve transparency and digital-dollarisation risks. FATF virtual-asset guidance~[117] distinguishes \emph{unhosted-wallet} P2P (outside Travel Rule transmission) from \emph{platform-mediated} transfers where a VASP must collect originator and beneficiary data---the compliance model for CWB's KYC-gated \texttt{P2PTransfer} module under Local Bank sponsorship rather than permissionless public-wallet remittance.
-
-Together, these sources establish that retail payment extensions are empirically and regulatorily \emph{studyable}, but that no prior work composes hierarchical development-finance lending with closed-loop, compliance-gated remittance, merchant checkout, and PSP-mediated ramps in a single four-tier architecture---the research gap Section~\ref{sec:future-retail-payments} addresses.
-
-\subsection{Monetary Policy Distribution and Financial Inequality}
-
-Recent empirical studies have reported the distributional impact of monetary policy on wealth inequality. A 2025 cross-country study spanning 49 nations (1999--2019) discovered that the relationship between central bank asset purchases programs and greater wealth inequality, whose outcomes are stronger in the distribution of wealth and long lasting~[28] than income inequality effects. The Federal Reserve's own 2025 contractionary monetary analysis based on the U.S. metropolitan tax data confirmed that policies harm the income of low income employees~[29]. These findings deliver economic incentive to the design principles of Crypto World Bank: transparent and algorithmically determined monetary parameters (interest rates, reserve ratios, supply rules) are encoded in smart contracts rather than set discretionally by opaque committees. On-chain transparency reduces \textit{price discrimination}---all borrowers at the same tier face the same utilization-driven interest rate, eliminating the ability of loan officers to charge higher rates to less-informed borrowers. This is a distinct mechanism from the Cantillon Effect (a macroeconomic phenomenon concerning newly created money benefiting first recipients); the Cantillon Effect does not apply to the CWB because USDC is 100\%-reserve backed and no new money supply is created by the platform's operations~[30].
-
-\subsection{Real-World Asset Tokenization and Institutional DeFi}
-
-The tokenization of real-world assets is an emerging convergence of traditional and decentralized finance. The Corda platform of R3 boasts of more than \$17~billion in tokenized real-world assets on its permissioned ledger as of September 2025, with institutional participants including HSBC and Bank of America~[31]. Centrifuge has deployed in eight blockchain networks of more than \$1~billion in tokenized institutional fund products~[32]. The World Bank is using blockchain on its own public chain side to track the disbursement of funds using its FundsChain program (based on Hyperledger Besu) which is flown on 13 projects in 10 countries and increases to 250 projects by mid-2026~[33]. These developments confirm the institutional interest of blockchain-based financial infrastructure and the viability of hierarchical fund distribution design models on distributed ledgers. This institutional adoption is continued in the Crypto World Bank's trajectory through carrying out not only fund tracking but total hierarchical lending system that has on-chain interest rates, reserves and credit assessment.
-
-\subsection{Graph Neural Networks for Relational Fraud Detection}
-\label{sec:lit-gnn}
-
-Recent work has demonstrated that DeFi fraud is fundamentally a relational phenomenon: coordinated borrowing rings, sybil attacks, and flash-loan manipulation appear in the wallet-interaction graph, not in individual transaction features. Cheng~et~al.~(2024)~[93], Chang et~al.~(2024)~[93], and the DeFiGuard graph-neural-network architecture~[67] consistently outperform flat ML baselines on blockchain fraud, with reported detection above 70\% of illicit transactions at sub-1\% false-positive rates on the Elliptic dataset; Wang and Wang (2025) report similar advantages on cross-chain laundering~[67]. This evidence motivates a Graph Neural Network (GNN) extension to the platform's Random-Forest fraud-detection layer, treated as an ablation isolating the marginal value of \textit{hierarchical tier-relationship edges} over flat wallet graphs---a question unanswered in the literature. The GNN extension is described in Section~\ref{sec:gnn-extension}.
-
-\subsection{Federated Learning Across Banking Tiers}
-\label{sec:lit-fl}
-
-Hasan et~al.~(2022)~[42] introduced privacy-preserving fraud detection via federated learning on the blockchain. The PrivChain-AI study in \textit{Nature Scientific Reports} (December~2025) demonstrates the same pattern with 94.7\% fraud-detection accuracy across multiple banks, while Abbassi et~al.~(2025), FED-SPFD, and FedFraud~[97] document regulatory-grade FL for cross-border fraud intelligence. Cross-tier DeFi federated learning has not been studied; the Crypto World Bank's four-tier structure---where National and Local Banks are independent legal entities that cannot share raw transaction data---makes FedAvg + differential privacy architecturally appropriate: each Local Bank trains a local fraud model, parameter updates are aggregated at the National Bank tier, and no raw records leave the bank. The detailed FL pipeline is given in Section~\ref{sec:fl-fraud}.
-
-\subsection{Stablecoin Regulation: MiCA and GENIUS Act}
-\label{sec:lit-stablecoin-reg}
-
-Two recent statutes reshape the legal context of any stablecoin-denominated lending platform. The EU Markets in Crypto-Assets (MiCA) Regulation, fully in effect from December~2024, requires authorized issuers, 1{:}1 reserve backing, and regular audits for electronic-money tokens---categories that directly cover USDC and USDT used at retail tiers of this platform~[75, 76]. The United States GENIUS Act of July~2025 creates the first federal payment-stablecoin framework with similar reserve and disclosure obligations~[77]. These statutes are read in this thesis not as obstacles but as the regulatory anchor that makes stablecoin-first design defensible (Section~\ref{sec:stablecoin-first}); the corresponding compliance mapping is presented in Section~\ref{sec:mica-compliance}.
-
-\subsection{On-Chain Credit Passport and Soulbound Tokens}
-\label{sec:lit-sbt}
-
-Buterin, Hitzig, and Weyl~(2022)~[69] introduce the concept of Soulbound Tokens (SBTs)---non-transferable ERC-style credentials that bind reputational data to an identity rather than to a tradable asset. For a multi-tier cryptocurrency exchange and financial services platform, SBTs provide a natural primitive for a portable on-chain credit passport: a client's successful repayment history at one Local Bank becomes a credential they can present to any other CWB Local Bank, and (with the schema fixed) to any external lending protocol that adopts the standard. MicroSave Consulting~(December~2025)~[70] documents the microfinance sector's shift toward performance-based credit identity, providing literature support for the credit-passport design. The full credit-passport schema is in Section~\ref{sec:credit-passport}.
-
-\subsection{Institutional DeFi Gap and the mBridge/Agora Landscape}
+\subsection{Monetary Policy, Tokenization, and Institutional Landscape}
 \label{sec:lit-institutional}
 
-Sygnum Bank's February~2026 report \textit{Institutional DeFi in 2025}~[65] documents the central gap that this thesis attempts to fill: DeFi protocols work technically, but pension-fund and endowment allocators do not participate until legal enforceability is resolved (Aave Arc held only $\approx$\$50\,k TVL despite permissioned architecture). The BIS mBridge platform~[78] (China, Hong Kong, Thailand, UAE, Saudi Arabia) reached Minimum Viable Product status in mid-2024 and now settles real-value cross-border CBDC transactions, and the BIS / central-bank \textit{Project Agora}~[79] explores tokenized bank deposits on a unified ledger. The IMF CBDC survey 2025 reports that 94\% of central banks are now engaged in CBDC research~[71]. None of these initiatives implements a retail lending hierarchy: they are settlement rails. This positions the Crypto World Bank explicitly as the lending-layer \textit{specification} compatible with such institutional CBDC infrastructure rather than as a competitor to it.
+Cross-country evidence links QE to wealth inequality~[28]; Federal Reserve metro analysis~[29] shows low-income harm from tightening---motivating algorithmic, transparent rate and reserve parameters rather than opaque committee discretion. Tier-uniform utilization rates reduce loan-officer price discrimination; the Cantillon effect does not apply where USDC is fully reserved and the platform creates no new money~[30].
 
-\subsection{AI/ML Oracle and DeFi Fraud Literature (2024--2026)}
-\label{sec:lit-ml-oracle}
+R3 Corda reports \$17B tokenized RWAs~[31]; Centrifuge exceeds \$1B across eight chains~[32]; World Bank FundsChain tracks disbursements on 13 projects scaling to 250~[33]---institutional precedent for hierarchical on-chain finance beyond fund tracking alone.
 
-Luo et al.~(2024) provide the most comprehensive survey of AI-powered fraud detection across the DeFi project lifecycle~[94]; CWB is positioned as a \textit{system instantiation} of that framework rather than a derivative survey. Caldarelli~(2025) surveys AI techniques applied to blockchain oracles and identify ML-score delivery for lending governance---not price feeds---as an under-researched interface~[95]. The BCCC-DeFiFraudTrans-2025 dataset (1,026,867 annotated transactions, 79 features) is introduced by York University BCCC~[83] and serves as the primary supervised training corpus (Section~\ref{sec:ml-workload}); Fazliani et al.~(2025) demonstrate semi-supervised DeFi fraud detection as a baseline the stacking approach should be compared against~[96]. For federated learning, Alhasawi et al.~(2025) report F1$=$0.90 on credit-card fraud with trust-aware aggregation~[97]---the direct baseline for the cross-tier DeFi FL extension (Section~\ref{sec:fl-fraud}).
+Sygnum~[65] notes institutional allocators require legal enforceability (Aave Arc $\approx$\$50k TVL). mBridge~[78] and \textit{Project Agora}~[79] are settlement rails, not retail lending hierarchies; 94\% of central banks research CBDCs~[71]. CWB positions as a lending-layer specification compatible with these rails.
 
-\subsection{LLMs in Finance and Hallucination Risk}
+\subsection{Graph ML, Federated Learning, Regulation, and Identity Primitives}
+
+DeFi fraud is relational: Cheng et al.~[93], Chang et al.~[93], and DeFiGuard~[67] outperform flat ML on graph structure---motivating a GNN extension with hierarchical tier edges (Section~\ref{sec:gnn-extension}). Federated learning~[42, 97] and PrivChain-AI (94.7\% accuracy) suit banks that cannot share raw records; FedAvg aggregation at National tier is architecturally natural (Section~\ref{sec:fl-fraud}).
+
+MiCA~[75, 76] and the U.S.\ GENIUS Act~[77] anchor stablecoin-first retail design (Section~\ref{sec:stablecoin-first}; mapping in Section~\ref{sec:mica-compliance}). Buterin et al.~[69] introduce non-transferable SBTs for portable credit passports~[70] (Section~\ref{sec:credit-passport}).
+
+\subsection{Oracle-Mediated ML and Optional LLM Interfaces}
 \label{sec:lit-llm}
 
-The optional CWB conversational add-on is specified to use an 8B-parameter open-weight LLM with QLoRA fine-tuning, RAG over the platform's policy and contract documents, and an explicit refusal layer for regulated questions. The LLM-in-finance literature~[72, 73, 74] gives both the design rationale and the necessary cautions: Morgan Stanley's GPT-based equity-analysis assistant achieved a reported 50\% reduction in analyst time, McKinsey estimates LLMs can cut back-office costs by 40\%, but the 2025 LLM-vulnerability-in-finance corpus~[74] documents specific regulatory-hallucination failure modes when LLMs are asked compliance questions without RLHF from domain experts. The evaluation methodology in Section~\ref{sec:llm-eval} includes a red-teaming protocol for adversarial financial prompts directly motivated by this work.
+Luo et al.~[94] survey AI fraud detection across the DeFi lifecycle; Caldarelli~[95] identifies ML-score oracle delivery as under-researched beyond price feeds. BCCC-DeFiFraudTrans-2025~[83] (1,026,867 labeled transactions) is the primary training corpus (Section~\ref{sec:ml-workload}); Fazliani et al.~[96] and Alhasawi et al.~[97] supply semi-supervised and federated baselines.
+
+The optional conversational add-on uses an 8B open-weight LLM with QLoRA, RAG, and refusal layers. Finance LLM studies~[72, 73, 74] report productivity gains but document regulatory-hallucination risks---motivating the red-team protocol in Section~\ref{sec:llm-eval}.
 
 \section{Literature Review Summary}
 
-The most important reviewed works with their methodologies, key findings, and relevance to our project are presented in Table~\ref{tab:lit-summary}, in the form of literature table suggested by Michigan State University Libraries~[17].
+Table~\ref{tab:lit-summary} (Parts A--F) summarizes reviewed works by methodology, findings, and project relevance, following the synthesis table format recommended by Michigan State University Libraries~[17].
 
 \begin{table}[H]
 \centering
@@ -1041,9 +973,6 @@ Atzei et al.\ (2017) [7] · Smart contract security & SoK of Ethereum attack vec
 \TableScreenshotEnd[tab:lit-summary]{Literature Review Summary (Part 1): DeFi Lending and Hierarchical Architecture}
 \end{table}
 
-\vspace{2pt}
-\noindent\textit{\small Of the works reviewed, none model a four-tier hierarchical lending structure, confirming the architectural novelty of this project. The synthesis shows that DeFi and institutional finance have developed in parallel without converging on a governance-aware, multi-tier design.}
-
 \begin{table}[H]
 \centering
 \footnotesize
@@ -1063,9 +992,6 @@ Bastankhah et al.\ (2024) [2] · Adaptive DeFi lending & Dual fast/slow control;
 }
 \TableScreenshotEnd{Literature Review Summary (Part 2): Governance, Settlement, and Institutional Adoption}
 \end{table}
-
-\vspace{2pt}
-\noindent\textit{\small This continuation extends coverage to governance, settlement, and institutional blockchain adoption. The key observation is that enabling infrastructure (Layer~2 networks, oracle pricing, EVM tooling) is mature, while the specific hierarchical banking architecture remains architecturally unexplored.}
 
 \begin{table}[H]
 \centering
@@ -1088,9 +1014,6 @@ Liao et al.\ (2019) [44] · Smart contract audit automation & Hybrid classificat
 }
 \TableScreenshotEnd{Literature Review Summary (Part 3): Cross-Border Settlement and Security Tooling}
 \end{table}
-
-\vspace{2pt}
-\noindent\textit{\small This continuation captures empirical and systems findings on cross-border settlement and security tooling, supporting the claim that Layer~2 deployment and hybrid ML-static analysis pipelines substantially reduce feasibility risk for an academic prototype.}
 
 \begin{table}[H]
 \centering
@@ -1118,9 +1041,6 @@ World Bank (2025) [33] · Blockchain for development finance & Pilot on 13 proje
 \TableScreenshotEnd{Literature Review Summary (Part 4): Risk Monitoring and AI/ML in Finance}
 \end{table}
 
-\vspace{2pt}
-\noindent\textit{\small This block summarizes works informing the platform's risk and monitoring approach. The synthesis justifies the choice of lightweight, auditable ML components rather than opaque deep learning models, prioritizing regulatory interpretability over raw detection performance.}
-
 \begin{table}[H]
 \centering
 \footnotesize
@@ -1143,9 +1063,6 @@ Yuan (2024) [49] · SHAP-based credit default models & SHAP, Random Forest, and 
 }
 \TableScreenshotEnd{Literature Review Summary (Part 5): Institutional Adoption and MFI Literature}
 \end{table}
-
-\vspace{2pt}
-\noindent\textit{\small This final block closes the synthesis with institutional and microfinance-literature sources. The combined evidence supports increasing institutional blockchain adoption alongside persistent gaps in hierarchical, governance-aware lending---matching the platform's institutional-first, multi-tier scope.}
 
 \begin{table}[H]
 \centering
@@ -1173,14 +1090,10 @@ FATF (2021) [117] · VASP / P2P guidance & Risk-based AML standards for virtual 
 \TableScreenshotEnd{Literature Review Summary (Part 6): Retail Payments and Remittance Rails}
 \end{table}
 
-\vspace{2pt}
-\noindent\textit{\small This block grounds the post-MVT retail-payment roadmap (Section~\ref{sec:future-retail-payments}) in peer-reviewed and policy literature. The synthesis shows these features are empirically studyable but not yet integrated with hierarchical development-finance lending.}
-
-
 \section{Comparative Protocol Analysis}
 \label{sec:comparative-protocol}
 
-The literature survey above reveals that no existing DeFi protocol combines multi-tier institutional hierarchy with AI-assisted governance and compliance-aware identity. Table~\ref{tab:protocol-comparison} provides a structured comparison of the Crypto World Bank against representative existing protocols on eleven architectural dimensions.
+No surveyed protocol combines multi-tier hierarchy, oracle-mediated explainable ML, and compliance-aware identity. Table~\ref{tab:protocol-comparison} compares CWB against Aave, Compound, Maker, Maple, and Goldfinch on eleven architectural dimensions.
 
 \begin{table}[H]
 \centering
@@ -1218,54 +1131,38 @@ TVL / Status (2026) & \$26B & \$1.4B & \$10B & \$2.6B & \$680M & Planning \\
 \label{tab:protocol-comparison}
 \end{table}
 
-This comparison directly answers RQ1: no existing protocol simultaneously enforces a four-tier reserve-ratio hierarchy, oracle-mediated explainable ML governance, and programmable mutual-liability group lending. While Aave~v3 implements risk-parameterized sub-markets (Isolation Mode, Efficiency Mode) and Compound~v3 deploys separate Comet markets, these mechanisms differentiate risk parameters for different assets within a single-tier pool---they do not model institutional relationships, cross-tier governance, or inter-bank lending flows. Maple Finance, Goldfinch, and Morpho~V2 approach institutional credit from flatter market-structure angles~[117, 90]; none mirrors multilateral development-finance capital allocation. The Crypto World Bank's compound novelty claim (Section~\ref{sec:research-contribution}) holds when stated precisely across all three axes.
+This answers RQ1: Aave~v3 and Compound~v3 sub-markets differentiate assets within flat pools, not institutional relationships or inter-bank flows; Maple, Goldfinch, and Morpho~V2~[117, 90] lack multilateral development-finance capital allocation. CWB's compound novelty (Section~\ref{sec:research-contribution}) holds across hierarchy, explainable ML governance, and group lending axes.
 
-\paragraph{Note on ERC-3643 (T-REX) for institutional-tier permissioning.}
-The institutional tiers (Tiers~1--3) use the bespoke RBAC described in Section~\ref{sec:defense-in-depth} for transfer-level access control.  ERC-3643 (the T-REX standard for permissioned, compliance-gated token transfers) and ERC-4626 for tokenized vaults are gaining adoption as standards that ensure tokenized assets can plug and play across platforms without custom integrations~[82].  ERC-3643 is specifically designed for regulated institutional token transfers where KYC and AML checks gate individual token movements at the token contract level, rather than at the application layer.  The platform's current RBAC serves the same functional purpose: role gates on every state-mutating function enforce that only KYC-verified, role-holding addresses can transfer institutional-tier assets.  A production deployment operating under MiCA~[75] or equivalent regulated-asset frameworks would evaluate full ERC-3643 compliance as the path to interoperability with other regulated tokenized-asset platforms; the architecture is designed to accommodate this migration because the RBAC role structure maps directly onto the ERC-3643 identity registry model.  This note is recorded here rather than as a Future Work item so that examiners can identify the deliberate design alignment.
+\paragraph{ERC-3643 (T-REX) alignment.}
+Tiers~1--3 use bespoke RBAC (Section~\ref{sec:defense-in-depth}) functionally equivalent to ERC-3643 token-level KYC gating~[82]; production under MiCA~[75] could migrate to full T-REX interoperability without redesigning the role registry.
 
-\paragraph{Positioning against failed centralized exchanges.}
-Centralized cryptocurrency exchanges such as FTX (defunct, 2022) demonstrate the catastrophic consequence of opaque reserve management: an \$8~billion client-fund shortfall was discovered only at the point of bankruptcy, having been concealed through commingling of client deposits with proprietary trading activity by its affiliated trading firm Alameda Research. FTX halted withdrawals and filed for bankruptcy within three days. The structural cause was centralized custody with no on-chain proof of reserves, no separation between customer funds and operating capital, and no real-time verifiability of solvency. The Crypto World Bank's on-chain reserve architecture is designed as a structural response to this class of failure: every tier's reserve ratio is an enforced smart contract invariant, readable by any participant in real time without trust in any third-party attestation. This design property---on-chain Proof of Reserves by construction---is increasingly recognized as the non-negotiable foundation of trustworthy crypto-financial infrastructure, and the Crypto World Bank implements it at the institutional tier level rather than the exchange-account level. The platform's purpose is also structurally distinct from FTX: it targets institutional and retail banking (savings, credit, interbank lending)---not speculative trading, derivatives, or leveraged tokens---and its four-tier institutional hierarchy mirrors multilateral development finance rather than a flat exchange order book. DeFi naturally provides on-chain transparency, self-custody, and governance---precisely the properties whose absence destroyed FTX.
+\paragraph{Contrast with opaque custody failures.}
+FTX's 2022 collapse exposed commingled client funds with no real-time solvency proof---the class of failure CWB addresses via enforced per-tier reserve ratios readable on-chain. The platform targets banking (savings, credit, interbank lending), not speculative exchange activity.
 
 \subsection{Literature Synthesis}
 
-The literature synthesis above directly informs six architectural decisions in this work: (1) Gudgeon et al.'s~(2020)~[56] empirical finding that utilization above 90\% causes liquidity crises motivates the kinked interest rate model in Section~\ref{sec:kinked-rate}; (2) Piper et al.'s~(2025)~[58] ZKP permissioning framework provides the technical foundation for the compliance pathway in Section~\ref{sec:identity}; (3) Tan~(2023)~[5], the BIS foundational CBDC report~[46], Kiff et al.~[106], and Auer and B\"{o}hme~[107] on hierarchical and hybrid CBDC distribution inform the four-tier capital-flow model and client-via-Local-Bank entry path; (4) Bindseil~[105], Project Pine~[103], and Dong et al.~[104] on tiered remuneration, hierarchical smart contracts, and cross-tier direct financing inform the multi-directional lending modules in Section~\ref{sec:cross-tier-lending}; (5) Asaduzzaman et al.'s~(2020)~[47] on blockchain microcredit provides prior art for the programmable \texttt{GroupLendingPool} module (literature precedent, not a deployment jurisdiction claim); and (6) Ante~[108], Du et al.~[110], Li et al.~[109], Lin et al.~[113], CPMI~[114], and FATF~[117] on stablecoin remittance, competing payment rails, retail-payment architecture, platform-economy settlement, and VASP-mediated compliance inform the post-MVT retail stack (\texttt{CurrentAccount}, \texttt{P2PTransfer}, merchant checkout, PSP ramps) in Section~\ref{sec:future-retail-payments}.
+Six design decisions follow directly from the survey: (1)~Gudgeon et al.~[56] on utilization crises $\to$ kinked-rate model (Section~\ref{sec:kinked-rate}); (2)~Piper et al.~[58] $\to$ ZKP identity path (Section~\ref{sec:identity}); (3)~Tan~[5], BIS~[46], Kiff~[106], Auer and B\"{o}hme~[107] $\to$ four-tier capital flows; (4)~Bindseil~[105], Project Pine~[103], Dong et al.~[104] $\to$ multi-directional lending (Section~\ref{sec:cross-tier-lending}); (5)~Asaduzzaman et al.~[47] $\to$ \texttt{GroupLendingPool}; (6)~Ante~[108], Du et al.~[110], Li et al.~[109], Lin et al.~[113], CPMI~[114], FATF~[117] $\to$ post-MVT retail stack (Section~\ref{sec:future-retail-payments}).
 
 \subsection{Agent Harness Engineering and Production Safety}
 \label{sec:harness-lit}
 
-A parallel research stream has documented prompt injection as the dominant
-vulnerability in production banking agents. Alizadeh et~al.~[87]
-demonstrate that income document uploads and language preference fields in
-banking tool-calling agents are viable injection vectors for personal data
-exfiltration --- the same fields present in the CWB context assembly pipeline.
-The OWASP Top~10 for LLM Applications~[88] classifies LLM01 (Prompt
-Injection) as the highest-priority threat in agentic financial systems, providing
-an authoritative standard against which the CWB scanning middleware can be
-evaluated.
+Alizadeh et al.~[87] show income uploads and language-preference fields as prompt-injection vectors in banking agents---fields present in CWB context assembly. OWASP LLM Top~10~[88] ranks prompt injection (LLM01) highest for agentic finance, framing evaluation of the scanning middleware.
 
 \section{Summary of Key Findings}
+\label{sec:lit-key-findings}
 
-The following summarized findings are obtained in the literature review and are directly informative to our design:
+The literature review yields the following design-relevant conclusions:
 
 \begin{itemize}[noitemsep]
-\item \textbf{DeFi lending is structurally flat.} Available protocols (Aave, Compound, MakerDAO) operate pool-based or over-collateralized models with total value locked exceeding \$55~billion~[8]. Institutional hierarchy has no comparable protocol models to development finance. CBDC research~[5] ascertains that tiered distribution is a workable institutional design pattern.
-\item \textbf{Correspondent banking is inefficient in structure.} Cross-border settlement spends two to five days at average costs of \$42 per transaction~[19]. The system traps important capital lying idle in nostro/vostro accounts~[18], and remittance fees are estimated to consume between \$48--56~billion a year~[20]. Cerutti et al.~[116] and Du et al.~[110] show that digital-money and stablecoin rails can compress corridor costs but remain constrained by fiat on/off-ramp infrastructure---motivating the phased retail-payment roadmap (Sections~\ref{sec:lit-retail-payments},~\ref{sec:future-retail-payments}).
-\item \textbf{Retail stablecoin payments are studyable but not open-loop card substitutes.} Li et al.~[109] find stablecoins advantaged in closed-loop and cross-border contexts; Zhang et al.~[112] and Fr\"{o}hlich et al.~[111] highlight refund volatility and on-ramp friction. Platform-mediated models (Lin et al.~[113]; BIS Project Sela~[119]) validate Local-Bank--sponsored checkout rather than permissionless merchant wallets.
-\item \textbf{ML enhances fraud detection in blockchain.} DeFi-specific behavioral features significantly work well as compared to transactional features (F1: 0.76--0.85 vs.\ 0.08~[3]). The Isolation Forest~[6] allows unsupervised detection in which labeled data is scarce.
-\item \textbf{SHAP is explainable by regulators.} SHAP offers greater consistency and is better than the LIME in loan approval systems~[4] in meeting prudential demands on open-minded automated decision-making.
-\item \textbf{Layered defense is needed in smart contract security.} Reentrancy, overflow, and vulnerabilities to access control are well documented~[7]. ML-based vulnerability detection achieves F1-scores of above 0.93~[43], and hybrid ML-fuzz methods reduce audit time by 70\%~[44]. Verification tools are formal, i.e., VERISMART achieves 98.4\% precision~[45]. Automated primitives used with OpenZeppelin are recommended for production deployments to be verified.
-\item \textbf{Monetary policy leads to distributional inequality.} Cross-country evidence~[28] and Federal Reserve research~[29] confirm that quantitative easing disproportionately favors asset holders, and workers of lower income cover the expenses of both inflation and consequent tightening. Transparent, algorithmic monetary parameters can decrease this informational asymmetry.
-\item \textbf{The use of blockchains in institutions is gaining momentum.} The World Bank's FundsChain~[33], tokenized assets of R3 Corda worth \$17~billion~[31], and JPMorgan Kinexys settling multi-billion dollars per day~[34] reflect the fact that financial institutions are actively implementing blockchain on settlement, funds tracking, and asset tokenization.
-\item \textbf{Microfinance literature informs group lending design.} Global unbanked statistics~[9] and mobile-money adoption studies motivate hierarchical intermediation in development finance. Blockchain-based microcredit research shows up to 60\% reduction in administrative overhead~[47], supporting the economic case for on-chain \texttt{GroupLendingPool} specification.
-\item \textbf{Multi-chain lending enhances scalability.} Cross-chain lending models~[39] and Layer~2 gas optimization strategies~[48] prove the fact that the lending is distributed when operating on several networks, decreasing congestion and transaction costs by 30--50\%.
-\item \textbf{ML can be used to detect cross-institutional fraud using privacy preserving ML.} Federated learning methods~[42] are such that enable several lending institutions to cooperate and learn fraud detection models in a non-intrusive manner, i.e. no individual transaction data is exposed, resolving the conflict between institution-wide security and data privacy.
-
-\item \textbf{Group lending reduces default risk in analogue MFIs.} Microfinance research from BRAC, Grameen Bank, and ASA consistently reports repayment rates above 95\% in solidarity group structures~[47]. On-chain enforcement of mutual liability has not been studied in the academic literature, representing an open research gap that this specification begins to address.
-
-\item \textbf{Sustainable microfinance requires deposit-funded lending.} Literature on sustainable microfinance institutions consistently shows that deposit-funded lending rather than donor-funded or externally capitalized models is the only economically viable approach at scale. The platform's banking product suite is designed to close this loop by mobilizing retail savings at the Local Bank tier to partially fund the lending pool.
+\item \textbf{Flat DeFi vs.\ tiered finance.} Pool-based protocols exceed \$55B TVL~[8] but lack institutional hierarchy; CBDC research confirms tiered distribution as a workable pattern~[5]. No prior work models four-tier reserve-enforced lending.
+\item \textbf{Settlement and retail rails.} Correspondent banking traps idle capital~[18], settles in 2--5 days at $\approx$\$42/transfer~[19], and costs remittance users \$48--56B annually~[20]. Stablecoin rails can compress costs~[116, 110] but need ramp infrastructure; retail studies~[109, 112, 111, 113, 119] favour Local-Bank--sponsored closed-loop flows over open permissionless checkout.
+\item \textbf{ML, XAI, and security.} Behavioral DeFi features lift fraud F1 to 0.76--0.85~[3]; Isolation Forest~[6] covers unlabeled cases; SHAP beats LIME for regulatory explainability~[4]. Contract vulnerabilities are well catalogued~[7]; ML audit tools reach F1 $>$0.93~[43], cut review time 70\%~[44], and formal verifiers such as VERISMART reach 98.4\% precision~[45].
+\item \textbf{Hierarchy, groups, and institutions.} Cross-tier CBDC and Project Pine literature~[106, 105, 107, 103, 104] supports multi-directional programmable flows; analogue MFIs report $>$95\% group repayment~[47] with on-chain mutual liability still an open gap. FundsChain~[33], Corda RWAs~[31], and Kinexys~[34] show rising institutional blockchain adoption.
+\item \textbf{Scalability, privacy, and regulation.} Multi-chain lending~[39] and L2 gas optimization~[48] cut costs 30--50\%; federated learning~[42, 97] enables cross-bank fraud intelligence without raw data sharing. MiCA and GENIUS~[75, 77] anchor stablecoin-first design; algorithmic parameters mitigate distributional opacity from discretionary monetary policy~[28, 29].
+\item \textbf{Deposit-funded sustainability.} Sustainable MFIs rely on mobilized deposits, not donor capital alone---motivating savings vaults at the Local Bank tier alongside \texttt{GroupLendingPool}.
 \end{itemize}
 
-The results explain why we have a four-tier architecture, AI/ML integration (Random Forest, Isolation Forest, SHAP), cross-tier lending structure, governance structure, and planned security verification pipeline.
+These findings justify the four-tier architecture, cross-tier lending modules, Random Forest / Isolation Forest / SHAP analytics, governance structure, and phased security verification pipeline developed in later chapters.
 
 
 %% CHAPTER 3: SYSTEM ARCHITECTURE AND DESIGN

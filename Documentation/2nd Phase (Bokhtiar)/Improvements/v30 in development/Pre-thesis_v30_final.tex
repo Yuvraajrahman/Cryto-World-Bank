@@ -4820,19 +4820,29 @@ The following table is a \textbf{planned deployment manifest template} for Polyg
 
 \begin{table}[H]
 \centering
-\begin{tabular}{@{}llp{5.5cm}@{}}
+\caption[Planned Cardona testnet deployment manifest]{Planned Cardona testnet deployment manifest (Phase~IV template).}
+\label{tab:cardona-manifest}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}%
+  >{\raggedright\arraybackslash}p{0.22\linewidth}%
+  >{\raggedright\arraybackslash}p{0.26\linewidth}%
+  >{\raggedright\arraybackslash}p{0.48\linewidth}@{}}
 \toprule
 \tableheadcolor
-\tableheadfont Contract & \tableheadfont Network & \tableheadfont Address \\
+\tableheadfont Contract & \tableheadfont Network & \tableheadfont Address / manifest path \\
 \midrule
-WorldBankReserve & Polygon zkEVM Cardona & \texttt{[See project repository: /deployments/cardona/WorldBankReserve.json]} \\
+WorldBankReserve & Polygon zkEVM Cardona & \url{deployments/cardona/WorldBankReserve.json} \\
 \rowcolor{RowShade}
-NationalBank (Scaffold) & Polygon zkEVM Cardona & \texttt{[See project repository: /deployments/cardona/NationalBank.json]} \\
-LocalBank (Scaffold) & Polygon zkEVM Cardona & \texttt{[See project repository: /deployments/cardona/LocalBank.json]} \\
+NationalBank (Scaffold) & Polygon zkEVM Cardona & \url{deployments/cardona/NationalBank.json} \\
+LocalBank (Scaffold) & Polygon zkEVM Cardona & \url{deployments/cardona/LocalBank.json} \\
 \rowcolor{RowShade}
-LendingController & Polygon zkEVM Cardona & \texttt{[See project repository: /deployments/cardona/LendingController.json]} \\
+LendingController & Polygon zkEVM Cardona & \url{deployments/cardona/LendingController.json} \\
 \bottomrule
 \end{tabular}
+\endgroup
 \end{table}
 
 \noindent\textit{Note: Exact hex addresses will be populated after Phase~IV testnet deployment. The repository manifest is the authoritative record. This appendix documents the intended contract inventory only; it does not assert live deployment at pre-thesis stage.}
@@ -4921,18 +4931,26 @@ This appendix catalogues supplementary industry-research documents prepared for 
 \centering
 \caption[Internal industry research corpus]{Internal industry research corpus.}
 \label{tab:internal-research}
-\begin{tabular}{@{}clp{7.5cm}@{}}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}%
+  >{\raggedright\arraybackslash}p{0.07\linewidth}%
+  >{\raggedright\arraybackslash}p{0.36\linewidth}%
+  >{\raggedright\arraybackslash}p{0.53\linewidth}@{}}
 \toprule
 \tableheadcolor
 \textbf{ID} & \textbf{Document} & \textbf{Thesis use} \\
 \midrule
-IR-1 & \texttt{Binance\_FTX\_Full\_Report.md} & CEX vs.\ CWB table (Table~\ref{tab:cex-vs-cwb}); FTT/BNB token lesson; SAFU and Binance Earn analogues; PoR and commingling safeguards \\
-IR-2 & \texttt{blockchain platforms research.csv} & Five-exchange comparative matrix (Binance, Bybit, Coinbase, OKX, Kraken) for Table~\ref{tab:cex-vs-cwb} \\
-IR-3 & \texttt{Binance Business Analysis.md} & Exchange revenue taxonomy (trading fees, listing, OTC, \$16.8B revenue benchmark) for Table~\ref{tab:revenue-taxonomy} \\
-IR-4 & \texttt{binance\_software\_engineering\_architecture.md} & Nine-actor formal taxonomy (Section~\ref{sec:onboarding}); use-case and sequence-diagram conventions \\
-IR-5 & \texttt{binance\_architecture\_research.md} & Off-chain PostgreSQL/Redis layer design patterns (background only; not formally cited in body text) \\
+IR-1 & \texttt{Binance\_FTX\_Full\_Report.md} & CEX vs.\ CWB (Table~\ref{tab:cex-vs-cwb}); FTT/BNB token lesson; SAFU and Binance Earn analogues; PoR and commingling safeguards \\
+IR-2 & \texttt{blockchain platforms research.csv} & Five-exchange matrix (Binance, Bybit, Coinbase, OKX, Kraken) for Table~\ref{tab:cex-vs-cwb} \\
+IR-3 & \texttt{Binance Business Analysis.md} & Exchange revenue taxonomy for Table~\ref{tab:revenue-taxonomy} (fees, listing, OTC) \\
+IR-4 & \texttt{binance\_software\_engineering\_architecture.md} & Nine-actor taxonomy (Section~\ref{sec:onboarding}); use-case and sequence-diagram conventions \\
+IR-5 & \texttt{binance\_architecture\_research.md} & Off-chain PostgreSQL/Redis patterns (background; not cited in body text) \\
 \bottomrule
 \end{tabular}
+\endgroup
 \end{table}
 
 \noindent These documents are project-internal research notes, not peer-reviewed publications. They are listed here for reproducibility and examiner traceability; formal citations in the body text use bibliography entries~[128]--[130] for the three documents most directly referenced.

@@ -1,0 +1,14 @@
+## 2. Meeting Feedback (6 May 2026) — Response Summary
+
+| # | Feedback received | Status in v30 | Where addressed |
+|---|-------------------|---------------|-----------------|
+| 1 | Integrate the **banking concept** more clearly and prominently throughout the report and architecture | **Addressed** | Six core banking functions (Ch. 1); full banking product suite (Ch. 3); deposit mobilization, liquidation, savings, FX, insurance (Ch. 3 & appendices); market/competitive framing as a *banking platform* not only a lending protocol (Ch. 5) |
+| 2 | Add missing lists (**figures, tables, abbreviations**) | **Addressed** | Table of Contents, List of Tables, List of Figures; new **List of Formulas** and **List of Abbreviations** (60+ entries); expanded figure/table inventory |
+| 3 | Fix **text visibility** issues in tables | **Addressed** | Migration from image-only table PNGs to **native LaTeX tables** with `booktabs`, column width control, `\footnotesize`, ragged-right `p{}` columns, and post-table context notes; appendix tables (e.g. D.1, Appendix C manifest) resized to page width |
+| 4 | Add functionality to **lend and fund a group of entities** | **Addressed (design/specification)** | `GroupLendingPool` (retail solidarity / mutual liability); `SyndicatedLoan`, `TranchedPool`, `TreasurySwap`, `NettingEngine` (institutional co-lending/co-funding); multi-entity cross-tier operations (Ch. 3, Conclusion) |
+| 5 | Use **standard ER notation** (Crow's Foot or Chen) consistently | **Addressed** | ERD/EER figures and captions explicitly state cardinality, participation, generalization/specialization, weak entities, and aggregation; entity-relationship figures updated (e.g. core ERD, extended ERD, EER model) with consistent relational notation in captions and Chapter 3 data-model prose |
+| 6 | Include **descriptions alongside each table** for context | **Addressed** | Context paragraphs after major tables using `\noindent\textit{\small ...}` blocks (market sizing, competitive landscape, governance, ML features, regulatory mapping, etc.); table captions expanded beyond image placeholders |
+| 7 | Demonstrate **deeper conceptual understanding** of blockchain, smart contracts, and DeFi | **Addressed** | New **Blockchain, Smart Contract, and DeFi Fundamentals** subsection (Ch. 2); expanded DeFi-vs-banking contrast; EVM execution model, oracle problem, gas/CEI patterns; Chainlink oracle stack; formal contribution statements with scope honesty |
+| 8 | **Expand references** beyond IEEE — ACM, Springer, arXiv, DeFi whitepapers | **Addressed** | Bibliography grew from **~55** entries (v5) to **147** entries (v30), spanning ACM, IEEE, Springer, Elsevier, BIS, World Bank, IMF, arXiv, EIP/ERC standards, OWASP, EU MiCA/GENIUS Act, and protocol documentation (Aave, Compound, Chainlink, etc.) |
+
+---

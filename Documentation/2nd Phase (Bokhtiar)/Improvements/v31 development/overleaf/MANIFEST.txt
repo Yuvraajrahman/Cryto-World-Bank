@@ -1,0 +1,14 @@
+Overleaf figure bundle for Pre-thesis v31
+=========================================
+52 assets: 19 chapter PNGs + 31 vector PDF diagrams + BRACU logo.
+
+PNG (raster, high-res exports):
+  Ch1_*.png (3)
+  Ch3_*.png (11)
+  Ch4_*.png (6)
+
+PDF (vector, from mermaid improved-diagrams pipeline):
+  fig-*.pdf (31)
+
+Upload the parent folder (v31 development/) to Overleaf with main.tex as the project root.
+Compiler: pdfLaTeX (run twice for references).

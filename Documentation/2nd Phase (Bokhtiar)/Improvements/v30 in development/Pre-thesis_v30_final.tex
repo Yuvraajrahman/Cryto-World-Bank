@@ -667,7 +667,7 @@ Figure~\ref{fig:intro-system-overview} maps the whole-system architecture at a g
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Chapter1_diagram1.png}
+\BalancedDiagram{Ch1_system-overview-four-tier-stack.png}
 \caption[Crypto World Bank system overview]{Whole-system overview: four-tier capital hierarchy (top) and four-layer technology stack (bottom). Reserve ratios, RBAC, oracle-mediated ML, compliance controls, and modular contracts are specified in Chapter~\ref{sec:high-level-arch}.}
 \label{fig:intro-system-overview}
 \end{figure}
@@ -858,7 +858,7 @@ The platform implements six standard banking functions across the four-tier hier
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Chapter1_diagram2.png}
+\BalancedDiagram{Ch1_six-banking-functions.png}
 \caption[Six banking functions of the platform]{Six banking functions enforced across the four-tier core. Contract mappings (\texttt{SavingsVault}, \texttt{allocateCapital}, \texttt{IBLP}, etc.) are listed in the bullets below and in Chapter~\ref{sec:high-level-arch}.}
 \label{fig:banking-functions}
 \end{figure}
@@ -891,7 +891,7 @@ Figure~\ref{fig:cross-tier-lending} maps the four coordinated flow directions on
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Chapter1_diagram3.png}
+\BalancedDiagram{Ch1_cross-tier-lending-flows.png}
 \caption[Cross-tier lending flow directions]{Cross-tier lending: downward allocation through four tiers, upward surplus repatriation, and same-tier interbank pools. Syndicated, group, and tranched co-funding are specified in Section~\ref{sec:multi-entity}.}
 \label{fig:cross-tier-lending}
 \end{figure}
@@ -1562,7 +1562,7 @@ The system employs a \textbf{four-layer decentralised application architecture} 
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{chapter 3 png 1.png}
+\BalancedDiagram{Ch3_four-layer-dapp-architecture.png}
 \caption[Four-layer application architecture]{Four-layer decentralised application architecture (blockchain-first): presentation (React 18, TypeScript, Wagmi/Viem); smart-contract layer on the EVM (World Bank Reserve, National Bank, Local Bank + twelve planned modules); off-chain services (Express REST API, PostgreSQL, FastAPI ML service, Chainlink oracle integration, event listener, Redis cache); Chainlink infrastructure (Functions, Automation, Price Feeds, Proof of Reserve). Optional add-on: AI agent (Qwen3-8B + MCP) interfaces through the same APIs without altering on-chain logic.}
 \label{fig:three-layer-arch}
 \end{figure}
@@ -1771,14 +1771,14 @@ The relational database schema comprises 20 normalized entities in Third Normal 
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{chapter 3 ER DIAGRAM.png}
+\BalancedDiagram{Ch3_core-entity-relationship-diagram.png}
 \caption[Core system entity graph]{Core system graph showing entity relationships across the four-tier banking hierarchy (\texttt{WORLD\_BANK} $\to$ \texttt{NATIONAL\_BANK} $\to$ \texttt{LOCAL\_BANK} $\to$ \texttt{BANK\_USER}), the central \texttt{BORROWER} entity, and the lending-lifecycle sub-graph (\texttt{LOAN\_REQUEST}, \texttt{LOAN}, \texttt{INSTALLMENT}, \texttt{TRANSACTION}, \texttt{INCOME\_PROOF}, \texttt{CHAT\_MESSAGE}, \texttt{AI\_ML\_LOG}, \texttt{CREDIT\_PASSPORT}).}
 \label{fig:core-system-graph}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{figure 3.6.png}
+\BalancedDiagram{Ch3_extended-erd-banking-multi-entity.png}
 \caption[Extended ERD entities]{Extended ERD entities: the banking-product entities (\texttt{SAVINGS\_ACCOUNT}, \texttt{FIXED\_DEPOSIT}, \texttt{CURRENT\_ACCOUNT}, \texttt{LOAN\_GROUP}, \texttt{GROUP\_MEMBER}, \texttt{INSURANCE\_FUND}) and the multi-entity / cross-tier operational entities (\texttt{INTERBANK\_LOAN}, \texttt{UPWARD\_DEPOSIT}, \texttt{SYNDICATE}, \texttt{SYNDICATE\_MEMBER}, \texttt{TRANCHED\_POOL}, \texttt{TREASURY\_SWAP}, \texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}). Foreign-key relationships into the core entities of Figure~\ref{fig:core-system-graph} are preserved.}
 \label{fig:erd-extended}
 \end{figure}
@@ -1788,7 +1788,7 @@ The current ERD covers the core lending and governance entities. Figure~\ref{fig
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{EER diagram chapter 3.png}
+\BalancedDiagram{Ch3_enhanced-eer-model.png}
 \caption[Enhanced EER model]{Enhanced Entity-Relationship (EER) model showing generalization / specialization (\texttt{BANK\_USER} $\to$ National-/Local-bank-admin / Approver subtypes), the weak entity \texttt{INSTALLMENT} identified by its parent \texttt{LOAN}, the multi-valued attribute \texttt{INCOME\_PROOF}, the loan-centric aggregation, and participation constraints (total / partial).}
 \label{fig:eer}
 \end{figure}
@@ -2106,7 +2106,7 @@ View reserve summary (public) & YES & YES & YES & YES & READ \\
 
 \begin{figure}[H]
 \centering
-\ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{figure 3.10 .png}
+\ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{Ch3_actor-permission-matrix.png}
 \caption[Actor permission matrix (primary actions)]{Actor permission matrix (primary actions): clients submit loans and pay installments via the React UI (or optionally via the MCP agent); Local Bank approvers approve and freeze accounts; National and World Bank admins set rates and reserve parameters; the optional AI Agent may call read tools freely and write tools only after human confirmation (\dag).}
 \label{fig:permission-matrix}
 \end{figure}
@@ -2325,7 +2325,7 @@ The hierarchical control is preserved across chains by requiring that all loan s
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{figure 3.19.png}
+\BalancedDiagram{Ch3_multi-entity-cross-tier-operations.png}
 \caption[Multi-entity and cross-tier capital operations]{Multi-entity and cross-tier capital operations: (a) InterBankLendingPool with utilization-kinked rate model and default cascade, (b) UpwardDepositFacility with asymmetric rate structure, (c) SyndicatedLoan with Lead Arranger and Co-Lenders, (d) TranchedPool with senior--junior waterfall, (e) TreasurySwap for cross-tier asset exchange, and (f) NettingEngine for multilateral settlement.}
 \label{fig:multi-entity-ops}
 \end{figure}
@@ -2398,7 +2398,7 @@ The system involves nine actors across 20 representative use cases (Figure~\ref{
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram[width=0.98\linewidth]{figure 3.20.png}
+\BalancedDiagram[width=0.98\linewidth]{Ch3_use-case-nine-actor-taxonomy.png}
 \caption[Use-case diagram (nine-actor taxonomy)]{Use-case diagram reflecting the nine-actor taxonomy of Table~\ref{tab:actor-taxonomy}: primary actors (A1--A5, top), external actors (A6--A9, top), and eleven grouped use cases inside the system boundary. Shaded rows denote multi-entity operations (UC5--UC8); dashed nodes and links denote the optional AI Agent add-on (A5, UC10), excluded from MVT.}
 \label{fig:usecase}
 \end{figure}
@@ -2452,7 +2452,7 @@ Figure~\ref{fig:dfd-suite} consolidates the Level-0 context diagram with the Lev
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{figure 3.24.png}
+\BalancedDiagram{Ch3_data-flow-diagrams.png}
 \caption[Data-flow diagrams]{Data-flow diagrams: Level-0 context view of the Crypto World Bank platform with five external entities; Level-1 decomposition of the core lending subsystem (origination, ML scoring, disbursement, installment engine, and their data stores); and Level-1 decomposition of the deposit-mobilization, InterBankLendingPool, TreasurySwap, and NettingEngine subsystems.}
 \label{fig:dfd-suite}
 \label{fig:dfd-context}\label{fig:dfd-level1a}\label{fig:dfd-level1b}
@@ -2500,7 +2500,7 @@ Figure~\ref{fig:four-tier} illustrates the hierarchical capital flow and cascadi
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{figure 3.29.png}
+\BalancedDiagram{Ch3_four-tier-capital-flow.png}
 \caption[Four-tier hierarchical capital flow]{Four-tier hierarchical capital flow with cascading repayment, plus the same-tier interbank-lending pools (InterBankLendingPool, Section~\ref{sec:interbank-pool}) and the upward-surplus repatriation facility (UpwardDepositFacility, Section~\ref{sec:upward-flow}). The asymmetric rate structure ($r_{\text{up}} < r_{\text{down}}-\delta$) is enforced on-chain.}
 \label{fig:four-tier}
 \end{figure}
@@ -2659,7 +2659,7 @@ Prototype runs on public testnets only; architecture emits audit logs for sandbo
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Figure 3.33.png}
+\BalancedDiagram{Ch3_five-layer-defense-in-depth.png}
 \caption[Five-layer defense-in-depth security architecture]{Five-layer defense-in-depth security architecture. Each layer is necessary; breaching the smart-contract layer requires defeating every layer above it. Layer~1 (smart contract): OpenZeppelin~v5, UUPS, TimeLock, RBAC, ReentrancyGuard, audit suite. Layer~2 (application): EIP-712 sign-in, JWT, rate-limit. Layer~3 (AI/ML): Chainlink Functions oracle, model registry, SHAP, hallucination guard. Layer~4 (runtime): Tenderly, The Graph, WebSocket dashboard, anomaly detection. Layer~5 (operations): Safe multisig, key rotation, bug-bounty.}
 \label{fig:defense-in-depth}
 \end{figure}
@@ -3311,7 +3311,7 @@ The simulation produces five categories of verifiable empirical evidence: (i)~\t
 
 \begin{figure}[H]
 \centering
-\ActivityDiagram{figure 4.5.png}
+\ActivityDiagram{Ch4_realtime-dashboard-monitoring-pipeline.png}
 \caption[Real-time dashboard and runtime monitoring pipeline]{Real-time dashboard and runtime monitoring pipeline: smart contracts emit typed events; The Graph indexes them and pushes to a Node WebSocket server which renders the React dashboard via a Redis snapshot. Tenderly runtime alerts and an Isolation-Forest anomaly detector feed the operations runbook with the granular-pause control surface of Section~\ref{sec:defense-in-depth}.}
 \label{fig:realtime-dashboard}
 \end{figure}
@@ -3333,7 +3333,7 @@ Six critical alerts are planned for the testnet contracts: single disbursement o
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{figure 4.6.png}
+\BalancedDiagram{Ch4_loan-lifecycle-state-machine.png}
 \caption[Transaction state machine of the loan lifecycle]{Transaction state machine of the loan lifecycle: DRAFT $\to$ PENDING\_KYC $\to$ PENDING\_LIMIT $\to$ PENDING\_SCORE $\to$ PENDING\_APPROVAL $\to$ ACTIVE $\to$ \{CLOSED, DEFAULTED $\to$ \{LIQUIDATED, cured-back-to-ACTIVE\}\}, with every transition guarded by a CEI-ordered contract function and every transition emitting an indexed event.}
 \label{fig:tx-state-machine}
 \end{figure}
@@ -3549,7 +3549,7 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--08 & Certora, F
 
 \begin{figure}[H]
 \centering
-\ActivityDiagram{Figure 4.7.png}
+\ActivityDiagram{Ch4_four-phase-roadmap-sdlc.png}
 \caption[Four-phase roadmap with SDLC mapping and progress]{Four-phase implementation roadmap with SDLC stage mapping: Pre-thesis covers Planning--Design; Phases~I--IV span Development through Maintenance over 16~weeks. Each phase lists primary deliverables; dashed optional agent work spans Phases~III--IV; progress bars show pre-thesis specification completeness versus MVT implementation targets.}
 \label{fig:phase-roadmap}
 \end{figure}
@@ -3563,14 +3563,14 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--08 & Certora, F
 
 \begin{figure}[H]
 \centering
-\ThesisIncludeGraphics[width=0.75\linewidth,height=0.54\textheight,keepaspectratio]{figure 4.9.png}
+\ThesisIncludeGraphics[width=0.75\linewidth,height=0.54\textheight,keepaspectratio]{Ch4_optional-conversational-agent-addon.png}
 \caption[Optional conversational agent add-on]{Optional conversational agent add-on: React UI (primary path) and MCP agent (alternate path) both call the same Express.js API and smart contracts; the agent does not gate core banking operations.}
 \label{fig:optional-agent-addon}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ActivityDiagram{figure 4.10.png}
+\ActivityDiagram{Ch4_dev-verification-toolchain.png}
 \caption[Planned development and verification toolchain]{Planned development and verification toolchain: Solidity contracts (Hardhat deploy) $\to$ Foundry fuzz/invariants $\to$ Certora CVL proofs $\to$ CI pipeline; testnet deployment to Polygon zkEVM Cardona in Phase~IV.}
 \label{fig:dev-toolchain}
 \end{figure}
@@ -3647,7 +3647,7 @@ Write-tool enforcement (optional) & Confirmation audit hook & In-pipeline check 
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{figure 4.11.png}
+\BalancedDiagram{Ch4_design-decisions-alternatives.png}
 \caption[Key design decisions and alternatives considered]{Key design decisions and alternatives considered: smart-contract platform (EVM vs.\ Cosmos / Solana), chain choice (Polygon + Sepolia vs.\ L1-only vs.\ single L2), upgradeability (UUPS vs.\ Transparent Proxy vs.\ immutable), identity (DID/VC + zkKYC vs.\ raw on-chain KYC vs.\ off-chain-only), ML oracle (commit-reveal vs.\ trusted-backend vs.\ on-chain ML), and cross-chain bridge (Chainlink CCIP vs.\ LayerZero vs.\ Axelar).}
 \label{fig:design-decisions}
 \end{figure}

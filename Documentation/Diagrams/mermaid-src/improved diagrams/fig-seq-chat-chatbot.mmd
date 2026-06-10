@@ -9,31 +9,32 @@ sequenceDiagram
     participant WS as WebSocket
     participant LLM as Qwen3-8B
     participant MCP as MCP Tools
-    participant SC as On-chain Contract
+    participant SC as Contract
 
     rect rgb(245,245,245)
-        Note over U,WS: (a) Client–bank chat — core path
+        Note over U,WS: (a) Client-bank chat (core path)
         U->>FE: Open support thread
         FE->>API: Authenticate + open WS
         API->>WS: Subscribe thread
         U->>FE: Message to approver
         FE->>API: POST /chat
-        API->>API: Persist CHAT_MESSAGE
+        Note right of API: persist CHAT_MESSAGE
         API-->>U: Deliver via WebSocket
     end
 
     rect rgb(238,238,238)
-        Note over U,SC: (b) Optional MCP agent — Phase III–IV add-on (dashed = not MVT)
-        U->>FE: "Apply for 150 USDC loan"
+        Note over U,SC: (b) Optional MCP agent (Phase III-IV, not MVT)
+        U->>FE: Apply for 150 USDC loan
         FE->>API: Stream message (SSE)
-        API->>API: Inject on-chain context JSON
+        Note right of API: inject on-chain context
         API->>LLM: /v1/chat/completions
         LLM-->>API: Confirmation summary
-        API-->>U: "Proceed? EMI 26.25 USDC"
-        U->>FE: "Yes, proceed"
-        API->>API: Log confirmation_turn_id
-        API->>MCP: submit_loan_application (write)
-        MCP->>SC: EIP-7702 session key signs tx
+        API-->>U: Proceed? EMI 26.25 USDC
+        U->>FE: Yes, proceed
+        Note right of API: log confirmation_turn_id
+        API->>MCP: submit_loan_application
+        MCP->>API: POST /api/loan/apply
+        API->>SC: applyLoan (wallet or session key)
         SC-->>U: Loan submitted L-4821
-        Note over API,MCP: HTTP 403 if write without confirmation
+        Note over API,MCP: HTTP 403 without confirmation
     end

@@ -1,0 +1,40 @@
+/* Sequence diagrams: compact labels + offset step numbers away from message text. */
+foreignObject div,
+foreignObject span,
+foreignObject p,
+.nodeLabel,
+.edgeLabel,
+.label,
+.actor,
+.messageText,
+.loopText,
+.noteText,
+.labelText,
+.cluster-label,
+title,
+text,
+tspan {
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  line-height: 1.25 !important;
+}
+
+.cluster-label,
+title {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+.messageText {
+  font-size: 21px !important;
+}
+
+.noteText {
+  font-size: 20px !important;
+}
+
+.sequenceNumber {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}

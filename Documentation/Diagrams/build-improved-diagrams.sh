@@ -36,6 +36,9 @@ ACTIVITY_CSS="${SCRIPT_DIR}/mmdc-fonts-activity.css"
 SDLC_DIAGRAMS="fig-sdlc-agile fig-phase-roadmap fig-realtime-dashboard"
 SDLC_CFG="${SCRIPT_DIR}/mmdc-config-sdlc.json"
 SDLC_CSS="${SCRIPT_DIR}/mmdc-fonts-sdlc.css"
+SEQUENCE_DIAGRAMS="fig-seq-loan-flow fig-seq-installment-income fig-seq-banking-data fig-seq-chat-chatbot"
+SEQUENCE_CFG="${SCRIPT_DIR}/mmdc-config-sequence.json"
+SEQUENCE_CSS="${SCRIPT_DIR}/mmdc-fonts-sequence.css"
 XLARGE_10X_FLOW_DIAGRAMS="fig-dev-toolchain"
 XLARGE_10X_FLOW_CFG="${SCRIPT_DIR}/mmdc-config-10x-flow.json"
 XLARGE_10X_FLOW_CSS="${SCRIPT_DIR}/mmdc-fonts-10x-flow.css"
@@ -153,6 +156,34 @@ for src in "${SRC_DIR}"/*.mmd; do
       mmdc_width=(-w 2400 -H 1800 -s "${MMDC_SCALE}")
     fi
     printf "  render  %s (sdlc)\n" "${name}"
+  elif [[ " ${SEQUENCE_DIAGRAMS} " == *" ${name} "* ]]; then
+    cfg="${SEQUENCE_CFG}"
+    css="${SEQUENCE_CSS}"
+    svg_tmp="${OUT_DIR}/${name}.svg"
+    if [[ "${name}" == "fig-seq-banking-data" ]]; then
+      seq_dims=(-w 4800 -H 4200 -s 2)
+    else
+      seq_dims=(-w 4000 -H 3600 -s 2)
+    fi
+    printf "  render  %s (sequence)\n" "${name}"
+    if ! mmdc -i "${src}" -o "${svg_tmp}" \
+        -c "${cfg}" -C "${css}" -p "${PUPPETEER_CFG}" \
+        "${seq_dims[@]}" \
+        -b white --quiet >/dev/null 2>&1; then
+      printf "  FAILED  %s (svg)\n" "${name}" >&2
+      failed_names+=("${name}")
+      fail=$((fail + 1))
+      continue
+    fi
+    python3 "${SCRIPT_DIR}/fix-sequence-svg.py" "${svg_tmp}" >/dev/null
+    if ! rsvg-convert -f pdf -o "${out}" "${svg_tmp}" 2>/dev/null; then
+      printf "  FAILED  %s (pdf via rsvg-convert)\n" "${name}" >&2
+      failed_names+=("${name}")
+      fail=$((fail + 1))
+    else
+      count=$((count + 1))
+    fi
+    continue
   elif [[ " ${XLARGE_10X_FLOW_DIAGRAMS} " == *" ${name} "* ]]; then
     cfg="${XLARGE_10X_FLOW_CFG}"
     css="${XLARGE_10X_FLOW_CSS}"
@@ -180,4 +211,9 @@ echo "Rendered ${count} diagram(s)${fail:+, ${fail} failed}."
 if (( fail > 0 )); then
   printf "Failed: %s\n" "${failed_names[@]}"
   exit 1
+fi
+
+V31_SYNC="${SCRIPT_DIR}/../2nd Phase (Bokhtiar)/Improvements/v31 development/sync-overleaf-figures.sh"
+if [[ -x "${V31_SYNC}" ]]; then
+  "${V31_SYNC}"
 fi

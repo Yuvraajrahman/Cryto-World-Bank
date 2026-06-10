@@ -12,32 +12,31 @@ sequenceDiagram
 
     rect rgb(245,245,245)
         Note over WBA,U: (a) Hierarchical capital flow
-        WBA->>WB: allocateCapital(NB, amount)
-        WB->>WB: require ratio ≥ min
-        WB-->>NB: transfer + emit CapitalAllocated
-        NB->>NB: allocateCapital(LB, amount)
-        NB-->>LB: transfer + emit CapitalAllocated
-        LB-->>API: pool funded → loans available
+        WBA->>WB: allocateCapital(NB)
+        Note right of WB: require ratio >= min
+        WB-->>NB: emit CapitalAllocated
+        NB-->>LB: allocateCapital(LB)
+        LB-->>API: pool funded
     end
 
     rect rgb(238,238,238)
         Note over WBA,U: (b) Market-data retrieval
         U->>API: GET /market
-        API->>API: cache miss?
-        API->>WB: read Chainlink price feeds (RPC)
-        WB-->>API: USDC/ETH, ETH/USD, fiat/USD
+        Note right of API: cache miss?
+        API->>WB: Chainlink price feeds
+        WB-->>API: ETH/USD, fiat pairs
         API-->>U: prices (cached 10s)
     end
 
     rect rgb(230,230,230)
         Note over WBA,U: (c) Borrowing-limit calculation
-        U->>API: POST /loans { amount, term }
-        API->>LB: read SBT.openLoans + tier
-        LB-->>API: tier ceiling, simultaneous-loan cap
-        API->>API: ceiling check + cap check
+        U->>API: POST /loans
+        API->>LB: read SBT + tier
+        LB-->>API: tier cap + loan cap
+        Note right of API: ceiling + cap checks
         alt Pass
             API-->>U: proceed to ML scoring
         else Fail
-            API-->>U: 'borrowing limit exceeded'
+            API-->>U: limit exceeded
         end
     end

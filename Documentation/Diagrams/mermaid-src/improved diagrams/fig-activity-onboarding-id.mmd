@@ -9,44 +9,45 @@ flowchart LR
     classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
     classDef tier   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111
     classDef chain  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:4 3
+    classDef stretch fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:6 4
 
     S(("Start")):::start
 
     subgraph L1[" Discover "]
         direction TB
-        A1["Browse products · rates<br/>L0 — no wallet required"]:::act
+        A1["Browse products · rates<br/>Level 0 — no wallet required"]:::act
         A2{Register<br/>account?}:::dec
         A1 --> A2
     end
 
-    subgraph L2[" Smart account "]
+    subgraph L2[" Smart account (Phase I) "]
         direction TB
         B1["Email / OAuth sign-in<br/>ERC-4337 account deploy"]:::act
         B2["Paymaster sponsors<br/>bootstrap transactions"]:::act
         B1 --> B2
     end
 
-    subgraph L3[" Document ladder "]
+    subgraph L3[" Document ladder (progressive) "]
         direction TB
-        C1["L1 · NID<br/>+ selfie capture"]:::tier
-        C2["L2 · income proof<br/>upload<br/>IPFS → INCOME_PROOF"]:::tier
-        C3["L3 · video interview<br/>officer attestation"]:::tier
+        C1["Level 1 · NID<br/>+ selfie liveness"]:::tier
+        C2["Level 2 · income proof<br/>IPFS → INCOME_PROOF"]:::tier
+        C3["Level 3 · video interview<br/>officer attestation"]:::tier
         C1 --> C2 --> C3
     end
 
     subgraph L4[" Compliance proofs "]
         direction TB
-        D1["Licensed KYC provider<br/>issues W3C VC<br/>+ DID"]:::act
-        D2["Generate zkKYC proof<br/>Groth16 circuit"]:::act
-        D3["Generate zkAML proof<br/>sanction<br/>non-membership"]:::act
+        D1["Licensed KYC provider<br/>issues W3C VC + DID"]:::act
+        D2["Generate zkKYC proof<br/>Groth16 circuit (Phase I)"]:::act
+        D3["Generate zkAML proof<br/>sanctions screen (Phase IV stretch)"]:::stretch
         D1 --> D2 --> D3
     end
 
     subgraph L5[" On-chain activation "]
         direction TB
-        E1["KYCVerifier + AMLVerifier<br/>verify proofs on-chain"]:::chain
+        E1["KYCVerifier (+ AMLVerifier)<br/>verify proofs on-chain"]:::chain
         E2{Proofs<br/>valid?}:::dec
-        E3["Grant CLIENT role<br/>enforce USDC<br/>tier limits"]:::chain
+        E3["Grant CLIENT role<br/>enforce USDC tier limits"]:::chain
         E1 --> E2
         E2 -- "Yes" --> E3
     end
@@ -56,5 +57,5 @@ flowchart LR
     S --> L1
     A2 -- "No" --> EN
     A2 -- "Yes" --> L2 --> L3 --> L4 --> L5
-    E2 -- "No" --> R1["Manual review queue<br/>retry or escalate"]:::act --> D2
+    E2 -- "No" --> R1["Manual review queue<br/>retry or escalate"]:::act --> E1
     E3 --> EN

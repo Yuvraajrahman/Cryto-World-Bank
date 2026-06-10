@@ -9,45 +9,46 @@ flowchart LR
     classDef dec    fill:#E2E2E2,stroke:#1F1F1F,stroke-width:1.6px,color:#111111
     classDef exit   fill:#E8E8E8,stroke:#1F1F1F,stroke-width:1.2px,color:#111111,stroke-dasharray:5 4
     classDef store  fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1px,color:#111111,stroke-dasharray:3 3
+    classDef ph3    fill:#FFFFFF,stroke:#1F1F1F,stroke-width:1.4px,color:#111111,stroke-dasharray:6 4
 
     S(("Start")):::start
 
-    subgraph P1[" ① Eligibility gate "]
+    subgraph P1[" ① Eligibility gate (Phase II) "]
         direction TB
         P1A["Client opens loan form<br/>JWT + wallet bound"]:::act
-        P1B["Read CREDIT_PASSPORT SBT<br/>tier · openLoans<br/>· DTI"]:::act
+        P1B["Read CREDIT_PASSPORT SBT<br/>tier · openLoans · DTI"]:::act
         P1C{Within tier<br/>ceiling?}:::dec
         P1A --> P1B --> P1C
     end
 
-    subgraph P2[" ② Origination "]
+    subgraph P2[" ② Origination (Phase II) "]
         direction TB
         P2A["POST /loans<br/>EIP-712 sign<br/>persist LOAN_REQUEST"]:::act
-        P2B["WB → NB → LB<br/>allocateCapital<br/>+ RR check"]:::act
-        P2C["applyLoan()<br/>on LocalBank"]:::act
-        P2A --> P2B --> P2C
+        P2B["applyLoan()<br/>pending on LocalBank"]:::act
+        P2A --> P2B
     end
 
-    subgraph P3[" ③ Oracle risk score "]
+    subgraph P3[" ③ Oracle risk score (Phase III) "]
         direction TB
-        P3A["FastAPI: RF + iForest<br/>SHAP Authority Brief"]:::act
-        P3B["Chainlink DON<br/>commit → reveal score"]:::act
-        P3C["SCORE_REVEALED<br/>on-chain"]:::act
-        P3A --> P3B --> P3C
+        P3N["Post pre-thesis 2 · spec only at P1"]:::ph3
+        P3A["FastAPI: 22 features<br/>RF + iForest + stacking<br/>SHAP Authority Brief"]:::act
+        P3B["Chainlink Functions DON<br/>commit score on-chain<br/>(commit-reveal fallback)"]:::act
+        P3C["SCORE_REVEALED<br/>state enforced"]:::act
+        P3N --> P3A --> P3B --> P3C
     end
 
     subgraph P4[" ④ Human approval "]
         direction TB
-        P4A["Approver reviews brief<br/>top-3 SHAP features"]:::act
+        P4A["Approver reviews brief<br/>mandatory if 0.4 ≤ s &lt; 0.7"]:::act
         P4B{Approve or<br/>reject?}:::dec
         P4A --> P4B
     end
 
     subgraph P5[" ⑤ Disbursement & close "]
         direction TB
-        P5A["approveLoan()<br/>USDC out<br/>schedule INSTALLMENTs"]:::act
-        P5B["Client repays<br/>on schedule<br/>per-installment settle"]:::act
-        P5C["Update SBT<br/>close LOAN<br/>emit audit events"]:::act
+        P5A["approveLoan()<br/>verify pool liquidity<br/>USDC out + INSTALLMENTs"]:::act
+        P5B["Client repays on schedule<br/>processInstallment (CEI)"]:::act
+        P5C["Update SBT · close LOAN<br/>emit audit events"]:::act
         P5A --> P5B --> P5C
     end
 
@@ -59,5 +60,5 @@ flowchart LR
     P4B -- "Reject" --> X2["rejectLoan()<br/>+ explanation<br/>log AI_ML_LOG"]:::exit --> E
     P4B -- "Approve" --> P5 --> E
 
-    P2B -.-> D1[("Capital pool<br/>on-chain")]:::store
+    P5A -.-> D1[("LB capital pool<br/>on-chain")]:::store
     P3A -.-> D2[("ML scores<br/>PostgreSQL")]:::store

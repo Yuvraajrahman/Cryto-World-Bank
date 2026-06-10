@@ -11,13 +11,15 @@ sequenceDiagram
     participant SC as LocalBank
     participant AP as Approver
 
+    Note over U,AP: ML + oracle path (Phase III, after pre-thesis 2)
     U->>FE: Submit loan (USDC)
     FE->>API: POST /loans (EIP-712)
     API->>SC: applyLoan()
-    API->>ML: Compute RF + SHAP score
-    ML->>DON: Risk score request
-    DON->>DON: Multi-node consensus
-    DON->>SC: commitRiskScore + revealScore
+    API->>ML: assemble features (22)
+    ML-->>API: RF + IF + SHAP score
+    API->>DON: oracle score request
+    Note right of DON: ML API consensus
+    DON->>SC: commit score on-chain
     API->>AP: Authority Brief (SHAP top-3)
     alt Approve
         AP->>SC: approveLoan (SCORE_REVEALED)

@@ -1,0 +1,30 @@
+Figure bundle for Pre-thesis v31 (Diagrams/)
+==========================================
+Sources: .svg only (edit these). LaTeX includes generated .pdf.
+
+Raster (logo only):
+  bracu_logo_12-0-2022.png
+
+Hand-authored Ch*.svg → Ch*.pdf (rsvg-convert in sync-overleaf-figures.sh):
+  Ch1_system-overview-four-tier-stack
+  Ch1_six-banking-functions
+  Ch1_cross-tier-lending-flows
+  Ch3_actor-permission-matrix
+  Ch3_data-flow-diagrams
+  Ch3_multi-entity-cross-tier-operations
+  Ch3_use-case-nine-actor-taxonomy
+  Ch4_design-decisions-alternatives
+  Ch4_dev-verification-toolchain
+  Ch4_four-phase-roadmap-sdlc
+  Ch4_loan-lifecycle-state-machine
+
+Mermaid fig-*.mmd → fig-*.svg + fig-*.pdf (build-improved-diagrams.sh):
+  Flowcharts/ER: mmdc --pdfFit (Chromium)
+  Charts/sequence: mmdc SVG then rsvg-convert where noted in build script
+
+Rebuild (from repo root):
+  cd Documentation/Diagrams && FORCE=1 ./build-improved-diagrams.sh
+
+Compile thesis:
+  cd "Documentation/2nd Phase (Bokhtiar)/Improvements/v31 development"
+  pdflatex Pre-thesis_v31_final.tex && pdflatex Pre-thesis_v31_final.tex

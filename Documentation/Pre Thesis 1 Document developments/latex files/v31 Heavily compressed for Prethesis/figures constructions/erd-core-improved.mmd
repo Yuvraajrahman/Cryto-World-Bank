@@ -1,0 +1,174 @@
+---
+title: Core ERD — 20 PostgreSQL Entities (Improved v31)
+config:
+  er:
+    fontSize: 22
+    entityPadding: 24
+---
+erDiagram
+    WORLD_BANK ||--o{ NATIONAL_BANK : registers
+    NATIONAL_BANK ||--o{ LOCAL_BANK : registers
+    LOCAL_BANK ||--o{ BANK_USER : employs
+    LOCAL_BANK ||--o{ BORROWER : onboards
+    BORROWER ||--o{ LOAN_REQUEST : submits
+    BANK_USER ||--o{ LOAN_REQUEST : approves
+    LOAN_REQUEST ||--|| LOAN : produces
+    LOAN ||--o{ INSTALLMENT : schedules
+    BORROWER ||--|| BORROWING_LIMIT : has
+    BORROWER ||--o{ INCOME_PROOF : provides
+    BORROWER ||--o{ TRANSACTION : makes
+    LOAN ||--o{ TRANSACTION : generates
+    INSTALLMENT |o--o| TRANSACTION : settled_by
+    LOAN_REQUEST ||--o{ CHAT_MESSAGE : threads
+    LOAN ||--o{ AI_ML_SECURITY_LOG : scored_by
+    TRANSACTION ||--o{ AI_ML_SECURITY_LOG : monitored_by
+    BORROWER ||--o{ SESSIONS : has
+    SESSIONS ||--o{ AGENT_ACTION_LOG : audits
+    WORLD_BANK }o--|| INTEREST_RATE_TIER : uses
+    LOAN }o--|| ASSETS : collateral_asset
+    LOAN }o--|| ASSETS : loan_asset
+    BORROWER ||--o| PROFILE_SETTING : preferences
+    BORROWER |o--o| CREDIT_PASSPORT : holds_SBT
+
+    WORLD_BANK {
+        bigint world_bank_id PK
+        string name UK
+        numeric reserve_ratio
+        bigint interest_rate_tier_id FK
+    }
+    NATIONAL_BANK {
+        bigint national_bank_id PK
+        bigint world_bank_id FK
+        string name
+        string country
+        numeric allocated_capital
+    }
+    LOCAL_BANK {
+        bigint local_bank_id PK
+        bigint national_bank_id FK
+        string name
+        string city
+        numeric pool_balance
+    }
+    BANK_USER {
+        bigint bank_user_id PK
+        string wallet UK
+        enum bank_type
+        bigint national_bank_id FK
+        bigint local_bank_id FK
+        enum role
+    }
+    BORROWER {
+        bigint borrower_id PK
+        string wallet UK
+        bigint local_bank_id FK
+        int kyc_level
+        int tier
+    }
+    LOAN_REQUEST {
+        bigint request_id PK
+        bigint borrower_id FK
+        bigint local_bank_id FK
+        numeric amount
+        string status
+        bigint approved_by FK
+    }
+    LOAN {
+        bigint loan_id PK
+        bigint loan_request_id FK_UK
+        numeric principal
+        bigint collateral_asset_id FK
+        bigint loan_asset_id FK
+        string status
+        string on_chain_id UK
+    }
+    INSTALLMENT {
+        bigint loan_id FK_PK
+        int installment_number PK
+        numeric amount_due
+        date due_date
+        string status
+    }
+    TRANSACTION {
+        bigint transaction_id PK
+        bigint borrower_id FK
+        bigint related_loan_id FK
+        enum transaction_type
+        numeric amount
+        timestamp transaction_date
+    }
+    BORROWING_LIMIT {
+        bigint limit_id PK
+        bigint borrower_id FK_UK
+        numeric six_month_limit
+        numeric one_year_limit
+    }
+    INCOME_PROOF {
+        bigint proof_id PK
+        bigint borrower_id FK
+        string file_hash
+        string status
+    }
+    CHAT_MESSAGE {
+        bigint message_id PK
+        bigint loan_request_id FK
+        enum sender_type
+        bigint sender_id
+        text body
+    }
+    AI_ML_SECURITY_LOG {
+        bigint security_log_id PK
+        bigint loan_id FK
+        bigint transaction_id FK
+        numeric risk_score
+        json explanation
+    }
+    MARKET_DATA {
+        bigint market_data_id PK
+        string symbol
+        numeric price_usd
+        string source
+        timestamp recorded_at
+    }
+    PROFILE_SETTING {
+        bigint profile_id PK
+        bigint client_id FK_UK
+        string display_currency
+        json preferences
+    }
+    SESSIONS {
+        uuid session_id PK
+        bigint borrower_id FK
+        uuid parent_session_id FK
+        json session_key_scope
+    }
+    AGENT_ACTION_LOG {
+        bigint action_id PK
+        uuid session_id FK
+        string tool_name
+        string tx_hash
+    }
+    INTEREST_RATE_TIER {
+        bigint tier_id PK
+        numeric base_rate
+        numeric kink_utilisation
+        numeric rate_above_kink
+    }
+    ASSETS {
+        bigint asset_id PK
+        string symbol UK
+        int decimals
+        string oracle_feed_address
+    }
+    AI_CHATBOT_LOG {
+        bigint log_id PK
+        string user_wallet
+        text question
+        text response
+    }
+    CREDIT_PASSPORT {
+        int credit_score
+        int risk_tier
+        int open_loans
+        string sbt_token_id
+    }

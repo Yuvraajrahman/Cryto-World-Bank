@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto World Bank — Pre-Thesis 1</title>
+<style>
+  :root {
+    --bg:        #09111F;
+    --surface:   #0E1E36;
+    --card:      #132847;
+    --gold:      #C9973A;
+    --gold-dim:  #8A6220;
+    --ice:       #E8EFF8;
+    --dim:       #5E7FA8;
+    --accent2:   #2E9E8A;
+    --red:       #C44A3A;
+    --border:    #1C3558;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ice);
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── SLIDE SYSTEM ── */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 64px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+    overflow-y: auto;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ice);
+  }
+  h2 {
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ice);
+    margin-bottom: 28px;
+  }
+  .subtitle {
+    font-size: clamp(14px, 1.6vw, 18px);
+    color: var(--dim);
+    margin-top: 12px;
+    line-height: 1.6;
+    max-width: 640px;
+    text-align: center;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--gold);
+    transition: width 0.35s ease;
+    z-index: 100;
+  }
+
+  /* ── SLIDE COUNTER ── */
+  #counter {
+    position: fixed;
+    bottom: 20px; right: 28px;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    z-index: 100;
+  }
+
+  /* ── NAV ARROWS ── */
+  .nav-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--border);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 12px;
+    transition: color 0.2s;
+    z-index: 100;
+  }
+  .nav-btn:hover { color: var(--gold); }
+  #nav-prev { left: 16px; }
+  #nav-next { right: 16px; }
+
+  /* ── DECORATIVE HEX BG ── */
+  .hex-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 15% 50%, rgba(201,151,58,0.05) 0%, transparent 55%),
+      radial-gradient(circle at 85% 50%, rgba(46,158,138,0.04) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(28,53,88,0.35) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(28,53,88,0.35) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  /* ── GOLD LINE RULE ── */
+  .gold-line {
+    width: 56px;
+    height: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+    margin: 16px auto 24px;
+  }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: 960px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+    border-radius: 2px 0 0 2px;
+  }
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .card-text {
+    font-size: clamp(12px, 1.3vw, 14px);
+    color: #A8C4E0;
+    line-height: 1.55;
+  }
+
+  /* ── STAT BLOCKS ── */
+  .stat-row {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+    flex-wrap: wrap;
+  }
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 28px;
+    text-align: center;
+    flex: 1;
+    min-width: 160px;
+  }
+  .stat-box.sub-toggle { cursor: pointer; transition: border-color 0.2s; }
+  .stat-box.sub-toggle:hover { border-color: var(--gold-dim); }
+  .stat-box.sub-toggle.active { border-color: var(--gold); }
+  .stat-number {
+    font-size: clamp(26px, 3.5vw, 40px);
+    font-weight: 800;
+    color: var(--gold);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── TIER DIAGRAM ── */
+  .tier-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 680px;
+  }
+  .tier-node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: clamp(11px, 1.3vw, 14px);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-align: center;
+    position: relative;
+  }
+  .tier-connector {
+    width: 2px;
+    height: 22px;
+    background: linear-gradient(to bottom, var(--gold-dim), var(--gold));
+    position: relative;
+  }
+  .tier-connector::after {
+    content: '▼';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--gold);
+    font-size: 9px;
+  }
+  .t1 { background: rgba(201,151,58,0.25); border: 1.5px solid var(--gold); color: var(--gold); width: 280px; }
+  .t2 { background: rgba(201,151,58,0.15); border: 1.5px solid var(--gold-dim); color: #D4B060; width: 340px; }
+  .t3 { background: rgba(46,158,138,0.15); border: 1.5px solid #2E9E8A; color: var(--accent2); width: 400px; }
+  .t4 { background: rgba(94,127,168,0.15); border: 1.5px solid #5E7FA8; color: #7AAECC; width: 480px; }
+
+  /* ── PROBLEM LIST ── */
+  .prob-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 900px;
+  }
+  .prob-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .prob-item.sub-toggle { cursor: pointer; transition: border-color 0.2s; }
+  .prob-item.sub-toggle:hover { border-color: var(--gold-dim); }
+  .prob-item.sub-toggle.active { border-color: var(--gold); }
+  .prob-icon {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--gold);
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(201,151,58,0.12);
+    border-radius: 50%;
+    margin-top: 1px;
+  }
+  .prob-title {
+    font-size: clamp(12px, 1.2vw, 13.5px);
+    font-weight: 700;
+    color: var(--ice);
+    margin-bottom: 3px;
+  }
+  .prob-desc {
+    font-size: clamp(10px, 1vw, 11.5px);
+    color: var(--dim);
+    line-height: 1.5;
+  }
+
+  /* ── NUMBERED LIST ── */
+  .num-list {
+    list-style: none;
+    width: 100%;
+    max-width: 820px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .num-list li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    flex-wrap: wrap;
+  }
+  .num-list li.sub-toggle { cursor: pointer; }
+  .num-list li .sub-more { width: 100%; padding-left: 40px; }
+  .num-badge {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--gold);
+    flex-shrink: 0;
+    width: 24px;
+    text-align: right;
+  }
+  .num-text {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: #A8C4E0;
+    line-height: 1.5;
+  }
+  .num-text strong { color: var(--ice); }
+
+  /* ── PHASE TIMELINE ── */
+  .phase-track {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    max-width: 920px;
+    align-items: stretch;
+  }
+  .phase-box {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 14px;
+    text-align: center;
+    position: relative;
+  }
+  .phase-box.sub-toggle { cursor: pointer; transition: border-color 0.2s; }
+  .phase-box.sub-toggle:hover { border-color: var(--gold-dim); }
+  .phase-box.sub-toggle.active { border-color: var(--gold); }
+  .phase-box.highlight { border-color: var(--gold); }
+  .phase-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,151,58,0.12);
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+  }
+  .phase-title {
+    font-size: clamp(11px, 1.1vw, 13px);
+    font-weight: 700;
+    color: var(--ice);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .phase-desc {
+    font-size: clamp(9px, 0.95vw, 11px);
+    color: var(--dim);
+    line-height: 1.45;
+  }
+  .phase-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--gold-dim);
+    font-size: 18px;
+    flex-shrink: 0;
+    padding-top: 20px;
+  }
+
+  /* ── SCOPE TWO-COL ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
+  }
+  .col-header {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .col-header.gold { color: var(--gold); }
+  .col-header.red { color: var(--red); }
+  .dot-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .dot-list li {
+    font-size: clamp(11px, 1.15vw, 13px);
+    color: #A8C4E0;
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.45;
+  }
+  .dot-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .dot-list li.sub-toggle {
+    cursor: pointer;
+    padding: 10px 16px 10px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: border-color 0.2s;
+  }
+  .dot-list li.sub-toggle::before { top: 14px; left: 10px; }
+  .dot-list li.sub-toggle:hover { border-color: var(--gold-dim); }
+  .dot-list li.sub-toggle.active { border-color: var(--gold); }
+  .dot-list.red li::before { background: var(--red); }
+
+  /* ── LIT REVIEW ── */
+  .prisma-box {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .prisma-step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    text-align: center;
+    min-width: 110px;
+  }
+  .prisma-step.sub-toggle { cursor: pointer; transition: border-color 0.2s; }
+  .prisma-step.sub-toggle:hover { border-color: var(--gold-dim); }
+  .prisma-step.sub-toggle.active { border-color: var(--gold); }
+  .prisma-n {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .prisma-l {
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 3px;
+  }
+  .prisma-arrow { color: var(--gold-dim); font-size: 18px; }
+
+  .area-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 860px;
+  }
+  .chip {
+    background: rgba(201,151,58,0.1);
+    border: 1px solid var(--gold-dim);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    color: #D4B060;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── KEY FINDINGS ── */
+  .finding-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 900px;
+  }
+  .finding {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .finding.sub-toggle { cursor: pointer; transition: border-color 0.2s; }
+  .finding.sub-toggle:hover { border-color: var(--gold-dim); }
+  .finding.sub-toggle.active { border-color: var(--gold); }
+  .finding .sub-more { width: 100%; padding-left: 134px; }
+  .finding-src {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    text-transform: uppercase;
+    flex-shrink: 0;
+    margin-top: 2px;
+    width: 120px;
+    text-align: right;
+    line-height: 1.4;
+  }
+  .finding-text {
+    font-size: clamp(11px, 1.2vw, 13px);
+    color: #A8C4E0;
+    line-height: 1.5;
+  }
+  .finding-text strong { color: var(--ice); }
+
+  /* ── TITLE SLIDE SPECIAL ── */
+  #s1 { text-align: center; }
+  .title-glow {
+    text-shadow: 0 0 60px rgba(201,151,58,0.3);
+  }
+  .team-row {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin-top: 28px;
+  }
+  .team-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 13px;
+  }
+  .team-id { font-size: 10px; color: var(--dim); margin-top: 3px; }
+  .dept-badge {
+    margin-top: 28px;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    display: inline-block;
+    padding: 7px 20px;
+  }
+  .slide-label {
+    position: absolute;
+    bottom: 28px;
+    left: 64px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  /* animated gold border for title */
+  @keyframes borderSpin {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  .gold-border-card {
+    background: var(--surface);
+    padding: 36px 52px;
+    border-radius: 16px;
+    position: relative;
+  }
+  .gold-border-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    background: linear-gradient(90deg, var(--gold), #F0D080, var(--gold-dim), var(--gold));
+    background-size: 300% 100%;
+    animation: borderSpin 4s linear infinite;
+    z-index: -1;
+  }
+
+  /* pulsing tier connector */
+  @keyframes pulse-down {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  .tier-connector { animation: pulse-down 2s ease-in-out infinite; }
+
+  /* ── THANK YOU SLIDE ── */
+  .thanks-big {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--ice);
+    margin-bottom: 8px;
+  }
+  .thanks-sub { font-size: clamp(13px, 1.5vw, 17px); color: var(--dim); }
+  .chapter-pill {
+    display: inline-block;
+    margin-top: 24px;
+    background: rgba(201,151,58,0.12);
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 13px;
+    color: var(--gold);
+  }
+
+  /* ── SLIDE LAYOUT + DIAGRAMS ── */
+  .slide-inner {
+    width: 100%;
+    max-width: 1040px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .slide-body {
+    display: grid;
+    grid-template-columns: minmax(220px, 280px) 1fr;
+    gap: 28px;
+    width: 100%;
+    align-items: start;
+  }
+  .slide-body.single-col { grid-template-columns: 1fr; }
+  .mini-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+  }
+  .mini-diagram svg { width: 100%; height: auto; max-height: 220px; }
+  .mini-diagram-label {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-align: center;
+    margin-top: 8px;
+  }
+  .sub-hint {
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  /* ── CLICKABLE SUBSECTIONS ── */
+  .sub-toggle {
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    text-align: left;
+    width: 100%;
+  }
+  .sub-toggle:hover { border-color: var(--gold-dim); transform: translateY(-1px); }
+  .sub-toggle.active { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(201,151,58,0.25); }
+  .sub-toggle .sub-more {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sub-toggle.active .sub-more { color: var(--gold); }
+  .sub-toggle .sub-more::after { content: '+'; font-size: 12px; font-weight: 700; }
+  .sub-toggle.active .sub-more::after { content: '−'; }
+
+  /* ── DETAIL OVERLAY ── */
+  .detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9,17,31,0.88);
+    backdrop-filter: blur(6px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .detail-overlay.open { opacity: 1; pointer-events: all; }
+  .detail-panel {
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    border-radius: 14px;
+    padding: 28px 32px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  }
+  .detail-close {
+    position: absolute;
+    top: 14px; right: 16px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--dim);
+    font-size: 18px;
+    width: 32px; height: 32px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .detail-close:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .detail-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .detail-title {
+    font-size: clamp(18px, 2.2vw, 24px);
+    font-weight: 700;
+    color: var(--ice);
+    margin-bottom: 14px;
+    padding-right: 36px;
+  }
+  .detail-diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .detail-diagram svg { max-width: 100%; height: auto; max-height: 160px; }
+  .detail-body {
+    font-size: 14px;
+    color: #A8C4E0;
+    line-height: 1.65;
+  }
+  .detail-body strong { color: var(--ice); }
+  .detail-body ul { margin: 10px 0 0 18px; }
+  .detail-body li { margin-bottom: 6px; }
+
+  .chip-toggle { cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+  .chip-toggle:hover, .chip-toggle.active {
+    background: rgba(201,151,58,0.22);
+    border-color: var(--gold);
+    color: var(--ice);
+  }
+
+  @media (max-width: 900px) {
+    .slide { padding: 32px 24px; }
+    .slide-body { grid-template-columns: 1fr; }
+    .prob-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .phase-track { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="counter"></div>
+<button class="nav-btn" id="nav-prev" onclick="go(-1)">&#8592;</button>
+<button class="nav-btn" id="nav-next" onclick="go(1)">&#8594;</button>
+
+<div id="detail-overlay" class="detail-overlay" onclick="closeDetail(event)">
+  <div class="detail-panel" onclick="event.stopPropagation()">
+    <button class="detail-close" onclick="closeDetail()" aria-label="Close">&times;</button>
+    <div class="detail-eyebrow" id="detail-eyebrow"></div>
+    <div class="detail-title" id="detail-title"></div>
+    <div class="detail-diagram" id="detail-diagram"></div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<div class="deck">
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 1: TITLE -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide active" id="s1">
+    <div class="grid-bg"></div>
+    <div class="hex-bg"></div>
+
+    <div class="gold-border-card" style="text-align:center; position:relative; z-index:1;">
+      <div class="eyebrow">Pre-Thesis 1 &nbsp;·&nbsp; BRAC University &nbsp;·&nbsp; Spring 2026</div>
+      <h1 class="title-glow">Decentralized<br>Crypto World Bank</h1>
+      <p class="subtitle" style="margin: 12px auto 0;">A Blockchain-Based Banking Platform<br>with AI-Enhanced Security &amp; Assistance</p>
+
+      <div class="mini-diagram" style="margin: 24px auto 0; max-width: 320px;">
+        <svg viewBox="0 0 280 120" aria-hidden="true">
+          <rect x="90" y="4" width="100" height="22" rx="4" fill="rgba(201,151,58,0.25)" stroke="#C9973A" stroke-width="1.5"/>
+          <text x="140" y="19" text-anchor="middle" fill="#C9973A" font-size="8" font-weight="600">World Bank</text>
+          <line x1="140" y1="26" x2="140" y2="34" stroke="#8A6220" stroke-width="1.5"/>
+          <rect x="70" y="34" width="140" height="22" rx="4" fill="rgba(201,151,58,0.15)" stroke="#8A6220" stroke-width="1.5"/>
+          <text x="140" y="49" text-anchor="middle" fill="#D4B060" font-size="8" font-weight="600">National Banks</text>
+          <line x1="140" y1="56" x2="140" y2="64" stroke="#8A6220" stroke-width="1.5"/>
+          <rect x="50" y="64" width="180" height="22" rx="4" fill="rgba(46,158,138,0.15)" stroke="#2E9E8A" stroke-width="1.5"/>
+          <text x="140" y="79" text-anchor="middle" fill="#2E9E8A" font-size="8" font-weight="600">Local Banks</text>
+          <line x1="140" y1="86" x2="140" y2="94" stroke="#5E7FA8" stroke-width="1.5"/>
+          <rect x="30" y="94" width="220" height="22" rx="4" fill="rgba(94,127,168,0.15)" stroke="#5E7FA8" stroke-width="1.5"/>
+          <text x="140" y="109" text-anchor="middle" fill="#7AAECC" font-size="8" font-weight="600">Retail Clients</text>
+        </svg>
+      </div>
+
+      <div class="dept-badge">
+        Department of Computer Science &amp; Engineering &nbsp;|&nbsp; Chapters 1 &amp; 2
+      </div>
+    </div>
+
+    <div class="slide-label">Chapter 1 &amp; 2 Overview</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 2: WHAT ARE WE BUILDING? -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s2">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Introduction</div>
+      <h2>What Are We Building?</h2>
+      <p class="sub-hint">Click any subsection for more detail &nbsp;·&nbsp; Arrow keys to navigate slides</p>
+
+      <div class="slide-body">
+        <div>
+          <div class="mini-diagram">
+            <svg viewBox="0 0 240 200" aria-hidden="true">
+              <rect x="20" y="10" width="200" height="36" rx="6" fill="rgba(201,151,58,0.2)" stroke="#C9973A"/>
+              <text x="120" y="32" text-anchor="middle" fill="#C9973A" font-size="9" font-weight="600">Smart Contracts (4 tiers)</text>
+              <line x1="120" y1="46" x2="120" y2="58" stroke="#8A6220"/>
+              <rect x="40" y="58" width="160" height="36" rx="6" fill="rgba(46,158,138,0.15)" stroke="#2E9E8A"/>
+              <text x="120" y="80" text-anchor="middle" fill="#2E9E8A" font-size="9" font-weight="600">Express.js + PostgreSQL</text>
+              <line x1="120" y1="94" x2="120" y2="106" stroke="#5E7FA8"/>
+              <rect x="60" y="106" width="120" height="36" rx="6" fill="rgba(94,127,168,0.15)" stroke="#5E7FA8"/>
+              <text x="120" y="128" text-anchor="middle" fill="#7AAECC" font-size="9" font-weight="600">React UI</text>
+              <line x1="120" y1="142" x2="120" y2="154" stroke="#C9973A" stroke-dasharray="4 3"/>
+              <rect x="30" y="154" width="180" height="36" rx="6" fill="rgba(201,151,58,0.12)" stroke="#C9973A" stroke-dasharray="4 3"/>
+              <text x="120" y="176" text-anchor="middle" fill="#D4B060" font-size="8" font-weight="600">FastAPI ML + Chainlink Oracle</text>
+            </svg>
+          </div>
+          <div class="mini-diagram-label">System stack overview</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div class="card sub-toggle" data-section="s2-core">
+            <div class="card-label">Core Concept</div>
+            <div class="card-text">A <strong style="color:var(--ice);">four-tier hierarchical lending system</strong> on blockchain — reserve ratios, approvals, and repayments enforced by smart contracts.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="card sub-toggle" data-section="s2-ai">
+            <div class="card-label">AI Layer</div>
+            <div class="card-text"><strong style="color:var(--ice);">Random Forest + Isolation Forest + SHAP</strong> for fraud detection and explainable credit decisions — wired on-chain via oracle.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="card sub-toggle" data-section="s2-diff">
+            <div class="card-label">What Makes It Different</div>
+            <div class="card-text">No existing DeFi protocol combines <strong style="color:var(--ice);">multi-tier capital flows, inter-bank lending, and solidarity group lending</strong> in one open architecture.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-label">1.6 Proposed Solution</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 3: BACKGROUND -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s3">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Background</div>
+      <h2>Why Does This Need to Exist?</h2>
+      <p class="sub-hint">Click a stat or comparison card for context</p>
+
+      <div class="slide-body single-col">
+        <div style="display:grid; grid-template-columns: minmax(200px,260px) 1fr; gap:24px; width:100%;">
+          <div>
+            <div class="mini-diagram">
+              <svg viewBox="0 0 240 160" aria-hidden="true">
+                <text x="120" y="16" text-anchor="middle" fill="#5E7FA8" font-size="8" font-weight="600">TRADFI vs DEFI vs CWB</text>
+                <rect x="10" y="24" width="65" height="50" rx="4" fill="rgba(196,74,58,0.15)" stroke="#C44A3A"/>
+                <text x="42" y="44" text-anchor="middle" fill="#C44A3A" font-size="7">TradFi</text>
+                <text x="42" y="56" text-anchor="middle" fill="#5E7FA8" font-size="6">Slow · Opaque</text>
+                <text x="42" y="66" text-anchor="middle" fill="#5E7FA8" font-size="6">$42 avg fee</text>
+                <rect x="87" y="24" width="65" height="50" rx="4" fill="rgba(94,127,168,0.15)" stroke="#5E7FA8"/>
+                <text x="119" y="44" text-anchor="middle" fill="#7AAECC" font-size="7">DeFi</text>
+                <text x="119" y="56" text-anchor="middle" fill="#5E7FA8" font-size="6">Fast · Flat</text>
+                <text x="119" y="66" text-anchor="middle" fill="#5E7FA8" font-size="6">No hierarchy</text>
+                <rect x="164" y="24" width="66" height="50" rx="4" fill="rgba(201,151,58,0.2)" stroke="#C9973A"/>
+                <text x="197" y="44" text-anchor="middle" fill="#C9973A" font-size="7">CWB</text>
+                <text x="197" y="56" text-anchor="middle" fill="#5E7FA8" font-size="6">4-tier · Open</text>
+                <text x="197" y="66" text-anchor="middle" fill="#5E7FA8" font-size="6">Programmable</text>
+                <path d="M42 78 L42 100 L197 100 L197 78" fill="none" stroke="#1C3558" stroke-width="1"/>
+                <text x="120" y="118" text-anchor="middle" fill="#A8C4E0" font-size="7">Gap: institutional hierarchy + transparency</text>
+                <rect x="30" y="128" width="180" height="24" rx="4" fill="rgba(46,158,138,0.1)" stroke="#2E9E8A"/>
+                <text x="120" y="144" text-anchor="middle" fill="#2E9E8A" font-size="7">Blockchain = shared ledger + smart rules</text>
+              </svg>
+            </div>
+            <div class="mini-diagram-label">Market gap diagram</div>
+          </div>
+
+          <div>
+            <div class="stat-row" style="margin-bottom:14px;">
+              <div class="stat-box sub-toggle" data-section="s3-stat-cost">
+                <div class="stat-number">$42</div>
+                <div class="stat-label">avg. cross-border cost</div>
+                <div class="sub-more">Details</div>
+              </div>
+              <div class="stat-box sub-toggle" data-section="s3-stat-time">
+                <div class="stat-number">2–5</div>
+                <div class="stat-label">days settlement</div>
+                <div class="sub-more">Details</div>
+              </div>
+              <div class="stat-box sub-toggle" data-section="s3-stat-unbanked">
+                <div class="stat-number">1.4B</div>
+                <div class="stat-label">unbanked adults</div>
+                <div class="sub-more">Details</div>
+              </div>
+            </div>
+            <div class="card-grid" style="grid-template-columns:1fr 1fr;">
+              <div class="card sub-toggle" data-section="s3-tradfi">
+                <div class="card-label">Traditional Finance Problem</div>
+                <div class="card-text">Correspondent banking traps capital in nostro/vostro accounts, creates delays, and costs ~$48–56B/year in remittance fees. Reserve adequacy audited quarterly — no real-time visibility.</div>
+                <div class="sub-more">More detail</div>
+              </div>
+              <div class="card sub-toggle" data-section="s3-defi" style="--gold:#2E9E8A;">
+                <div class="card-label" style="color:var(--accent2);">DeFi's Limitation</div>
+                <div class="card-text">DeFi lending ($55B+ TVL) is flat and pool-based. Aave, Compound, MakerDAO — none model institutional hierarchy or development-banking governance.</div>
+                <div class="sub-more">More detail</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-label">1.1 Background</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 4: RATIONALE -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s4">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Rationale of the Study</div>
+      <h2>Three Forces Driving This Work</h2>
+      <p class="sub-hint">Click each force to expand</p>
+
+      <div class="slide-body">
+        <div>
+          <div class="mini-diagram">
+            <svg viewBox="0 0 200 180" aria-hidden="true">
+              <polygon points="100,20 180,150 20,150" fill="rgba(201,151,58,0.08)" stroke="#C9973A" stroke-width="1.5"/>
+              <circle cx="100" cy="55" r="28" fill="rgba(201,151,58,0.2)" stroke="#C9973A"/>
+              <text x="100" y="52" text-anchor="middle" fill="#C9973A" font-size="7" font-weight="600">Legacy</text>
+              <text x="100" y="62" text-anchor="middle" fill="#C9973A" font-size="7">Finance</text>
+              <circle cx="55" cy="130" r="28" fill="rgba(46,158,138,0.15)" stroke="#2E9E8A"/>
+              <text x="55" y="127" text-anchor="middle" fill="#2E9E8A" font-size="7" font-weight="600">DeFi</text>
+              <text x="55" y="137" text-anchor="middle" fill="#2E9E8A" font-size="7">Gap</text>
+              <circle cx="145" cy="130" r="28" fill="rgba(94,127,168,0.15)" stroke="#5E7FA8"/>
+              <text x="145" y="127" text-anchor="middle" fill="#7AAECC" font-size="7" font-weight="600">AI +</text>
+              <text x="145" y="137" text-anchor="middle" fill="#7AAECC" font-size="7">Chain</text>
+              <text x="100" y="172" text-anchor="middle" fill="#5E7FA8" font-size="7">Convergence → Crypto World Bank</text>
+            </svg>
+          </div>
+          <div class="mini-diagram-label">Three-force rationale</div>
+        </div>
+
+        <div class="card-grid" style="grid-template-columns:1fr; gap:10px;">
+          <div class="card sub-toggle" data-section="s4-f1" style="padding:16px 20px;">
+            <div class="card-label">Force 1 — Legacy Finance Inefficiencies</div>
+            <div class="card-text">Fragmented transparency, slow settlements, and uneven credit access limit development finance at every tier.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="card sub-toggle" data-section="s4-f2" style="padding:16px 20px;">
+            <div class="card-label">Force 2 — DeFi's Missing Hierarchy</div>
+            <div class="card-text">No DeFi design models deposit mobilization, solidarity group lending, <em>and</em> hierarchical lending together.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="card sub-toggle" data-section="s4-f3" style="padding:16px 20px;">
+            <div class="card-label">Force 3 — AI + Blockchain Opportunity</div>
+            <div class="card-text">Blockchain auditability + lightweight ML monitoring → transparent, programmable banking governance.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px; font-size:12px; color:var(--dim); max-width:680px; text-align:center; line-height:1.6;">
+        Serving institutional tiers <em>and</em> retail clients in one open architecture — unexplored in prior published work.
+      </p>
+    </div>
+    <div class="slide-label">1.2 Rationale of the Study</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 5: PROBLEM STATEMENT -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s5">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Problem Statement</div>
+      <h2>Six Key Problems We're Addressing</h2>
+      <p class="sub-hint">Click any problem for the full statement</p>
+
+      <div class="slide-body">
+        <div>
+          <div class="mini-diagram">
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <circle cx="100" cy="100" r="85" fill="none" stroke="#1C3558" stroke-width="1"/>
+              <circle cx="100" cy="100" r="55" fill="rgba(201,151,58,0.06)" stroke="#8A6220" stroke-width="1" stroke-dasharray="3 3"/>
+              <text x="100" y="96" text-anchor="middle" fill="#C9973A" font-size="9" font-weight="700">6 Problems</text>
+              <text x="100" y="110" text-anchor="middle" fill="#5E7FA8" font-size="7">Development Finance</text>
+              <circle cx="100" cy="22" r="14" fill="rgba(196,74,58,0.2)" stroke="#C44A3A"/><text x="100" y="25" text-anchor="middle" fill="#C44A3A" font-size="7">1</text>
+              <circle cx="170" cy="55" r="14" fill="rgba(196,74,58,0.2)" stroke="#C44A3A"/><text x="170" y="58" text-anchor="middle" fill="#C44A3A" font-size="7">2</text>
+              <circle cx="170" cy="145" r="14" fill="rgba(196,74,58,0.2)" stroke="#C44A3A"/><text x="170" y="148" text-anchor="middle" fill="#C44A3A" font-size="7">3</text>
+              <circle cx="100" cy="178" r="14" fill="rgba(196,74,58,0.2)" stroke="#C44A3A"/><text x="100" y="181" text-anchor="middle" fill="#C44A3A" font-size="7">4</text>
+              <circle cx="30" cy="145" r="14" fill="rgba(196,74,58,0.2)" stroke="#C44A3A"/><text x="30" y="148" text-anchor="middle" fill="#C44A3A" font-size="7">5</text>
+              <circle cx="30" cy="55" r="14" fill="rgba(196,74,58,0.2)" stroke="#C44A3A"/><text x="30" y="58" text-anchor="middle" fill="#C44A3A" font-size="7">6</text>
+            </svg>
+          </div>
+          <div class="mini-diagram-label">Problem map</div>
+        </div>
+
+        <div class="prob-grid">
+          <div class="prob-item sub-toggle" data-section="s5-p1">
+            <div class="prob-icon">1</div>
+            <div>
+              <div class="prob-title">Lack of Transparency</div>
+              <div class="prob-desc">Reserve adequacy self-reported quarterly — no real-time verification across tiers.</div>
+              <div class="sub-more">More detail</div>
+            </div>
+          </div>
+          <div class="prob-item sub-toggle" data-section="s5-p2">
+            <div class="prob-icon">2</div>
+            <div>
+              <div class="prob-title">Sluggish Settlements</div>
+              <div class="prob-desc">2–5 day cross-border delays; capital locked in nostro/vostro accounts.</div>
+              <div class="sub-more">More detail</div>
+            </div>
+          </div>
+          <div class="prob-item sub-toggle" data-section="s5-p3">
+            <div class="prob-icon">3</div>
+            <div>
+              <div class="prob-title">Inconsistent Risk Evaluation</div>
+              <div class="prob-desc">No unified credit history — borrowers re-evaluated at every tier.</div>
+              <div class="sub-more">More detail</div>
+            </div>
+          </div>
+          <div class="prob-item sub-toggle" data-section="s5-p4">
+            <div class="prob-icon">4</div>
+            <div>
+              <div class="prob-title">Institutional Trust Barriers</div>
+              <div class="prob-desc">Legal agreements and audits are expensive — smaller institutions disadvantaged.</div>
+              <div class="sub-more">More detail</div>
+            </div>
+          </div>
+          <div class="prob-item sub-toggle" data-section="s5-p5">
+            <div class="prob-icon">5</div>
+            <div>
+              <div class="prob-title">No Programmable Savings</div>
+              <div class="prob-desc">Near-zero real yields; no visibility into fund deployment.</div>
+              <div class="sub-more">More detail</div>
+            </div>
+          </div>
+          <div class="prob-item sub-toggle" data-section="s5-p6">
+            <div class="prob-icon">6</div>
+            <div>
+              <div class="prob-title">No On-Chain Group Lending</div>
+              <div class="prob-desc">Solidarity groups lack collateral but no DeFi protocol encodes mutual liability.</div>
+              <div class="sub-more">More detail</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-label">1.3 Problem Statement</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 6: OBJECTIVES -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s6">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Objectives</div>
+      <h2>What We Set Out to Do</h2>
+      <p class="sub-hint">Click an objective for scope detail</p>
+
+      <div class="slide-body">
+        <div>
+          <div class="mini-diagram">
+            <svg viewBox="0 0 180 200" aria-hidden="true">
+              <line x1="40" y1="20" x2="40" y2="180" stroke="#1C3558" stroke-width="2"/>
+              <circle cx="40" cy="30" r="10" fill="#C9973A"/><text x="40" y="34" text-anchor="middle" fill="#09111F" font-size="8" font-weight="700">1</text>
+              <rect x="58" y="20" width="110" height="20" rx="3" fill="rgba(201,151,58,0.15)" stroke="#C9973A"/><text x="113" y="34" text-anchor="middle" fill="#D4B060" font-size="7">4-tier architecture</text>
+              <circle cx="40" cy="65" r="10" fill="#C9973A"/><text x="40" y="69" text-anchor="middle" fill="#09111F" font-size="8" font-weight="700">2</text>
+              <rect x="58" y="55" width="110" height="20" rx="3" fill="rgba(201,151,58,0.12)" stroke="#8A6220"/><text x="113" y="69" text-anchor="middle" fill="#D4B060" font-size="7">Banking products</text>
+              <circle cx="40" cy="100" r="10" fill="#C9973A"/><text x="40" y="104" text-anchor="middle" fill="#09111F" font-size="8" font-weight="700">3</text>
+              <rect x="58" y="90" width="110" height="20" rx="3" fill="rgba(46,158,138,0.12)" stroke="#2E9E8A"/><text x="113" y="104" text-anchor="middle" fill="#2E9E8A" font-size="7">AI/ML oracle</text>
+              <circle cx="40" cy="135" r="10" fill="#C9973A"/><text x="40" y="139" text-anchor="middle" fill="#09111F" font-size="8" font-weight="700">4</text>
+              <rect x="58" y="125" width="110" height="20" rx="3" fill="rgba(94,127,168,0.12)" stroke="#5E7FA8"/><text x="113" y="139" text-anchor="middle" fill="#7AAECC" font-size="7">Smart-contract lending</text>
+              <circle cx="40" cy="170" r="10" fill="#C9973A"/><text x="40" y="174" text-anchor="middle" fill="#09111F" font-size="8" font-weight="700">5</text>
+              <rect x="58" y="160" width="110" height="20" rx="3" fill="rgba(201,151,58,0.1)" stroke="#8A6220"/><text x="113" y="174" text-anchor="middle" fill="#D4B060" font-size="7">Testnet deployment</text>
+            </svg>
+          </div>
+          <div class="mini-diagram-label">Objective roadmap</div>
+        </div>
+
+        <ul class="num-list">
+          <li class="sub-toggle" data-section="s6-o1">
+            <span class="num-badge">01</span>
+            <span class="num-text"><strong>Design &amp; formally specify</strong> a four-tier lending architecture with reserve-ratio enforcement and RBAC on EVM-compatible blockchain.</span>
+            <div class="sub-more">More detail</div>
+          </li>
+          <li class="sub-toggle" data-section="s6-o2">
+            <span class="num-badge">02</span>
+            <span class="num-text"><strong>Specify an extended banking product suite</strong> — deposits, savings, and solidarity group lending on the hierarchical core.</span>
+            <div class="sub-more">More detail</div>
+          </li>
+          <li class="sub-toggle" data-section="s6-o3">
+            <span class="num-badge">03</span>
+            <span class="num-text"><strong>Investigate AI/ML analytics</strong> — Random Forest, Isolation Forest, SHAP — wired on-chain via oracle.</span>
+            <div class="sub-more">More detail</div>
+          </li>
+          <li class="sub-toggle" data-section="s6-o4">
+            <span class="num-badge">04</span>
+            <span class="num-text"><strong>Specify transparent lending</strong> with borrowing limits, installments, and RBAC enforced by smart contracts.</span>
+            <div class="sub-more">More detail</div>
+          </li>
+          <li class="sub-toggle" data-section="s6-o5">
+            <span class="num-badge">05</span>
+            <span class="num-text"><strong>Plan testnet deployment</strong> on Polygon zkEVM Cardona and Ethereum Sepolia in the final thesis phase.</span>
+            <div class="sub-more">More detail</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="slide-label">1.4 Objectives</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 7: METHODOLOGY -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s7">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Methodology in Brief</div>
+      <h2>Lightweight Agile + SDLC Framework</h2>
+      <p class="sub-hint">Click a phase for deliverables</p>
+
+      <div class="mini-diagram" style="max-width:640px; margin-bottom:14px;">
+        <svg viewBox="0 0 640 48" aria-hidden="true">
+          <rect x="4" y="12" width="120" height="24" rx="4" fill="rgba(201,151,58,0.2)" stroke="#C9973A"/>
+          <text x="64" y="28" text-anchor="middle" fill="#C9973A" font-size="8" font-weight="600">Pre-Thesis: Design</text>
+          <line x1="128" y1="24" x2="148" y2="24" stroke="#8A6220" marker-end="url(#arr)"/>
+          <rect x="152" y="12" width="460" height="24" rx="4" fill="rgba(46,158,138,0.1)" stroke="#2E9E8A"/>
+          <text x="382" y="28" text-anchor="middle" fill="#2E9E8A" font-size="8" font-weight="600">Final Thesis: Build · Test · Deploy · Maintain</text>
+          <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#8A6220"/></marker></defs>
+        </svg>
+      </div>
+
+      <div class="phase-track">
+        <div class="phase-box highlight sub-toggle" data-section="s7-p1">
+          <div class="phase-badge">Phase I</div>
+          <div class="phase-title">Foundation</div>
+          <div class="phase-desc">Contracts, 51-entity DB, React shell, Chainlink PoR.</div>
+          <div class="sub-more">Details</div>
+        </div>
+        <div class="phase-arrow">›</div>
+        <div class="phase-box sub-toggle" data-section="s7-p2">
+          <div class="phase-badge">Phase II</div>
+          <div class="phase-title">Core Banking</div>
+          <div class="phase-desc">Loan lifecycle, limits, SavingsVault, GroupLending.</div>
+          <div class="sub-more">Details</div>
+        </div>
+        <div class="phase-arrow">›</div>
+        <div class="phase-box sub-toggle" data-section="s7-p3">
+          <div class="phase-badge">Phase III</div>
+          <div class="phase-title">AI/ML Oracle</div>
+          <div class="phase-desc">RF + IF + SHAP on-chain, Authority Brief, SAR.</div>
+          <div class="sub-more">Details</div>
+        </div>
+        <div class="phase-arrow">›</div>
+        <div class="phase-box sub-toggle" data-section="s7-p4">
+          <div class="phase-badge">Phase IV</div>
+          <div class="phase-title">Verification</div>
+          <div class="phase-desc">Certora, Foundry fuzz, 300-client sim, testnet.</div>
+          <div class="sub-more">Details</div>
+        </div>
+      </div>
+
+      <p style="margin-top:16px; font-size:12px; color:var(--dim); text-align:center;">
+        Two-week Agile sprints &nbsp;·&nbsp; Blockchain-first delivery &nbsp;·&nbsp; Pre-thesis = design stage only
+      </p>
+    </div>
+    <div class="slide-label">1.7 Methodology in Brief</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 8: SCOPE & CHALLENGES -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s8">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Scopes &amp; Challenges</div>
+      <h2>What's In Scope — and What's Hard</h2>
+      <p class="sub-hint">Click any scope item or challenge</p>
+
+      <div class="slide-body">
+        <div>
+          <div class="mini-diagram">
+            <svg viewBox="0 0 200 160" aria-hidden="true">
+              <line x1="100" y1="20" x2="100" y2="140" stroke="#1C3558" stroke-width="2"/>
+              <polygon points="100,30 170,80 100,130 30,80" fill="rgba(201,151,58,0.1)" stroke="#C9973A"/>
+              <text x="100" y="78" text-anchor="middle" fill="#C9973A" font-size="8" font-weight="600">IN SCOPE</text>
+              <text x="100" y="90" text-anchor="middle" fill="#5E7FA8" font-size="6">Spec + testnet</text>
+              <rect x="20" y="142" width="75" height="14" rx="3" fill="rgba(46,158,138,0.15)" stroke="#2E9E8A"/>
+              <text x="57" y="152" text-anchor="middle" fill="#2E9E8A" font-size="6">15 contracts</text>
+              <rect x="105" y="142" width="75" height="14" rx="3" fill="rgba(196,74,58,0.15)" stroke="#C44A3A"/>
+              <text x="142" y="152" text-anchor="middle" fill="#C44A3A" font-size="6">5 challenges</text>
+            </svg>
+          </div>
+          <div class="mini-diagram-label">Scope balance</div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="col-header gold">✦ &nbsp; In Scope</div>
+            <ul class="dot-list">
+              <li class="sub-toggle" data-section="s8-in1">15 modular smart contracts across 4 tiers</li>
+              <li class="sub-toggle" data-section="s8-in2">Four-tier lending lifecycle + borrowing limits</li>
+              <li class="sub-toggle" data-section="s8-in3">AI/ML: Random Forest, Isolation Forest, SHAP</li>
+              <li class="sub-toggle" data-section="s8-in4">Testnet deployment — Polygon zkEVM Cardona</li>
+              <li class="sub-toggle" data-section="s8-in5">Test tokens only — no real financial transactions</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-header red">⚠ &nbsp; Key Challenges</div>
+            <ul class="dot-list red">
+              <li class="sub-toggle" data-section="s8-ch1"><strong style="color:var(--ice);">Unlabeled DeFi fraud data</strong></li>
+              <li class="sub-toggle" data-section="s8-ch2"><strong style="color:var(--ice);">Regulatory uncertainty</strong></li>
+              <li class="sub-toggle" data-section="s8-ch3"><strong style="color:var(--ice);">Gas cost sensitivity</strong></li>
+              <li class="sub-toggle" data-section="s8-ch4"><strong style="color:var(--ice);">Model interpretability</strong></li>
+              <li class="sub-toggle" data-section="s8-ch5"><strong style="color:var(--ice);">Economic sustainability</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-label">1.8 Scopes &amp; Challenges</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 9: LITERATURE REVIEW METHOD -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s9">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Chapter 2 — Literature Review</div>
+      <h2>How We Reviewed the Literature</h2>
+      <p class="sub-hint">Click a PRISMA step or research area</p>
+
+      <div class="slide-body single-col">
+        <div style="display:grid; grid-template-columns: minmax(180px,220px) 1fr; gap:24px; width:100%;">
+          <div>
+            <div class="mini-diagram">
+              <svg viewBox="0 0 200 180" aria-hidden="true">
+                <polygon points="100,10 170,50 150,90 50,90 30,50" fill="rgba(201,151,58,0.15)" stroke="#C9973A"/>
+                <text x="100" y="55" text-anchor="middle" fill="#C9973A" font-size="9" font-weight="700">892</text>
+                <polygon points="100,95 140,115 120,145 80,145 60,115" fill="rgba(201,151,58,0.1)" stroke="#8A6220"/>
+                <text x="100" y="125" text-anchor="middle" fill="#D4B060" font-size="8">114</text>
+                <rect x="70" y="152" width="60" height="22" rx="4" fill="rgba(46,158,138,0.2)" stroke="#2E9E8A"/>
+                <text x="100" y="167" text-anchor="middle" fill="#2E9E8A" font-size="9" font-weight="700">131</text>
+                <text x="100" y="178" text-anchor="middle" fill="#5E7FA8" font-size="6">PRISMA funnel</text>
+              </svg>
+            </div>
+            <div class="mini-diagram-label">Screening funnel</div>
+          </div>
+
+          <div>
+            <div class="prisma-box" style="margin-bottom:14px;">
+              <div class="prisma-step sub-toggle" data-section="s9-prisma1">
+                <div class="prisma-n">892</div>
+                <div class="prisma-l">Identified</div>
+              </div>
+              <div class="prisma-arrow">→</div>
+              <div class="prisma-step sub-toggle" data-section="s9-prisma2">
+                <div class="prisma-n">614</div>
+                <div class="prisma-l">Deduped</div>
+              </div>
+              <div class="prisma-arrow">→</div>
+              <div class="prisma-step sub-toggle" data-section="s9-prisma3">
+                <div class="prisma-n">114</div>
+                <div class="prisma-l">Assessed</div>
+              </div>
+              <div class="prisma-arrow">+17</div>
+              <div class="prisma-step sub-toggle" data-section="s9-prisma4" style="border-color:var(--gold);">
+                <div class="prisma-n" style="color:var(--gold);">131</div>
+                <div class="prisma-l">Synthesised</div>
+              </div>
+            </div>
+
+            <div class="area-chips">
+              <div class="chip chip-toggle" data-section="s9-a1">DeFi Lending</div>
+              <div class="chip chip-toggle" data-section="s9-a2">ML Fraud Detection</div>
+              <div class="chip chip-toggle" data-section="s9-a3">ZKP &amp; Identity</div>
+              <div class="chip chip-toggle" data-section="s9-a4">Group Lending</div>
+              <div class="chip chip-toggle" data-section="s9-a5">Smart Contract Security</div>
+              <div class="chip chip-toggle" data-section="s9-a6">Institutional DeFi</div>
+              <div class="chip chip-toggle" data-section="s9-a7">MiCA / GENIUS</div>
+              <div class="chip chip-toggle" data-section="s9-a8">Remittance</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-label">2.1 Review Methodology</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 10: KEY FINDINGS -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s10">
+    <div class="hex-bg"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Literature Review — Key Findings</div>
+      <h2>What the Literature Told Us</h2>
+      <p class="sub-hint">Click a finding for citation detail</p>
+
+      <div class="slide-body">
+        <div>
+          <div class="mini-diagram">
+            <svg viewBox="0 0 200 180" aria-hidden="true">
+              <rect x="60" y="10" width="80" height="28" rx="4" fill="rgba(196,74,58,0.15)" stroke="#C44A3A"/>
+              <text x="100" y="28" text-anchor="middle" fill="#C44A3A" font-size="7" font-weight="600">GAP</text>
+              <text x="100" y="38" text-anchor="middle" fill="#5E7FA8" font-size="6">No DeFi hierarchy</text>
+              <line x1="100" y1="38" x2="100" y2="50" stroke="#8A6220"/>
+              <rect x="20" y="50" width="160" height="24" rx="4" fill="rgba(201,151,58,0.12)" stroke="#C9973A"/>
+              <text x="100" y="66" text-anchor="middle" fill="#D4B060" font-size="7">ML F1: 0.08 → 0.85</text>
+              <rect x="20" y="82" width="160" height="24" rx="4" fill="rgba(46,158,138,0.12)" stroke="#2E9E8A"/>
+              <text x="100" y="98" text-anchor="middle" fill="#2E9E8A" font-size="7">SHAP &gt; LIME</text>
+              <rect x="20" y="114" width="160" height="24" rx="4" fill="rgba(94,127,168,0.12)" stroke="#5E7FA8"/>
+              <text x="100" y="130" text-anchor="middle" fill="#7AAECC" font-size="7">IMF: 2-tier CBDC model</text>
+              <rect x="20" y="146" width="160" height="24" rx="4" fill="rgba(201,151,58,0.1)" stroke="#8A6220"/>
+              <text x="100" y="162" text-anchor="middle" fill="#D4B060" font-size="7">Governance &gt; tech alone</text>
+            </svg>
+          </div>
+          <div class="mini-diagram-label">Evidence stack</div>
+        </div>
+
+        <div class="finding-list">
+          <div class="finding sub-toggle" data-section="s10-f1">
+            <div class="finding-src">Werner<br>2022</div>
+            <div class="finding-text"><strong>DeFi is structurally flat.</strong> Aave, Compound, MakerDAO — no institutional hierarchy. <strong>This is our gap.</strong></div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="finding sub-toggle" data-section="s10-f2">
+            <div class="finding-src">Palaiokrassas<br>2024</div>
+            <div class="finding-text"><strong>Behavioral ML features</strong> push F1 from 0.08 to <strong>0.76–0.85</strong> on 54M+ DeFi transactions.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="finding sub-toggle" data-section="s10-f3">
+            <div class="finding-src">Adom<br>2022</div>
+            <div class="finding-text"><strong>SHAP beats LIME</strong> for lending explainability — game-theory consistent attributions.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="finding sub-toggle" data-section="s10-f4">
+            <div class="finding-src">Tan IMF<br>2023</div>
+            <div class="finding-text"><strong>Two-tier CBDC distribution</strong> validates hierarchical institutional design for digital finance.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+          <div class="finding sub-toggle" data-section="s10-f5">
+            <div class="finding-src">Sygnum<br>2026</div>
+            <div class="finding-text"><strong>Institutional DeFi needs governance</strong>, not just technology — legal enforceability is the blocker.</div>
+            <div class="sub-more">More detail</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-label">2.2–2.3 Review of Existing Research</div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SLIDE 11: THANK YOU / NEXT -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="slide" id="s11">
+    <div class="grid-bg"></div>
+    <div class="hex-bg"></div>
+
+    <div style="text-align:center; position:relative; z-index:1;">
+      <div class="eyebrow">End of Chapter 1 &amp; 2</div>
+      <div class="thanks-big">Thank You</div>
+      <div class="thanks-sub">Questions on Background, Rationale, Problem Statement,<br>Objectives, Methodology, Scope, or Literature Review?</div>
+
+      <div class="mini-diagram" style="max-width:400px; margin:24px auto;">
+        <svg viewBox="0 0 400 80" aria-hidden="true">
+          <rect x="10" y="20" width="110" height="40" rx="6" fill="rgba(201,151,58,0.15)" stroke="#C9973A"/>
+          <text x="65" y="38" text-anchor="middle" fill="#C9973A" font-size="8" font-weight="600">Ch. 1–2</text>
+          <text x="65" y="50" text-anchor="middle" fill="#5E7FA8" font-size="7">Done ✓</text>
+          <line x1="125" y1="40" x2="155" y2="40" stroke="#8A6220" marker-end="url(#arr2)"/>
+          <rect x="160" y="20" width="110" height="40" rx="6" fill="rgba(46,158,138,0.12)" stroke="#2E9E8A" stroke-dasharray="4 3"/>
+          <text x="215" y="38" text-anchor="middle" fill="#2E9E8A" font-size="8" font-weight="600">Ch. 3–4</text>
+          <text x="215" y="50" text-anchor="middle" fill="#5E7FA8" font-size="7">Architecture</text>
+          <line x1="275" y1="40" x2="305" y2="40" stroke="#5E7FA8" stroke-dasharray="3 3"/>
+          <rect x="310" y="20" width="80" height="40" rx="6" fill="rgba(94,127,168,0.1)" stroke="#5E7FA8" stroke-dasharray="4 3"/>
+          <text x="350" y="44" text-anchor="middle" fill="#7AAECC" font-size="8">Deploy</text>
+          <defs><marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#8A6220"/></marker></defs>
+        </svg>
+      </div>
+
+      <div class="chapter-pill">
+        🔜 &nbsp; Chapter 3 &amp; 4 — System Architecture, Smart Contracts &amp; Implementation Roadmap
+      </div>
+
+      <div style="margin-top:28px; font-size:12px; color:var(--dim);">
+        Open-source repository &nbsp;·&nbsp; github.com/Yuvraajrahman/Cryto-World-Bank
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+  const total = slides.length;
+
+  const SECTIONS = {
+    's2-core': {
+      eyebrow: 'Proposed Solution',
+      title: 'Four-Tier Hierarchical Lending',
+      diagram: `<svg viewBox="0 0 320 140"><rect x="110" y="4" width="100" height="24" rx="4" fill="rgba(201,151,58,0.25)" stroke="#C9973A"/><text x="160" y="20" text-anchor="middle" fill="#C9973A" font-size="9">World Bank Reserve</text><line x1="160" y1="28" x2="160" y2="36" stroke="#8A6220"/><rect x="90" y="36" width="140" height="24" rx="4" fill="rgba(201,151,58,0.15)" stroke="#8A6220"/><text x="160" y="52" text-anchor="middle" fill="#D4B060" font-size="9">National Banks</text><line x1="160" y1="60" x2="160" y2="68" stroke="#2E9E8A"/><rect x="70" y="68" width="180" height="24" rx="4" fill="rgba(46,158,138,0.15)" stroke="#2E9E8A"/><text x="160" y="84" text-anchor="middle" fill="#2E9E8A" font-size="9">Local Banks</text><line x1="160" y1="92" x2="160" y2="100" stroke="#5E7FA8"/><rect x="50" y="100" width="220" height="24" rx="4" fill="rgba(94,127,168,0.15)" stroke="#5E7FA8"/><text x="160" y="116" text-anchor="middle" fill="#7AAECC" font-size="9">Retail Clients</text><text x="160" y="134" text-anchor="middle" fill="#5E7FA8" font-size="8">Capital flows downward · repayments upward</text></svg>`,
+      body: `<p><strong>World Bank → National Bank → Local Bank → Client</strong> — each tier is a separate smart contract with role-based access control (RBAC).</p><ul><li>Reserve ratios enforced on-chain at every tier</li><li>15 modular contracts: lending core + banking products + multi-entity ops</li><li>51-entity PostgreSQL schema mirrors on-chain state via event listener</li><li>Polygon zkEVM Cardona target for testnet deployment</li></ul>`
+    },
+    's2-ai': {
+      eyebrow: 'AI/ML Layer',
+      title: 'Oracle-Mediated Risk Scoring',
+      diagram: `<svg viewBox="0 0 320 80"><rect x="10" y="20" width="70" height="40" rx="4" fill="rgba(46,158,138,0.15)" stroke="#2E9E8A"/><text x="45" y="44" text-anchor="middle" fill="#2E9E8A" font-size="8">FastAPI ML</text><line x1="80" y1="40" x2="110" y2="40" stroke="#C9973A"/><rect x="110" y="20" width="70" height="40" rx="4" fill="rgba(201,151,58,0.15)" stroke="#C9973A"/><text x="145" y="44" text-anchor="middle" fill="#C9973A" font-size="8">Oracle</text><line x1="180" y1="40" x2="210" y2="40" stroke="#C9973A"/><rect x="210" y="20" width="100" height="40" rx="4" fill="rgba(94,127,168,0.15)" stroke="#5E7FA8"/><text x="260" y="44" text-anchor="middle" fill="#7AAECC" font-size="8">LoanController</text></svg>`,
+      body: `<p>Three-model pipeline per loan application:</p><ul><li><strong>Random Forest</strong> — fraud probability (calibrated via Platt scaling)</li><li><strong>Isolation Forest</strong> — anomaly score on behavioral features</li><li><strong>SHAP</strong> — explainability for clients, approvers, and auditors</li></ul><p>Scores committed on-chain via commit-reveal oracle before any approver can disburse. Audit rows stored in <strong>LOAN_RISK_ASSESSMENT</strong> linked to <strong>MODEL_REGISTRY</strong>.</p>`
+    },
+    's2-diff': {
+      eyebrow: 'Novelty',
+      title: 'What Existing Protocols Miss',
+      diagram: `<svg viewBox="0 0 320 70"><rect x="10" y="15" width="90" height="40" rx="4" fill="rgba(94,127,168,0.12)" stroke="#5E7FA8"/><text x="55" y="32" text-anchor="middle" fill="#7AAECC" font-size="7">Aave / Compound</text><text x="55" y="46" text-anchor="middle" fill="#5E7FA8" font-size="6">Flat pools</text><rect x="115" y="15" width="90" height="40" rx="4" fill="rgba(94,127,168,0.12)" stroke="#5E7FA8"/><text x="160" y="32" text-anchor="middle" fill="#7AAECC" font-size="7">MakerDAO</text><text x="160" y="46" text-anchor="middle" fill="#5E7FA8" font-size="6">Single tier</text><rect x="220" y="15" width="90" height="40" rx="4" fill="rgba(201,151,58,0.2)" stroke="#C9973A"/><text x="265" y="32" text-anchor="middle" fill="#C9973A" font-size="7">Crypto World Bank</text><text x="265" y="46" text-anchor="middle" fill="#5E7FA8" font-size="6">4-tier + group</text></svg>`,
+      body: `<p>No prior DeFi protocol combines all of the following in one open architecture:</p><ul><li>Multi-tier institutional capital allocation (downward flow)</li><li>Same-tier interbank lending (InterBankLendingPool)</li><li>Upward surplus repatriation (UpwardDepositFacility)</li><li>Solidarity group lending with mutual liability (GroupLendingPool)</li><li>Portable Credit Passport SBT across Local Banks</li></ul>`
+    },
+    's3-stat-cost': { eyebrow: 'Background Stat', title: '$42 Average Cross-Border Cost', body: `<p>World Bank remittance data shows the global average cost of sending $200 internationally remains high — roughly <strong>$42 per transaction</strong> in correspondent-banking corridors.</p><p>Crypto World Bank targets programmable settlement on Layer-2 testnets to demonstrate sub-dollar, same-block settlement as a design alternative.</p>` },
+    's3-stat-time': { eyebrow: 'Background Stat', title: '2–5 Business Days Settlement', body: `<p>Traditional cross-border payments traverse multiple correspondent banks with nostro/vostro pre-funding, creating <strong>2–5 day delays</strong> and locking idle capital.</p><p>On-chain settlement reduces this to block-time confirmation (seconds on L2) in the prototype design.</p>` },
+    's3-stat-unbanked': { eyebrow: 'Background Stat', title: '1.4 Billion Unbanked Adults', body: `<p>World Bank Findex data: approximately <strong>1.4 billion adults</strong> globally lack access to formal financial services.</p><p>Mobile-first ERC-4337 smart accounts and progressive KYC tiers (L0–L3) are designed to lower the onboarding barrier in the architecture.</p>` },
+    's3-tradfi': { eyebrow: 'Traditional Finance', title: 'Correspondent Banking Inefficiencies', body: `<p>Reserve adequacy is self-reported and audited quarterly — no real-time verification across tiers.</p><ul><li>~$48–56B/year in global remittance fees</li><li>Nostro/vostro accounts lock capital that could be lent</li><li>MSME financing gap estimated at $4.5T annually</li><li>Average remittance fee: 6.49% in 2024 (World Bank)</li></ul>` },
+    's3-defi': { eyebrow: 'DeFi Limitation', title: 'Flat Pool-Based Lending', body: `<p>DeFi lending exceeds <strong>$55B TVL</strong> but remains structurally flat:</p><ul><li>Aave, Compound, MakerDAO — uniformly pool-based</li><li>Over-collateralization only; no credit scoring pipeline</li><li>No institutional hierarchy or development-banking governance</li><li>No solidarity group lending or portable credit history</li></ul>` },
+    's4-f1': { eyebrow: 'Rationale · Force 1', title: 'Legacy Finance Inefficiencies', body: `<p>Development finance suffers from fragmented transparency, slow settlements, and uneven credit access at every tier.</p><p>Quarterly reserve audits cannot detect intra-quarter stress. Cross-border flows depend on expensive legal trust frameworks.</p>` },
+    's4-f2': { eyebrow: 'Rationale · Force 2', title: "DeFi's Missing Hierarchy", body: `<p>Existing DeFi covers automated lending but not:</p><ul><li>Deposit mobilization across tiers</li><li>Solidarity group lending (microfinance model)</li><li>Hierarchical reserve management</li><li>Inter-bank and syndicated lending</li></ul>` },
+    's4-f3': { eyebrow: 'Rationale · Force 3', title: 'AI + Blockchain Convergence', body: `<p>Blockchain provides tamper-resistant audit trails; lightweight ML provides operational risk monitoring.</p><p>Together they enable <strong>decision support with explainability</strong> — SHAP attributions, Authority Brief for approvers, and immutable inference logs — without auto-disbursing on ML output alone.</p>` },
+    's5-p1': { eyebrow: 'Problem 1', title: 'Lack of Transparency', body: `<p>Institutional reserve adequacy is self-reported and audited quarterly. Stakeholders cannot verify financial health in real time across the four-tier hierarchy.</p><p><strong>CWB response:</strong> Chainlink Proof of Reserve + on-chain reserve ratios + BLOCKCHAIN_EVENT_LOG audit trail.</p>` },
+    's5-p2': { eyebrow: 'Problem 2', title: 'Sluggish Settlements & Idle Capital', body: `<p>Cross-border payments take 2–5 days. Pre-funded nostro/vostro accounts lock capital.</p><p><strong>CWB response:</strong> Programmable smart-contract settlement on EVM L2; NettingEngine for multilateral batch settlement (Phase III).</p>` },
+    's5-p3': { eyebrow: 'Problem 3', title: 'Inconsistent Risk Evaluation', body: `<p>Borrowers are re-evaluated from scratch at every tier — no portable credit history.</p><p><strong>CWB response:</strong> CreditPassport SBT (on-chain) + CREDIT_PASSPORT read-model (off-chain projection) + LOAN_RISK_ASSESSMENT per application.</p>` },
+    's5-p4': { eyebrow: 'Problem 4', title: 'Barriers to Institutional Trust', body: `<p>Legal agreements and bilateral audits for inter-institutional trust are expensive — smaller institutions in developing markets are disadvantaged.</p><p><strong>CWB response:</strong> Smart-contract RBAC, Safe multisig governance, and transparent on-chain state reduce bilateral trust requirements.</p>` },
+    's5-p5': { eyebrow: 'Problem 5', title: 'No Programmable Savings', body: `<p>Traditional savings offer near-zero real yields with no visibility into fund deployment.</p><p><strong>CWB response:</strong> SavingsVault and FixedDeposit contracts (Phase II) with on-chain balance visibility and tiered interest via INTEREST_RATE_TIER.</p>` },
+    's5-p6': { eyebrow: 'Problem 6', title: 'No On-Chain Group Lending', body: `<p>Many borrowers lack individual collateral but could access credit through solidarity groups — a proven microfinance model with no DeFi equivalent.</p><p><strong>CWB response:</strong> GroupLendingPool contract + GROUP_CONSENT table for per-member multi-signature consent recording.</p>` },
+    's6-o1': { eyebrow: 'Objective 1', title: 'Four-Tier Architecture Specification', body: `<p>Formally specify World Bank Reserve → National Bank → Local Bank → Client hierarchy with:</p><ul><li>INSTITUTION supertype for cross-tier FK integrity</li><li>Reserve-ratio enforcement via smart contracts</li><li>RBAC on EVM-compatible blockchain (Solidity 0.8.20)</li><li>51-entity PostgreSQL schema with CQRS projection tables</li></ul>` },
+    's6-o2': { eyebrow: 'Objective 2', title: 'Extended Banking Product Suite', body: `<p>Specify deposit mobilization, savings, and solidarity group lending on the hierarchical core:</p><ul><li>SavingsVault, FixedDeposit, CurrentAccount</li><li>GroupLendingPool with mutual liability</li><li>InterBankLendingPool, UpwardDepositFacility (Phase II)</li></ul>` },
+    's6-o3': { eyebrow: 'Objective 3', title: 'AI/ML Analytics Layer', body: `<p>Investigate lightweight ML wired on-chain via oracle:</p><ul><li>Random Forest fraud probability + Isolation Forest anomaly score</li><li>Stacking meta-learner for calibrated composite score</li><li>SHAP explainability (Authority Brief + client decline reasons)</li><li>BCCC-DeFiFraudTrans-2025 primary training dataset</li></ul>` },
+    's6-o4': { eyebrow: 'Objective 4', title: 'Transparent Programmable Lending', body: `<p>Specify smart-contract-enforced lending with:</p><ul><li>Configurable 6-month and 1-year borrowing limits</li><li>Automated installment schedule (INSTALLMENT weak entity)</li><li>Commit-reveal oracle state machine on LOAN_REQUEST</li><li>Human approver gate before any disbursement</li></ul>` },
+    's6-o5': { eyebrow: 'Objective 5', title: 'Testnet Deployment Plan', body: `<p>Plan validation on public testnets in the final thesis phase:</p><ul><li>Primary: Polygon zkEVM Cardona</li><li>Secondary: Ethereum Sepolia</li><li>Foundry 300-client simulation + Hardhat integration tests</li><li>Test tokens only — no real financial transactions</li></ul>` },
+    's7-p1': { eyebrow: 'Phase I · Weeks 1–4', title: 'Foundation & Infrastructure', body: `<ul><li>World Bank Reserve, National Bank, Local Bank contracts</li><li>51-entity DB schema (31 core + 20 extension/stub)</li><li>React frontend shell + Express.js API</li><li>Chainlink Proof of Reserve integration</li><li>Groth16 KYC age-range circuit (Circom 2.0)</li></ul>` },
+    's7-p2': { eyebrow: 'Phase II · Weeks 5–9', title: 'Core Banking Lifecycle', body: `<ul><li>Loan request → approval → disbursement → installments</li><li>Borrowing limit enforcement (on-chain authoritative)</li><li>SavingsVault, GroupLendingPool, Chainlink Automation</li><li>GROUP_CONSENT, INTEREST_RATE_TIER versioning</li><li>SESSION_ANCESTOR closure table</li></ul>` },
+    's7-p3': { eyebrow: 'Phase III · Weeks 10–13', title: 'AI/ML Oracle Pipeline', body: `<ul><li>Chainlink Functions DON for decentralised score commit</li><li>RF + IF + SHAP wired via commit-reveal oracle</li><li>Authority Brief UI for bank approvers</li><li>SAR workflow (AML → compliance queue → freeze)</li><li>Optional MCP agent add-on (Qwen3-8B, EIP-7702)</li></ul>` },
+    's7-p4': { eyebrow: 'Phase IV · Weeks 14–16', title: 'Verification & Deployment', body: `<ul><li>Certora reserve invariants + Foundry fuzz tests</li><li>300-client Foundry simulation</li><li>Testnet deployment on Polygon zkEVM Cardona</li><li>zkAML circuit (Future Work — larger than KYC circuit)</li><li>EU AI Act Annex III conformity baseline</li></ul>` },
+    's8-in1': { eyebrow: 'In Scope', title: '15 Modular Smart Contracts', body: `<p>Full formal specification across four tiers: 3 core lending + 6 banking products + 6 multi-entity operations (InterBankLendingPool, NettingEngine, TranchedPool, etc.).</p>` },
+    's8-in2': { eyebrow: 'In Scope', title: 'Four-Tier Lending Lifecycle', body: `<p>Complete workflow: LOAN_REQUEST → oracle scoring → approver review → LOAN disbursement → INSTALLMENT repayments with borrowing limit enforcement at every step.</p>` },
+    's8-in3': { eyebrow: 'In Scope', title: 'AI/ML Pipeline', body: `<p>Random Forest + Isolation Forest + SHAP explainability. Training on BCCC-DeFiFraudTrans-2025. LOAN_RISK_ASSESSMENT audit rows. Human-in-the-loop invariant — ML is decision support, not decision authority.</p>` },
+    's8-in4': { eyebrow: 'In Scope', title: 'Testnet Deployment', body: `<p>Polygon zkEVM Cardona (primary) and Ethereum Sepolia (secondary). Public block explorer verification of all critical state transitions.</p>` },
+    's8-in5': { eyebrow: 'In Scope', title: 'Test Tokens Only', body: `<p>No real financial transactions at any stage. Open-source GitHub repository with design artifacts, contract interfaces, and MVT run instructions.</p>` },
+    's8-ch1': { eyebrow: 'Challenge', title: 'Unlabeled DeFi Fraud Data', body: `<p>Limited labeled fraud data for DeFi lending. Mitigation: BCCC-DeFiFraudTrans-2025 primary dataset, synthetic Foundry manifest for integration testing, transfer learning from Elliptic Bitcoin Dataset as baseline comparison.</p>` },
+    's8-ch2': { eyebrow: 'Challenge', title: 'Regulatory Uncertainty', body: `<p>Crypto lending regulation varies by jurisdiction (MiCA EU, GENIUS Act US). Mitigation: testnet-only deployment, ZKP KYC for privacy-preserving compliance, no real-money flows.</p>` },
+    's8-ch3': { eyebrow: 'Challenge', title: 'Gas Cost Sensitivity', body: `<p>Complex multi-tier on-chain operations require gas optimization. Mitigation: L2 deployment (Polygon zkEVM), AI/ML runs entirely off-chain, batch settlement via NettingEngine.</p>` },
+    's8-ch4': { eyebrow: 'Challenge', title: 'Model Interpretability', body: `<p>EU AI Act Annex III classifies credit-scoring AI as high-risk from August 2026. Mitigation: SHAP attributions, Authority Brief, immutable LOAN_RISK_ASSESSMENT rows, mandatory human approver gate.</p>` },
+    's8-ch5': { eyebrow: 'Challenge', title: 'Economic Sustainability', body: `<p>Interest revenue must cover gas and operational costs across all four tiers. Mitigation: kinked utilization rate model (INTEREST_RATE_TIER), tier spreads, and revenue projection modeling in the thesis.</p>` },
+    's9-prisma1': { eyebrow: 'PRISMA Step 1', title: '892 Records Identified', body: `<p>Systematic search across 6 databases: ACM Digital Library, IEEE Xplore, Elsevier Scopus, MDPI, arXiv, and BIS/World Bank grey literature. Date range: 2017–2026.</p>` },
+    's9-prisma2': { eyebrow: 'PRISMA Step 2', title: '614 After Deduplication', body: `<p>278 duplicate records removed via DOI/title matching. Remaining records screened against inclusion criteria: blockchain banking, DeFi lending, ML fraud detection, ZKP identity, group lending, smart contract security.</p>` },
+    's9-prisma3': { eyebrow: 'PRISMA Step 3', title: '114 Full-Text Assessed', body: `<p>614 abstracts screened; 114 selected for full-text review against exclusion criteria (non-English, no blockchain component, purely theoretical with no architectural relevance).</p>` },
+    's9-prisma4': { eyebrow: 'PRISMA Final', title: '131 Entries in Synthesis', body: `<p>114 peer-reviewed sources + 17 grey literature and policy documents (BIS, IMF, World Bank, MiCA, GENIUS Act) synthesised across 8 research areas.</p>` },
+    's9-a1': { eyebrow: 'Research Area', title: 'DeFi Lending Mechanics', body: `<p>Covers Aave, Compound, MakerDAO architecture analysis, liquidity pool design, over-collateralization models, and flash loan attack vectors (Werner et al. 2022).</p>` },
+    's9-a2': { eyebrow: 'Research Area', title: 'ML Fraud & Anomaly Detection', body: `<p>BCCC-DeFiFraudTrans-2025, Palaiokrassas et al. 2024 behavioral features, Elliptic Bitcoin Dataset baseline, Isolation Forest for anomaly detection in financial networks.</p>` },
+    's9-a3': { eyebrow: 'Research Area', title: 'ZKP & Decentralized Identity', body: `<p>Groth16 zk-SNARKs via Circom 2.0, KYC age-range circuits, zkAML (IACR ePrint 2025/465), verifiable credentials, and ERC-4337 smart account onboarding.</p>` },
+    's9-a4': { eyebrow: 'Research Area', title: 'Group Lending & Microfinance', body: `<p>Grameen-style solidarity lending, joint liability models, over-indebtedness control algorithms, and ConsentRecorded on-chain events for GroupLendingPool.</p>` },
+    's9-a5': { eyebrow: 'Research Area', title: 'Smart Contract Security', body: `<p>Atzei et al. attack taxonomy, OpenZeppelin ReentrancyGuard, Slither static analysis, Mythril symbolic execution, Certora formal verification, Foundry fuzz testing.</p>` },
+    's9-a6': { eyebrow: 'Research Area', title: 'Institutional DeFi & Development Finance', body: `<p>IMF two-tier CBDC distribution (Tan 2023), Sygnum 2026 institutional DeFi governance gap, BIS cross-border CBDC projects, development banking capital allocation models.</p>` },
+    's9-a7': { eyebrow: 'Research Area', title: 'Regulatory Compliance (MiCA / GENIUS)', body: `<p>EU MiCA Arts. 16, 62; GENIUS Act §§4, 7; EU AI Act Annex III high-risk credit scoring (August 2026 deadline); GDPR Art. 17 right to erasure.</p>` },
+    's9-a8': { eyebrow: 'Research Area', title: 'Retail Payments & Remittance', body: `<p>World Bank remittance cost data, correspondent banking inefficiencies, stablecoin-first denomination for cross-border users, ERC-4337 gas abstraction for mobile onboarding.</p>` },
+    's10-f1': { eyebrow: 'Werner et al. 2022', title: 'DeFi Is Structurally Flat', body: `<p>Comprehensive analysis of DeFi lending protocols confirms: Aave, Compound, MakerDAO are uniformly pool-based and over-collateralized. <strong>No institutional hierarchy exists anywhere in DeFi</strong> — this is the architectural gap Crypto World Bank addresses.</p>` },
+    's10-f2': { eyebrow: 'Palaiokrassas et al. 2024', title: 'Behavioral Features Drive F1 to 0.85', body: `<p>On 54M+ DeFi transactions, XGBoost and Neural Networks achieve F1 of <strong>0.76–0.85</strong> using behavioral features (rolling windows, graph hops) vs. just 0.08 with raw transaction data. Directly informs our 22-dimensional CWB feature vector design.</p>` },
+    's10-f3': { eyebrow: 'Adom et al. 2022', title: 'SHAP Beats LIME for Lending', body: `<p>SHAP provides deeper, more consistent feature attributions backed by Shapley values from cooperative game theory. Primary reason we use SHAP (not LIME) for credit decision explainability and EU AI Act Art. 86 compliance.</p>` },
+    's10-f4': { eyebrow: 'Tan (IMF) 2023', title: 'Hierarchical Distribution Validated', body: `<p>IMF research on CBDC distribution confirms: central bank → commercial banks → users is the <strong>preferred institutional design pattern</strong> for digital finance. Our four-tier model extends this to development banking.</p>` },
+    's10-f5': { eyebrow: 'Sygnum Bank Feb 2026', title: 'Governance Is the Blocker', body: `<p>Institutional DeFi report: pension funds and endowments won't participate until <em>legal enforceability</em> is resolved. Technology alone is insufficient — structured governance (Safe multisig, TimelockController, RBAC) is required. Our four-tier governance architecture directly addresses this.</p>` }
+  };
+
+  function go(dir) {
+    closeDetail();
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(total - 1, current + dir));
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  function updateUI() {
+    const pct = ((current + 1) / total) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('counter').textContent =
+      (current + 1).toString().padStart(2,'0') + ' / ' + total.toString().padStart(2,'0');
+  }
+
+  function openDetail(id) {
+    const data = SECTIONS[id];
+    if (!data) return;
+    document.getElementById('detail-eyebrow').textContent = data.eyebrow || '';
+    document.getElementById('detail-title').textContent = data.title || '';
+    document.getElementById('detail-body').innerHTML = data.body || '';
+    const diag = document.getElementById('detail-diagram');
+    if (data.diagram) {
+      diag.innerHTML = data.diagram;
+      diag.style.display = 'flex';
+    } else {
+      diag.innerHTML = '';
+      diag.style.display = 'none';
+    }
+    document.getElementById('detail-overlay').classList.add('open');
+    document.querySelectorAll('.sub-toggle.active, .chip-toggle.active').forEach(el => el.classList.remove('active'));
+    const trigger = document.querySelector('[data-section="' + id + '"]');
+    if (trigger) trigger.classList.add('active');
+  }
+
+  function closeDetail(e) {
+    if (e && e.target && e.target.closest && e.target.closest('.detail-panel')) return;
+    document.getElementById('detail-overlay').classList.remove('open');
+    document.querySelectorAll('.sub-toggle.active, .chip-toggle.active').forEach(el => el.classList.remove('active'));
+  }
+
+  document.querySelectorAll('[data-section]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      openDetail(el.dataset.section);
+    });
+  });
+
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('detail-overlay').classList.contains('open')) {
+      if (e.key === 'Escape') { e.preventDefault(); closeDetail(); }
+      return;
+    }
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp') { e.preventDefault(); go(-1); }
+  });
+
+  document.querySelector('.deck').addEventListener('click', e => {
+    if (e.target.closest('.nav-btn') || e.target.closest('[data-section]') || e.target.closest('.detail-overlay')) return;
+    go(1);
+  });
+
+  updateUI();
+</script>
+</body>
+</html>

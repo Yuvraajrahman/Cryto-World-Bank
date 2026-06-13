@@ -725,7 +725,7 @@ To our knowledge, no prior published academic work specifies a programmable mutu
 \textit{Implementation scope:} Contribution~2 is a specification contribution: no prior academic work formally specifies the algorithmic structure of solidarity group lending as a smart contract interface. The formal specification is given in Section~\ref{sec:over-indebt}. A minimal proof-of-concept deployment is scoped to Phase~II of the final thesis phase; full lifecycle implementation with mutual liability enforcement and over-indebtedness control is likewise Phase~II.
 
 \item[\textbf{Contribution 3 --- Oracle-Mediated AI/ML Integration with Explainability.}]
-We propose an architectural pattern for integrating off-chain Random Forest fraud detection, Isolation Forest anomaly detection, and SHAP- plus deviation-report explainability (Section~\ref{sec:ml-explainability}) into an on-chain lending decision workflow via a trusted oracle relay, providing a blueprint for auditable, AI-assisted credit governance in DeFi. The design addresses the oracle problem---the challenge of securely bridging on-chain logic with off-chain data---and specifies three concrete integration options (centralized relay, Chainlink Functions, and commit-reveal scheme) with explicit trust trade-offs. Explainability outputs are audience-specific: plain-language decline reasons for retail clients, an Authority Brief dashboard for bank approvers, and a full inference audit trail in \texttt{AI\_ML\_SECURITY\_LOG} for compliance reviewers.
+We propose an architectural pattern for integrating off-chain Random Forest fraud detection, Isolation Forest anomaly detection, and SHAP- plus deviation-report explainability (Section~\ref{sec:ml-explainability}) into an on-chain lending decision workflow via a trusted oracle relay, providing a blueprint for auditable, AI-assisted credit governance in DeFi. The design addresses the oracle problem---the challenge of securely bridging on-chain logic with off-chain data---and specifies three concrete integration options (centralized relay, Chainlink Functions, and commit-reveal scheme) with explicit trust trade-offs. Explainability outputs are audience-specific: plain-language decline reasons for retail clients, an Authority Brief dashboard for bank approvers, and a full inference audit trail in \texttt{LOAN\_RISK\_ASSESSMENT} (FK to \texttt{MODEL\_REGISTRY}) for compliance reviewers; system-wide AML alerts append to \texttt{SECURITY\_EVENT\_LOG}.
 
 \textit{Implementation scope:} The Random Forest fraud detector is trained and benchmarked on the BCCC-DeFiFraudTrans-2025 dataset~[R47] (1,026,867 annotated DeFi transactions, 79 features), with cross-validation against the Elliptic Bitcoin Dataset~[R48]. Datasets, training steps, feature mapping, and pre-submission deliverables are documented in Section~\ref{sec:ml-workload}; explainability is formalised in Section~\ref{sec:ml-explainability}. Oracle wiring to the \texttt{LocalBank} contract via Chainlink Functions is scoped to Phase~III; the architectural specification, ML workload plan, benchmark, and explainability design together constitute the Contribution~3 claim at pre-thesis stage.
 
@@ -2933,7 +2933,7 @@ Syndicated / tranched / NettingEngine & Stretch (Phase~III) & Specified; full su
 3 & Reserve-ratio / borrowing-limit enforcement visible on-chain & II & Hardhat or Foundry test proves revert on violation \\
 4 & FastAPI ML service: RF + IF + stacking $\to$ composite score $s$ & II--III & \texttt{POST /score} returns JSON in $<$50\,ms on laptop \\
 5 & SHAP + anomaly deviation report + Authority Brief UI & II--III & Approver sees brief on sample loan; decline shows top-3 SHAP reasons \\
-6 & \texttt{AI\_ML\_SECURITY\_LOG} row per inference & III & DB row contains \texttt{shap\_json}, \texttt{model\_version}, \texttt{loan\_id} \\
+6 & \texttt{LOAN\_RISK\_ASSESSMENT} row per inference & III & DB row contains \texttt{shap\_vector}, \texttt{model\_id} (FK $\to$ \texttt{MODEL\_REGISTRY}), \texttt{loan\_request\_id} \\
 7 & Commit-reveal or centralized relay score commit before approval & III & Contract in \texttt{SCORE\_REVEALED} before \texttt{approveLoan} succeeds \\
 8 & BCCC-DeFiFraudTrans benchmark table (precision, recall, F1, AUC) & II--III & Table in Section~\ref{sec:ml-workload} populated with measured values \\
 9 & 300-client Foundry simulation OR documented gas-cost table & IV & Appendix~C manifest + reserve dynamics output \\
@@ -3015,7 +3015,7 @@ The offline training job (\texttt{train\_risk\_models.py} in the planned FastAPI
 \item \textbf{Train Isolation Forest} --- \texttt{sklearn.ensemble.IsolationForest}, trained on validation-set \textit{non-fraud} rows only; anomaly scores normalised to $[0,1]$.
 \item \textbf{Fit stacking meta-learner} --- logistic regression on $(p_f, s_{\text{IF}})$ using validation labels; export coefficients and intercept to \texttt{meta\_learner.json}.
 \item \textbf{Evaluate} on held-out test set; write metrics to \texttt{metrics.json} and confusion matrix to \texttt{eval\_report.pdf}.
-\item \textbf{Serialize} --- \texttt{rf\_model.pkl}, \texttt{if\_model.pkl}, \texttt{meta\_learner.json}, \texttt{feature\_schema.json}, \texttt{model\_version} SHA-256 hash for \texttt{AI\_ML\_SECURITY\_LOG}.
+\item \textbf{Serialize} --- \texttt{rf\_model.pkl}, \texttt{if\_model.pkl}, \texttt{meta\_learner.json}, \texttt{feature\_schema.json}; register \texttt{artifact\_hash} in \texttt{MODEL\_REGISTRY} (referenced by \texttt{LOAN\_RISK\_ASSESSMENT}).
 \end{enumerate}
 
 \begin{table}[H]
@@ -3038,7 +3038,7 @@ The offline training job (\texttt{train\_risk\_models.py} in the planned FastAPI
 \end{table}
 
 \paragraph{Online inference workload (runtime).}
-At loan submission, the Express.js backend POSTs the feature JSON to FastAPI \texttt{/v1/score}. The service loads serialized models, returns $\{p_f, s_{\text{IF}}, s, \text{shap\_top3}, \text{anomaly\_deviations}\}$ in under 50\,ms (laptop target), writes one \texttt{AI\_ML\_SECURITY\_LOG} row, and triggers the commit-reveal step (Section~\ref{sec:oracle-architecture}). The approver dashboard polls \texttt{/v1/brief/\{loan\_id\}} for the Authority Brief.
+At loan submission, the Express.js backend POSTs the feature JSON to FastAPI \texttt{/v1/score}. The service loads serialized models, returns $\{p_f, s_{\text{IF}}, s, \text{shap\_top3}, \text{anomaly\_deviations}\}$ in under 50\,ms (laptop target), writes one \texttt{LOAN\_RISK\_ASSESSMENT} row (FK to \texttt{MODEL\_REGISTRY}), and triggers the commit-reveal step (Section~\ref{sec:oracle-architecture}). The approver dashboard polls \texttt{/v1/brief/\{loan\_id\}} for the Authority Brief.
 
 \begin{table}[H]
 \centering
@@ -3052,7 +3052,7 @@ Train RF + IF on BCCC; export \texttt{.pkl} + \texttt{metrics.json} & \textbf{Ye
 SHAP TreeExplainer + 5 worked explanation examples (PDF/screenshots) & \textbf{Yes} --- recommended & Required for RQ3 \\
 FastAPI \texttt{/v1/score} + \texttt{/v1/brief} endpoints (local) & \textbf{Yes} --- recommended & Wire to live loan form \\
 Authority Brief React component (mock or live data) & Partial --- mock OK & Live data from inference service \\
-\texttt{AI\_ML\_SECURITY\_LOG} schema + sample rows & \textbf{Yes} --- schema in Ch.~3 & One row per real inference \\
+\texttt{LOAN\_RISK\_ASSESSMENT} + \texttt{MODEL\_REGISTRY} schema + sample rows & \textbf{Yes} --- schema in Ch.~3 & One row per real inference \\
 On-chain commit-reveal / relay integration & Design only & Must --- item~7 in Table~\ref{tab:mvt-checklist} \\
 Chainlink Functions DON commit & Future Work & Stretch beyond centralized relay \\
 GNN / federated learning & Future Work only & Not MVT \\
@@ -3230,7 +3230,7 @@ Because IF lacks native Shapley values, anomaly explainability uses a \textbf{fe
 \midrule
 Retail client & React loan status page & Top-3 SHAP reasons in plain language on decline; optional anomaly summary if score $\ge 0.7$ \\
 Bank approver & Authority Brief dashboard & SHAP waterfall + anomaly deviation table + composite $s$; one-click approve / decline \\
-Compliance auditor & \texttt{AI\_ML\_SECURITY\_LOG} & Full SHAP vector, IF score, feature JSON, model version hash, oracle tx hash \\
+Compliance auditor & \texttt{LOAN\_RISK\_ASSESSMENT} + \texttt{MODEL\_REGISTRY} & Full SHAP vector (\texttt{shap\_vector}), anomaly score, feature vector hash, model artifact hash, oracle commit tx (via \texttt{LOAN\_REQUEST}) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3239,7 +3239,7 @@ Compliance auditor & \texttt{AI\_ML\_SECURITY\_LOG} & Full SHAP vector, IF score
 When any loan application is submitted---via the React UI or optionally via the agent---the approver dashboard renders an Authority Brief with ML risk score, SHAP breakdown, and anomaly deviation lines (see verbatim example in Section~\ref{sec:optional-agent}). The brief is produced by the FastAPI scoring service; the agent may \textit{also} display it when filing on behalf of a client, but the blockchain lending path does not require the agent.
 
 \paragraph{Audit trail and human-in-the-loop invariant.}
-Every inference writes one row to \texttt{AI\_ML\_SECURITY\_LOG}: \texttt{\{wallet, loan\_id, p\_f, s\_if, s\_composite, shap\_json, anomaly\_features\_json, model\_version, oracle\_commit\_tx\}}. The contract never auto-disburses on ML output alone; an approver (or client via wallet) must sign the disbursement transaction. ML is \textbf{decision support}, not decision authority---consistent with EU AI Act Art.~86 and the thesis ethical statement.
+Every inference writes one row to \texttt{LOAN\_RISK\_ASSESSMENT}: \texttt{\{loan\_request\_id, model\_id, fraud\_probability, anomaly\_score, shap\_vector, feature\_vector\_hash, created\_at\}} with model lineage in \texttt{MODEL\_REGISTRY}; system-wide AML alerts append to \texttt{SECURITY\_EVENT\_LOG}. The contract never auto-disburses on ML output alone; an approver (or client via wallet) must sign the disbursement transaction. ML is \textbf{decision support}, not decision authority---consistent with EU AI Act Art.~86 and the thesis ethical statement.
 
 \paragraph{Timeliness: anticipatory alignment with EU AI Act Annex~III.}
 The EU AI Act classifies AI systems used to evaluate the creditworthiness
@@ -3248,7 +3248,7 @@ obligations applying from August~2026~[126]---a deadline that falls
 within the timeline of this thesis. The explainability pipeline specified
 above already produces several of the artifacts such systems require:
 per-inference SHAP attributions and feature-deviation reports (Art.~86
-right-to-explanation), an immutable \texttt{AI\_ML\_SECURITY\_LOG} row per
+right-to-explanation), an immutable \texttt{LOAN\_RISK\_ASSESSMENT} row per
 decision (Art.~12 automated logging), and a mandatory human-approver gate
 before disbursement (Art.~14 human oversight). Section~\ref{sec:mica-compliance}
 maps these elements against the full Annex~III conformity checklist; the
@@ -3463,7 +3463,7 @@ This section summarizes how each research question will be evaluated in the prot
 \begin{itemize}[noitemsep]
 \item \textbf{RQ1 (architecture fidelity):} feature comparison and workflow mapping against flat DeFi protocols (e.g., Aave, Compound, MakerDAO), focusing on institutional hierarchy, role separation, and directional capital flow.
 \item \textbf{RQ2 (settlement and transparency):} measurement of transaction latency and approximate per-transaction cost on testnets / Layer~2, plus demonstration of on-chain verifiability of reserves and critical state transitions.
-\item \textbf{RQ3 (analytics support):} model evaluation using standard metrics (precision, recall, F1, AUC) plus explainability completeness (SHAP coverage, anomaly deviation reports, Authority Brief audit rows in \texttt{AI\_ML\_SECURITY\_LOG}) is reported in two explicitly separated phases. \textit{Phase~(a) --- synthetic-data evaluation:} model performance on the procedurally-generated synthetic dataset (documented in Section~\ref{sec:abm-sim}), labeled ``proof-of-concept evaluation only.'' These metrics reflect the upper-bound performance achievable given the synthetic distribution and do not make claims about real-world fraud detection. The stacking meta-learner weights are hardcoded initial placeholder values (approximately 0.7 for $p_f$, 0.3 for the anomaly signal) pending real labeled data; when no labeled validation set is available, the system degrades gracefully to a calibrated Random Forest alone. \textit{Phase~(b) --- real-data evaluation:} deferred to future work once actual user transaction data is available. Additionally, a GNN ablation study (Section~\ref{sec:gnn-extension}) quantifies the marginal value of relational features over flat behavioral features.
+\item \textbf{RQ3 (analytics support):} model evaluation using standard metrics (precision, recall, F1, AUC) plus explainability completeness (SHAP coverage, anomaly deviation reports, Authority Brief audit rows in \texttt{LOAN\_RISK\_ASSESSMENT}) is reported in two explicitly separated phases. \textit{Phase~(a) --- synthetic-data evaluation:} model performance on the procedurally-generated synthetic dataset (documented in Section~\ref{sec:abm-sim}), labeled ``proof-of-concept evaluation only.'' These metrics reflect the upper-bound performance achievable given the synthetic distribution and do not make claims about real-world fraud detection. The stacking meta-learner weights are hardcoded initial placeholder values (approximately 0.7 for $p_f$, 0.3 for the anomaly signal) pending real labeled data; when no labeled validation set is available, the system degrades gracefully to a calibrated Random Forest alone. \textit{Phase~(b) --- real-data evaluation:} deferred to future work once actual user transaction data is available. Additionally, a GNN ablation study (Section~\ref{sec:gnn-extension}) quantifies the marginal value of relational features over flat behavioral features.
 \item \textbf{RQ4 (technical viability):} end-to-end deployment verification on public testnets with integration tests covering wallet connection, loan request, approval, repayment, and role-based access control; Foundry invariant suite reports the proportion of fuzz runs that hold each invariant (Section~\ref{sec:foundry}). \textit{Note:} at pre-thesis stage, RQ4 is evaluated through formal specification, Hardhat simulation scripts, and planned Phase~IV testnet deployment. End-to-end four-tier capital flow will be evaluated and reported in the final thesis.
 \item \textbf{RQ5 (banking extensions):} design-level validation via specification completeness and interface contracts for deposit products and group lending, plus prototype demonstrations of selected mechanisms where implemented; the scripted on-chain Hardhat simulation (Section~\ref{sec:abm-sim}) produces an aggregate stress-test outcome under 30\% simultaneous-default scenario across the simulated six-institution hierarchy.
 \end{itemize}
@@ -4412,7 +4412,7 @@ GENIUS Act \S\,4 (Federal Payment Stablecoin Framework) & Federal registration o
 GENIUS Act \S\,7 (Reserve Disclosure) & Monthly attestation and public disclosure of reserves & Circle / Tether attestations are independently verifiable on-chain; CWB dashboard surfaces issuer attestation links per stablecoin pool. \\
 EU AI Act Annex~III (high-risk: credit scoring) & AI systems evaluating natural-person creditworthiness classified high-risk from August~2026~[126] & RF/IF pipeline is in scope; conformity assessment, risk-management system, and technical documentation required before EU-resident deployment. \\
 EU AI Act Art.~86 & Right to explanation for AI-assisted decisions & Borrower-facing SHAP + anomaly summaries (Section~\ref{sec:ml-explainability}); Authority Brief for approvers; audit log for compliance. SHAP satisfies post-hoc explanation partially; substantive ``meaningful explanation'' threshold may require additional artifacts~[126]. \\
-EU AI Act Arts.~11, 12, 14 & Technical documentation, automated logging, human oversight & \texttt{AI\_ML\_SECURITY\_LOG} (Art.~12 partial); human approver gate (Art.~14); full Art.~11 technical file and risk-management system not yet complete. \\
+EU AI Act Arts.~11, 12, 14 & Technical documentation, automated logging, human oversight & \texttt{LOAN\_RISK\_ASSESSMENT} + \texttt{MODEL\_REGISTRY} (Art.~12 partial); human approver gate (Art.~14); full Art.~11 technical file and risk-management system not yet complete. \\
 GDPR Art.~17 (Right to Erasure) & Personal data must be deletable on request & No PII on-chain; off-chain PostgreSQL data is encrypted and subject to data-subject deletion requests; only document hashes (SHA-256) appear on-chain. \\
 \bottomrule
 \end{tabular}
@@ -4795,7 +4795,8 @@ Every client receives a personalised experience without deploying a separate mod
 
 \begin{verbatim}
 {
-  "client_id": "0xABC...",
+  "borrower_id": "550e8400-e29b-41d4-a716-446655440000",
+  "wallet_address": "0xABC...",
   "language": "en",
   "credit_tier": "Silver",
   "credit_score": 512,
@@ -4850,7 +4851,7 @@ When the assembled prompt approaches the 32K-token window, the backend retains h
 \section{Lifecycle Hooks and Optional Capabilities}
 
 \paragraph{Lifecycle hook middleware.}
-Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook (Phase~II) verifies a logged confirmation turn or returns HTTP~403; (2)~session-key scope pre-check (Phase~III); (3)~AML pre-check against \texttt{AI\_ML\_SECURITY\_LOG} (Phase~IV).
+Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook (Phase~II) verifies a logged confirmation turn or returns HTTP~403; (2)~session-key scope pre-check (Phase~III); (3)~AML pre-check against \texttt{LOAN\_RISK\_ASSESSMENT} and \texttt{SECURITY\_EVENT\_LOG} (Phase~IV).
 
 \paragraph{Optional agent capabilities.}
 \begin{itemize}[noitemsep]
@@ -4882,7 +4883,8 @@ The Express.js backend injects the client's full on-chain state as a structured 
 \begin{verbatim}
 {
   "tier": "volatile",
-  "client_id": "0xABC...",
+  "borrower_id": "550e8400-e29b-41d4-a716-446655440000",
+  "wallet_address": "0xABC...",
   "language": "en",
   "credit_tier": "Silver",
   "credit_score": 512,

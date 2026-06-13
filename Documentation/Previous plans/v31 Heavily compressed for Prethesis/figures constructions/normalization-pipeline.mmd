@@ -1,0 +1,18 @@
+---
+title: Normalization Pipeline — Crypto World Bank Schema
+---
+flowchart LR
+    classDef bad fill:#f8cecc,stroke:#b85450
+    classDef ok fill:#d5e8d4,stroke:#82b366
+    classDef note fill:#fff2cc,stroke:#d6b656
+
+    U0["0NF / Unnormalized<br/>Repeating income proofs in BORROWER<br/>Repeating installments in LOAN<br/>Rate params inside bank rows"]:::bad
+    N1["1NF<br/>INCOME_PROOF table<br/>INSTALLMENT table<br/>Atomic values only"]:::ok
+    N2["2NF<br/>Composite PK on INSTALLMENT<br/>No partial dependencies"]:::ok
+    N3["3NF<br/>INTEREST_RATE_TIER extracted<br/>Derived limits computed at query"]:::ok
+    BC["BCNF check<br/>BANK_USER bank_type CHECK"]:::note
+
+    U0 -->|"Remove repeating groups"| N1
+    N1 -->|"Full-key dependencies"| N2
+    N2 -->|"Remove transitive deps"| N3
+    N3 --> BC

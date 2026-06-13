@@ -1,0 +1,492 @@
+<svg viewBox="0 0 1500 1130" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif" style="background:#f5f5f5;">
+
+  <!-- DEFS -->
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#1a1a1a"/>
+    </marker>
+    <marker id="arr-d" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#666"/>
+    </marker>
+    <!-- cylinder clip -->
+    <clipPath id="cyltop"><ellipse cx="35" cy="6" rx="35" ry="6"/></clipPath>
+  </defs>
+
+  <!-- PAGE BG -->
+  <rect width="1500" height="1130" fill="#f5f5f5"/>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       PANEL A – Level-0 Context Diagram
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="8" y="8" width="1484" height="370" rx="6" fill="white" stroke="#bbb" stroke-width="1.5"/>
+  <text x="750" y="32" text-anchor="middle" font-size="18.6" font-weight="bold" fill="#111">(A) Level-0 (Context Diagram) – Crypto World Bank Platform</text>
+
+  <!-- ─── Central Process 0 ─── -->
+  <rect x="560" y="48" width="240" height="130" rx="6" fill="white" stroke="#222" stroke-width="2"/>
+  <text x="680" y="72" text-anchor="middle" font-size="15.6" font-weight="bold" fill="#111">0</text>
+  <text x="680" y="89" text-anchor="middle" font-size="14.4" font-weight="bold" fill="#111">Crypto World Bank</text>
+  <text x="680" y="104" text-anchor="middle" font-size="14.4" font-weight="bold" fill="#111">Platform</text>
+  <text x="680" y="122" text-anchor="middle" font-size="10.8" fill="#555">(Four-Tier Decentralised</text>
+  <text x="680" y="135" text-anchor="middle" font-size="10.8" fill="#555">Lending &amp; Treasury System)</text>
+  <text x="680" y="152" text-anchor="middle" font-size="9.6" fill="#888">Process</text>
+
+  <!-- ─── E1: Users/Customers ─── -->
+  <rect x="52" y="48" width="148" height="90" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="55" y="51" width="142" height="84" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="126" y="70" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">E1</text>
+  <text x="126" y="84" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Users / Customers</text>
+  <text x="126" y="100" text-anchor="middle" font-size="10.2" fill="#444">(Tier 4 Borrowers</text>
+  <text x="126" y="113" text-anchor="middle" font-size="10.2" fill="#444">&amp; Depositors)</text>
+  <text x="126" y="128" text-anchor="middle" font-size="9.6" fill="#888">External Entity</text>
+
+  <!-- ─── E2: Banks ─── -->
+  <rect x="52" y="195" width="148" height="90" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="55" y="198" width="142" height="84" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="126" y="216" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">E2</text>
+  <text x="126" y="230" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Banks (Tier 1–3)</text>
+  <text x="126" y="248" text-anchor="middle" font-size="10.2" fill="#444">(National &amp;</text>
+  <text x="126" y="261" text-anchor="middle" font-size="10.2" fill="#444">Local Banks)</text>
+  <text x="126" y="277" text-anchor="middle" font-size="9.6" fill="#888">External Entity</text>
+
+  <!-- ─── E3: Blockchain Network ─── -->
+  <rect x="1100" y="48" width="155" height="90" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="1103" y="51" width="149" height="84" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="1177" y="68" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">E3</text>
+  <text x="1177" y="82" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Blockchain</text>
+  <text x="1177" y="96" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Network</text>
+  <text x="1177" y="111" text-anchor="middle" font-size="10.2" fill="#444">(Polygon zkEVM)</text>
+
+  <!-- ─── E4: Oracle & External Services ─── -->
+  <rect x="1100" y="188" width="155" height="95" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="1103" y="191" width="149" height="89" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="1177" y="210" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">E4</text>
+  <text x="1177" y="224" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Oracle &amp; External</text>
+  <text x="1177" y="238" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Services</text>
+  <text x="1177" y="253" text-anchor="middle" font-size="9.6" fill="#444">(Chainlink, Price Feeds,</text>
+  <text x="1177" y="265" text-anchor="middle" font-size="9.6" fill="#444">KYC, Sanctions, FX Rates)</text>
+
+  <!-- ─── E5: Regulators / Compliance ─── -->
+  <rect x="556" y="298" width="248" height="72" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="559" y="301" width="242" height="66" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="680" y="319" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">E5</text>
+  <text x="680" y="333" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Regulators / Compliance</text>
+  <text x="680" y="350" text-anchor="middle" font-size="10.2" fill="#444">(Authorities, Auditors)</text>
+
+  <!-- ═══ PANEL A ARROWS ═══ -->
+  <!-- E1 → P0 (Registrations, KYC...) -->
+  <path d="M201,78 L558,80" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="370" y="67" text-anchor="middle" font-size="9.4" fill="#222">Registration, KYC Data, Loan Requests,</text>
+  <text x="370" y="77" text-anchor="middle" font-size="9.4" fill="#222">Deposits, Repayments, Queries</text>
+
+  <!-- P0 → E1 (Approvals...) -->
+  <path d="M559,115 L201,125" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="385" y="143" text-anchor="middle" font-size="9.4" fill="#222">Approvals, Loan Terms,</text>
+  <text x="385" y="153" text-anchor="middle" font-size="9.4" fill="#222">Balances, Statements, Notifications</text>
+
+  <!-- E2 → P0 (Loan Requests...) -->
+  <path d="M201,225 L559,170" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="373" y="210" text-anchor="middle" font-size="9.4" fill="#222">Loan Requests, Repayments,</text>
+  <text x="373" y="220" text-anchor="middle" font-size="9.4" fill="#222">Collateral Data, Reports</text>
+
+  <!-- P0 → E2 (Loan Decisions...) -->
+  <path d="M560,190 L201,248" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="375" y="255" text-anchor="middle" font-size="9.4" fill="#222">Loan Decisions, Disbursements,</text>
+  <text x="375" y="265" text-anchor="middle" font-size="9.4" fill="#222">Limits, Statements</text>
+
+  <!-- P0 → E3 (Transactions...) -->
+  <path d="M800,80 L1098,82" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="950" y="70" text-anchor="middle" font-size="9.4" fill="#222">Transactions, Events,</text>
+  <text x="950" y="80" text-anchor="middle" font-size="9.4" fill="#222">Smart Contract Calls</text>
+
+  <!-- E3 → P0 (Transaction Receipts...) -->
+  <path d="M1099,110 L801,115" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="953" y="127" text-anchor="middle" font-size="9.4" fill="#222">Transaction Receipts,</text>
+  <text x="953" y="137" text-anchor="middle" font-size="9.4" fill="#222">Event Logs, Block Data</text>
+
+  <!-- P0 → E4 (Data Requests) -->
+  <path d="M800,150 L1099,210" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="975" y="165" text-anchor="middle" font-size="9.4" fill="#222">Data Requests</text>
+
+  <!-- E4 → P0 (External Data) -->
+  <path d="M1099,240 L801,165" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="970" y="208" text-anchor="middle" font-size="9.4" fill="#222">External Data</text>
+  <text x="970" y="218" text-anchor="middle" font-size="9.4" fill="#222">(Prices, Rates, KYC, etc.)</text>
+
+  <!-- P0 → E5 (Reports, Audit Trails) -->
+  <path d="M622,178 L610,297" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="545" y="238" text-anchor="middle" font-size="9.4" fill="#222">Reports, Audit Trails,</text>
+  <text x="545" y="248" text-anchor="middle" font-size="9.4" fill="#222">Risk &amp; Compliance Data</text>
+
+  <!-- E5 → P0 (Policies – dashed) -->
+  <path d="M730,297 L740,179" fill="none" stroke="#666" stroke-width="1.2" stroke-dasharray="6,3" marker-end="url(#arr-d)"/>
+  <text x="790" y="238" text-anchor="middle" font-size="9.4" fill="#666">Policies, Rules,</text>
+  <text x="790" y="248" text-anchor="middle" font-size="9.4" fill="#666">Compliance Requests</text>
+
+  <!-- ═══ DFD LEGEND ═══ -->
+  <rect x="1290" y="40" width="188" height="225" rx="4" fill="white" stroke="#aaa" stroke-width="1.2" stroke-dasharray="6,4"/>
+  <text x="1384" y="60" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">DFD Legend (Notation Used)</text>
+  <!-- External Entity -->
+  <rect x="1302" y="72" width="36" height="24" fill="#efefef" stroke="#111" stroke-width="2.2"/>
+  <rect x="1305" y="75" width="30" height="18" fill="#efefef" stroke="#111" stroke-width="0.8"/>
+  <text x="1350" y="88" font-size="10.2" fill="#222">External Entity</text>
+  <!-- Process -->
+  <rect x="1302" y="106" width="36" height="24" fill="white" stroke="#111" stroke-width="1.5"/>
+  <text x="1350" y="122" font-size="10.2" fill="#222">Process</text>
+  <!-- Data Store cylinder -->
+  <ellipse cx="1320" cy="148" rx="18" ry="5.5" fill="white" stroke="#222" stroke-width="1.4"/>
+  <rect x="1302" y="148" width="36" height="20" fill="white" stroke="#222" stroke-width="1.4"/>
+  <ellipse cx="1320" cy="168" rx="18" ry="5.5" fill="white" stroke="#222" stroke-width="1.4"/>
+  <line x1="1302" y1="148" x2="1302" y2="168" stroke="#222" stroke-width="1.4"/>
+  <line x1="1338" y1="148" x2="1338" y2="168" stroke="#222" stroke-width="1.4"/>
+  <text x="1350" y="162" font-size="10.2" fill="#222">Data Store</text>
+  <!-- Named Data Store -->
+  <line x1="1302" y1="187" x2="1302" y2="203" stroke="#222" stroke-width="1.5"/>
+  <line x1="1307" y1="187" x2="1307" y2="203" stroke="#222" stroke-width="1.5"/>
+  <rect x="1307" y="187" width="31" height="16" fill="white" stroke="#222" stroke-width="1.3"/>
+  <text x="1302" y="185" font-size="8.4" fill="#555">1D</text>
+  <text x="1350" y="200" font-size="10.2" fill="#222">Data Store (Named)</text>
+  <!-- Data Flow -->
+  <line x1="1302" y1="222" x2="1336" y2="222" stroke="#111" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="1350" y="226" font-size="10.2" fill="#222">Data Flow</text>
+  <!-- Control Flow -->
+  <line x1="1302" y1="242" x2="1336" y2="242" stroke="#666" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="1350" y="246" font-size="10.2" fill="#666">Control / Feedback Flow</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       PANEL B – Level-1 Core Lending Subsystem
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="8" y="388" width="730" height="730" rx="6" fill="white" stroke="#bbb" stroke-width="1.5"/>
+  <text x="373" y="412" text-anchor="middle" font-size="16.2" font-weight="bold" fill="#111">(B) Level-1 DFD – Core Lending Subsystem</text>
+
+  <!-- E1,E2 left external -->
+  <rect x="20" y="432" width="110" height="78" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="23" y="435" width="104" height="72" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="75" y="452" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">E1, E2</text>
+  <text x="75" y="466" text-anchor="middle" font-size="10.2" fill="#333">Banks (Tier 1–3)</text>
+  <text x="75" y="479" text-anchor="middle" font-size="10.2" fill="#333">&amp; Customers</text>
+  <text x="75" y="492" text-anchor="middle" font-size="10.2" fill="#333">(Tier 4)</text>
+
+  <!-- 1.1 Origination Service -->
+  <rect x="148" y="425" width="130" height="100" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="213" y="447" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">1.1</text>
+  <text x="213" y="461" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Origination</text>
+  <text x="213" y="475" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Service</text>
+  <text x="213" y="491" text-anchor="middle" font-size="9" fill="#444">• Validate request</text>
+  <text x="213" y="502" text-anchor="middle" font-size="9" fill="#444">• Capture terms</text>
+  <text x="213" y="513" text-anchor="middle" font-size="9" fill="#444">• Create loan application</text>
+
+  <!-- 1.2 ML Scoring Service -->
+  <rect x="298" y="425" width="130" height="100" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="363" y="447" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">1.2</text>
+  <text x="363" y="461" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">ML Scoring</text>
+  <text x="363" y="475" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Service</text>
+  <text x="363" y="491" text-anchor="middle" font-size="9" fill="#444">• Feature extraction</text>
+  <text x="363" y="502" text-anchor="middle" font-size="9" fill="#444">• ML risk scoring</text>
+  <text x="363" y="513" text-anchor="middle" font-size="9" fill="#444">• Decision support</text>
+
+  <!-- 1.3 Disbursement Service -->
+  <rect x="448" y="425" width="130" height="100" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="513" y="447" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">1.3</text>
+  <text x="513" y="461" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Disbursement</text>
+  <text x="513" y="475" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Service</text>
+  <text x="513" y="491" text-anchor="middle" font-size="9" fill="#444">• Credit approval</text>
+  <text x="513" y="502" text-anchor="middle" font-size="9" fill="#444">• Smart contract call</text>
+  <text x="513" y="513" text-anchor="middle" font-size="9" fill="#444">• Fund disbursement</text>
+
+  <!-- 1.4 Installment Engine -->
+  <rect x="598" y="425" width="130" height="100" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="663" y="447" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">1.4</text>
+  <text x="663" y="461" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Installment</text>
+  <text x="663" y="475" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Engine</text>
+  <text x="663" y="491" text-anchor="middle" font-size="9" fill="#444">• Schedule EMIs</text>
+  <text x="663" y="502" text-anchor="middle" font-size="9" fill="#444">• Generate due events</text>
+  <text x="663" y="513" text-anchor="middle" font-size="9" fill="#444">• Track payments</text>
+
+  <!-- E1,E2 right output -->
+  <rect x="20" y="548" width="110" height="68" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="23" y="551" width="104" height="62" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="75" y="569" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">E1, E2</text>
+  <text x="75" y="583" text-anchor="middle" font-size="10.2" fill="#333">Banks (Tier 1–3)</text>
+  <text x="75" y="597" text-anchor="middle" font-size="10.2" fill="#333">&amp; Customers (Tier 4)</text>
+
+  <!-- Process arrows – horizontal chain -->
+  <line x1="131" y1="472" x2="146" y2="472" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="138" y="465" text-anchor="middle" font-size="9" fill="#333">Application</text>
+  <text x="138" y="480" text-anchor="middle" font-size="9" fill="#333">Data</text>
+
+  <line x1="279" y1="470" x2="296" y2="470" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="288" y="463" text-anchor="middle" font-size="9" fill="#333">Score &amp;</text>
+  <text x="288" y="478" text-anchor="middle" font-size="9" fill="#333">Risk Grade</text>
+
+  <line x1="429" y1="472" x2="446" y2="472" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="437" y="462" text-anchor="middle" font-size="9" fill="#333">Disbursement</text>
+  <text x="437" y="478" text-anchor="middle" font-size="9" fill="#333">Transaction</text>
+
+  <line x1="579" y1="472" x2="596" y2="472" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="588" y="462" text-anchor="middle" font-size="9" fill="#333">Installment</text>
+  <text x="588" y="478" text-anchor="middle" font-size="9" fill="#333">Schedules</text>
+
+  <!-- 1.4 → E1,E2 output (route down-left) -->
+  <polyline points="663,525 663,570 131,582" fill="none" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="440" y="562" text-anchor="middle" font-size="9" fill="#333">Installment Schedules &amp; Dues</text>
+
+  <!-- DATA STORES ROW  y≈615 -->
+  <!-- Cylinder helper macro via group translate -->
+  <!-- D1 Customer & KYC Repository -->
+  <g transform="translate(148,610)">
+    <ellipse cx="38" cy="8" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="76" height="30" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="38" cy="38" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="38" stroke="#333" stroke-width="1.5"/>
+    <line x1="76" y1="8" x2="76" y2="38" stroke="#333" stroke-width="1.5"/>
+    <text x="38" y="27" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D1</text>
+    <text x="38" y="53" text-anchor="middle" font-size="9" fill="#333">Customer &amp; KYC</text>
+    <text x="38" y="63" text-anchor="middle" font-size="9" fill="#333">Repository</text>
+  </g>
+
+  <!-- D2 ML Models & Feature Store -->
+  <g transform="translate(283,610)">
+    <ellipse cx="38" cy="8" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="76" height="30" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="38" cy="38" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="38" stroke="#333" stroke-width="1.5"/>
+    <line x1="76" y1="8" x2="76" y2="38" stroke="#333" stroke-width="1.5"/>
+    <text x="38" y="27" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D2</text>
+    <text x="38" y="53" text-anchor="middle" font-size="9" fill="#333">ML Models &amp;</text>
+    <text x="38" y="63" text-anchor="middle" font-size="9" fill="#333">Feature Store</text>
+  </g>
+
+  <!-- D3 Loan Accounts (On-Chain) -->
+  <g transform="translate(400,610)">
+    <ellipse cx="38" cy="8" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="76" height="30" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="38" cy="38" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="38" stroke="#333" stroke-width="1.5"/>
+    <line x1="76" y1="8" x2="76" y2="38" stroke="#333" stroke-width="1.5"/>
+    <text x="38" y="27" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D3</text>
+    <text x="38" y="53" text-anchor="middle" font-size="9" fill="#333">Loan Accounts</text>
+    <text x="38" y="63" text-anchor="middle" font-size="9" fill="#333">(On-Chain)</text>
+  </g>
+
+  <!-- D4 Repayment Schedule Repository -->
+  <g transform="translate(496,610)">
+    <ellipse cx="38" cy="8" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="76" height="30" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="38" cy="38" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="38" stroke="#333" stroke-width="1.5"/>
+    <line x1="76" y1="8" x2="76" y2="38" stroke="#333" stroke-width="1.5"/>
+    <text x="38" y="27" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D4</text>
+    <text x="38" y="53" text-anchor="middle" font-size="9" fill="#333">Repayment Schedule</text>
+    <text x="38" y="63" text-anchor="middle" font-size="9" fill="#333">Repository</text>
+  </g>
+
+  <!-- D5 Payment Ledger (On-Chain) -->
+  <g transform="translate(600,610)">
+    <ellipse cx="38" cy="8" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="76" height="30" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="38" cy="38" rx="38" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="38" stroke="#333" stroke-width="1.5"/>
+    <line x1="76" y1="8" x2="76" y2="38" stroke="#333" stroke-width="1.5"/>
+    <text x="38" y="27" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D5</text>
+    <text x="38" y="53" text-anchor="middle" font-size="9" fill="#333">Payment Ledger</text>
+    <text x="38" y="63" text-anchor="middle" font-size="9" fill="#333">(On-Chain)</text>
+  </g>
+
+  <!-- Dashed feedback: D1 ↔ 1.1 -->
+  <line x1="186" y1="610" x2="196" y2="526" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="152" y="573" text-anchor="middle" font-size="8.4" fill="#666">Customer Data,</text>
+  <text x="152" y="582" text-anchor="middle" font-size="8.4" fill="#666">KYC Status</text>
+
+  <!-- D1 to 1.2 -->
+  <line x1="224" y1="618" x2="330" y2="526" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="290" y="575" text-anchor="middle" font-size="8.4" fill="#666">Customer Data,</text>
+  <text x="290" y="584" text-anchor="middle" font-size="8.4" fill="#666">Requisites</text>
+
+  <!-- D2 to 1.2 (Models) -->
+  <line x1="321" y1="610" x2="345" y2="526" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+
+  <!-- D2 to 1.3 (Features) -->
+  <line x1="355" y1="610" x2="488" y2="526" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="432" y="572" text-anchor="middle" font-size="8.4" fill="#666">Models, Features</text>
+
+  <!-- D3 to 1.3 (Loan Account Update) -->
+  <line x1="438" y1="610" x2="500" y2="526" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="490" y="597" text-anchor="middle" font-size="8.4" fill="#666">Loan Account</text>
+  <text x="490" y="606" text-anchor="middle" font-size="8.4" fill="#666">Update</text>
+
+  <!-- D5 to 1.4 (Schedules, Payment Status) -->
+  <line x1="638" y1="610" x2="645" y2="526" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="680" y="572" text-anchor="middle" font-size="8.4" fill="#666">Schedules,</text>
+  <text x="680" y="581" text-anchor="middle" font-size="8.4" fill="#666">Payment Status</text>
+
+  <!-- Panel B bottom note -->
+  <line x1="148" y1="700" x2="620" y2="700" stroke="#888" stroke-width="0.9" stroke-dasharray="4,3"/>
+  <text x="384" y="715" text-anchor="middle" font-size="10.2" fill="#666">Events, Loan Status Updates, Notifications</text>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       PANEL C – Level-1 Treasury & Liquidity Subsystems
+  ══════════════════════════════════════════════════════════════ -->
+  <rect x="748" y="388" width="744" height="730" rx="6" fill="white" stroke="#bbb" stroke-width="1.5"/>
+  <text x="1120" y="412" text-anchor="middle" font-size="16.2" font-weight="bold" fill="#111">(C) Level-1 DFD – Treasury &amp; Liquidity Subsystems</text>
+
+  <!-- E1, E2 left (Treasury side) -->
+  <rect x="760" y="432" width="110" height="78" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="763" y="435" width="104" height="72" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="815" y="452" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">E1, E2</text>
+  <text x="815" y="466" text-anchor="middle" font-size="10.2" fill="#333">Customers &amp;</text>
+  <text x="815" y="479" text-anchor="middle" font-size="10.2" fill="#333">Banks</text>
+  <text x="815" y="492" text-anchor="middle" font-size="10.2" fill="#333">(Tier 1–4)</text>
+
+  <!-- 2.1 Deposit Mobilization Service -->
+  <rect x="888" y="425" width="135" height="105" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="955" y="447" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">2.1</text>
+  <text x="955" y="461" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Deposit</text>
+  <text x="955" y="475" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Mobilization</text>
+  <text x="955" y="489" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Service</text>
+  <text x="955" y="505" text-anchor="middle" font-size="9" fill="#444">• Accept deposits</text>
+  <text x="955" y="516" text-anchor="middle" font-size="9" fill="#444">• Manage products</text>
+  <text x="955" y="527" text-anchor="middle" font-size="9" fill="#444">• Update balances</text>
+
+  <!-- D6 Deposit Accounts -->
+  <g transform="translate(1040,435)">
+    <ellipse cx="40" cy="8" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="80" height="32" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="40" cy="40" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="40" stroke="#333" stroke-width="1.5"/>
+    <line x1="80" y1="8" x2="80" y2="40" stroke="#333" stroke-width="1.5"/>
+    <text x="40" y="28" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D6</text>
+    <text x="40" y="56" text-anchor="middle" font-size="9" fill="#333">Deposit Accounts</text>
+    <text x="40" y="66" text-anchor="middle" font-size="9" fill="#333">(On-Chain)</text>
+  </g>
+
+  <!-- 2.2 InterBankLendingPool Service -->
+  <rect x="1138" y="425" width="140" height="105" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="1208" y="447" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">2.2</text>
+  <text x="1208" y="461" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">InterBank</text>
+  <text x="1208" y="475" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">LendingPool Service</text>
+  <text x="1208" y="491" text-anchor="middle" font-size="9" fill="#444">• Same-tier P2P lending</text>
+  <text x="1208" y="502" text-anchor="middle" font-size="9" fill="#444">• Manage liquidity pool</text>
+  <text x="1208" y="513" text-anchor="middle" font-size="9" fill="#444">• Calculate peer rates</text>
+
+  <!-- D7 InterBank Pool Ledger -->
+  <g transform="translate(1296,435)">
+    <ellipse cx="40" cy="8" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="80" height="32" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="40" cy="40" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="40" stroke="#333" stroke-width="1.5"/>
+    <line x1="80" y1="8" x2="80" y2="40" stroke="#333" stroke-width="1.5"/>
+    <text x="40" y="28" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D7</text>
+    <text x="40" y="56" text-anchor="middle" font-size="9" fill="#333">InterBank Pool</text>
+    <text x="40" y="66" text-anchor="middle" font-size="9" fill="#333">Ledger (On-Chain)</text>
+  </g>
+
+  <!-- ─── BOTTOM ROW Treasury ─── -->
+
+  <!-- 2.3 TreasurySwap Service -->
+  <rect x="788" y="620" width="135" height="105" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="855" y="642" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">2.3</text>
+  <text x="855" y="656" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">TreasurySwap</text>
+  <text x="855" y="670" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Service</text>
+  <text x="855" y="686" text-anchor="middle" font-size="9" fill="#444">• FX &amp; rate swaps</text>
+  <text x="855" y="697" text-anchor="middle" font-size="9" fill="#444">• Treasury operations</text>
+  <text x="855" y="708" text-anchor="middle" font-size="9" fill="#444">• Hedge management</text>
+
+  <!-- D8 Swap Positions -->
+  <g transform="translate(942,630)">
+    <ellipse cx="40" cy="8" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="80" height="32" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="40" cy="40" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="40" stroke="#333" stroke-width="1.5"/>
+    <line x1="80" y1="8" x2="80" y2="40" stroke="#333" stroke-width="1.5"/>
+    <text x="40" y="28" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D8</text>
+    <text x="40" y="56" text-anchor="middle" font-size="9" fill="#333">Swap Positions</text>
+    <text x="40" y="66" text-anchor="middle" font-size="9" fill="#333">(On-Chain)</text>
+  </g>
+
+  <!-- 2.4 NettingEngine Service -->
+  <rect x="1058" y="620" width="140" height="105" rx="8" fill="white" stroke="#333" stroke-width="1.8"/>
+  <text x="1128" y="642" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">2.4</text>
+  <text x="1128" y="656" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">NettingEngine</text>
+  <text x="1128" y="670" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Service</text>
+  <text x="1128" y="686" text-anchor="middle" font-size="9" fill="#444">• Multilateral netting</text>
+  <text x="1128" y="697" text-anchor="middle" font-size="9" fill="#444">• Offset positions</text>
+  <text x="1128" y="708" text-anchor="middle" font-size="9" fill="#444">• Settle obligations</text>
+
+  <!-- D9 Netting & Settlement Ledger -->
+  <g transform="translate(1218,630)">
+    <ellipse cx="40" cy="8" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <rect x="0" y="8" width="80" height="32" fill="white" stroke="#333" stroke-width="1.5"/>
+    <ellipse cx="40" cy="40" rx="40" ry="7" fill="white" stroke="#333" stroke-width="1.5"/>
+    <line x1="0" y1="8" x2="0" y2="40" stroke="#333" stroke-width="1.5"/>
+    <line x1="80" y1="8" x2="80" y2="40" stroke="#333" stroke-width="1.5"/>
+    <text x="40" y="28" text-anchor="middle" font-size="10.2" font-weight="bold" fill="#111">D9</text>
+    <text x="40" y="55" text-anchor="middle" font-size="9" fill="#333">Netting &amp; Settlement</text>
+    <text x="40" y="65" text-anchor="middle" font-size="9" fill="#333">Ledger (On-Chain)</text>
+  </g>
+
+  <!-- E4 Oracles bottom -->
+  <rect x="910" y="775" width="200" height="68" fill="#efefef" stroke="#111" stroke-width="2.5"/>
+  <rect x="913" y="778" width="194" height="62" fill="#efefef" stroke="#111" stroke-width="1"/>
+  <text x="1010" y="796" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">E4</text>
+  <text x="1010" y="810" text-anchor="middle" font-size="11.4" font-weight="bold" fill="#111">Oracles &amp; External Services</text>
+  <text x="1010" y="826" text-anchor="middle" font-size="9" fill="#444">(Chainlink, Price Feeds, KYC, FX Rates, etc.)</text>
+
+  <!-- ═══ PANEL C ARROWS ═══ -->
+  <!-- E1,E2 → 2.1 -->
+  <line x1="871" y1="468" x2="886" y2="468" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+
+  <!-- 2.1 → D6 (Deposit Records) -->
+  <line x1="1023" y1="468" x2="1038" y2="466" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="1031" y="458" text-anchor="middle" font-size="9" fill="#333">Deposit Records</text>
+
+  <!-- D6 Account Updates back (dashed) -->
+  <line x1="1040" y1="487" x2="1024" y2="490" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="1032" y="503" text-anchor="middle" font-size="8.4" fill="#666">Account Updates</text>
+
+  <!-- D6 → 2.2 (Pool Contributions) -->
+  <line x1="1120" y1="466" x2="1136" y2="466" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="1128" y="457" text-anchor="middle" font-size="9" fill="#333">Pool Contributions</text>
+
+  <!-- D6 Pool Updates (dashed back from 2.2) -->
+  <line x1="1138" y1="485" x2="1121" y2="485" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="1128" y="498" text-anchor="middle" font-size="8.4" fill="#666">Pool Updates</text>
+
+  <!-- 2.2 → D7 (Pool Transactions) -->
+  <line x1="1278" y1="466" x2="1294" y2="466" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="1287" y="457" text-anchor="middle" font-size="9" fill="#333">Pool Transactions</text>
+
+  <!-- D7 Pool Updates back (dashed) -->
+  <line x1="1336" y1="485" x2="1280" y2="487" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="1307" y="498" text-anchor="middle" font-size="8.4" fill="#666">Pool Updates</text>
+
+  <!-- 2.2 → 2.4 (Exposure & Obligations) -->
+  <line x1="1208" y1="531" x2="1155" y2="618" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="1212" y="578" text-anchor="middle" font-size="9" fill="#333">Exposure &amp;</text>
+  <text x="1212" y="588" text-anchor="middle" font-size="9" fill="#333">Obligations</text>
+
+  <!-- 2.3 → D8 (Swap Trades) -->
+  <line x1="923" y1="668" x2="940" y2="666" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="932" y="658" text-anchor="middle" font-size="9" fill="#333">Swap Trades</text>
+
+  <!-- D8 Position Updates back (dashed) -->
+  <line x1="982" y1="682" x2="925" y2="684" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="953" y="697" text-anchor="middle" font-size="8.4" fill="#666">Position Updates</text>
+
+  <!-- D8 → 2.4 -->
+  <line x1="1022" y1="666" x2="1056" y2="666" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+
+  <!-- 2.4 → D9 (Netting Results) -->
+  <line x1="1198" y1="666" x2="1216" y2="666" stroke="#111" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="1207" y="657" text-anchor="middle" font-size="9" fill="#333">Netting Results</text>
+
+  <!-- D9 Settlement Updates back (dashed) -->
+  <line x1="1258" y1="682" x2="1200" y2="684" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+  <text x="1228" y="697" text-anchor="middle" font-size="8.4" fill="#666">Settlement Updates</text>
+
+  <!-- E4 to 2.3 (dashed) -->
+  <line x1="958" y1="775" x2="870" y2="727" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+
+  <!-- E4 to 2.4 (dashed) -->
+  <line x1="1060" y1="775" x2="1120" y2="728" stroke="#666" stroke-width="1.1" stroke-dasharray="5,3" marker-end="url(#arr-d)"/>
+
+</svg>

@@ -1,0 +1,196 @@
+<svg width="100%" viewBox="0 0 1100 620" xmlns="http://www.w3.org/2000/svg" font-family="Arial, sans-serif" font-size="12">
+  <title>Core Platform Architecture: 4-Layer System Diagram</title>
+  <rect width="1100" height="620" fill="#ffffff"/>
+
+  <!-- Column Headers -->
+  <text x="80" y="24" text-anchor="middle" font-size="11" font-weight="bold" fill="#555"/>
+  <text x="460" y="24" text-anchor="middle" font-size="13" font-weight="bold" fill="#111">CORE PLATFORM</text>
+  <text x="860" y="24" text-anchor="middle" font-size="13" font-weight="bold" fill="#111">OPTIONAL ADD-ON</text>
+
+  <!-- KEY TECHNOLOGIES column header -->
+  <text x="1010" y="24" text-anchor="middle" font-size="11" font-weight="bold" fill="#555">KEY TECHNOLOGIES</text>
+
+  <!-- Vertical divider between core and optional -->
+  <line x1="760" y1="30" x2="760" y2="590" stroke="#ccc" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 1: PRESENTATION LAYER -->
+  <!-- ============================================================ -->
+  <!-- Layer label box (left) -->
+  <rect x="10" y="38" width="130" height="130" rx="4" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+  <text x="75" y="72" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">1</text>
+  <text x="75" y="92" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">PRESENTATION</text>
+  <text x="75" y="106" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">LAYER</text>
+  <text x="75" y="124" text-anchor="middle" font-size="10" fill="#bbb">(User Interface)</text>
+
+  <!-- Core platform box -->
+  <rect x="155" y="38" width="590" height="130" rx="4" fill="#f5f5f5" stroke="#555" stroke-width="1.5"/>
+  <!-- Title -->
+  <text x="450" y="64" text-anchor="middle" font-size="13" font-weight="bold" fill="#111">React 18 + TypeScript Web Application</text>
+  <line x1="165" y1="70" x2="735" y2="70" stroke="#ccc" stroke-width="0.5"/>
+  <text x="450" y="90" text-anchor="middle" font-size="11" fill="#333">Pages • Components • State Management</text>
+  <text x="450" y="108" text-anchor="middle" font-size="11" fill="#333">Wagmi / Viem • Wallet Integration</text>
+
+  <!-- Bidirectional arrow between core and optional in layer 1 -->
+  <line x1="745" y1="100" x2="770" y2="100" stroke="#555" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <polygon points="770,96 778,100 770,104" fill="#555"/>
+  <polygon points="745,96 737,100 745,104" fill="#555"/>
+
+  <!-- Optional Add-on box -->
+  <rect x="770" y="38" width="200" height="130" rx="4" fill="#f9f9f9" stroke="#555" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="870" y="60" text-anchor="middle" font-size="11" font-weight="bold" fill="#111">AI Agent Interface</text>
+  <text x="870" y="74" text-anchor="middle" font-size="10" fill="#333">(Qwen3-8B)</text>
+  <line x1="780" y1="82" x2="960" y2="82" stroke="#ccc" stroke-width="0.5"/>
+  <text x="870" y="98" text-anchor="middle" font-size="11" font-weight="bold" fill="#111">MCP Tool Server</text>
+  <text x="870" y="114" text-anchor="middle" font-size="10" fill="#333">(17 Banking Tools)</text>
+
+  <!-- Key Technologies box - layer 1 -->
+  <rect x="985" y="38" width="105" height="130" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="1038" y="58" text-anchor="middle" font-size="10" fill="#333">React 18, TypeScript,</text>
+  <text x="1038" y="72" text-anchor="middle" font-size="10" fill="#333">Wagmi, Viem,</text>
+  <text x="1038" y="86" text-anchor="middle" font-size="10" fill="#333">Ethers.js</text>
+
+  <!-- Vertical connector arrow between layers 1 and 2 -->
+  <line x1="450" y1="168" x2="450" y2="185" stroke="#333" stroke-width="2"/>
+  <polygon points="446,185 450,193 454,185" fill="#333"/>
+  <polygon points="446,168 450,160 454,168" fill="#333"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 2: SMART-CONTRACT LAYER -->
+  <!-- ============================================================ -->
+  <rect x="10" y="195" width="130" height="160" rx="4" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+  <text x="75" y="228" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">2</text>
+  <text x="75" y="248" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">SMART-CONTRACT</text>
+  <text x="75" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">LAYER</text>
+  <text x="75" y="280" text-anchor="middle" font-size="10" fill="#bbb">(On-Chain – EVM)</text>
+
+  <!-- Big core box -->
+  <rect x="155" y="195" width="590" height="160" rx="4" fill="#f5f5f5" stroke="#555" stroke-width="1.5"/>
+  <text x="450" y="218" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">15 Modular Smart Contracts (Solidity)</text>
+  <line x1="165" y1="224" x2="735" y2="224" stroke="#ccc" stroke-width="0.5"/>
+
+  <!-- Left sub-box: Core Four-Tier Hierarchy -->
+  <rect x="170" y="232" width="250" height="110" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="295" y="250" text-anchor="middle" font-size="11" font-weight="bold" fill="#111">Core Four-Tier Hierarchy</text>
+  <text x="295" y="268" text-anchor="middle" font-size="10" fill="#333">World Bank Reserve (Tier 1)</text>
+  <text x="295" y="282" text-anchor="middle" font-size="10" fill="#555">↓</text>
+  <text x="295" y="296" text-anchor="middle" font-size="10" fill="#333">National Banks (Tier 2)</text>
+  <text x="295" y="310" text-anchor="middle" font-size="10" fill="#555">↓</text>
+  <text x="295" y="324" text-anchor="middle" font-size="10" fill="#333">Local Banks (Tier 3)</text>
+
+  <!-- Right sub-box: 12 Planned Modules -->
+  <rect x="440" y="232" width="290" height="110" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="585" y="250" text-anchor="middle" font-size="11" font-weight="bold" fill="#111">12 Planned Modules</text>
+  <text x="452" y="266" font-size="10" fill="#333">• Loans, SavingsVault, FixedDeposit</text>
+  <text x="452" y="280" font-size="10" fill="#333">• GroupLendingPool, InterBankPool</text>
+  <text x="452" y="294" font-size="10" fill="#333">• CreditPassport, Compliance (ZKP-KYC)</text>
+  <text x="452" y="308" font-size="10" fill="#333">• Fraud Detection, Oracles, Automation</text>
+  <text x="452" y="322" font-size="10" fill="#333">• and others</text>
+
+  <!-- Optional arrow from AI agent to layer 2 -->
+  <line x1="870" y1="168" x2="870" y2="195" stroke="#555" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <polygon points="866,193 870,201 874,193" fill="#555"/>
+  <polygon points="866,170 870,162 874,170" fill="#555"/>
+
+  <!-- Key Technologies box - layer 2 -->
+  <rect x="985" y="195" width="105" height="160" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="1038" y="218" text-anchor="middle" font-size="10" fill="#333">Solidity ^0.8.x</text>
+  <text x="1038" y="232" text-anchor="middle" font-size="10" fill="#333">OpenZeppelin,</text>
+  <text x="1038" y="246" text-anchor="middle" font-size="10" fill="#333">EVM (zkEVM)</text>
+
+  <!-- Vertical connector between layers 2 and 3 -->
+  <line x1="450" y1="355" x2="450" y2="372" stroke="#333" stroke-width="2"/>
+  <polygon points="446,372 450,380 454,372" fill="#333"/>
+  <polygon points="446,355 450,347 454,355" fill="#333"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 3: OFF-CHAIN SERVICES LAYER -->
+  <!-- ============================================================ -->
+  <rect x="10" y="382" width="130" height="115" rx="4" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+  <text x="75" y="414" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">3</text>
+  <text x="75" y="432" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">OFF-CHAIN</text>
+  <text x="75" y="446" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">SERVICES LAYER</text>
+  <text x="75" y="462" text-anchor="middle" font-size="10" fill="#bbb">(Backend &amp; Data</text>
+  <text x="75" y="476" text-anchor="middle" font-size="10" fill="#bbb">Services)</text>
+
+  <!-- Core platform off-chain box -->
+  <rect x="155" y="382" width="590" height="115" rx="4" fill="#f5f5f5" stroke="#555" stroke-width="1.5"/>
+  <!-- Service boxes within -->
+  <!-- Express.js REST API -->
+  <rect x="165" y="398" width="120" height="82" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="225" y="416" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Express.js</text>
+  <text x="225" y="430" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">REST API</text>
+  <text x="225" y="448" text-anchor="middle" font-size="10" fill="#555">(Node.js)</text>
+  <!-- PostgreSQL -->
+  <rect x="298" y="398" width="120" height="82" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="358" y="416" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">PostgreSQL</text>
+  <text x="358" y="430" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Relational</text>
+  <text x="358" y="444" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Database</text>
+  <!-- FastAPI ML -->
+  <rect x="431" y="398" width="100" height="82" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="481" y="416" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">FastAPI</text>
+  <text x="481" y="430" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">ML Scoring</text>
+  <text x="481" y="444" text-anchor="middle" font-size="10" fill="#555">Service</text>
+  <!-- Chainlink Oracle -->
+  <rect x="544" y="398" width="110" height="82" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="599" y="416" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Chainlink</text>
+  <text x="599" y="430" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Oracle</text>
+  <text x="599" y="444" text-anchor="middle" font-size="10" fill="#555">Integration</text>
+  <!-- Event Listener -->
+  <rect x="667" y="398" width="78" height="82" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="706" y="416" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Event</text>
+  <text x="706" y="430" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Listener</text>
+  <text x="706" y="448" text-anchor="middle" font-size="10" fill="#555">(Indexer)</text>
+
+  <!-- Key Technologies - layer 3 -->
+  <rect x="985" y="382" width="105" height="115" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="1038" y="402" text-anchor="middle" font-size="10" fill="#333">Node.js, Express.js,</text>
+  <text x="1038" y="416" text-anchor="middle" font-size="10" fill="#333">PostgreSQL, FastAPI,</text>
+  <text x="1038" y="430" text-anchor="middle" font-size="10" fill="#333">Redis, WebSockets</text>
+
+  <!-- Vertical connector between layers 3 and 4 -->
+  <line x1="450" y1="497" x2="450" y2="514" stroke="#333" stroke-width="2"/>
+  <polygon points="446,514 450,522 454,514" fill="#333"/>
+  <polygon points="446,497 450,489 454,497" fill="#333"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 4: CHAINLINK INFRASTRUCTURE LAYER -->
+  <!-- ============================================================ -->
+  <rect x="10" y="524" width="130" height="90" rx="4" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+  <text x="75" y="554" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">4</text>
+  <text x="75" y="572" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">CHAINLINK</text>
+  <text x="75" y="586" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">INFRASTRUCTURE</text>
+  <text x="75" y="600" text-anchor="middle" font-size="10" fill="#bbb">(Oracle &amp; Automation)</text>
+
+  <rect x="155" y="524" width="590" height="90" rx="4" fill="#f5f5f5" stroke="#555" stroke-width="1.5"/>
+  <text x="450" y="544" text-anchor="middle" font-size="12" font-weight="bold" fill="#111">Chainlink Decentralized Oracle Services</text>
+  <line x1="165" y1="550" x2="735" y2="550" stroke="#ccc" stroke-width="0.5"/>
+
+  <!-- 4 chainlink service boxes -->
+  <rect x="168" y="558" width="130" height="48" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="233" y="574" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Chainlink</text>
+  <text x="233" y="588" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Functions</text>
+  <text x="233" y="600" text-anchor="middle" font-size="9" fill="#555">(Off-Chain Compute)</text>
+
+  <rect x="312" y="558" width="130" height="48" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="377" y="574" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Chainlink</text>
+  <text x="377" y="588" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Automation</text>
+  <text x="377" y="600" text-anchor="middle" font-size="9" fill="#555">(Scheduled Tasks)</text>
+
+  <rect x="456" y="558" width="130" height="48" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="521" y="574" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Chainlink</text>
+  <text x="521" y="588" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Price Feeds</text>
+  <text x="521" y="600" text-anchor="middle" font-size="9" fill="#555">(Market Data)</text>
+
+  <rect x="600" y="558" width="135" height="48" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="668" y="574" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Chainlink</text>
+  <text x="668" y="588" text-anchor="middle" font-size="10" font-weight="bold" fill="#111">Proof of Reserve</text>
+  <text x="668" y="600" text-anchor="middle" font-size="9" fill="#555">(Reserve Verification)</text>
+
+  <!-- Key Technologies - layer 4 -->
+  <rect x="985" y="524" width="105" height="90" rx="4" fill="#e8e8e8" stroke="#999" stroke-width="1"/>
+  <text x="1038" y="546" text-anchor="middle" font-size="10" fill="#333">Chainlink Functions,</text>
+  <text x="1038" y="560" text-anchor="middle" font-size="10" fill="#333">Automation, Price</text>
+  <text x="1038" y="574" text-anchor="middle" font-size="10" fill="#333">Feeds, Proof of</text>
+  <text x="1038" y="588" text-anchor="middle" font-size="10" fill="#333">Reserve</text>
+</svg>

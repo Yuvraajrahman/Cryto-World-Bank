@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="680" height="920" viewBox="0 0 680 920" role="img"
+     xmlns="http://www.w3.org/2000/svg"
+     font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
+<title>CWB system overview — four-tier capital hierarchy and technology stack (monochrome)</title>
+<desc>Unified monochrome diagram: four-tier institutional hierarchy with allocateCapital, InterBankLendingPool, and UpwardDepositFacility flows; six on-chain banking functions; and four-layer technology stack.</desc>
+<defs>
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .sm  { font-size: 11px; }
+    .md  { font-size: 12px; font-weight: 600; }
+  </style>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect width="680" height="920" fill="#ffffff"/>
+
+<!-- TIER LABELS -->
+<rect x="2" y="34"  width="60" height="22" rx="3" fill="#000000"/>
+<text class="sm" x="32" y="45"  text-anchor="middle" dominant-baseline="central" fill="#ffffff">Tier 1</text>
+<text class="sm" x="32" y="65"  text-anchor="middle" fill="#000000">Global</text>
+
+<rect x="2" y="170" width="60" height="22" rx="3" fill="#2a2a2a"/>
+<text class="sm" x="32" y="181" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Tier 2</text>
+<text class="sm" x="32" y="200" text-anchor="middle" fill="#000000">National</text>
+
+<rect x="2" y="320" width="60" height="22" rx="3" fill="#666666"/>
+<text class="sm" x="32" y="331" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Tier 3</text>
+<text class="sm" x="32" y="350" text-anchor="middle" fill="#000000">Local</text>
+
+<rect x="2" y="464" width="60" height="22" rx="3" fill="#aaaaaa"/>
+<text class="sm" x="32" y="475" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Tier 4</text>
+<text class="sm" x="32" y="495" text-anchor="middle" fill="#000000">Client</text>
+
+<!-- TIER 1 — solid black -->
+<rect x="70" y="24" width="540" height="52" rx="5" fill="#000000"/>
+<text class="md" x="340" y="44" text-anchor="middle" dominant-baseline="central" fill="#ffffff">World Bank Reserve — Tier 1</text>
+<text class="sm"  x="340" y="63" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Reserve authority · Capital issuer · Proof of reserve</text>
+
+<!-- TIER 2 — dark charcoal -->
+<rect x="70"  y="160" width="155" height="52" rx="5" fill="#2a2a2a"/>
+<text class="md" x="147" y="180" text-anchor="middle" dominant-baseline="central" fill="#ffffff">National Bank A</text>
+<text class="sm" x="147" y="198" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Reserve ratio enforced</text>
+
+<rect x="255" y="160" width="170" height="52" rx="5" fill="#f0f0f0" stroke="#000000" stroke-width="1" stroke-dasharray="4 2"/>
+<text class="md" x="340" y="178" text-anchor="middle" dominant-baseline="central" fill="#000000">InterBankLendingPool</text>
+<text class="sm" x="340" y="196" text-anchor="middle" dominant-baseline="central" fill="#000000">National-tier liquidity</text>
+
+<rect x="445" y="160" width="165" height="52" rx="5" fill="#2a2a2a"/>
+<text class="md" x="527" y="180" text-anchor="middle" dominant-baseline="central" fill="#ffffff">National Bank B</text>
+<text class="sm" x="527" y="198" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Reserve ratio enforced</text>
+
+<!-- TIER 3 — medium grey -->
+<rect x="70"  y="310" width="118" height="52" rx="5" fill="#666666"/>
+<text class="md" x="129" y="330" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Local Bank A</text>
+<text class="sm" x="129" y="348" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Retail lending</text>
+
+<rect x="204" y="310" width="118" height="52" rx="5" fill="#666666"/>
+<text class="md" x="263" y="330" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Local Bank B</text>
+<text class="sm" x="263" y="348" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Retail lending</text>
+
+<rect x="338" y="310" width="138" height="52" rx="5" fill="#f0f0f0" stroke="#000000" stroke-width="1" stroke-dasharray="4 2"/>
+<text class="md" x="407" y="328" text-anchor="middle" dominant-baseline="central" fill="#000000">InterBankLendingPool</text>
+<text class="sm" x="407" y="346" text-anchor="middle" dominant-baseline="central" fill="#000000">Local-tier liquidity</text>
+
+<rect x="492" y="310" width="118" height="52" rx="5" fill="#666666"/>
+<text class="md" x="551" y="330" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Local Bank C</text>
+<text class="sm" x="551" y="348" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Retail lending</text>
+
+<!-- TIER 4 — near-white, black border -->
+<rect x="70"  y="454" width="135" height="52" rx="5" fill="#f0f0f0" stroke="#000000" stroke-width="1"/>
+<text class="md" x="137" y="472" text-anchor="middle" dominant-baseline="central" fill="#000000">Individual borrower</text>
+<text class="sm" x="137" y="490" text-anchor="middle" dominant-baseline="central" fill="#000000">Savings · installment loan</text>
+
+<rect x="218" y="454" width="165" height="52" rx="5" fill="#f0f0f0" stroke="#000000" stroke-width="1"/>
+<text class="md" x="300" y="472" text-anchor="middle" dominant-baseline="central" fill="#000000">Group borrowers</text>
+<text class="sm" x="300" y="490" text-anchor="middle" dominant-baseline="central" fill="#000000">GroupLendingPool · joint liability</text>
+
+<rect x="397" y="454" width="140" height="52" rx="5" fill="#f0f0f0" stroke="#000000" stroke-width="1"/>
+<text class="md" x="467" y="472" text-anchor="middle" dominant-baseline="central" fill="#000000">SME / business</text>
+<text class="sm" x="467" y="490" text-anchor="middle" dominant-baseline="central" fill="#000000">Syndicated co-lending</text>
+
+<rect x="550" y="454" width="60" height="52" rx="5" fill="#000000"/>
+<text class="sm" x="580" y="472" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Credit</text>
+<text class="sm" x="580" y="490" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Passport</text>
+
+<!-- ARROWS -->
+<line x1="270" y1="76"  x2="185" y2="160" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+<line x1="410" y1="76"  x2="490" y2="160" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+
+<line x1="225" y1="183" x2="255" y2="183" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="255" y1="191" x2="225" y2="191" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="425" y1="183" x2="445" y2="183" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="445" y1="191" x2="425" y2="191" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+
+<line x1="130" y1="212" x2="120" y2="310" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+<line x1="163" y1="212" x2="248" y2="310" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+<line x1="510" y1="212" x2="550" y2="310" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+
+<line x1="188" y1="333" x2="204" y2="333" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="204" y1="341" x2="188" y2="341" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="322" y1="333" x2="338" y2="333" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="338" y1="341" x2="322" y2="341" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="476" y1="333" x2="492" y2="333" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="492" y1="341" x2="476" y2="341" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+
+<line x1="120" y1="362" x2="120" y2="454" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+<line x1="255" y1="362" x2="285" y2="454" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+<line x1="551" y1="362" x2="500" y2="454" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+
+<path d="M 610 480 L 638 480 L 638 50 L 610 50" fill="none" stroke="#999999" stroke-width="1.1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+<text class="sm" x="642" y="254" dominant-baseline="central" fill="#000000">Upward</text>
+<text class="sm" x="642" y="268" dominant-baseline="central" fill="#000000">surplus</text>
+<text class="sm" x="642" y="282" dominant-baseline="central" fill="#000000">repatriation</text>
+
+<!-- BANKING FUNCTIONS -->
+<text class="sm" x="70" y="534" font-weight="600" fill="#000000">Six banking functions enforced on-chain:</text>
+
+<rect x="70"  y="546" width="104" height="26" rx="3" fill="#000000"/>
+<text class="sm" x="122" y="559" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Deposit mobilization</text>
+<rect x="184" y="546" width="108" height="26" rx="3" fill="#000000"/>
+<text class="sm" x="238" y="559" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Credit allocation</text>
+<rect x="302" y="546" width="116" height="26" rx="3" fill="#000000"/>
+<text class="sm" x="360" y="559" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Payment &amp; settlement</text>
+
+<rect x="70"  y="580" width="120" height="26" rx="3" fill="#000000"/>
+<text class="sm" x="130" y="593" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Risk intermediation</text>
+<rect x="200" y="580" width="126" height="26" rx="3" fill="#000000"/>
+<text class="sm" x="263" y="593" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Liquidity management</text>
+<rect x="336" y="580" width="120" height="26" rx="3" fill="#000000"/>
+<text class="sm" x="396" y="593" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Ancillary services</text>
+
+<!-- TECH STACK -->
+<text class="sm" x="70" y="630" font-weight="600" fill="#000000">Technology stack:</text>
+
+<text class="sm" x="66" y="654" text-anchor="end" dominant-baseline="central" fill="#000000">L4</text>
+<rect x="70" y="638" width="540" height="32" rx="3" fill="#f0f0f0" stroke="#aaaaaa" stroke-width="0.8"/>
+<text class="sm" x="340" y="654" text-anchor="middle" dominant-baseline="central" fill="#000000">React 18 / TypeScript UI · wallet signing · optional MCP agent (Qwen3-8B, 17 banking tools)</text>
+
+<text class="sm" x="66" y="692" text-anchor="end" dominant-baseline="central" fill="#000000">L3</text>
+<rect x="70" y="676" width="540" height="32" rx="3" fill="#cccccc" stroke="#888888" stroke-width="0.8"/>
+<text class="sm" x="340" y="692" text-anchor="middle" dominant-baseline="central" fill="#000000">Express.js + FastAPI · scikit-learn fraud detection · SHAP explainability · Chainlink Functions oracle</text>
+
+<text class="sm" x="66" y="730" text-anchor="end" dominant-baseline="central" fill="#000000">L2</text>
+<rect x="70" y="714" width="540" height="32" rx="3" fill="#444444" stroke="#222222" stroke-width="0.8"/>
+<text class="sm" x="340" y="730" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Solidity 0.8.20 smart contracts · ERC-4337 Paymaster · ZKP identity (Circom 2.0 / Groth16) · RBAC</text>
+
+<text class="sm" x="66" y="768" text-anchor="end" dominant-baseline="central" fill="#000000">L1</text>
+<rect x="70" y="752" width="540" height="32" rx="3" fill="#000000" stroke="#000000" stroke-width="0.8"/>
+<text class="sm" x="340" y="768" text-anchor="middle" dominant-baseline="central" fill="#ffffff">Polygon zkEVM Cardona · Ethereum Sepolia · PostgreSQL (19 entities) · IPFS</text>
+
+<!-- LEGEND -->
+<rect x="70" y="800" width="540" height="96" rx="4" fill="none" stroke="#aaaaaa" stroke-width="0.8" stroke-dasharray="4 3"/>
+<text class="sm" x="86" y="820" font-weight="600" fill="#000000">Flow key:</text>
+
+<line x1="86" y1="840" x2="120" y2="840" stroke="#000000" stroke-width="1.3" marker-end="url(#arr)"/>
+<text class="sm" x="128" y="840" dominant-baseline="central" fill="#000000">allocateCapital — downward capital allocation (Tier 1 → 2 → 3 → 4)</text>
+
+<line x1="86"  y1="862" x2="106" y2="862" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<line x1="106" y1="870" x2="86"  y2="870" stroke="#555555" stroke-width="1.1" marker-end="url(#arr)"/>
+<text class="sm" x="114" y="866" dominant-baseline="central" fill="#000000">InterBankLendingPool — same-tier liquidity (dashed border)</text>
+
+<line x1="86" y1="886" x2="120" y2="886" stroke="#999999" stroke-width="1.1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+<text class="sm" x="128" y="886" dominant-baseline="central" fill="#000000">UpwardDepositFacility — surplus repatriation to parent tier</text>
+
+</svg>

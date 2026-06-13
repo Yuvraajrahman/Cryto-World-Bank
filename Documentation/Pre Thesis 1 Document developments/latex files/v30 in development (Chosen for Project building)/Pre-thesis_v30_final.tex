@@ -47,27 +47,9 @@
 \newcommand{\tmarkPlanned}{\textcolor{black!55}{\faCircle}}
 
 \usepackage{graphicx}
-% Asset paths: PDF is built from ``v30 in development/''; diagrams live under Documentation/Diagrams/
-\newcommand*{\ThesisDiagImp}{../Diagrams/mermaid-pdf/improved diagrams/}
-\newcommand*{\ThesisDiagPdf}{../Diagrams/mermaid-pdf/}
-\newcommand*{\ThesisDiagPng}{../Diagrams/PNGs/}
-\newcommand*{\ThesisDiagRoot}{../Diagrams/}
-\newcommand*{\ThesisAssetUpTwo}{../../}% Improvements/ (bracu_logo_12-0-2022.png)
-\newcommand*{\ThesisAssetUpThree}{../../../}% Documentation/ (logo + shared assets)
-\graphicspath{%
-  {./}%
-  {\ThesisAssetUpTwo}%
-  {\ThesisAssetUpThree}%
-  {\ThesisDiagImp}%                             redesigned diagrams (preferred)
-  {\ThesisDiagPdf}%
-  {\ThesisDiagPng}%                             Chapter PNG exports
-  {\ThesisDiagRoot}%
-  {Tables/}%
-  {Diagrams/mermaid-pdf/improved diagrams/}%  fallback if compiled from Documentation/
-  {Diagrams/mermaid-pdf/}%
-  {Diagrams/}%
-  {Diagrams/CSE370/}{Diagrams/CSE471/}{Diagrams/CSE470/}%
-}
+% Self-contained build: figure assets in Diagrams/ (SVG sources; LaTeX includes generated PDF).
+\newcommand*{\ThesisDiagDir}{Diagrams/}
+\graphicspath{{./Diagrams/}{Diagrams/}{./}{Tables/}}
 \pdfimageresolution=300
 \makeatletter
 \newcommand*{\@thesis@doinclude}[2]{%
@@ -78,41 +60,18 @@
   \fi
 }
 \newcommand*{\@thesismissingimg}[1]{%
-  \fbox{\parbox{0.92\linewidth}{\scriptsize\centering\ttfamily Missing file: \detokenize{#1}.\\[2pt]Copy it into the project (or match \string\graphicspath) and recompile.}}%
+  \fbox{\parbox{0.92\linewidth}{\scriptsize\centering\ttfamily Missing file: \detokenize{#1}.\\[2pt]Add it to the \texttt{Diagrams/} folder and recompile.}}%
 }
 \newcommand{\ThesisIncludeGraphics}[2][]{%
-  \IfFileExists{\ThesisDiagPng#2}{%
-    \@thesis@doinclude{#1}{\ThesisDiagPng#2}}{%
-  \IfFileExists{\ThesisDiagImp#2}{%
-    \@thesis@doinclude{#1}{\ThesisDiagImp#2}}{%
-  \IfFileExists{\ThesisDiagPdf#2}{%
-    \@thesis@doinclude{#1}{\ThesisDiagPdf#2}}{%
-  \IfFileExists{\ThesisDiagRoot#2}{%
-    \@thesis@doinclude{#1}{\ThesisDiagRoot#2}}{%
+  \IfFileExists{\ThesisDiagDir#2}{%
+    \@thesis@doinclude{#1}{\ThesisDiagDir#2}}{%
   \IfFileExists{#2}{%
     \@thesis@doinclude{#1}{#2}}{%
-  \IfFileExists{./#2}{%
-    \@thesis@doinclude{#1}{#2}}{%
-  \IfFileExists{\ThesisAssetUpTwo#2}{%
-    \@thesis@doinclude{#1}{\ThesisAssetUpTwo#2}}{%
-  \IfFileExists{\ThesisAssetUpThree#2}{%
-    \@thesis@doinclude{#1}{\ThesisAssetUpThree#2}}{%
   \IfFileExists{Tables/#2}{%
-    \@thesis@doinclude{#1}{#2}}{%
-  \IfFileExists{Diagrams/mermaid-pdf/improved diagrams/#2}{%
-    \@thesis@doinclude{#1}{Diagrams/mermaid-pdf/improved diagrams/#2}}{%
-  \IfFileExists{Diagrams/mermaid-pdf/#2}{%
-    \@thesis@doinclude{#1}{Diagrams/mermaid-pdf/#2}}{%
-  \IfFileExists{Diagrams/#2}{%
-    \@thesis@doinclude{#1}{#2}}{%
-  \IfFileExists{Diagrams/CSE370/#2}{%
-    \@thesis@doinclude{#1}{#2}}{%
-  \IfFileExists{Diagrams/CSE471/#2}{%
-    \@thesis@doinclude{#1}{#2}}{%
-  \IfFileExists{Diagrams/CSE470/#2}{%
-    \@thesis@doinclude{#1}{#2}}{%
+    \@thesis@doinclude{#1}{Tables/#2}}{%
     \@thesismissingimg{#2}%
-  }}}}}}}}}}}}}}}}}%
+  }}}%
+}
 \makeatother
 \newcommand{\TableScreenshotEnd}[2][]{%
   \refstepcounter{table}%
@@ -189,15 +148,15 @@
   \if\relax\detokenize{#1}\relax
     \ThesisIncludeGraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{#2}%
   \else
-    \ThesisIncludeGraphics[#1,width=\linewidth,height=0.72\textheight,keepaspectratio]{#2}%
+    \ThesisIncludeGraphics[#1,height=0.72\textheight,keepaspectratio]{#2}%
   \fi
 }
 % Activity diagrams — full-height slot for 3× label size.
 \newcommand{\ActivityDiagram}[2][]{%
   \if\relax\detokenize{#1}\relax
-    \ThesisIncludeGraphics[width=\linewidth,height=\textheight,keepaspectratio]{#2}%
+    \ThesisIncludeGraphics[width=\linewidth,height=0.88\textheight,keepaspectratio]{#2}%
   \else
-    \ThesisIncludeGraphics[#1,width=\linewidth,height=\textheight,keepaspectratio]{#2}%
+    \ThesisIncludeGraphics[#1,height=0.88\textheight,keepaspectratio]{#2}%
   \fi
 }
 % Half-size slot (50\% of BalancedDiagram width and height).
@@ -344,7 +303,7 @@
 
 \vspace*{0.3cm}
 
-\ThesisIncludeGraphics[width=3.5cm]{bracu_logo_12-0-2022.png}
+\ThesisIncludeGraphics[width=3.5cm]{bracu_logo_12-0-2022.pdf}
 
 \vspace{0.8cm}
 
@@ -667,7 +626,7 @@ Figure~\ref{fig:intro-system-overview} maps the whole-system architecture at a g
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch1_system-overview-four-tier-stack.png}
+\BalancedDiagram{Ch1_system-overview-four-tier-stack.pdf}
 \caption[Crypto World Bank system overview]{Whole-system overview: four-tier capital hierarchy (top) and four-layer technology stack (bottom). Reserve ratios, RBAC, oracle-mediated ML, compliance controls, and modular contracts are specified in Chapter~\ref{sec:high-level-arch}.}
 \label{fig:intro-system-overview}
 \end{figure}
@@ -858,7 +817,7 @@ The platform implements six standard banking functions across the four-tier hier
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch1_six-banking-functions.png}
+\BalancedDiagram{Ch1_six-banking-functions.pdf}
 \caption[Six banking functions of the platform]{Six banking functions enforced across the four-tier core. Contract mappings (\texttt{SavingsVault}, \texttt{allocateCapital}, \texttt{IBLP}, etc.) are listed in the bullets below and in Chapter~\ref{sec:high-level-arch}.}
 \label{fig:banking-functions}
 \end{figure}
@@ -891,7 +850,7 @@ Figure~\ref{fig:cross-tier-lending} maps the four coordinated flow directions on
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch1_cross-tier-lending-flows.png}
+\BalancedDiagram{Ch1_cross-tier-lending-flows.pdf}
 \caption[Cross-tier lending flow directions]{Cross-tier lending: downward allocation through four tiers, upward surplus repatriation, and same-tier interbank pools. Syndicated, group, and tranched co-funding are specified in Section~\ref{sec:multi-entity}.}
 \label{fig:cross-tier-lending}
 \end{figure}
@@ -1461,6 +1420,15 @@ The OWASP Top~10 for LLM Applications~[R54] classifies LLM01 (Prompt
 Injection) as the highest-priority threat in agentic financial systems, providing
 an authoritative standard against which the CWB scanning middleware can be
 evaluated.
+This vulnerability class is corroborated at industry scale: OpenClaw, the
+most widely adopted open-source MCP agent framework as of 2026
+(346{,}000+ GitHub stars), required three successive security patches
+(v0.3.3, v0.4.1, v0.4.2) following a February~2026 Microsoft security
+advisory addressing overly permissive default tool-execution
+policies~[R55], reinforcing that the mandatory human-confirmation gate
+and \texttt{injection\_scan\_flag} scanning specified for the CWB agent
+(Section~\ref{sec:optional-agent}) target an actively exploited
+vulnerability class rather than a hypothetical risk.
 
 \section{Summary of Key Findings}
 
@@ -1562,7 +1530,7 @@ The system employs a \textbf{four-layer decentralised application architecture} 
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_four-layer-dapp-architecture.png}
+\BalancedDiagram{fig-three-layer-arch.pdf}
 \caption[Four-layer application architecture]{Four-layer decentralised application architecture (blockchain-first): presentation (React 18, TypeScript, Wagmi/Viem); smart-contract layer on the EVM (World Bank Reserve, National Bank, Local Bank + twelve planned modules); off-chain services (Express REST API, PostgreSQL, FastAPI ML service, Chainlink oracle integration, event listener, Redis cache); Chainlink infrastructure (Functions, Automation, Price Feeds, Proof of Reserve). Optional add-on: AI agent (Qwen3-8B + MCP) interfaces through the same APIs without altering on-chain logic.}
 \label{fig:three-layer-arch}
 \end{figure}
@@ -1609,7 +1577,7 @@ NettingEngine & Multi-entity & Planned (Phase~III) & Multilateral settlement net
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{fig-blockchain-stack.pdf}
+\resizebox{!}{0.68\textheight}{\ThesisIncludeGraphics{fig-blockchain-stack.pdf}}
 \caption[Layered blockchain and application stack]{Layered blockchain and application stack: L1 settlement (Polygon~zkEVM Cardona for retail, Ethereum~Sepolia for institutional, plus Chainlink CCIP bridge, The~Graph indexer, and Tenderly monitor); L2 smart-contract platform (Solidity 0.8.20, OpenZeppelin~v5, UUPS, TimeLock, RBAC); L3 data (PostgreSQL~16 in 3NF, Redis, IPFS); L4 API and services (Express, FastAPI, WebSocket, EIP-712); L5 presentation (React + ERC-4337 account abstraction).}
 \label{fig:blockchain-stack}
 \end{figure}
@@ -1771,14 +1739,14 @@ The relational database schema comprises 20 normalized entities in Third Normal 
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_core-entity-relationship-diagram.png}
+\BalancedDiagram{fig-erd-core.pdf}
 \caption[Core system entity graph]{Core system graph showing entity relationships across the four-tier banking hierarchy (\texttt{WORLD\_BANK} $\to$ \texttt{NATIONAL\_BANK} $\to$ \texttt{LOCAL\_BANK} $\to$ \texttt{BANK\_USER}), the central \texttt{BORROWER} entity, and the lending-lifecycle sub-graph (\texttt{LOAN\_REQUEST}, \texttt{LOAN}, \texttt{INSTALLMENT}, \texttt{TRANSACTION}, \texttt{INCOME\_PROOF}, \texttt{CHAT\_MESSAGE}, \texttt{AI\_ML\_LOG}, \texttt{CREDIT\_PASSPORT}).}
 \label{fig:core-system-graph}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_extended-erd-banking-multi-entity.png}
+\BalancedDiagram{fig-erd-extended.pdf}
 \caption[Extended ERD entities]{Extended ERD entities: the banking-product entities (\texttt{SAVINGS\_ACCOUNT}, \texttt{FIXED\_DEPOSIT}, \texttt{CURRENT\_ACCOUNT}, \texttt{LOAN\_GROUP}, \texttt{GROUP\_MEMBER}, \texttt{INSURANCE\_FUND}) and the multi-entity / cross-tier operational entities (\texttt{INTERBANK\_LOAN}, \texttt{UPWARD\_DEPOSIT}, \texttt{SYNDICATE}, \texttt{SYNDICATE\_MEMBER}, \texttt{TRANCHED\_POOL}, \texttt{TREASURY\_SWAP}, \texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}). Foreign-key relationships into the core entities of Figure~\ref{fig:core-system-graph} are preserved.}
 \label{fig:erd-extended}
 \end{figure}
@@ -1788,7 +1756,7 @@ The current ERD covers the core lending and governance entities. Figure~\ref{fig
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_enhanced-eer-model.png}
+\BalancedDiagram{fig-eer-model.pdf}
 \caption[Enhanced EER model]{Enhanced Entity-Relationship (EER) model showing generalization / specialization (\texttt{BANK\_USER} $\to$ National-/Local-bank-admin / Approver subtypes), the weak entity \texttt{INSTALLMENT} identified by its parent \texttt{LOAN}, the multi-valued attribute \texttt{INCOME\_PROOF}, the loan-centric aggregation, and participation constraints (total / partial).}
 \label{fig:eer}
 \end{figure}
@@ -2106,7 +2074,7 @@ View reserve summary (public) & YES & YES & YES & YES & READ \\
 
 \begin{figure}[H]
 \centering
-\ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{Ch3_actor-permission-matrix.png}
+\ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{Ch3_actor-permission-matrix.pdf}
 \caption[Actor permission matrix (primary actions)]{Actor permission matrix (primary actions): clients submit loans and pay installments via the React UI (or optionally via the MCP agent); Local Bank approvers approve and freeze accounts; National and World Bank admins set rates and reserve parameters; the optional AI Agent may call read tools freely and write tools only after human confirmation (\dag).}
 \label{fig:permission-matrix}
 \end{figure}
@@ -2325,7 +2293,7 @@ The hierarchical control is preserved across chains by requiring that all loan s
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_multi-entity-cross-tier-operations.png}
+\BalancedDiagram{Ch3_multi-entity-cross-tier-operations.pdf}
 \caption[Multi-entity and cross-tier capital operations]{Multi-entity and cross-tier capital operations: (a) InterBankLendingPool with utilization-kinked rate model and default cascade, (b) UpwardDepositFacility with asymmetric rate structure, (c) SyndicatedLoan with Lead Arranger and Co-Lenders, (d) TranchedPool with senior--junior waterfall, (e) TreasurySwap for cross-tier asset exchange, and (f) NettingEngine for multilateral settlement.}
 \label{fig:multi-entity-ops}
 \end{figure}
@@ -2398,7 +2366,7 @@ The system involves nine actors across 20 representative use cases (Figure~\ref{
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram[width=0.98\linewidth]{Ch3_use-case-nine-actor-taxonomy.png}
+\BalancedDiagram[width=0.98\linewidth]{Ch3_use-case-nine-actor-taxonomy.pdf}
 \caption[Use-case diagram (nine-actor taxonomy)]{Use-case diagram reflecting the nine-actor taxonomy of Table~\ref{tab:actor-taxonomy}: primary actors (A1--A5, top), external actors (A6--A9, top), and eleven grouped use cases inside the system boundary. Shaded rows denote multi-entity operations (UC5--UC8); dashed nodes and links denote the optional AI Agent add-on (A5, UC10), excluded from MVT.}
 \label{fig:usecase}
 \end{figure}
@@ -2452,7 +2420,7 @@ Figure~\ref{fig:dfd-suite} consolidates the Level-0 context diagram with the Lev
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_data-flow-diagrams.png}
+\BalancedDiagram{Ch3_data-flow-diagrams.pdf}
 \caption[Data-flow diagrams]{Data-flow diagrams: Level-0 context view of the Crypto World Bank platform with five external entities; Level-1 decomposition of the core lending subsystem (origination, ML scoring, disbursement, installment engine, and their data stores); and Level-1 decomposition of the deposit-mobilization, InterBankLendingPool, TreasurySwap, and NettingEngine subsystems.}
 \label{fig:dfd-suite}
 \label{fig:dfd-context}\label{fig:dfd-level1a}\label{fig:dfd-level1b}
@@ -2500,7 +2468,7 @@ Figure~\ref{fig:four-tier} illustrates the hierarchical capital flow and cascadi
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_four-tier-capital-flow.png}
+\BalancedDiagram{fig-hierarchical-banking.pdf}
 \caption[Four-tier hierarchical capital flow]{Four-tier hierarchical capital flow with cascading repayment, plus the same-tier interbank-lending pools (InterBankLendingPool, Section~\ref{sec:interbank-pool}) and the upward-surplus repatriation facility (UpwardDepositFacility, Section~\ref{sec:upward-flow}). The asymmetric rate structure ($r_{\text{up}} < r_{\text{down}}-\delta$) is enforced on-chain.}
 \label{fig:four-tier}
 \end{figure}
@@ -2659,7 +2627,7 @@ Prototype runs on public testnets only; architecture emits audit logs for sandbo
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch3_five-layer-defense-in-depth.png}
+\BalancedDiagram{fig-defense-in-depth.pdf}
 \caption[Five-layer defense-in-depth security architecture]{Five-layer defense-in-depth security architecture. Each layer is necessary; breaching the smart-contract layer requires defeating every layer above it. Layer~1 (smart contract): OpenZeppelin~v5, UUPS, TimeLock, RBAC, ReentrancyGuard, audit suite. Layer~2 (application): EIP-712 sign-in, JWT, rate-limit. Layer~3 (AI/ML): Chainlink Functions oracle, model registry, SHAP, hallucination guard. Layer~4 (runtime): Tenderly, The Graph, WebSocket dashboard, anomaly detection. Layer~5 (operations): Safe multisig, key rotation, bug-bounty.}
 \label{fig:defense-in-depth}
 \end{figure}
@@ -3150,6 +3118,22 @@ When any loan application is submitted---via the React UI or optionally via the 
 \paragraph{Audit trail and human-in-the-loop invariant.}
 Every inference writes one row to \texttt{AI\_ML\_SECURITY\_LOG}: \texttt{\{wallet, loan\_id, p\_f, s\_if, s\_composite, shap\_json, anomaly\_features\_json, model\_version, oracle\_commit\_tx\}}. The contract never auto-disburses on ML output alone; an approver (or client via wallet) must sign the disbursement transaction. ML is \textbf{decision support}, not decision authority---consistent with EU AI Act Art.~86 and the thesis ethical statement.
 
+\paragraph{Timeliness: anticipatory alignment with EU AI Act Annex~III.}
+The EU AI Act classifies AI systems used to evaluate the creditworthiness
+of natural persons as high-risk under Annex~III, with conformity
+obligations applying from August~2026~[126]---a deadline that falls
+within the timeline of this thesis. The explainability pipeline specified
+above already produces several of the artifacts such systems require:
+per-inference SHAP attributions and feature-deviation reports (Art.~86
+right-to-explanation), an immutable \texttt{AI\_ML\_SECURITY\_LOG} row per
+decision (Art.~12 automated logging), and a mandatory human-approver gate
+before disbursement (Art.~14 human oversight). Section~\ref{sec:mica-compliance}
+maps these elements against the full Annex~III conformity checklist; the
+explainability design in this section should therefore be read not only
+as a fraud-detection and regulator-facing audit mechanism, but as an
+early-stage technical-documentation baseline for the Annex~III conformity
+assessment that production deployment would need to complete.
+
 \noindent\textit{Future Work note: session-level behavioral biometrics are a specified extension requiring \texttt{session\_events} instrumentation; the 18 core on-chain transaction features above are the active feature set at pre-thesis stage.}
 
 \section{Optional Conversational Agent Add-On (Phase III--IV)}
@@ -3311,7 +3295,7 @@ The simulation produces five categories of verifiable empirical evidence: (i)~\t
 
 \begin{figure}[H]
 \centering
-\ActivityDiagram{Ch4_realtime-dashboard-monitoring-pipeline.png}
+\ActivityDiagram{fig-realtime-dashboard.pdf}
 \caption[Real-time dashboard and runtime monitoring pipeline]{Real-time dashboard and runtime monitoring pipeline: smart contracts emit typed events; The Graph indexes them and pushes to a Node WebSocket server which renders the React dashboard via a Redis snapshot. Tenderly runtime alerts and an Isolation-Forest anomaly detector feed the operations runbook with the granular-pause control surface of Section~\ref{sec:defense-in-depth}.}
 \label{fig:realtime-dashboard}
 \end{figure}
@@ -3333,7 +3317,7 @@ Six critical alerts are planned for the testnet contracts: single disbursement o
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch4_loan-lifecycle-state-machine.png}
+\BalancedDiagram{Ch4_loan-lifecycle-state-machine.pdf}
 \caption[Transaction state machine of the loan lifecycle]{Transaction state machine of the loan lifecycle: DRAFT $\to$ PENDING\_KYC $\to$ PENDING\_LIMIT $\to$ PENDING\_SCORE $\to$ PENDING\_APPROVAL $\to$ ACTIVE $\to$ \{CLOSED, DEFAULTED $\to$ \{LIQUIDATED, cured-back-to-ACTIVE\}\}, with every transition guarded by a CEI-ordered contract function and every transition emitting an indexed event.}
 \label{fig:tx-state-machine}
 \end{figure}
@@ -3549,7 +3533,7 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--08 & Certora, F
 
 \begin{figure}[H]
 \centering
-\ActivityDiagram{Ch4_four-phase-roadmap-sdlc.png}
+\ActivityDiagram{Ch4_four-phase-roadmap-sdlc.pdf}
 \caption[Four-phase roadmap with SDLC mapping and progress]{Four-phase implementation roadmap with SDLC stage mapping: Pre-thesis covers Planning--Design; Phases~I--IV span Development through Maintenance over 16~weeks. Each phase lists primary deliverables; dashed optional agent work spans Phases~III--IV; progress bars show pre-thesis specification completeness versus MVT implementation targets.}
 \label{fig:phase-roadmap}
 \end{figure}
@@ -3563,14 +3547,14 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--08 & Certora, F
 
 \begin{figure}[H]
 \centering
-\ThesisIncludeGraphics[width=0.75\linewidth,height=0.54\textheight,keepaspectratio]{Ch4_optional-conversational-agent-addon.png}
+\ThesisIncludeGraphics[width=0.75\linewidth,height=0.54\textheight,keepaspectratio]{fig-optional-agent-addon.pdf}
 \caption[Optional conversational agent add-on]{Optional conversational agent add-on: React UI (primary path) and MCP agent (alternate path) both call the same Express.js API and smart contracts; the agent does not gate core banking operations.}
 \label{fig:optional-agent-addon}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\ActivityDiagram{Ch4_dev-verification-toolchain.png}
+\ActivityDiagram{Ch4_dev-verification-toolchain.pdf}
 \caption[Planned development and verification toolchain]{Planned development and verification toolchain: Solidity contracts (Hardhat deploy) $\to$ Foundry fuzz/invariants $\to$ Certora CVL proofs $\to$ CI pipeline; testnet deployment to Polygon zkEVM Cardona in Phase~IV.}
 \label{fig:dev-toolchain}
 \end{figure}
@@ -3647,7 +3631,7 @@ Write-tool enforcement (optional) & Confirmation audit hook & In-pipeline check 
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch4_design-decisions-alternatives.png}
+\BalancedDiagram{Ch4_design-decisions-alternatives.pdf}
 \caption[Key design decisions and alternatives considered]{Key design decisions and alternatives considered: smart-contract platform (EVM vs.\ Cosmos / Solana), chain choice (Polygon + Sepolia vs.\ L1-only vs.\ single L2), upgradeability (UUPS vs.\ Transparent Proxy vs.\ immutable), identity (DID/VC + zkKYC vs.\ raw on-chain KYC vs.\ off-chain-only), ML oracle (commit-reveal vs.\ trusted-backend vs.\ on-chain ML), and cross-chain bridge (Chainlink CCIP vs.\ LayerZero vs.\ Axelar).}
 \label{fig:design-decisions}
 \end{figure}
@@ -3745,7 +3729,7 @@ stack implements a chain of responsibility: the confirmation audit hook, session
 key scope pre-check, and AML pre-check each examine the request and either reject
 it (HTTP~403) or pass it to the next hook. New policy controls are added as new
 chain links without modifying existing route logic or the model
-pipeline~[R55].
+pipeline~[R57].
 
 \item \textbf{Strategy Pattern (Toolset Selection):} The toolset selector
 encapsulates the intent-classification algorithm as a replaceable strategy. The
@@ -4603,6 +4587,12 @@ INTEREST\_RATE\_TIER & \texttt{tier\_id} $\to$ \texttt{base\_rate, kink\_utiliza
 \label{app:agent-harness}
 
 This appendix records the optional conversational agent harness (Phase~III--IV Could deliverables). It is not required to evaluate the core blockchain-banking contribution. Section~\ref{sec:optional-agent} in Chapter~4 summarises the six-step pipeline, MCP tool schema, and Authority Brief example.
+The choice of a locally-hosted 8B-parameter model over a cloud-hosted
+API (Section~\ref{sec:local-llm}) is consistent with the broader 2026
+industry shift toward on-device inference for compliance-sensitive
+financial applications, in which major hardware and platform vendors
+have positioned on-premise deployment as the only viable path for
+sectors handling sensitive financial records~[R56].
 
 \section{Per-User Context and Prompt Assembly}
 
@@ -4680,6 +4670,7 @@ Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook 
 \chapter{Technology Stack}
 
 \section{In-product assistant: local large language model (LLM) integration (prototype)}
+\label{sec:local-llm}
 
 \paragraph{Purpose.}
 The in-product assistant is an \textbf{optional} conversational add-on (Section~\ref{sec:optional-agent}), not a static product guide and not required for deposits, loans, or approvals. It combines a locally hosted, privacy-preserving large language model (Qwen3-8B, Apache~2.0~licence) with a Model Context Protocol (MCP) tool server exposing 17 tools (9 read tools, including a session history search tool, and 8 write tools requiring human confirmation). The agent can both answer questions---via retrieval-augmented generation (RAG) from policy documents---and execute on-chain banking operations via write tools, subject to an explicit human confirmation gate before any state-modifying action is taken. Local hosting keeps conversation data on institutional infrastructure, supporting data-sovereignty requirements in regulated pilots. The agent is additive: a client who does not use it experiences no difference in available functionality, since every operation the agent can perform is equally available through the standard React dashboard.
@@ -5160,6 +5151,10 @@ June 2026.
 \item OWASP Foundation, ``OWASP Top 10 for Large Language Model Applications and
 Agents, 2026 Edition,'' OWASP Foundation, 2026. [Online]. Available:
 \url{https://owasp.org/www-project-top-10-for-large-language-model-applications/}. Accessed: June~9, 2026.
+
+\item Microsoft Security, ``Running OpenClaw Safely: Identity, Isolation, and Runtime Risk,'' Microsoft Security Blog, February~2026; OpenClaw Project, security advisories addressing permissive default tool-execution policies (releases v0.3.3, v0.4.1, v0.4.2), 2026. [Online]. Available: \url{https://www.microsoft.com/en-us/security/blog/2026/02/19/running-openclaw-safely-identity-isolation-runtime-risk/}. Accessed: June~9, 2026.
+
+\item NVIDIA, ``NVIDIA and Microsoft Reinvent Windows PCs for the Age of Personal AI,'' NVIDIA Newsroom, GTC Taipei / COMPUTEX 2026, May--June~2026; see also NVIDIA Blog, ``RTX PCs and DGX Spark Supercomputers Run AI Agents Locally'' (Nemotron on-premise inference for finance, healthcare, and legal workloads). [Online]. Available: \url{https://nvidianews.nvidia.com/news/nvidia-microsoft-windows-pcs-agents-rtx-spark}. Accessed: June~9, 2026.
 
 \item E.~Gamma, R.~Helm, R.~Johnson, and J.~Vlissides, \textit{Design Patterns:
 Elements of Reusable Object-Oriented Software}, Addison-Wesley, 1994.

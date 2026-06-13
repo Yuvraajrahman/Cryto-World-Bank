@@ -1,9 +1,0 @@
-#!/bin/sh
-# Strip Cursor attribution trailers before the commit is created.
-# Installed via: npm install (postinstall) or scripts/install-git-hooks.sh
-msgfile="$1"
-[ -f "$msgfile" ] || exit 0
-
-tmp="${msgfile}.cursor-strip"
-grep -v -E '^(Co-authored-by: Cursor <cursoragent@cursor\.com>|Made-with: Cursor)$' "$msgfile" > "$tmp" \
-  && mv "$tmp" "$msgfile"

@@ -24,6 +24,11 @@ typechain-types/
 .vscode/
 .idea/
 
+# Local-only dev tooling (keep on machine; do not publish)
+.continue/
+.cursor/
+.githooks/
+
 # Python virtualenvs
 venv/
 .venv/

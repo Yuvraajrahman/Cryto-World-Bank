@@ -742,7 +742,7 @@ We design a two-circuit privacy-preserving compliance architecture combining a z
 \paragraph{Positioning against institutional DeFi.}
 The Sygnum Bank \textit{Institutional DeFi in 2025} report (February~2026) documents a specific gap: protocols work technically, but pension-fund and endowment allocators do not participate until \textit{legal enforceability}---not technology---is resolved~[R21]. The Crypto World Bank is a \textbf{planning-phase research prototype} targeting development-finance and MFI use cases (national development banks, local MFIs), not large-cap pension-fund DeFi; those populations operate under different mandates and risk tolerances. Combined with the mBridge / Agora positioning in Section~\ref{sec:stablecoin-first}, this reframes the contribution from ``an alternative to traditional banking'' to ``a composable lending-layer specification compatible with emerging CBDC and tokenized-deposit settlement rails''---a substantially more defensible and publishable claim.
 
-The remainder of this paper is organized as follows. Chapter~2 surveys the academic and industry literature on DeFi lending, hierarchical financial architecture, institutional DeFi, AI-assisted credit assessment, and development-finance economics, identifying the research gaps that motivate this work and presenting the synthesis under a PRISMA-style methodological frame. Chapter~3 presents the system architecture and design, including the smart contract hierarchy, banking product specifications, data model (46 normalized entities), identity and onboarding flows, the formal actor taxonomy and permission matrix, the Chainlink oracle stack, and the compliance and governance framework. Chapter~4 describes the development methodology, the Minimum Viable Thesis checklist (Section~\ref{sec:mvt-checklist}), blockchain-first implementation phase plan, AI/ML datasets and training workload (Section~\ref{sec:ml-workload}), explainability methodology (Section~\ref{sec:ml-explainability}), optional agent add-on (Section~\ref{sec:optional-agent}; harness detail in Appendix~\ref{app:agent-harness}), formal-verification strategy, and technology stack justification. Chapter~5 evaluates the technical, economic, regulatory, and sustainability feasibility of the proposed system, including the revenue stream taxonomy. Chapter~6 presents conclusions and future research directions.
+The remainder of this paper is organized as follows. Chapter~2 surveys the academic and industry literature on DeFi lending, hierarchical financial architecture, institutional DeFi, AI-assisted credit assessment, and development-finance economics, identifying the research gaps that motivate this work and presenting the synthesis under a PRISMA-style methodological frame. Chapter~3 presents the system architecture and design, including the smart contract hierarchy, banking product specifications, data model (51 normalized entities), identity and onboarding flows, the formal actor taxonomy and permission matrix, the Chainlink oracle stack, and the compliance and governance framework. Chapter~4 describes the development methodology, the Minimum Viable Thesis checklist (Section~\ref{sec:mvt-checklist}), blockchain-first implementation phase plan, AI/ML datasets and training workload (Section~\ref{sec:ml-workload}), explainability methodology (Section~\ref{sec:ml-explainability}), optional agent add-on (Section~\ref{sec:optional-agent}; harness detail in Appendix~\ref{app:agent-harness}), formal-verification strategy, and technology stack justification. Chapter~5 evaluates the technical, economic, regulatory, and sustainability feasibility of the proposed system, including the revenue stream taxonomy. Chapter~6 presents conclusions and future research directions.
 
 \section{Blockchain Justification}
 
@@ -897,7 +897,7 @@ This multi-way lending scheme---downward capital allocation, same-tier interbank
 
 \section{Methodology in Brief}
 
-Our approach combines a lightweight Agile delivery process with an explicit Software Development Life Cycle (SDLC) frame. Pre-thesis~1 covers the requirements, architecture, and design phases of the SDLC; the implementation, verification, and validation phases run across four subsequent phases during the final thesis stage. Phase~I builds the four-tier smart contract scaffold (World Bank Reserve, National Bank, Local Bank), the wallet authentication flow, the frontend skeleton, the PostgreSQL schema (26 core entities; 6 extension and 14 stub entities phased in Phases~II--III), and the Chainlink Proof of Reserve integration. Phase~II implements lending services (loan application, approval, installment generation, borrowing limit enforcement) and core on-chain lifecycle controls. Deposit-mobilization modules, group lending, and multi-entity treasury operations are scheduled for Phase~II--III. The optional AI Agent MCP tool server (EIP-7702 session keys, confirmation audit hook) is a Could deliverable in Phase~II--III. Phase~III wires the off-chain AI/ML risk-scoring pipeline (Random Forest, Isolation Forest, SHAP) into the on-chain loan decision via Chainlink Functions (DON-based trustless oracle; the commit-reveal relay is retained as the prototype fallback per Section~\ref{sec:oracle-architecture}), layers the Graph-Neural-Network and federated-learning extensions on top, adds the syndicated-lending, tranched-pool, and netting-engine contracts (\texttt{SyndicatedLoan} per Section~\ref{sec:syndicated-lending}, \texttt{TranchedPool} per Section~\ref{sec:tranched-pools}, \texttt{NettingEngine} per Section~\ref{sec:netting-settlement}, plus the off-chain Settlement Coordinator service), and adds the Foundry invariant suite and Tenderly runtime monitoring. Phase~IV adds the Certora reserve-invariant specifications and formal verification proofs. The implementation stack is Solidity~0.8.20 (smart contracts), React~18 with TypeScript and ERC-4337 account abstraction (frontend), Express.js + FastAPI (backend), scikit-learn + PyTorch Geometric (ML), and Circom~2.0 + snarkjs (ZKP); optionally ChromaDB + a locally hosted 8B-parameter LLM (RAG assistant, Phase~III--IV Could deliverable). All planned deployments target Polygon~zkEVM~Cardona and Ethereum~Sepolia testnets; stablecoin pools use testnet USDC.
+Our approach combines a lightweight Agile delivery process with an explicit Software Development Life Cycle (SDLC) frame. Pre-thesis~1 covers the requirements, architecture, and design phases of the SDLC; the implementation, verification, and validation phases run across four subsequent phases during the final thesis stage. Phase~I builds the four-tier smart contract scaffold (World Bank Reserve, National Bank, Local Bank), the wallet authentication flow, the frontend skeleton, the PostgreSQL schema (31 core entities; 6 extension and 14 stub entities phased in Phases~II--III), and the Chainlink Proof of Reserve integration. Phase~II implements lending services (loan application, approval, installment generation, borrowing limit enforcement) and core on-chain lifecycle controls. Deposit-mobilization modules, group lending, and multi-entity treasury operations are scheduled for Phase~II--III. The optional AI Agent MCP tool server (EIP-7702 session keys, confirmation audit hook) is a Could deliverable in Phase~II--III. Phase~III wires the off-chain AI/ML risk-scoring pipeline (Random Forest, Isolation Forest, SHAP) into the on-chain loan decision via Chainlink Functions (DON-based trustless oracle; the commit-reveal relay is retained as the prototype fallback per Section~\ref{sec:oracle-architecture}), layers the Graph-Neural-Network and federated-learning extensions on top, adds the syndicated-lending, tranched-pool, and netting-engine contracts (\texttt{SyndicatedLoan} per Section~\ref{sec:syndicated-lending}, \texttt{TranchedPool} per Section~\ref{sec:tranched-pools}, \texttt{NettingEngine} per Section~\ref{sec:netting-settlement}, plus the off-chain Settlement Coordinator service), and adds the Foundry invariant suite and Tenderly runtime monitoring. Phase~IV adds the Certora reserve-invariant specifications and formal verification proofs. The implementation stack is Solidity~0.8.20 (smart contracts), React~18 with TypeScript and ERC-4337 account abstraction (frontend), Express.js + FastAPI (backend), scikit-learn + PyTorch Geometric (ML), and Circom~2.0 + snarkjs (ZKP); optionally ChromaDB + a locally hosted 8B-parameter LLM (RAG assistant, Phase~III--IV Could deliverable). All planned deployments target Polygon~zkEVM~Cardona and Ethereum~Sepolia testnets; stablecoin pools use testnet USDC.
 
 \section{Scopes and Challenges}
 \label{sec:scopes-challenges}
@@ -1491,8 +1491,9 @@ Oracle integration (Chainlink Functions) & \tmarkPlanned{} Planned (Phase~III) \
 ZKP KYC compliance layer & \tmarkPlanned{} Planned (Phase~IV) \\
 \rowcolor{RowShade}
 Testnet deployment (Polygon zkEVM Cardona) & \tmarkPlanned{} Planned (Phase~IV) \\
-AI Agent / MCP tool server (17 banking tools) & \tmarkPlanned{} Optional (Phase~III--IV) \\
+AI Agent / MCP tool server (17 banking tools) & \tmarkPlanned{} Optional (Phase~III--IV; \textbf{retail client only}) \\
 \rowcolor{RowShade}
+Bank-authority AI agent (NB/WB aggregate read tools) & \tmarkPlanned{} Future Work (post-MVT) \\
 EIP-7702 session key management & \tmarkPlanned{} Optional (Phase~III) \\
 Authority Brief UI (SHAP for bank approvers) & \tmarkPlanned{} Planned (Phase~III) \\
 \rowcolor{RowShade}
@@ -1516,7 +1517,7 @@ This table eliminates ambiguity between architectural specification (present ten
 The remainder of this chapter is organised as follows. Sections~\ref{sec:high-level-arch}--\ref{sec:oracle-architecture} describe the platform stack, contract inventory, blockchain selection, and oracle architecture. Sections~\ref{sec:data-model}--\ref{sec:data-partitioning} present the relational data model and on-chain/off-chain partitioning. Sections~\ref{sec:operating-context}--\ref{sec:funnel} cover operating context, identity, onboarding, and the retail conversion funnel. Sections~\ref{sec:kinked-rate}--\ref{sec:bridge} specify interest-rate, liquidation, deposit, credit-passport, and cross-chain designs. Section~\ref{sec:multi-entity} details multi-entity capital operations. Sections~\ref{sec:system-modeling}--\ref{sec:banking-products} provide UML-style models and the banking product suite. Sections~\ref{sec:governance-framework}--\ref{sec:threat-model} close with governance and the five-layer security architecture.
 
 \paragraph{Specification voice.}
-Throughout this chapter, \textbf{specified} denotes a formally documented design in this pre-thesis; \textbf{planned} denotes a Phase~I--IV implementation deliverable; and \textbf{optional} denotes the conversational agent add-on, which mirrors the same Express.js API and smart contracts as the primary React interface but is not required for core platform operation. Architectural descriptions use the present tense for specification clarity; Table~\ref{tab:prototype-scope} takes precedence when scope could be ambiguous.
+Throughout this chapter, \textbf{specified} denotes a formally documented design in this pre-thesis; \textbf{planned} denotes a Phase~I--IV implementation deliverable; and \textbf{optional} denotes the conversational agent add-on for \textbf{retail clients only}---it mirrors the same Express.js API and smart contracts as the primary React interface but is not required for core platform operation and does not extend to National Bank or World Bank authority workflows in the MVT scope (Table~\ref{tab:prototype-scope}). Architectural descriptions use the present tense for specification clarity; Table~\ref{tab:prototype-scope} takes precedence when scope could be ambiguous.
 
 \section{High-Level Architecture}
 \label{sec:high-level-arch}
@@ -1730,12 +1731,12 @@ This function is the FTX commingling safeguard described in Section~\ref{sec:def
 \section{Data Model and Database Design}
 \label{sec:data-model}
 
-The relational database schema comprises 46 normalized entities in Third Normal Form (3NF): 26 core prototype entities (Table~\ref{tab:db-entities}), six primary extension entities (Table~\ref{tab:db-entities-ext}), and 14 Phase~II--III banking-product and multi-entity entity stubs (Table~\ref{tab:db-entities-ext2}). Stub entities are shown in the ERD figures and fully specified in Section~\ref{sec:multi-entity}; their physical schemas will be completed during implementation. Figure~\ref{fig:core-system-graph} presents the core entity-relationship overview, Figure~\ref{fig:erd-extended} presents extended product and multi-entity entities, and Figure~\ref{fig:eer} presents the Enhanced Entity-Relationship (EER) diagram with specialisation and weak-entity constructs.
+The relational database schema comprises 51 normalized entities in Third Normal Form (3NF): 31 core prototype entities (Table~\ref{tab:db-entities}), six primary extension entities (Table~\ref{tab:db-entities-ext}), and 14 Phase~II--III banking-product and multi-entity entity stubs (Table~\ref{tab:db-entities-ext2}). Core entities are Phase~I MVT-complete specifications; stub entities carry PK, FK anchors, and one-sentence roles in Table~\ref{tab:db-entities-ext2} and are fully attribute-specified in Section~\ref{sec:multi-entity}. Figure~\ref{fig:core-system-graph} presents the core entity-relationship overview, Figure~\ref{fig:erd-extended} presents extended product and multi-entity entities, and Figure~\ref{fig:eer} presents the Enhanced Entity-Relationship (EER) diagram with specialisation and weak-entity constructs.
 
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-erd-core.pdf}
-\caption[Core system entity graph]{Core system graph showing entity relationships across the four-tier banking hierarchy (\texttt{WORLD\_BANK} $\to$ \texttt{NATIONAL\_BANK} $\to$ \texttt{LOCAL\_BANK} $\to$ \texttt{BANK\_USER}), the central \texttt{BORROWER} entity, and the lending-lifecycle sub-graph (\texttt{LOAN\_REQUEST}, \texttt{LOAN}, \texttt{INSTALLMENT}, \texttt{TRANSACTION}, \texttt{INCOME\_PROOF}, \texttt{CHAT\_MESSAGE}, \texttt{AI\_ML\_SECURITY\_LOG}, \texttt{CREDIT\_PASSPORT}).}
+\caption[Core system entity graph]{Core system graph showing entity relationships across the four-tier banking hierarchy (\texttt{INSTITUTION} $\to$ \texttt{WORLD\_BANK} / \texttt{NATIONAL\_BANK} / \texttt{LOCAL\_BANK} $\to$ \texttt{BANK\_USER}), the central \texttt{BORROWER} entity, and the lending-lifecycle sub-graph (\texttt{LOAN\_REQUEST}, \texttt{LOAN}, \texttt{INSTALLMENT}, \texttt{TRANSACTION}, \texttt{INCOME\_PROOF}, \texttt{CHAT\_MESSAGE}, \texttt{LOAN\_RISK\_ASSESSMENT}, \texttt{CREDIT\_PASSPORT}).}
 \label{fig:core-system-graph}
 \end{figure}
 
@@ -1752,7 +1753,7 @@ The current ERD covers the core lending and governance entities. Figure~\ref{fig
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-eer-model.pdf}
-\caption[Enhanced EER model]{Enhanced Entity-Relationship (EER) model showing generalization / specialization (\texttt{BANK\_USER} $\to$ National-/Local-bank-admin / Approver subtypes), the weak entity \texttt{INSTALLMENT} identified by its parent \texttt{LOAN}, the multi-valued attribute \texttt{INCOME\_PROOF}, the loan-centric aggregation, and participation constraints (total / partial).}
+\caption[Enhanced EER model]{Enhanced Entity-Relationship (EER) model showing generalization / specialization (\texttt{INSTITUTION} $\to$ \texttt{WORLD\_BANK} / \texttt{NATIONAL\_BANK} / \texttt{LOCAL\_BANK}; \texttt{BANK\_USER} $\to$ World-/National-/Local-bank-admin subtypes), the weak entity \texttt{INSTALLMENT} identified by its parent \texttt{LOAN}, the multi-valued attribute \texttt{INCOME\_PROOF}, and participation constraints (total / partial).}
 \label{fig:eer}
 \end{figure}
 
@@ -1761,7 +1762,7 @@ The current ERD covers the core lending and governance entities. Figure~\ref{fig
 
 \begin{table}[H]
 \centering
-\caption[Database entity summary (26 core entities)]{Database entity summary (26 core entities): primary keys and roles.}
+\caption[Database entity summary (31 core entities)]{Database entity summary (31 core entities): primary keys and roles.}
 \label{tab:db-entities}
 \small
 \begin{tabular}{@{}p{2.6cm}p{3.4cm}p{7.0cm}@{}}
@@ -1769,15 +1770,17 @@ The current ERD covers the core lending and governance entities. Figure~\ref{fig
 \tableheadcolor
 \textbf{Entity} & \textbf{Primary key} & \textbf{Role / Description} \\
 \midrule
-WORLD\_BANK & \texttt{world\_bank\_id} & Top-level reserve holder; global lending parameters. On-chain binding: \texttt{contract\_address}, \texttt{chain\_id}, \texttt{last\_synced\_block}, \texttt{deployment\_tx\_hash}. \\
-NATIONAL\_BANK & \texttt{national\_bank\_id} & Country-level banks; borrow from World Bank. On-chain binding: \texttt{contract\_address}, \texttt{chain\_id}, \texttt{last\_synced\_block}, \texttt{deployment\_tx\_hash}. \\
-LOCAL\_BANK & \texttt{local\_bank\_id} & City-level banks; borrow from National Bank and lend to users. On-chain binding: \texttt{contract\_address}, \texttt{chain\_id}, \texttt{last\_synced\_block}, \texttt{deployment\_tx\_hash}. \\
-BANK\_USER & \texttt{bank\_user\_id} & Bank staff with role-based permissions (approve/reject loans). Nullable FK \texttt{world\_bank\_id} for Tier~1 governance actors. \\
-BORROWER & \texttt{borrower\_id} & End borrowers requesting and repaying loans (UK: \texttt{wallet\_address}).\footnote{The prototype uses \texttt{BORROWER} / \texttt{borrower\_id} consistently; the final migration may rename to \texttt{CLIENT} / \texttt{client\_id}. The \texttt{UNIQUE} constraint on \texttt{wallet\_address} assumes single-chain operation; Phase~IV CCIP requires \texttt{(wallet\_address, chain\_id)}.} \\
+INSTITUTION & \texttt{institution\_id} & Shared supertype for all banking-tier identities. Attributes: \texttt{institution\_type} \texttt{ENUM('WORLD','NATIONAL','LOCAL')}, \texttt{name}, \texttt{wallet\_address}, \texttt{contract\_address}, \texttt{status}, \texttt{created\_at}. All multi-entity tables (\texttt{INTERBANK\_LOAN}, \texttt{NETTING\_ENTRY}, \ldots) reference this PK for enforceable cross-tier FKs. \\
+COUNTRY & \texttt{country\_code} & ISO~3166-1 alpha-2 reference (PK). Attributes: \texttt{name}, \texttt{default\_stablecoin\_symbol}, \texttt{regulatory\_regime\_tag}. \\
+WORLD\_BANK & \texttt{institution\_id} & Subtype of \texttt{INSTITUTION} (\texttt{institution\_type='WORLD'}); PK is also FK $\to$ \texttt{INSTITUTION}. Singleton enforced: \texttt{CHECK (institution\_id = 1)} plus no-delete trigger. Global reserve parameters; on-chain binding: \texttt{chain\_id}, \texttt{last\_synced\_block}, \texttt{deployment\_tx\_hash}. \\
+NATIONAL\_BANK & \texttt{institution\_id} & Subtype of \texttt{INSTITUTION} (\texttt{institution\_type='NATIONAL'}); FK \texttt{country\_code} $\to$ \texttt{COUNTRY} with \texttt{UNIQUE} (one national reserve per nation). FK \texttt{parent\_world\_bank\_id} $\to$ \texttt{WORLD\_BANK}. \\
+LOCAL\_BANK & \texttt{institution\_id} & Subtype of \texttt{INSTITUTION} (\texttt{institution\_type='LOCAL'}); FK \texttt{national\_bank\_id} $\to$ \texttt{NATIONAL\_BANK}. City-level banks lending to retail clients. \\
+BANK\_USER & \texttt{bank\_user\_id} & Bank staff with role-based permissions. \texttt{bank\_type} \texttt{ENUM('world','national','local')}; nullable FKs \texttt{world\_bank\_id}, \texttt{national\_bank\_id}, \texttt{local\_bank\_id} with CHECK enforcing exactly one parent institution (Table~\ref{tab:integrity-constraints}). \\
+BORROWER & \texttt{borrower\_id} & End borrowers (UK: \texttt{wallet\_address}). FK \texttt{registered\_local\_bank\_id} $\to$ \texttt{LOCAL\_BANK} (NOT NULL, set at onboarding) records the client's home Local Bank for KYC attribution and dashboard scoping; \texttt{LOAN\_REQUEST} remains the separate M:N association for banks at which the client has applied.\footnote{The prototype uses \texttt{BORROWER} / \texttt{borrower\_id} consistently; the final migration may rename to \texttt{CLIENT} / \texttt{client\_id}. The \texttt{UNIQUE} constraint on \texttt{wallet\_address} assumes single-chain operation; Phase~IV CCIP requires \texttt{(wallet\_address, chain\_id)}.} \\
 LOAN\_REQUEST & \texttt{request\_id} & Loan applications and approval workflow. \texttt{status} (lifecycle): \texttt{DRAFT}, \texttt{SUBMITTED}, \texttt{UNDER\_REVIEW}, \texttt{APPROVED}, \texttt{REJECTED}, \texttt{DISBURSED}, \texttt{CANCELLED}. \texttt{oracle\_state} (event-listener only): \texttt{NONE}, \texttt{COMMIT\_PENDING}, \texttt{COMMITTED}, \texttt{DON\_REQUESTED}, \texttt{SCORE\_REVEALED}. FKs: \texttt{submission\_event\_log\_id}, \texttt{approval\_event\_log\_id}; \texttt{on\_chain\_request\_id}. \\
 LOAN & \texttt{loan\_id} & Active loan after disbursement; FK \texttt{loan\_request\_id} $\to$ \texttt{LOAN\_REQUEST}; collateral and loan asset references. \texttt{on\_chain\_loan\_id}, \texttt{disbursement\_event\_log\_id}. \\
 INSTALLMENT & \texttt{loan\_id}, \texttt{installment\_number} & Repayment schedule (weak entity on \texttt{LOAN}; composite PK). \texttt{payment\_event\_log\_id}, \texttt{payment\_tx\_hash}. \\
-TRANSACTION & \texttt{transaction\_id} & Financial transaction records. \texttt{transaction\_type} (\texttt{LOAN\_DISBURSEMENT}, \texttt{INSTALLMENT\_PAYMENT}, \texttt{INTERBANK\_TRANSFER}, \ldots), \texttt{direction} (\texttt{CREDIT}/\texttt{DEBIT}), \texttt{counterparty\_type}, \texttt{blockchain\_tx\_hash}, \texttt{event\_log\_id}. \\
+TRANSACTION & \texttt{transaction\_id} & Financial ledger records for retail and institutional flows. \texttt{transaction\_type} (\texttt{LOAN\_DISBURSEMENT}, \texttt{INSTALLMENT\_PAYMENT}, \texttt{INTERBANK\_TRANSFER}, \texttt{UPWARD\_DEPOSIT}, \texttt{TREASURY\_SWAP}, \ldots), \texttt{direction} (\texttt{CREDIT}/\texttt{DEBIT}). Nullable FKs: \texttt{borrower\_id} $\to$ \texttt{BORROWER} (retail flows); \texttt{origin\_institution\_id}, \texttt{counterparty\_institution\_id} $\to$ \texttt{INSTITUTION} (institution-to-institution flows). CHECK: at least one actor side is non-null. \texttt{blockchain\_tx\_hash}, \texttt{event\_log\_id}. \\
 BORROWING\_LIMIT & \texttt{limit\_id} & Per-borrower limits with 6-month and 1-year rolling windows (UK: \texttt{borrower\_id}). \texttt{last\_computed\_at}, \texttt{last\_synced\_block}, \texttt{on\_chain\_enforced\_limit}, \texttt{sync\_discrepancy\_flag}. Authoritative enforcement remains on-chain. \\
 CREDIT\_PASSPORT & \texttt{passport\_id} & Read-model projection of on-chain CreditPassport SBT events (event-listener owned). FK \texttt{borrower\_id}; \texttt{wallet\_address}, \texttt{on\_chain\_token\_id}, \texttt{credit\_score}, \texttt{risk\_tier}, \texttt{open\_loans}, \texttt{total\_defaults}, \texttt{kyc\_level}, \texttt{last\_score\_updated\_at}, \texttt{last\_updated\_block}, \texttt{chain\_id}. \\
 \bottomrule
@@ -1796,9 +1799,12 @@ CREDIT\_PASSPORT & \texttt{passport\_id} & Read-model projection of on-chain Cre
 \textbf{Entity} & \textbf{Primary key} & \textbf{Role / Description} \\
 \midrule
 INCOME\_PROOF & \texttt{proof\_id} & Income verification documents (multi-valued per borrower). \\
-CHAT\_MESSAGE & \texttt{message\_id} & Human-to-human and human-to-system messages in the loan workflow (client query $\to$ bank approver reply). FK to \texttt{LOAN\_REQUEST} and/or \texttt{LOAN}. Not agent-specific. \\
+CHAT\_MESSAGE & \texttt{message\_id} & Human-to-human client$\leftrightarrow$bank messages in the loan workflow. FK to \texttt{LOAN\_REQUEST} and/or \texttt{LOAN}. Not agent-specific; not for inter-tier authority communication (see \texttt{INSTITUTION\_MESSAGE}). \\
+INSTITUTION\_MESSAGE & \texttt{message\_id} & Cross-tier / cross-authority communication audit trail. FK \texttt{sender\_institution\_id}, \texttt{receiver\_institution\_id} $\to$ \texttt{INSTITUTION}; \texttt{message\_type} (\texttt{SAR\_ESCALATION}, \texttt{SYNDICATION\_INVITE}, \texttt{RESERVE\_ALERT}, \texttt{IBLP\_REQUEST}, \ldots), \texttt{payload} (JSONB), \texttt{status}, \texttt{created\_at}, \texttt{read\_at}. \\
 AGENT\_CONVERSATION\_TURN & \texttt{turn\_id} & Each turn of the optional Qwen3-8B agent conversation. FK \texttt{session\_id} $\to$ \texttt{SESSIONS}. Stores \texttt{role} (user/assistant/system), \texttt{content\_summary}, \texttt{tokens\_used}, \texttt{tool\_calls} (JSONB). Separate from \texttt{AGENT\_ACTION\_LOG} (write-tool execution only). \\
-AI\_ML\_SECURITY\_LOG & \texttt{security\_log\_id} & Canonical prototype aggregate for ML inference and security monitoring. Final thesis splits into \texttt{LOAN\_RISK\_ASSESSMENT}, \texttt{SHAP\_EXPLANATION}, \texttt{ML\_MODEL\_REGISTRY}, \texttt{FEATURE\_VECTOR}, and \texttt{SECURITY\_ANOMALY\_EVENT}. \\
+MODEL\_REGISTRY & \texttt{model\_id} & ML model lineage for audit and explainability. Attributes: \texttt{model\_name}, \texttt{version}, \texttt{training\_date}, \texttt{metrics} (JSONB), \texttt{artifact\_hash}, \texttt{is\_active}. Referenced by \texttt{LOAN\_RISK\_ASSESSMENT}. \\
+LOAN\_RISK\_ASSESSMENT & \texttt{assessment\_id} & Per-loan ML inference record: FK \texttt{loan\_request\_id} $\to$ \texttt{LOAN\_REQUEST}; FK \texttt{model\_id} $\to$ \texttt{MODEL\_REGISTRY}; \texttt{fraud\_probability}, \texttt{anomaly\_score}, \texttt{shap\_vector} (JSONB), \texttt{feature\_vector\_hash}, \texttt{created\_at}. \\
+SECURITY\_EVENT\_LOG & \texttt{event\_id} & System-wide security and AML events (append-only). Attributes: \texttt{event\_type}, \texttt{actor\_id}, \texttt{actor\_type}, \texttt{severity}, \texttt{payload} (JSONB), \texttt{created\_at}. INSERT-only RLS policy; distinct from per-loan \texttt{LOAN\_RISK\_ASSESSMENT}. \\
 MARKET\_DATA & \texttt{market\_data\_id} & Non-Chainlink price cache (e.g.\ CoinGecko fallback). Read-only auxiliary; no FK into core lending. Key attributes: \texttt{symbol}, \texttt{price\_usd}, \texttt{source}, \texttt{recorded\_at}. Chainlink rounds are stored in \texttt{CHAINLINK\_PRICE\_ROUND}. \\
 CHAINLINK\_PRICE\_ROUND & \texttt{round\_id} & Chainlink \texttt{AggregatorV3Interface} round cache: \texttt{feed\_address}, \texttt{pair\_symbol}, \texttt{answer}, \texttt{round\_id\_on\_chain}, \texttt{answered\_in\_round}, \texttt{updated\_at}, \texttt{chain\_id}. Required for staleness check (\texttt{answeredInRound} $<$ \texttt{roundId}). \\
 PROFILE\_SETTING & \texttt{profile\_id} & Interface preferences for borrowers and bank staff. Nullable FKs: \texttt{borrower\_id} $\to$ \texttt{BORROWER}; \texttt{bank\_user\_id} $\to$ \texttt{BANK\_USER}. CHECK: exactly one FK is non-null. Attributes: \texttt{language\_setting}, \texttt{display\_currency}, \texttt{notification\_enabled}. \\
@@ -1822,7 +1828,7 @@ AUDIT\_LOGS & \texttt{audit\_id} & General-purpose append-only event log for gov
 \tableheadcolor
 \textbf{Entity} & \textbf{Primary key} & \textbf{Role / Description} \\
 \midrule
-SESSIONS & \texttt{session\_id} & Wallet session registry: device/IP hash, EIP-7702 session-key scope and TTL, parent lineage, compression summary, end reason, and delivery source. Audit FK for agent write tools. Phase~II: \texttt{SESSION\_ANCESTOR} closure table replaces recursive trigger (Section~\ref{sec:integrity-constraints}). \\
+SESSIONS & \texttt{session\_id} & Wallet session registry for the \textbf{retail-client} agent add-on: FK \texttt{borrower\_id} $\to$ \texttt{BORROWER}; device/IP hash, EIP-7702 session-key scope and TTL, parent lineage, compression summary, end reason. Bank-authority agent sessions (\texttt{actor\_type='BANK\_USER'}) are Future Work (Section~\ref{sec:prototype-scope}). Phase~II: \texttt{SESSION\_ANCESTOR} closure table (Section~\ref{sec:integrity-constraints}). \\
 AGENT\_ACTION\_LOG & \texttt{action\_id} & Append-only agent write-tool log (\texttt{session\_id}, \texttt{tool\_name}, \texttt{parameters}, \texttt{confirmation\_turn\_id}, \texttt{onchain\_tx\_hash}, \texttt{status}). Separate from \texttt{AGENT\_CONVERSATION\_TURN}; INSERT-only RLS policy. \\
 INTEREST\_RATE\_TIER & \texttt{tier\_id} & Normalised kinked-rate parameters (\texttt{base\_rate}, \texttt{kink\_utilisation}, \texttt{rate\_above\_kink}, \texttt{max\_rate}); Section~\ref{sec:normalization}. Discriminator: \texttt{bank\_tier\_type} \texttt{ENUM('world','national','local')}. Temporal validity: \texttt{effective\_from}, \texttt{effective\_to}, \texttt{governance\_proposal\_id}, \texttt{superseded\_by}, \texttt{is\_active}. Partial unique: \texttt{(bank\_tier\_type) WHERE is\_active = TRUE}. \\
 ASSETS & \texttt{asset\_id} & Collateral and loan asset registry (UK: \texttt{symbol}); referenced by \texttt{LOAN} via \texttt{collateral\_asset\_id} and \texttt{loan\_asset\_id}. \\
@@ -1832,7 +1838,7 @@ ASSETS & \texttt{asset\_id} & Collateral and loan asset registry (UK: \texttt{sy
 \end{table}
 
 \vspace{2pt}
-\noindent\textit{\small This entity summary table enumerates 26 core relational entities. The additions (\texttt{LOAN}, \texttt{SESSIONS}, \texttt{AGENT\_ACTION\_LOG}, \texttt{INTEREST\_RATE\_TIER}, \texttt{ASSETS}, \texttt{CREDIT\_PASSPORT}, \texttt{CREDIT\_PASSPORT\_HISTORY}, \texttt{CHAINLINK\_PRICE\_ROUND}, \texttt{COLLATERAL\_POSITION}, \texttt{BLOCKCHAIN\_EVENT\_LOG}, \texttt{AUDIT\_LOGS}) separate disbursement state from application state, support the AI agent session architecture, provide immutable audit trails, normalise interest-rate governance, standardise asset referencing, bind on-chain SBT and oracle state to off-chain projections, and cache on-chain event receipts respectively. Six extension entities (Table~\ref{tab:db-entities-ext}) and 14 Phase~II--III stubs (Table~\ref{tab:db-entities-ext2}) complete the schema to 46 total. The on-chain/off-chain split implied by the entities supports the architectural principle that high-integrity state transitions occur on-chain while analytics and document workflows remain off-chain.}
+\noindent\textit{\small This entity summary table enumerates 31 core relational entities. Key additions beyond the original lending core include the \texttt{INSTITUTION} supertype and \texttt{COUNTRY} reference (shared identity for cross-tier operations), \texttt{INSTITUTION\_MESSAGE} (inter-tier authority communication), split ML tables (\texttt{MODEL\_REGISTRY}, \texttt{LOAN\_RISK\_ASSESSMENT}, \texttt{SECURITY\_EVENT\_LOG}), \texttt{registered\_local\_bank\_id} on \texttt{BORROWER}, and institution-aware \texttt{TRANSACTION} columns. Six extension entities (Table~\ref{tab:db-entities-ext}) and 14 Phase~II--III stubs (Table~\ref{tab:db-entities-ext2}) complete the schema to 51 total.}
 
 \begin{table}[H]
 \centering
@@ -1865,28 +1871,42 @@ SESSION\_ANCESTOR & \texttt{session\_id}, \texttt{ancestor\_id} & Closure table 
 \tableheadcolor
 \textbf{Entity} & \textbf{Primary Key} & \textbf{Role / FK anchors} \\
 \midrule
-SAVINGS\_ACCOUNT & \texttt{account\_id} & SavingsVault deposit account. FK \texttt{borrower\_id} $\to$ \texttt{BORROWER}; FK \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK}. \texttt{on\_chain\_address}, \texttt{balance}, \texttt{last\_synced\_block}. \\
-FIXED\_DEPOSIT & \texttt{deposit\_id} & FixedDeposit term product. FK \texttt{borrower\_id}; FK \texttt{local\_bank\_id}. \texttt{principal}, \texttt{maturity\_date}, \texttt{on\_chain\_address}. \\
-CURRENT\_ACCOUNT & \texttt{ca\_id} & Transactional account. FK \texttt{borrower\_id}; FK \texttt{local\_bank\_id}. \texttt{balance}, \texttt{on\_chain\_address}. \\
-LOAN\_GROUP & \texttt{group\_id} & GroupLendingPool on-chain group. FK \texttt{local\_bank\_id}. \texttt{on\_chain\_group\_id}, \texttt{max\_members}, \texttt{status}. \\
+SAVINGS\_ACCOUNT & \texttt{account\_id} & SavingsVault deposit account. FK \texttt{borrower\_id} $\to$ \texttt{BORROWER}; FK \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)}. \texttt{on\_chain\_address}, \texttt{balance}, \texttt{last\_synced\_block}. \\
+FIXED\_DEPOSIT & \texttt{deposit\_id} & FixedDeposit term product. FK \texttt{borrower\_id}; FK \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)}. \texttt{principal}, \texttt{maturity\_date}, \texttt{on\_chain\_address}. \\
+CURRENT\_ACCOUNT & \texttt{ca\_id} & Transactional account. FK \texttt{borrower\_id}; FK \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)}. \texttt{balance}, \texttt{on\_chain\_address}. \\
+LOAN\_GROUP & \texttt{group\_id} & GroupLendingPool on-chain group. FK \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)}. \texttt{on\_chain\_group\_id}, \texttt{max\_members}, \texttt{status}. \\
 GROUP\_MEMBER & \texttt{member\_id} & Weak entity on \texttt{LOAN\_GROUP}. FK \texttt{group\_id}; FK \texttt{borrower\_id}. \texttt{joined\_at}, \texttt{consent\_tx\_hash}. \\
-INSURANCE\_FUND & \texttt{fund\_id} & InsuranceFund reserve tracker. FK \texttt{local\_bank\_id}. \texttt{balance}, \texttt{on\_chain\_address}, \texttt{last\_synced\_block}. \\
+INSURANCE\_FUND & \texttt{fund\_id} & InsuranceFund reserve tracker. FK \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)}. \texttt{balance}, \texttt{on\_chain\_address}, \texttt{last\_synced\_block}. \\
 \midrule
-INTERBANK\_LOAN & \texttt{ib\_loan\_id} & IBLP same-tier liquidity loan. FK \texttt{lender\_bank\_id} $\to$ tier table; FK \texttt{borrower\_bank\_id} $\to$ tier table. \texttt{tenor\_days}, \texttt{amount}, \texttt{status}, \texttt{on\_chain\_tx\_hash}. \\
-UPWARD\_DEPOSIT & \texttt{ud\_id} & UpwardDepositFacility surplus deposit. FK \texttt{depositor\_bank\_id}; FK \texttt{parent\_bank\_id}. \texttt{amount}, \texttt{rate}, \texttt{on\_chain\_tx\_hash}. \\
-SYNDICATE & \texttt{syndicate\_id} & SyndicatedLoan deal header. FK \texttt{lead\_bank\_id} $\to$ \texttt{LOCAL\_BANK}. \texttt{total\_amount}, \texttt{status}, \texttt{on\_chain\_address}. \\
-SYNDICATE\_MEMBER & \texttt{syndicate\_id}, \texttt{member\_bank\_id} & Co-lender position. \texttt{committed\_amount}, \texttt{share\_bps}, \texttt{consent\_tx\_hash}. \\
-TRANCHED\_POOL & \texttt{pool\_id} & TranchedPool deal header. FK \texttt{local\_bank\_id}. \texttt{senior\_target}, \texttt{junior\_target}, \texttt{status}, \texttt{on\_chain\_address}. \\
-TREASURY\_SWAP & \texttt{swap\_id} & TreasurySwap record. FK \texttt{initiator\_bank\_id}. \texttt{from\_asset\_id}, \texttt{to\_asset\_id}, \texttt{amount\_from}, \texttt{amount\_to}, \texttt{swap\_tx\_hash}. \\
+INTERBANK\_LOAN & \texttt{ib\_loan\_id} & IBLP same-tier liquidity loan. FK \texttt{lender\_institution\_id}, \texttt{borrower\_institution\_id} $\to$ \texttt{INSTITUTION}; trigger/CHECK enforces matching \texttt{institution\_type} per pool instance (\texttt{IBLP\_NB} or \texttt{IBLP\_LB}). \texttt{tenor\_days}, \texttt{amount}, \texttt{status}, \texttt{on\_chain\_tx\_hash}. \\
+UPWARD\_DEPOSIT & \texttt{ud\_id} & UpwardDepositFacility surplus deposit. FK \texttt{depositor\_institution\_id}, \texttt{parent\_institution\_id} $\to$ \texttt{INSTITUTION}; CHECK enforces adjacent tier-pair (Local$\to$National or National$\to$World). \texttt{amount}, \texttt{rate}, \texttt{on\_chain\_tx\_hash}. \\
+SYNDICATE & \texttt{syndicate\_id} & SyndicatedLoan deal header. FK \texttt{lead\_institution\_id} $\to$ \texttt{INSTITUTION}; FK \texttt{borrower\_id} $\to$ \texttt{BORROWER}. \texttt{total\_amount}, \texttt{status}, \texttt{on\_chain\_address}. \\
+SYNDICATE\_MEMBER & \texttt{syndicate\_id}, \texttt{member\_institution\_id} & Co-lender position. FK \texttt{member\_institution\_id} $\to$ \texttt{INSTITUTION}. \texttt{committed\_amount}, \texttt{share\_bps}, \texttt{consent\_tx\_hash}. \\
+TRANCHED\_POOL & \texttt{pool\_id} & TranchedPool deal header. FK \texttt{sponsor\_institution\_id} $\to$ \texttt{INSTITUTION}. \texttt{senior\_target}, \texttt{junior\_target}, \texttt{status}, \texttt{on\_chain\_address}. \\
+TREASURY\_SWAP & \texttt{swap\_id} & TreasurySwap record. FK \texttt{initiator\_institution\_id} $\to$ \texttt{INSTITUTION}. \texttt{from\_asset\_id}, \texttt{to\_asset\_id}, \texttt{amount\_from}, \texttt{amount\_to}, \texttt{swap\_tx\_hash}. \\
 NETTING\_BATCH & \texttt{batch\_id} & NettingEngine settlement batch header. \texttt{gross\_obligations} (JSONB), \texttt{status}, \texttt{on\_chain\_batch\_id}. \\
-NETTING\_ENTRY & \texttt{entry\_id} & Individual net position per bank per batch. FK \texttt{batch\_id} $\to$ \texttt{NETTING\_BATCH}; FK \texttt{bank\_id}. \texttt{net\_amount}, \texttt{settled\_tx\_hash}. \\
+NETTING\_ENTRY & \texttt{entry\_id} & Individual net position per institution per batch. FK \texttt{batch\_id} $\to$ \texttt{NETTING\_BATCH}; FK \texttt{participant\_institution\_id} $\to$ \texttt{INSTITUTION}. \texttt{net\_amount}, \texttt{settled\_tx\_hash}. \\
 \bottomrule
 \end{tabular}
 \TableScreenshotEnd{Extended Banking and Multi-Entity Entity Stubs (Phase II--III)}
 \end{table}
 
 \vspace{2pt}
-\noindent\textit{\small Extended banking entities in Figure~\ref{fig:erd-extended} (\texttt{SAVINGS\_ACCOUNT}, \texttt{FIXED\_DEPOSIT}, \texttt{LOAN\_GROUP}, \ldots) include planned on-chain anchor fields \texttt{on\_chain\_address} and \texttt{last\_synced\_block} so the event listener can map incoming events to the correct DB row. Phase~III adds \texttt{SESSION\_KEY\_PERMISSION} to normalise MCP tool allowlists currently stored as JSONB in \texttt{SESSIONS}.}
+\noindent\textit{\small Extended banking entities in Figure~\ref{fig:erd-extended} (\texttt{SAVINGS\_ACCOUNT}, \texttt{FIXED\_DEPOSIT}, \texttt{LOAN\_GROUP}, \ldots) include planned on-chain anchor fields \texttt{on\_chain\_address} and \texttt{last\_synced\_block} so the event listener can map incoming events to the correct DB row. Multi-entity stub FKs anchor to \texttt{INSTITUTION.institution\_id} (Table~\ref{tab:db-entities-ext2}) rather than tier-specific PK namespaces, enabling one enforceable referential-integrity path for \texttt{InterBankLendingPool}, \texttt{NettingEngine}, and related contracts. Phase~III adds \texttt{SESSION\_KEY\_PERMISSION} to normalise MCP tool allowlists currently stored as JSONB in \texttt{SESSIONS}.}
+
+\subsection{Institution Supertype and Cross-Tier Referential Integrity}
+\label{sec:institution-supertype}
+
+The four-tier hierarchy (World Bank $\to$ $n$ National Banks $\to$ $n$ Local Banks per nation $\to$ clients) requires a shared institution identity space for multi-entity operations specified in Section~\ref{sec:multi-entity}. Rather than three disjoint PK namespaces (\texttt{world\_bank\_id}, \texttt{national\_bank\_id}, \texttt{local\_bank\_id}), the schema introduces an \texttt{INSTITUTION} supertype with ID-based table-per-type inheritance: \texttt{WORLD\_BANK}, \texttt{NATIONAL\_BANK}, and \texttt{LOCAL\_BANK} are subtype tables whose primary key is also a foreign key to \texttt{INSTITUTION.institution\_id}. This pattern remains 3NF/BCNF-safe (shared identity, not shared attribute duplication) and allows \texttt{INTERBANK\_LOAN}, \texttt{SYNDICATE\_MEMBER}, \texttt{NETTING\_ENTRY}, and \texttt{TREASURY\_SWAP} to reference any banking-tier participant through a single FK. Application triggers or \texttt{CHECK} constraints enforce tier-appropriate pairings---for example, both rows in an \texttt{IBLP\_NB} loan must have \texttt{institution\_type='NATIONAL'}.
+
+Two cardinality rules implied by the architecture are encoded at the database layer. \textbf{World Bank singleton:} \texttt{WORLD\_BANK} permits exactly one row (\texttt{CHECK (institution\_id = 1)}), mirroring the singleton \texttt{WorldBankReserve} contract. \textbf{One national reserve per nation:} \texttt{NATIONAL\_BANK.country\_code} references \texttt{COUNTRY} with a \texttt{UNIQUE} constraint, guaranteeing at most one national-bank institution per ISO jurisdiction and providing a clean join key for FX, stablecoin defaults, and regulatory-sandbox reporting.
+
+Retail clients retain a permanent home-bank link via \texttt{BORROWER.registered\_local\_bank\_id} (set at onboarding, NOT NULL), independent of whether they have submitted a \texttt{LOAN\_REQUEST}. The \texttt{LOAN\_REQUEST} entity continues to model the many-to-many ``which Local Banks has this client borrowed from'' relationship required by the portable Credit Passport design.
+
+Inter-tier authority communication (SAR escalation, syndication invites, reserve alerts) is recorded in \texttt{INSTITUTION\_MESSAGE}, distinct from client-facing \texttt{CHAT\_MESSAGE}. ML inference and security monitoring are split at Phase~I into \texttt{LOAN\_RISK\_ASSESSMENT} (per-loan, SHAP-linked, FK to \texttt{MODEL\_REGISTRY}) and \texttt{SECURITY\_EVENT\_LOG} (system-wide, append-only), avoiding sparse-column conflation in a single aggregate table.
+
+\paragraph{Multi-tenant row-level security (Future Work).}
+Append-only RLS on \texttt{AGENT\_ACTION\_LOG} and \texttt{AUDIT\_LOGS} is specified in Table~\ref{tab:integrity-constraints}. For a global deployment with jurisdictional separation, production would extend RLS (or physical sharding) to scope PII-bearing core tables---\texttt{BORROWER}, \texttt{INCOME\_PROOF}, \texttt{LOAN}, \texttt{LOAN\_REQUEST}---by \texttt{registered\_local\_bank\_id} ancestry through \texttt{LOCAL\_BANK} $\to$ \texttt{NATIONAL\_BANK} $\to$ \texttt{COUNTRY}, preventing a National Bank Admin in one jurisdiction from querying another nation's client rows. This tenant-isolation layer is explicitly deferred to the final-thesis implementation phase.
 
 \subsection{EER Constructs Applied}
 
@@ -1898,14 +1918,14 @@ NETTING\_ENTRY & \texttt{entry\_id} & Individual net position per bank per batch
 \tableheadcolor
 \textbf{EER Construct} & \textbf{Applied To} & \textbf{Notes} \\
 \midrule
-Specialisation (disjoint) & BANK\_USER $\to$ WorldBankUser, NationalBankUser, LocalBankUser & A bank user belongs to exactly one bank type; enforced by CHECK constraint (Table~\ref{tab:integrity-constraints}). \\
-Generalisation & WORLD\_BANK, NATIONAL\_BANK, LOCAL\_BANK share institution attributes & Avoids attribute duplication across institution types. \\
+Specialisation (disjoint) & BANK\_USER $\to$ WorldBankUser, NationalBankUser, LocalBankUser & A bank user belongs to exactly one bank type (\texttt{world}, \texttt{national}, or \texttt{local}); enforced by CHECK constraint (Table~\ref{tab:integrity-constraints}). \\
+Generalisation / specialisation & INSTITUTION $\to$ WORLD\_BANK, NATIONAL\_BANK, LOCAL\_BANK & ID-based table-per-type inheritance: subtype PK = FK to \texttt{INSTITUTION.institution\_id}; shared identity for cross-tier FKs (Section~\ref{sec:institution-supertype}). \\
 Weak entity & INSTALLMENT depends on LOAN & Existence and identity determined by parent loan. \\
 Multi-valued attribute & INCOME\_PROOF per BORROWER & Modelled as separate entity to maintain 1NF. \\
-Aggregation & TRANSACTION, CHAT\_MESSAGE $\to$ AI\_ML\_SECURITY\_LOG & AI\_ML\_SECURITY\_LOG aggregates monitoring signals from both sources. \\
-Association entity & LOAN\_REQUEST links BORROWER + LOCAL\_BANK & LOAN\_REQUEST is a strong entity with primary key \texttt{request\_id} and foreign keys to BORROWER and LOCAL\_BANK, capturing the many-to-many relationship between borrowers and lending banks. It is \textit{not} a weak entity and is not an aggregation in the ER-theoretic sense; ``association entity'' or ``junction entity'' is the correct ER classification. \\
-Participation constraint & BORROWER must have $\geq 1$ LOAN\_REQUEST to access services & Enforced at application layer; architecturally planned for on-chain. \\
-Append-only table (policy) & AGENT\_ACTION\_LOG, AUDIT\_LOGS & DB-level INSERT-only role + Row-Level Security policy enforces that no UPDATE or DELETE is permitted on audit records. Provides immutable tamper-evident trail for regulatory review and agent action accountability. \\
+Aggregation & LOAN\_RISK\_ASSESSMENT $\leftarrow$ LOAN\_REQUEST; SECURITY\_EVENT\_LOG $\leftarrow$ runtime monitors & Per-loan ML scores and system-wide security events are separate append-only relations, not a conflated aggregate. \\
+Association entity & LOAN\_REQUEST links BORROWER + LOCAL\_BANK & Captures many-to-many borrowing relationships; distinct from \texttt{BORROWER.registered\_local\_bank\_id} (home bank at onboarding). \\
+Participation constraint & BORROWER.\texttt{registered\_local\_bank\_id} NOT NULL at onboarding & Home Local Bank is mandatory; \texttt{LOAN\_REQUEST} participation for lending services enforced at application layer. \\
+Append-only table (policy) & AGENT\_ACTION\_LOG, AUDIT\_LOGS, SECURITY\_EVENT\_LOG & DB-level INSERT-only role + Row-Level Security policy enforces that no UPDATE or DELETE is permitted on audit records. \\
 \bottomrule
 \end{tabular}
 \TableScreenshotEnd{EER Constructs Applied: Specialization, Hierarchy, and Constraints}
@@ -1956,12 +1976,12 @@ on INSERT of a new session, rows are copied from the parent's ancestor set with
 \tableheadcolor
 \textbf{Constraint Type} & \textbf{Examples} \\
 \midrule
-Primary Key & One surrogate or composite key per Table~\ref{tab:db-entities}, Table~\ref{tab:db-entities-ext}, and Table~\ref{tab:db-entities-ext2}: e.g.\ \texttt{world\_bank\_id}, \texttt{national\_bank\_id}, \texttt{local\_bank\_id}, \texttt{bank\_user\_id}, \texttt{borrower\_id}, \texttt{request\_id} (\texttt{LOAN\_REQUEST}), \texttt{loan\_id} (\texttt{LOAN}), (\texttt{loan\_id}, \texttt{installment\_number}) (\texttt{INSTALLMENT}), \texttt{transaction\_id}, \texttt{limit\_id}, \texttt{passport\_id}, \texttt{position\_id}, \texttt{event\_id}, \texttt{audit\_id}, \texttt{proof\_id}, \texttt{message\_id}, \texttt{turn\_id}, \texttt{security\_log\_id}, \texttt{market\_data\_id}, \texttt{round\_id}, \texttt{profile\_id}, \texttt{session\_id}, \texttt{action\_id}, \texttt{tier\_id}, \texttt{asset\_id}. \\
-Foreign Key & \texttt{local\_bank\_id} in \texttt{LOAN\_REQUEST} references \texttt{LOCAL\_BANK}; \texttt{loan\_request\_id} in \texttt{LOAN} references \texttt{LOAN\_REQUEST}; \texttt{loan\_id} in \texttt{INSTALLMENT} references \texttt{LOAN}; \texttt{borrower\_id} in \texttt{CREDIT\_PASSPORT} references \texttt{BORROWER}; \texttt{LOAN.borrower\_id} references \texttt{BORROWER(borrower\_id)}; \texttt{LOAN.local\_bank\_id} references \texttt{LOCAL\_BANK(local\_bank\_id)}; \texttt{LOAN\_REQUEST.borrower\_id} references \texttt{BORROWER(borrower\_id)}; \texttt{INCOME\_PROOF.borrower\_id} references \texttt{BORROWER(borrower\_id)}. \\
-UNIQUE & \texttt{wallet\_address} in \texttt{BORROWER}; \texttt{contract\_address} in institution tables; \texttt{blockchain\_tx\_hash} in \texttt{LOAN\_REQUEST}; \texttt{borrower\_id} in \texttt{BORROWING\_LIMIT}; \texttt{symbol} in \texttt{ASSETS}; \texttt{tx\_hash} in \texttt{BLOCKCHAIN\_EVENT\_LOG}; partial unique on \texttt{INTEREST\_RATE\_TIER(bank\_tier\_type)} \texttt{WHERE is\_active = TRUE} (ensures at most one active rate configuration exists per tier type at any time). \\
-CHECK & BANK\_USER: \texttt{(bank\_type='world' AND world\_bank\_id IS NOT NULL) OR (bank\_type='national' AND national\_bank\_id IS NOT NULL) OR (bank\_type='local' AND local\_bank\_id IS NOT NULL)}. \\
-NOT NULL & Core attributes: \texttt{name}, \texttt{wallet\_address}, \texttt{status}, \texttt{oracle\_state} (default \texttt{NONE}). \\
-APPEND-ONLY (DB policy) & \texttt{AGENT\_ACTION\_LOG}, \texttt{CREDIT\_PASSPORT\_HISTORY}: \texttt{CREATE ROLE audit\_writer; GRANT INSERT ON agent\_action\_log TO audit\_writer; REVOKE UPDATE, DELETE FROM PUBLIC.} \texttt{AUDIT\_LOGS}: same policy applied via Row-Level Security (\texttt{ALTER TABLE audit\_logs ENABLE ROW LEVEL SECURITY; CREATE POLICY audit\_insert\_only ON audit\_logs FOR INSERT WITH CHECK (TRUE)}). \\
+Primary Key & One surrogate or composite key per Table~\ref{tab:db-entities}, Table~\ref{tab:db-entities-ext}, and Table~\ref{tab:db-entities-ext2}: e.g.\ \texttt{institution\_id}, \texttt{country\_code}, \texttt{bank\_user\_id}, \texttt{borrower\_id}, \texttt{request\_id} (\texttt{LOAN\_REQUEST}), \texttt{loan\_id} (\texttt{LOAN}), (\texttt{loan\_id}, \texttt{installment\_number}) (\texttt{INSTALLMENT}), \texttt{transaction\_id}, \texttt{model\_id}, \texttt{assessment\_id}, \texttt{message\_id} (\texttt{INSTITUTION\_MESSAGE}), \ldots \\
+Foreign Key & \texttt{WORLD\_BANK.institution\_id}, \texttt{NATIONAL\_BANK.institution\_id}, \texttt{LOCAL\_BANK.institution\_id} $\to$ \texttt{INSTITUTION}; \texttt{NATIONAL\_BANK.country\_code} $\to$ \texttt{COUNTRY}; \texttt{BORROWER.registered\_local\_bank\_id} $\to$ \texttt{LOCAL\_BANK}; \texttt{local\_bank\_id} in \texttt{LOAN\_REQUEST} references \texttt{LOCAL\_BANK(institution\_id)}; \texttt{LOAN\_RISK\_ASSESSMENT.model\_id} $\to$ \texttt{MODEL\_REGISTRY}; \texttt{LOAN\_RISK\_ASSESSMENT.loan\_request\_id} $\to$ \texttt{LOAN\_REQUEST}; \texttt{INSTITUTION\_MESSAGE.sender\_institution\_id}, \texttt{receiver\_institution\_id} $\to$ \texttt{INSTITUTION}; multi-entity stubs (Table~\ref{tab:db-entities-ext2}) anchor institution participants to \texttt{INSTITUTION.institution\_id}. \\
+UNIQUE & \texttt{wallet\_address} in \texttt{BORROWER}; \texttt{NATIONAL\_BANK(country\_code)} (one national reserve per nation); \texttt{contract\_address} in \texttt{INSTITUTION}; \texttt{blockchain\_tx\_hash} in \texttt{LOAN\_REQUEST}; \texttt{borrower\_id} in \texttt{BORROWING\_LIMIT}; \texttt{symbol} in \texttt{ASSETS}; \texttt{tx\_hash} in \texttt{BLOCKCHAIN\_EVENT\_LOG}; partial unique on \texttt{INTEREST\_RATE\_TIER(bank\_tier\_type)} \texttt{WHERE is\_active = TRUE}. \\
+CHECK & \texttt{WORLD\_BANK}: \texttt{institution\_id = 1} (singleton). \texttt{BANK\_USER}: \texttt{(bank\_type='world' AND world\_bank\_id IS NOT NULL) OR (bank\_type='national' AND national\_bank\_id IS NOT NULL) OR (bank\_type='local' AND local\_bank\_id IS NOT NULL)}. \texttt{TRANSACTION}: at least one of \texttt{borrower\_id}, \texttt{origin\_institution\_id}, \texttt{counterparty\_institution\_id} is non-null. \\
+NOT NULL & Core attributes: \texttt{INSTITUTION.name}, \texttt{INSTITUTION.institution\_type}, \texttt{BORROWER.wallet\_address}, \texttt{BORROWER.registered\_local\_bank\_id}, \texttt{status}, \texttt{oracle\_state} (default \texttt{NONE}). \\
+APPEND-ONLY (DB policy) & \texttt{AGENT\_ACTION\_LOG}, \texttt{CREDIT\_PASSPORT\_HISTORY}, \texttt{SECURITY\_EVENT\_LOG}: \texttt{CREATE ROLE audit\_writer; GRANT INSERT ON agent\_action\_log TO audit\_writer; REVOKE UPDATE, DELETE FROM PUBLIC.} \texttt{AUDIT\_LOGS}: same policy applied via Row-Level Security (\texttt{ALTER TABLE audit\_logs ENABLE ROW LEVEL SECURITY; CREATE POLICY audit\_insert\_only ON audit\_logs FOR INSERT WITH CHECK (TRUE)}). \\
 PROJECTION (RLS policy) & \texttt{CREDIT\_PASSPORT}, \texttt{BORROWING\_LIMIT}, \texttt{COLLATERAL\_POSITION}: dedicated \texttt{event\_listener} role is the \textit{only} role permitted to \texttt{INSERT}/\texttt{UPDATE}; Express API role has \texttt{SELECT} only. \texttt{COMMENT ON TABLE credit\_passport IS 'READ-ONLY projection; writable only by event\_listener.'} \\
 FOREIGN KEY (new) & \texttt{LOAN.collateral\_asset\_id} \texttt{REFERENCES assets(asset\_id)}; \texttt{LOAN.loan\_asset\_id} \texttt{REFERENCES assets(asset\_id)}; \texttt{AGENT\_ACTION\_LOG.session\_id} \texttt{REFERENCES sessions(session\_id)}; \texttt{AGENT\_ACTION\_LOG.confirmation\_turn\_id} \texttt{REFERENCES agent\_conversation\_turn(turn\_id)}; \texttt{LOAN.disbursement\_event\_log\_id} \texttt{REFERENCES blockchain\_event\_log(event\_id)}. \\
 UNIQUE (new) & \texttt{assets.symbol} (asset ticker is globally unique across the platform asset registry). \\
@@ -1987,7 +2007,7 @@ UNIQUE (new) & \texttt{assets.symbol} (asset ticker is globally unique across th
 \textbf{Data Category} & \textbf{Storage} & \textbf{Rationale} \\
 \midrule
 Reserve balances, loan requests, approval/rejection events, repayment transactions & On-chain & Immutability, public auditability, trustless verification. \\
-User profiles, income verification documents, chat messages, AI/ML inference logs & Off-chain (database) & Data privacy, query flexibility, storage cost optimisation. \\
+User profiles, income verification documents, chat messages, loan risk assessments, security event logs & Off-chain (database) & Data privacy, query flexibility, storage cost optimisation. \\
 Borrowing limit computations & Off-chain with on-chain enforcement & Complex temporal aggregation; results committed as on-chain constraints via \texttt{LocalBank.updateBorrowingLimit(borrowerId, newLimit)} (see sync protocol below). \\
 Cryptocurrency market data (non-Chainlink) & Off-chain (\texttt{MARKET\_DATA}) & CoinGecko and other fallback feeds; high-frequency updates; external API dependency. \\
 Chainlink oracle price data & Off-chain (\texttt{CHAINLINK\_PRICE\_ROUND}) & Each \texttt{latestRoundData()} round cached with \texttt{answered\_in\_round} for staleness detection; on-chain \texttt{AggregatorV3Interface} is authoritative. \texttt{MARKET\_DATA} does \textit{not} store Chainlink rounds. \\
@@ -2135,7 +2155,7 @@ View reserve summary (public) & YES & YES & YES & YES & READ \\
 \end{tabular}
 \vspace{2pt}
 
-\noindent\textit{\small \dag{} All agent write tools require an explicit human confirmation gate: the agent assembles the full parameter set, presents a summary to the client, and waits for affirmative consent. No write tool is ever called without a confirmation turn in the conversation history. * own tier only.}
+\noindent\textit{\small \dag{} All agent write tools require an explicit human confirmation gate: the agent assembles the full parameter set, presents a summary to the client, and waits for affirmative consent. No write tool is ever called without a confirmation turn in the conversation history. Agent scope is retail-client only at MVT; bank-authority read/aggregate tools are Future Work (Section~\ref{sec:prototype-scope}). * own tier only.}
 \end{table}
 
 \begin{figure}[H]
@@ -2197,7 +2217,7 @@ After KYC approval, the smart contract sets \texttt{kycVerified[wallet] = true},
 \subsection{Five-Stage Retail Onboarding Funnel}
 \label{sec:funnel}
 
-The platform's retail onboarding is structured as a five-stage funnel that progressively reveals blockchain complexity. Stage~1 is information browsing with zero friction (no account required). Stage~2 is account creation via wallet connect or optional ERC-4337 smart account (email / social login). Stage~3 is KYC verification via document capture with automated verification (2--5~minutes in the planned implementation). Stage~4 is the first loan: the UI explains terms in plain language and shows the repayment schedule in USDC with optional fiat-equivalent display via a Chainlink FX oracle. Stage~5 is power-user mode---self-custodied MetaMask, block-explorer visibility, and solidarity-group lending. The primary interaction path remains the React dashboard; the conversational agent (Section~\ref{sec:optional-agent}) is an alternate interface to the same API.
+The platform's retail onboarding is structured as a five-stage funnel that progressively reveals blockchain complexity. Stage~1 is information browsing with zero friction (no account required). Stage~2 is account creation via wallet connect or optional ERC-4337 smart account (email / social login), with \texttt{registered\_local\_bank\_id} assigned at the selected home Local Bank. Stage~3 is KYC verification via document capture with automated verification (2--5~minutes in the planned implementation). Stage~4 is the first loan: the UI explains terms in plain language and shows the repayment schedule in USDC with optional fiat-equivalent display via a Chainlink FX oracle. Stage~5 is power-user mode---self-custodied MetaMask, block-explorer visibility, and solidarity-group lending. The primary interaction path remains the React dashboard; the conversational agent (Section~\ref{sec:optional-agent}) is an alternate interface to the same API.
 
 \begin{figure}[H]
 \centering
@@ -2209,7 +2229,7 @@ The platform's retail onboarding is structured as a five-stage funnel that progr
 \subsection{Optional Conversational Interface (Add-On)}
 \label{sec:optional-agent-ch3}
 
-The MCP-based agent is an \textbf{optional add-on} that calls the same Express.js endpoints and smart contracts as the React UI. It does not gate, modify, or replace the manual banking flows. Figure~\ref{fig:agent-six-step-pipeline} specifies the six-step pipeline: on-chain context injection, read/write routing, mandatory human confirmation gate, MCP write-tool execution via EIP-7702 session key (when enabled), and append-only \texttt{AGENT\_ACTION\_LOG} audit trail.
+The MCP-based agent is an \textbf{optional add-on} that calls the same Express.js endpoints and smart contracts as the React UI. It does not gate, modify, or replace the manual banking flows. At pre-thesis scope the agent is limited to \textbf{retail-client} sessions (\texttt{SESSIONS.borrower\_id}); bank-authority agent sessions (e.g.\ an NB Admin summarising reserve ratios across Local Banks) require generalising \texttt{SESSIONS} to \texttt{actor\_id} + \texttt{actor\_type} and a separate MCP tool set with tighter RBAC---explicitly deferred to Future Work (Table~\ref{tab:prototype-scope}). Figure~\ref{fig:agent-six-step-pipeline} specifies the six-step pipeline: on-chain context injection, read/write routing, mandatory human confirmation gate, MCP write-tool execution via EIP-7702 session key (when enabled), and append-only \texttt{AGENT\_ACTION\_LOG} audit trail.
 
 \begin{figure}[H]
 \centering
@@ -2418,7 +2438,7 @@ When single-name exposure exceeds a bank's lending ceiling, multiple banks co-fu
 \subsection{Database, Phase, and Contract Consistency for Multi-Entity Operations}
 \label{sec:multi-entity-consistency}
 
-Eight ERD entities (\texttt{INTERBANK\_LOAN}, \texttt{UPWARD\_DEPOSIT}, \texttt{SYNDICATE}, \texttt{SYNDICATE\_MEMBER}, \texttt{TRANCHED\_POOL}, \texttt{TREASURY\_SWAP}, \texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}) extend Figure~\ref{fig:erd-extended}, together with \texttt{GROUP\_CONSENT} (Phase~II, required before \texttt{GroupLendingPool}) and \texttt{TRANCHED\_POOL\_SUBSCRIPTION} (Phase~II). Six contracts complete the 15-contract architecture: \texttt{InterBankLendingPool}, \texttt{UpwardDepositFacility}, \texttt{SyndicatedLoan}, \texttt{TranchedPool}, \texttt{TreasurySwap}, \texttt{NettingEngine} (Phase~II: first three; Phase~III: last three). Extended entities include planned \texttt{on\_chain\_address} and \texttt{last\_synced\_block} columns for event-listener mapping.
+Eight ERD entities (\texttt{INTERBANK\_LOAN}, \texttt{UPWARD\_DEPOSIT}, \texttt{SYNDICATE}, \texttt{SYNDICATE\_MEMBER}, \texttt{TRANCHED\_POOL}, \texttt{TREASURY\_SWAP}, \texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}) extend Figure~\ref{fig:erd-extended}, together with \texttt{GROUP\_CONSENT} (Phase~II, required before \texttt{GroupLendingPool}) and \texttt{TRANCHED\_POOL\_SUBSCRIPTION} (Phase~II). All institution-participant FKs anchor to \texttt{INSTITUTION.institution\_id} (Section~\ref{sec:institution-supertype}, Table~\ref{tab:db-entities-ext2}). Six contracts complete the 15-contract architecture: \texttt{InterBankLendingPool}, \texttt{UpwardDepositFacility}, \texttt{SyndicatedLoan}, \texttt{TranchedPool}, \texttt{TreasurySwap}, \texttt{NettingEngine} (Phase~II: first three; Phase~III: last three). Extended entities include planned \texttt{on\_chain\_address} and \texttt{last\_synced\_block} columns for event-listener mapping.
 
 \begin{table}[H]
 \centering
@@ -2430,19 +2450,21 @@ Eight ERD entities (\texttt{INTERBANK\_LOAN}, \texttt{UPWARD\_DEPOSIT}, \texttt{
 \tableheadcolor
 \textbf{Entity} & \textbf{Foreign Keys into Core Schema} \\
 \midrule
-SAVINGS\_ACCOUNT, FIXED\_DEPOSIT, CURRENT\_ACCOUNT & \texttt{borrower\_id} $\to$ \texttt{BORROWER}; \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK} \\
-LOAN\_GROUP & \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK} \\
+SAVINGS\_ACCOUNT, FIXED\_DEPOSIT, CURRENT\_ACCOUNT & \texttt{borrower\_id} $\to$ \texttt{BORROWER}; \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)} \\
+LOAN\_GROUP & \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)} \\
 GROUP\_MEMBER & \texttt{group\_id} $\to$ \texttt{LOAN\_GROUP}; \texttt{borrower\_id} $\to$ \texttt{BORROWER} \\
-INSURANCE\_FUND & \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK} \\
-INTERBANK\_LOAN & \texttt{lender\_bank\_id}, \texttt{borrower\_bank\_id} $\to$ tier institution table \\
-UPWARD\_DEPOSIT & \texttt{depositor\_bank\_id}, \texttt{parent\_bank\_id} $\to$ tier institution table \\
-SYNDICATE & \texttt{lead\_bank\_id} $\to$ \texttt{LOCAL\_BANK}; \texttt{borrower\_id} $\to$ \texttt{BORROWER} \\
-SYNDICATE\_MEMBER & \texttt{syndicate\_id} $\to$ \texttt{SYNDICATE}; \texttt{member\_bank\_id} $\to$ tier table \\
-TRANCHED\_POOL & \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK} \\
+INSURANCE\_FUND & \texttt{local\_bank\_id} $\to$ \texttt{LOCAL\_BANK(institution\_id)} \\
+INTERBANK\_LOAN & \texttt{lender\_institution\_id}, \texttt{borrower\_institution\_id} $\to$ \texttt{INSTITUTION}; tier-type CHECK per IBLP instance \\
+UPWARD\_DEPOSIT & \texttt{depositor\_institution\_id}, \texttt{parent\_institution\_id} $\to$ \texttt{INSTITUTION}; adjacent-tier CHECK \\
+SYNDICATE & \texttt{lead\_institution\_id} $\to$ \texttt{INSTITUTION}; \texttt{borrower\_id} $\to$ \texttt{BORROWER} \\
+SYNDICATE\_MEMBER & \texttt{syndicate\_id} $\to$ \texttt{SYNDICATE}; \texttt{member\_institution\_id} $\to$ \texttt{INSTITUTION} \\
+TRANCHED\_POOL & \texttt{sponsor\_institution\_id} $\to$ \texttt{INSTITUTION} \\
 TRANCHED\_POOL\_SUBSCRIPTION & \texttt{pool\_id} $\to$ \texttt{TRANCHED\_POOL}; \texttt{subscriber\_id} $\to$ \texttt{BANK\_USER} \\
-TREASURY\_SWAP & \texttt{initiator\_bank\_id} $\to$ tier table; \texttt{from\_asset\_id}, \texttt{to\_asset\_id} $\to$ \texttt{ASSETS} \\
+TREASURY\_SWAP & \texttt{initiator\_institution\_id} $\to$ \texttt{INSTITUTION}; \texttt{from\_asset\_id}, \texttt{to\_asset\_id} $\to$ \texttt{ASSETS} \\
 NETTING\_BATCH & \texttt{coordinator\_id} $\to$ \texttt{BANK\_USER} \\
-NETTING\_ENTRY & \texttt{batch\_id} $\to$ \texttt{NETTING\_BATCH}; \texttt{bank\_id} $\to$ tier table \\
+NETTING\_ENTRY & \texttt{batch\_id} $\to$ \texttt{NETTING\_BATCH}; \texttt{participant\_institution\_id} $\to$ \texttt{INSTITUTION} \\
+INSTITUTION\_MESSAGE & \texttt{sender\_institution\_id}, \texttt{receiver\_institution\_id} $\to$ \texttt{INSTITUTION} \\
+LOAN\_RISK\_ASSESSMENT & \texttt{loan\_request\_id} $\to$ \texttt{LOAN\_REQUEST}; \texttt{model\_id} $\to$ \texttt{MODEL\_REGISTRY} \\
 GROUP\_CONSENT & \texttt{loan\_request\_id} $\to$ \texttt{LOAN\_REQUEST}; \texttt{member\_id} $\to$ \texttt{GROUP\_MEMBER} \\
 COLLATERAL\_POSITION & \texttt{borrower\_id} $\to$ \texttt{BORROWER}; \texttt{loan\_id} $\to$ \texttt{LOAN}; \texttt{asset\_id} $\to$ \texttt{ASSETS} \\
 BLOCKCHAIN\_EVENT\_LOG & Referenced by: \texttt{LOAN\_REQUEST.submission\_event\_log\_id}, \texttt{approval\_event\_log\_id}; \texttt{LOAN.disbursement\_event\_log\_id}; \texttt{INSTALLMENT.payment\_event\_log\_id} \\
@@ -2501,12 +2523,12 @@ The Suspicious Activity Report (SAR) workflow is triggered when the Isolation Fo
 
 \begin{enumerate}[noitemsep]
 \item Isolation Forest flags the wallet: \texttt{anomaly\_score > 0.75}.
-\item \texttt{AI\_ML\_SECURITY\_LOG} records the detection event (wallet, score, timestamp, feature vector).
+\item \texttt{LOAN\_RISK\_ASSESSMENT} records the per-loan detection (FK \texttt{model\_id} $\to$ \texttt{MODEL\_REGISTRY}); \texttt{SECURITY\_EVENT\_LOG} records the system-wide AML alert event.
 \item Express.js backend emits a planned event-bus message (\texttt{aml-alert} topic); the compliance dashboard consumes it.
 \item Bank officer reviews the alert in the admin compliance queue:
     \begin{itemize}[noitemsep]
     \item \textbf{False positive:} Dismiss and document reason (audit trail in \texttt{audit\_logs}).
-    \item \textbf{Confirmed:} Generate SAR record in \texttt{audit\_logs}; notify the tier above (National Bank); freeze wallet via \texttt{LocalBank.freezeAccount(clientId)}.
+    \item \textbf{Confirmed:} Generate SAR record in \texttt{audit\_logs}; insert \texttt{INSTITUTION\_MESSAGE} (\texttt{message\_type='SAR\_ESCALATION'}) to notify the tier above (National Bank); freeze wallet via \texttt{LocalBank.freezeAccount(clientId)}.
     \end{itemize}
 \item The \texttt{freezeAccount} function is gated by the \texttt{onlyApprover} modifier and is Foundry-tested (Phase~III invariant suite). A frozen wallet cannot initiate new loan disbursements or installment payments until the freeze is lifted by the tier above.
 \end{enumerate}
@@ -2750,7 +2772,7 @@ The correct mental model for a blockchain banking platform's security is not ``s
 \midrule
 L5 & Operational security & Safe (Gnosis) 2-of-3 multisig for \texttt{WorldBankAdmin}; 3-of-5 for global parameter changes; documented key-rotation schedule; hardware-wallet signer for the WorldBankAdmin Safe (Ledger Gen5). \\
 L4 & Runtime monitoring & Tenderly alerts on six critical triggers (large disbursement, repeated requests, reserve-ratio drop below 20\%, failed \texttt{disburseLoan}, role grants, governance pause); The Graph subgraph for indexed event history; transaction simulation pre-deployment. \\
-L3 & AI/ML security & Random Forest fraud probability + Isolation Forest anomaly score + SHAP explanation per loan, delivered via commit-reveal oracle; transaction-graph distance to flagged wallets; GNN-based wallet-graph clustering for relational fraud (Section~\ref{sec:gnn-extension}). \textit{Note: session-level behavioral biometrics (page-view timing, terms-acceptance latency) require client-side instrumentation not yet in the schema and are a specified Future Work extension.} \\
+L3 & AI/ML security & Random Forest fraud probability + Isolation Forest anomaly score + SHAP explanation per loan (stored in \texttt{LOAN\_RISK\_ASSESSMENT}, FK to \texttt{MODEL\_REGISTRY}), delivered via commit-reveal oracle; system-wide events in \texttt{SECURITY\_EVENT\_LOG}; transaction-graph distance to flagged wallets; GNN-based wallet-graph clustering for relational fraud (Section~\ref{sec:gnn-extension}). \textit{Note: session-level behavioral biometrics (page-view timing, terms-acceptance latency) require client-side instrumentation not yet in the schema and are a specified Future Work extension.} \\
 L2 & Application security & EIP-712 wallet-signed JWT (15-minute lifetime + refresh); \texttt{slowapi} rate limiting (5/min auth, 60/min reads, 10/min writes); Pydantic input range constraints; strict CORS and Content-Security-Policy; environment-variable secret hygiene; prompt injection scanning middleware on all user-sourced fields before context assembly (see below). \\
 L1 & Smart contract security & OpenZeppelin \texttt{ReentrancyGuard}; CEI pattern; Solidity~0.8.20 overflow protection; RBAC with role expiry; UUPS upgrade with Safe-multisig authorization; TimeLock on governance actions; granular per-function pause; four-tool audit pipeline (Slither, Mythril, Echidna, Halmos/Certora); Foundry fuzz + invariants. \\
 \bottomrule
@@ -2839,7 +2861,7 @@ Blind-signing on hardware wallet & L5 & User signs opaque calldata & Calldata de
 \end{tabular}
 \end{table}
 
-This expanded threat model is the structural justification for the five-layer architecture in Section~\ref{sec:defense-in-depth}: each row of the table is a vector that the corresponding layer prevents, detects, or recovers from. Application-layer rows (L2) and operational-layer rows (L5) are the largest blind spots in the prior literature on academic DeFi prototypes and are made explicit here.
+This expanded threat model is the structural justification for the five-layer architecture in Section~\ref{sec:defense-in-depth}: each row of the table is a vector that the corresponding layer prevents, detects, or recovers from. Application-layer rows (L2) and operational-layer rows (L5) are the largest blind spots in the prior literature on academic DeFi prototypes and are made explicit here. Multi-tenant data isolation for PII-bearing core tables is specified as Future Work in Section~\ref{sec:institution-supertype}.
 
 
 %% CHAPTER 4: METHODOLOGY
@@ -4653,10 +4675,19 @@ B-tree indexes (the PostgreSQL default) support efficient retrieval on frequentl
   \texttt{AGENT\_ACTION\_LOG}(\texttt{status})\newline
   \texttt{WHERE status = 'PENDING'} &
   Partial index for the agent status-monitoring loop. \\
-\texttt{idx\_aiml\_score} &
-  \texttt{AI\_ML\_SECURITY\_LOG}(\texttt{anomaly\_score DESC})\newline
+\texttt{idx\_risk\_score} &
+  \texttt{LOAN\_RISK\_ASSESSMENT}(\texttt{anomaly\_score DESC})\newline
   \texttt{WHERE anomaly\_score > 0.5} &
   Partial index for AML alert queue (SAR workflow). \\
+\texttt{idx\_ib\_loan\_status} &
+  \texttt{INTERBANK\_LOAN}(\texttt{status}, \texttt{lender\_institution\_id}) &
+  IBLP default cascade and maturity monitoring. \\
+\texttt{idx\_institution\_type} &
+  \texttt{INSTITUTION}(\texttt{institution\_type}, \texttt{status}) &
+  Tier-scoped institution lookups for multi-entity operations. \\
+\texttt{idx\_txn\_institution} &
+  \texttt{TRANSACTION}(\texttt{origin\_institution\_id}, \texttt{created\_at DESC}) &
+  Institution-to-institution ledger history retrieval. \\
 \texttt{idx\_chainlink\_feed} &
   \texttt{CHAINLINK\_PRICE\_ROUND}(\texttt{feed\_address},\newline
   \texttt{updated\_at DESC}) &
@@ -4668,9 +4699,6 @@ B-tree indexes (the PostgreSQL default) support efficient retrieval on frequentl
 \texttt{idx\_collateral\_borrower} &
   \texttt{COLLATERAL\_POSITION}(\texttt{borrower\_id}, \texttt{loan\_id}) &
   Health-factor lookup per borrower and per loan. \\
-\texttt{idx\_ib\_loan\_status} &
-  \texttt{INTERBANK\_LOAN}(\texttt{status}, \texttt{lender\_bank\_id}) &
-  IBLP default cascade and maturity monitoring. \\
 \texttt{idx\_event\_log\_txhash} &
   \texttt{BLOCKCHAIN\_EVENT\_LOG}(\texttt{tx\_hash}) &
   Deduplication guard: event listener checks this before INSERT. \\
@@ -4700,9 +4728,13 @@ LOAN & \texttt{loan\_id} $\to$ all attributes & Disbursement record keyed by loa
 LOAN & \texttt{loan\_request\_id} $\to$ \texttt{loan\_id} & 1:1 link from approved request to disbursed loan. \\
 BORROWING\_LIMIT & \texttt{borrower\_id} $\to$ \texttt{six\_month\_limit, one\_year\_limit,} \newline \texttt{on\_chain\_enforced\_limit, last\_synced\_block}, \ldots & 1:1 with BORROWER; event-listener owned projection. \\
 CREDIT\_PASSPORT & \texttt{passport\_id} $\to$ all attributes; \texttt{borrower\_id} $\to$ \texttt{passport\_id} & Read-model projection of on-chain SBT; event-listener owned. \\
-BORROWER & \texttt{wallet\_address} $\to$ \texttt{borrower\_id}, all attributes & Unique candidate key in the prototype; Phase~IV uses \texttt{(wallet\_address, chain\_id)}. \\
+BORROWER & \texttt{wallet\_address} $\to$ \texttt{borrower\_id}, all attributes; \texttt{registered\_local\_bank\_id} $\to$ home Local Bank & Unique candidate key in the prototype; Phase~IV uses \texttt{(wallet\_address, chain\_id)}. \\
+INSTITUTION & \texttt{institution\_id} $\to$ \texttt{institution\_type, name, wallet\_address, contract\_address, status} & Supertype for cross-tier FK anchors. \\
+NATIONAL\_BANK & \texttt{country\_code} $\to$ \texttt{institution\_id} & One national reserve per nation (\texttt{UNIQUE}). \\
+MODEL\_REGISTRY & \texttt{model\_id} $\to$ \texttt{model\_name, version, training\_date, metrics, is\_active} & Model lineage for explainability audit. \\
+LOAN\_RISK\_ASSESSMENT & \texttt{assessment\_id} $\to$ all attributes; \texttt{model\_id} $\to$ \texttt{fraud\_probability, anomaly\_score, shap\_vector} & Per-loan ML inference; FK to \texttt{MODEL\_REGISTRY}. \\
 INSTALLMENT & \texttt{loan\_id, installment\_number} $\to$ \texttt{amount, due\_date, status, payment\_event\_log\_id} & Composite primary key. \\
-SESSIONS & \texttt{session\_id} $\to$ \texttt{borrower\_id, wallet\_address, session\_key\_hash,} \newline \texttt{session\_key\_scope, session\_key\_expires\_at,} \newline \texttt{expires\_at, revoked} & Session key scope encodes approved MCP tool list + value cap (JSONB; normalised in \texttt{SESSION\_KEY\_PERMISSION}, Phase~III). \\
+SESSIONS & \texttt{session\_id} $\to$ \texttt{borrower\_id, wallet\_address, session\_key\_hash,} \newline \texttt{session\_key\_scope, session\_key\_expires\_at,} \newline \texttt{expires\_at, revoked} & Retail-client agent sessions only at MVT; bank-authority sessions are Future Work. \\
 AGENT\_ACTION\_LOG & \texttt{action\_id} $\to$ \texttt{session\_id, tool\_name,} \newline \texttt{parameters, confirmation\_turn\_id,} \newline \texttt{onchain\_tx\_hash, status, created\_at} & Links every write-tool execution to the user's consent turn in \texttt{AGENT\_CONVERSATION\_TURN}. \\
 ASSETS & \texttt{asset\_id} $\to$ \texttt{symbol, name, asset\_type,} \newline \texttt{network, decimals, is\_active}; also \texttt{symbol} $\to$ \texttt{asset\_id} & \texttt{symbol} is a unique candidate key. \\
 INTEREST\_RATE\_TIER & \texttt{tier\_id} $\to$ \texttt{base\_rate, kink\_utilization,} \newline \texttt{rate\_above\_kink, max\_rate, bank\_tier\_type, effective\_from, effective\_to, is\_active} & Eliminates transitive dependency; temporal versioning for governance changes. \\

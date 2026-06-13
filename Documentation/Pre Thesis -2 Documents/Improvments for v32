@@ -1,0 +1,668 @@
+# Crypto World Bank — Architecture & Database Schema Improvement Guide
+### Continuation of Prior Analysis | Chapter 3 Deep-Read Findings
+
+---
+
+## How to Use This Document
+
+The prior analysis (pasted context) correctly identified seven missing domain groups (~35 tables) and the foundational CQRS/event-sourcing gap. This document goes one level deeper: it is based on a full line-by-line read of Chapter 3 and the appendices, and surfaces issues the prior analysis could not have seen without the source text — internal contradictions, entity definitions that conflict with their own figure captions, naming splits across sections, and fields the contract architecture requires but the DB schema omits entirely.
+
+Issues are classified as:
+- **CRITICAL** — the system cannot function correctly without this fix
+- **HIGH** — causes examiner-detectable inconsistency or breaks a stated design invariant
+- **MEDIUM** — causes operational problems in production but won't block Phase I/II
+- **LOW** — polish, naming, or documentation-level
+
+---
+
+## Part 1: Internal Consistency Defects
+*These are cases where the thesis text contradicts itself. They are the highest-priority fixes because they are detectable by any careful examiner.*
+
+---
+
+### 1.1 CREDIT_PASSPORT Entity: Referenced but Not Defined [CRITICAL]
+
+**Where the conflict lives:**
+Figure caption at §3.3 (line 1743) explicitly lists `CREDIT_PASSPORT` as one of the entities in the core entity graph: *"...AI\_ML\_LOG, AI\_ML\_SECURITY\_LOG, CREDIT\_PASSPORT."* However, the formal entity summary tables enumerate exactly 20 entities and CREDIT\_PASSPORT is not among them.
+
+**The problem:**
+The entity appears in the architecture diagram but has no defined primary key, attributes, foreign key relationships, or normalization proof. This is not a cosmetic issue — `CREDIT_PASSPORT` is central to the CreditPassport SBT on-chain contract, the Authority Brief, and the borrowing limit logic. An examiner reading the entity tables will find 20 entities; reading the figure caption will find 21. The figure and the tables are directly inconsistent.
+
+**Fix:**
+Add `CREDIT_PASSPORT` as entity 21 in the entity summary, defined as follows — or formally remove it from the figure caption and explain it is a planned addition:
+
+```
+CREDIT_PASSPORT
+PK: passport_id (UUID)
+FK: borrower_id → BORROWER
+Attributes: wallet_address, on_chain_token_id (uint256),
+            credit_score (uint256), risk_tier (ENUM: Bronze/Silver/Gold/Platinum/Diamond),
+            open_loans (smallint), total_defaults (smallint),
+            kyc_level (smallint), last_score_updated_at, last_updated_block,
+            chain_id (int, FK → CHAIN_REGISTRY when multi-chain is added)
+Note: This is a read-model projection of on-chain SBT events.
+      It must ONLY be updated by the event listener, never directly by Express.
+```
+
+A `CREDIT_PASSPORT_HISTORY` append-only table should accompany it for audit.
+
+---
+
+### 1.2 Table Name `AI_ML_SECURITY` vs `AI_ML_LOG` vs `AI_ML_SECURITY_LOG` [CRITICAL]
+
+**Where the conflict lives:**
+- Entity summary (Table in §3.3.1): entity name is `AI_ML_SECURITY`, PK is `security_log_id`
+- Figure caption (§3.3, line 1743): called `AI\_ML\_SECURITY\_LOG`
+- Online inference section (§3.9, line 2918): *"writes one AI\_ML\_SECURITY\_LOG row"*
+- Appendix index table (line 4546): index is on table `AI_ML_LOG`
+- Same appendix table (line 4537): index is on table `AI_CHATBOT_LOG` (separate entity?)
+
+**The problem:**
+Four different names are used across Chapter 3 and the appendix for what appears to be the same or closely related tables. The index `idx_aiml_score` is defined on `AI_ML_LOG`, but the entity is named `AI_ML_SECURITY` — so the index references a table that does not appear in the entity list by that name. This will cause a hard failure if DDL is generated directly from the document.
+
+**Fix — Three-step resolution:**
+
+Step 1: Commit to a single canonical name for the aggregate prototype table: `AI_ML_SECURITY_LOG`. Update all references in Chapter 3, all figure captions, and the appendix index table to use this one name.
+
+Step 2: Update the index appendix to reference `AI_ML_SECURITY_LOG`, not `AI_ML_LOG`.
+
+Step 3: In the entity description, explicitly flag this as the merged prototype table and state clearly that the final thesis splits it into `LOAN_RISK_ASSESSMENT`, `SHAP_EXPLANATION`, `ML_MODEL_REGISTRY`, `FEATURE_VECTOR`, and `SECURITY_ANOMALY_EVENT` (as the prior analysis specified). This three-step change makes the prototype consistent now while keeping the final-thesis split documented.
+
+---
+
+### 1.3 `AI_CHATBOT_LOG` vs `CHAT_MESSAGE` — Undefined Boundary [HIGH]
+
+**Where the conflict lives:**
+Both `AI_CHATBOT_LOG` (entity 13, PK: `log_id`) and `CHAT_MESSAGE` (entity 12, PK: `message_id`, FK to `LOAN_REQUEST` and/or `LOAN`) appear in the entity list. The appendix indexing section has no index for `AI_CHATBOT_LOG`. Neither the entity table nor any other section of Chapter 3 defines what distinguishes these two tables — what goes in one versus the other.
+
+**The problem:**
+An examiner or implementer cannot determine: Does `AI_CHATBOT_LOG` store the agent's model outputs? Does it store system prompts? Does it store the same messages as `CHAT_MESSAGE` but with metadata? Without a boundary definition, the two tables are either redundant or confusingly overlapping.
+
+**Fix:**
+Define the boundary explicitly. Recommended split:
+
+- `CHAT_MESSAGE`: Human-to-human and human-to-system messages in the loan workflow (client submits query → bank approver replies). FK to `LOAN_REQUEST` and/or `LOAN`. Not agent-specific.
+- `AI_CHATBOT_LOG` → rename to `AGENT_CONVERSATION_TURN`: Each turn of the optional Qwen3-8B agent conversation. FK to `SESSIONS`. Stores `role` (user/assistant/system), `content_summary` (not full transcript for space), `tokens_used`, `tool_calls` (JSONB). Separate from `AGENT_ACTION_LOG` (which is write-tool execution only).
+
+If the agent is optional, consider merging `AI_CHATBOT_LOG` entirely into `CHAT_MESSAGE` with a `source` ENUM column (HUMAN / AGENT), and dropping the separate entity. This reduces the entity count cleanly.
+
+---
+
+### 1.4 BORROWER Entity Renaming — Inconsistently Applied [HIGH]
+
+**Where the conflict lives:**
+Entity summary (line 1781) says: *"Renamed CLIENT in the final migration; prototype retains BORROWER."* However, everywhere else in Chapter 3, the database schema consistently uses `BORROWER` — the integrity constraints table, the functional dependencies table, and the indexing appendix all reference `borrower_id`, `BORROWER`, and `idx_loan_borrower`. The entity description mentions both `borrower_id` and `client_id` in different places (e.g., the loan index at line 4533 uses `client_id`).
+
+**The problem:**
+There is an active naming split between `borrower_id` and `client_id` right now, within the same document. Line 4533 (`idx_loan_client_active`) references a column `client_id` on the `LOAN` table, but the entity summary says LOAN has a FK to `BORROWER` via `borrower_id`. These are inconsistent.
+
+**Fix:**
+Make a single decision for the thesis document: use `BORROWER` / `borrower_id` throughout *or* migrate all references to `CLIENT` / `client_id`. Do not leave the rename in a half-applied state. The safest option is to keep `BORROWER` / `borrower_id` for the prototype and add a footnote stating the final migration renames it. Then remove all references to `client_id` from indexes and constraints that currently use it.
+
+---
+
+### 1.5 BANK_USER CHECK Constraint Missing World Bank Case [HIGH]
+
+**Where the conflict lives:**
+The integrity constraints table (line 1904) defines the CHECK constraint as:
+```sql
+(bank_type='national' AND national_bank_id IS NOT NULL)
+OR (bank_type='local' AND local_bank_id IS NOT NULL)
+```
+
+**The problem:**
+The actor taxonomy defines World Bank admins as a distinct user type (A4: *"World Bank Admin (Governance)"*). There is no `world_bank_id IS NOT NULL` branch in the CHECK constraint, meaning World Bank users would fail the constraint as written. Either:
+(a) World Bank admins are not stored in `BANK_USER` at all (in which case the thesis needs to say where they are stored and who the governance Safe multisig maps to), or
+(b) The constraint is missing the third branch.
+
+**Fix:**
+Add the missing branch:
+```sql
+(bank_type='world' AND world_bank_id IS NOT NULL)
+OR (bank_type='national' AND national_bank_id IS NOT NULL)
+OR (bank_type='local' AND local_bank_id IS NOT NULL)
+```
+And add `world_bank_id` as a nullable FK column in `BANK_USER`. Alternatively, explicitly document that Tier 1 governance actors are represented only by their Safe multisig wallet address in the smart contract RBAC and have no `BANK_USER` row — and add a note to that effect in the entity description.
+
+---
+
+### 1.6 MARKET_DATA Partitioning Table Claims Chainlink Data [HIGH]
+
+**Where the conflict lives:**
+The on-chain/off-chain data partitioning table (§3.4, line 1936) states: *"Chainlink Price Feed results are cached in MARKET\_DATA with source = Chainlink feed address; the on-chain AggregatorV3Interface is the authoritative source."*
+
+**The problem:**
+This directly contradicts the architectural need for staleness detection. Chainlink's `latestRoundData()` returns six values: `roundId`, `answer`, `startedAt`, `updatedAt`, `answeredInRound`. The staleness check `answeredInRound < roundId` requires `answeredInRound` to be stored. `MARKET_DATA` only has `symbol`, `price_usd`, `source`, `recorded_at` — none of the Chainlink-specific fields. The LTV calculations the thesis describes (for collateral-backed loans) will be wrong if staleness is not checked, and the partitioning table is actively misleading the reader into thinking `MARKET_DATA` is adequate.
+
+**Fix:**
+Either: (a) Replace `MARKET_DATA` with `CHAINLINK_PRICE_ROUND` as the prior analysis specified (recommended), or (b) keep `MARKET_DATA` for non-Chainlink cached data (CoinGecko fallback) and add `CHAINLINK_PRICE_ROUND` as a separate entity. Update the partitioning table to accurately describe what each table stores. Remove the claim that `MARKET_DATA` is where Chainlink data lives.
+
+---
+
+### 1.7 Indexing Appendix References Tables Not in Entity List [HIGH]
+
+**Where the conflict lives:**
+The indexing strategy appendix defines:
+- `idx_aiml_score` on `AI_ML_LOG(anomaly_score DESC)` — but no entity named `AI_ML_LOG` exists
+- `idx_agent_client_date` on `AGENT_ACTION_LOG(client_id, created_at DESC)` — but `client_id` is not defined as a column of `AGENT_ACTION_LOG` in the functional dependencies (which defines it with `session_id`, `tool_name`, `parameters`, `confirmation_turn_id`, `onchain_tx_hash`, `status`, `created_at`)
+
+**Fix:**
+Reconcile index definitions with the actual entity columns. Update `idx_aiml_score` to reference `AI_ML_SECURITY_LOG`. Verify whether `client_id` is intended as a denormalized column in `AGENT_ACTION_LOG` (reachable via `session_id → SESSIONS → client_id`) — if so, document it; if not, remove it from the index definition and use a join-based query instead.
+
+---
+
+## Part 2: Missing Fields in Existing Entities
+*These are columns that must be added to already-defined tables based on what the contract architecture requires.*
+
+---
+
+### 2.1 LOAN_REQUEST: Missing Oracle State Machine Column [CRITICAL]
+
+The thesis describes a `LoanController` state machine with states: `NONE → COMMIT_PENDING → COMMITTED → DON_REQUESTED → SCORE_REVEALED → APPROVED / REJECTED`. This state machine is central to the oracle architecture described in §3.5. However, the `LOAN_REQUEST` entity has only a generic `status` field. There is no off-chain column that mirrors which oracle state the corresponding on-chain `LoanController` is in.
+
+**Without this column:**
+- The frontend cannot display "awaiting ML score" vs "ML scored, pending approver" vs "rejected by oracle"
+- The event listener has no way to determine whether a LOAN_REQUEST row needs further oracle processing
+- There is no way to query "how many loans are stuck in DON_REQUESTED state" (debugging/monitoring)
+
+**Add to LOAN_REQUEST:**
+```
+oracle_state  ENUM('NONE', 'COMMIT_PENDING', 'COMMITTED',
+                   'DON_REQUESTED', 'SCORE_REVEALED')
+              NOT NULL DEFAULT 'NONE'
+```
+This column is updated by the event listener only, not by Express directly, consistent with the CQRS principle stated in the prior analysis.
+
+---
+
+### 2.2 Core Institution Tables: Missing On-Chain Address Binding [CRITICAL]
+
+`WORLD_BANK`, `NATIONAL_BANK`, and `LOCAL_BANK` are PostgreSQL rows that represent on-chain contract instances. In a blockchain-first architecture, the DB row is a projection of on-chain state. Without knowing which contract address a DB row corresponds to, you cannot:
+- Emit events to the right listener subscription
+- Do cross-reference between `BLOCKCHAIN_EVENT_LOG.contract_address` and the institution row
+- Determine which contract to call when the API constructs a transaction
+
+**Add to each institution table:**
+```
+contract_address    VARCHAR(42) NOT NULL UNIQUE  -- EVM hex address, 0x-prefixed
+chain_id            INT NOT NULL                 -- FK → CHAIN_REGISTRY (Phase II)
+last_synced_block   BIGINT                       -- last block processed for this contract
+deployment_tx_hash  VARCHAR(66) UNIQUE           -- creation transaction hash
+```
+
+---
+
+### 2.3 LOAN and INSTALLMENT: Missing Blockchain Event Links [CRITICAL]
+
+Every state change in `LOAN` and `INSTALLMENT` is caused by an on-chain event. Without linking DB rows to the events that created or modified them, you cannot prove the DB is a faithful projection of the chain, and you cannot replay or audit specific state transitions.
+
+**Add to LOAN:**
+```
+disbursement_event_log_id   UUID REFERENCES blockchain_event_log(event_id)
+on_chain_loan_id            BIGINT   -- the uint256 loanId from the contract
+```
+
+**Add to INSTALLMENT:**
+```
+payment_event_log_id        UUID REFERENCES blockchain_event_log(event_id)
+                            -- NULL until payment is recorded on-chain
+payment_tx_hash             VARCHAR(66)
+```
+
+**Add to LOAN_REQUEST:**
+```
+submission_event_log_id     UUID REFERENCES blockchain_event_log(event_id)
+approval_event_log_id       UUID REFERENCES blockchain_event_log(event_id)
+on_chain_request_id         BIGINT  -- the uint256 requestId from the contract
+```
+
+---
+
+### 2.4 TRANSACTION Entity: Missing Transaction Type Discrimination [HIGH]
+
+The `TRANSACTION` entity is defined only as "Financial transaction records" with a `transaction_id`. In a system with loan disbursements, installment repayments, interbank transfers, FX swaps, reserve allocations, and savings deposits, a single undifferentiated `TRANSACTION` table will cause reporting and query complexity problems from day one.
+
+**Add to TRANSACTION:**
+```
+transaction_type    ENUM('LOAN_DISBURSEMENT', 'INSTALLMENT_PAYMENT',
+                         'INTERBANK_TRANSFER', 'FX_SWAP', 'RESERVE_ALLOCATION',
+                         'SAVINGS_DEPOSIT', 'SAVINGS_WITHDRAWAL',
+                         'FIXED_DEPOSIT_CREATE', 'FIXED_DEPOSIT_RELEASE',
+                         'INSURANCE_FUND_CONTRIBUTION', 'INSURANCE_FUND_CLAIM',
+                         'NETTING_SETTLEMENT')
+                    NOT NULL
+direction           ENUM('CREDIT', 'DEBIT') NOT NULL
+counterparty_type   ENUM('BORROWER', 'LOCAL_BANK', 'NATIONAL_BANK',
+                         'WORLD_BANK', 'EXTERNAL') NOT NULL
+blockchain_tx_hash  VARCHAR(66)
+event_log_id        UUID REFERENCES blockchain_event_log(event_id)
+```
+
+---
+
+### 2.5 INTEREST_RATE_TIER: Missing Versioning and Effective Dates [HIGH]
+
+The normalization section correctly extracts `INTEREST_RATE_TIER` from the bank entities. However, the current design has no temporal validity — there is a single row per tier with no `effective_from`, `effective_to`, or version number. Interest rate governance changes (voted through TimelockController) would require in-place updates to this table, which means you cannot reconstruct what interest rate applied to a historical loan. This violates the audit principle of the thesis.
+
+**Add to INTEREST_RATE_TIER:**
+```
+effective_from          TIMESTAMPTZ NOT NULL
+effective_to            TIMESTAMPTZ               -- NULL = currently active
+governance_proposal_id  UUID REFERENCES governance_proposal(proposal_id)
+                        -- (once GOVERNANCE_PROPOSAL table exists)
+superseded_by           UUID REFERENCES interest_rate_tier(tier_id)
+is_active               BOOLEAN NOT NULL DEFAULT TRUE
+```
+
+Add a UNIQUE constraint on `(tier_id, is_active)` where `is_active = TRUE` using a partial unique index.
+
+---
+
+### 2.6 BORROWER/BORROWING_LIMIT: Missing Chain Anchor and Sync Timestamp [HIGH]
+
+The `BORROWING_LIMIT` table enforces rolling 6-month and 1-year windows off-chain. The thesis says "authoritative enforcement remains on-chain." This implies the off-chain DB computes a limit and the chain verifies it. But there is no field capturing:
+- When the DB's limit calculation was last synced with on-chain state
+- Which block the on-chain enforcement is based on
+- Whether the DB's current limit is stale relative to the chain
+
+**Add to BORROWING_LIMIT:**
+```
+last_computed_at        TIMESTAMPTZ NOT NULL
+last_synced_block       BIGINT
+on_chain_enforced_limit NUMERIC(36,18)  -- what the contract currently enforces
+sync_discrepancy_flag   BOOLEAN DEFAULT FALSE  -- set if DB and chain disagree
+```
+
+---
+
+### 2.7 SESSIONS Table: session_key_scope JSON → Normalization [MEDIUM]
+
+The `SESSIONS` table stores `session_key_scope` as a JSONB blob (per the functional dependencies table). The thesis uses this to encode the MCP tool allowlist and value cap. This works for the prototype, but makes queries like "how many active sessions allow submit_loan_application?" require a JSONB `@>` query, which is non-trivial and unindexable by default.
+
+**Recommendation:** Add `SESSION_KEY_PERMISSION` as a normalized companion table (Phase II or III):
+```sql
+CREATE TABLE session_key_permission (
+    permission_id    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id       UUID NOT NULL REFERENCES sessions(session_id),
+    tool_name        VARCHAR(100) NOT NULL,
+    max_value_usdc   NUMERIC(18,6),
+    allowed_contracts TEXT[],
+    expiry           TIMESTAMPTZ,
+    UNIQUE (session_id, tool_name)
+);
+```
+Keep the JSONB blob in `SESSIONS` for the prototype. Add the normalized table in Phase III when the agent goes live.
+
+---
+
+### 2.8 Extended Banking Tables: Missing Contract Anchor Fields [MEDIUM]
+
+The 14 extended entities (`SAVINGS_ACCOUNT`, `FIXED_DEPOSIT`, `CURRENT_ACCOUNT`, `LOAN_GROUP`, `GROUP_MEMBER`, `INSURANCE_FUND`, `INTERBANK_LOAN`, `UPWARD_DEPOSIT`, `SYNDICATE`, `SYNDICATE_MEMBER`, `TRANCHED_POOL`, `TREASURY_SWAP`, `NETTING_BATCH`, `NETTING_ENTRY`) are listed as "planned" but their entity definitions do not include:
+```
+on_chain_address    VARCHAR(42)  -- contract address managing this record
+last_synced_block   BIGINT       -- last block processed
+```
+Without these, the event listener cannot map an incoming event to the correct DB row.
+
+---
+
+## Part 3: Missing Entities Not Covered by Prior Analysis
+
+*The prior analysis identified 7 missing domain groups. These are additional entities that the thesis's own Chapter 3 text implicitly requires but doesn't define.*
+
+---
+
+### 3.1 GROUP_CONSENT Table [HIGH]
+
+**Why it's required:**
+The `GroupLendingPool` contract emits `ConsentRecorded` events. The thesis (Appendix Smart Contracts) describes *"multi-signature consent recording"* as a core function. Group lending's legal and operational validity depends on capturing per-member consent. `GROUP_MEMBER` exists in the schema, but there is no `GROUP_CONSENT` table.
+
+```sql
+CREATE TABLE group_consent (
+    consent_id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    group_id            UUID NOT NULL REFERENCES loan_group(group_id),
+    member_id           UUID NOT NULL REFERENCES group_member(member_id),
+    loan_request_id     UUID NOT NULL REFERENCES loan_request(request_id),
+    consent_tx_hash     VARCHAR(66) NOT NULL,
+    consent_timestamp   TIMESTAMPTZ NOT NULL,
+    event_log_id        UUID REFERENCES blockchain_event_log(event_id),
+    UNIQUE (loan_request_id, member_id)  -- one consent per member per loan
+);
+```
+
+---
+
+### 3.2 TRANCHED_POOL_SUBSCRIPTION Table [MEDIUM]
+
+**Why it's required:**
+The `TranchedPool` contract is in the contract inventory (Phase II/III). The DB entity `TRANCHED_POOL` is in the extended entities list. But there is no entity for individual investor subscriptions to tranche positions — who subscribed at what size, to which tranche (senior/junior), at what time. Without this, the waterfall interest calculations cannot be attributed to individual investors.
+
+```sql
+CREATE TABLE tranched_pool_subscription (
+    subscription_id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    pool_id             UUID NOT NULL REFERENCES tranched_pool(pool_id),
+    subscriber_id       UUID NOT NULL  -- FK to either NATIONAL_BANK or LOCAL_BANK
+    subscriber_type     ENUM('NATIONAL_BANK', 'LOCAL_BANK') NOT NULL,
+    tranche             ENUM('SENIOR', 'JUNIOR') NOT NULL,
+    committed_amount    NUMERIC(36,18) NOT NULL,
+    subscribed_at       TIMESTAMPTZ NOT NULL,
+    subscription_tx_hash VARCHAR(66),
+    event_log_id        UUID REFERENCES blockchain_event_log(event_id)
+);
+```
+
+---
+
+### 3.3 NETTING_COORDINATOR_STATE Table [MEDIUM]
+
+**Why it's required:**
+The `NettingEngine` contract description says: *"Off-chain Settlement Coordinator computes the netted matrix, on-chain settleBatch executes the entire batch, with a public challenge window."* The Settlement Coordinator is an off-chain process that needs state tracking. There is no DB table for:
+- Which netting batches are currently being computed
+- The netting matrix inputs and outputs
+- The challenge window deadline
+- Dispute records
+
+```sql
+CREATE TABLE netting_coordinator_state (
+    batch_id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    batch_reference     VARCHAR(100) NOT NULL,  -- human-readable batch ref
+    period_start        TIMESTAMPTZ NOT NULL,
+    period_end          TIMESTAMPTZ NOT NULL,
+    status              ENUM('COMPUTING', 'PROPOSED', 'CHALLENGE_WINDOW',
+                             'SETTLED', 'DISPUTED', 'CANCELLED') NOT NULL,
+    gross_obligations   JSONB,  -- the full obligation matrix before netting
+    net_settlements     JSONB,  -- the reduced settlement instructions
+    challenge_deadline  TIMESTAMPTZ,
+    on_chain_batch_id   BIGINT,
+    settlement_tx_hash  VARCHAR(66),
+    settled_at          TIMESTAMPTZ,
+    event_log_id        UUID REFERENCES blockchain_event_log(event_id)
+);
+```
+
+---
+
+### 3.4 KYC_VERIFICATION_REQUEST Table [MEDIUM]
+
+**Why it's required:**
+The ZKP KYC architecture (§3.6.1) describes a workflow: KYC provider validates ID → issues signed credential → user generates zk-SNARK proof → contract verifies. The DB currently has no table that tracks where a user is in this workflow. Without it, the Express backend cannot answer "is this user's KYC request still pending?" or "which provider is processing this user?"
+
+```sql
+CREATE TABLE kyc_verification_request (
+    request_id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    borrower_id         UUID NOT NULL REFERENCES borrower(borrower_id),
+    provider_id         UUID,  -- FK → KYC_PROVIDER_REGISTRY (Phase IV)
+    kyc_level_requested SMALLINT NOT NULL,
+    status              ENUM('SUBMITTED', 'UNDER_REVIEW', 'CREDENTIAL_ISSUED',
+                             'PROOF_GENERATED', 'VERIFIED_ON_CHAIN', 'REJECTED') NOT NULL,
+    credential_hash     VARCHAR(66),  -- SHA-256 of the VC, not the VC itself
+    proof_hash          VARCHAR(66),  -- hash of the zk-SNARK proof
+    submitted_at        TIMESTAMPTZ NOT NULL,
+    verified_at         TIMESTAMPTZ,
+    rejection_reason    TEXT,
+    on_chain_tx_hash    VARCHAR(66)   -- tx that called KYCVerifier.verify()
+);
+```
+
+---
+
+### 3.5 ORACLE_HEARTBEAT_MONITOR Table [MEDIUM]
+
+**Why it's required:**
+The HTML architecture map lists `ORACLE_HEARTBEAT_MONITOR` as one of the oracle pipeline tables. The thesis uses Chainlink Price Feeds for LTV calculations. If a price feed goes stale (no update within the heartbeat period), loan approvals and liquidation triggers based on stale prices are incorrect. There needs to be a monitoring table that records whether each feed is within its heartbeat window.
+
+```sql
+CREATE TABLE oracle_heartbeat_monitor (
+    monitor_id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feed_address        VARCHAR(42) NOT NULL,
+    pair_symbol         VARCHAR(20) NOT NULL,
+    expected_heartbeat_seconds  INT NOT NULL,
+    last_round_id       NUMERIC(20,0),
+    last_updated_at     TIMESTAMPTZ,
+    next_expected_update TIMESTAMPTZ,
+    is_stale            BOOLEAN NOT NULL DEFAULT FALSE,
+    stale_since         TIMESTAMPTZ,
+    checked_at          TIMESTAMPTZ NOT NULL,
+    chain_id            INT NOT NULL
+);
+```
+
+---
+
+### 3.6 EIP_7702_SESSION_CONTRACT Registry [LOW]
+
+**Why it's required:**
+The thesis describes EIP-7702 session key authorization as: *"the session key contract at signing time enforces scope restrictions on-chain."* This implies there is a smart contract that manages session key scopes. That contract is not in the 15-contract inventory, and there is no DB table for it. This contract needs to be registered and its address tracked.
+
+Either: add a `SESSION_KEY_CONTRACT` entry to the contract inventory, or document that EIP-7702 uses a shared infrastructure contract (e.g., a standard EIP-7702 delegation contract from the Ethereum ecosystem), and add its address to `CHAIN_REGISTRY` as a platform-wide configuration field. The current silence on this is an architectural gap.
+
+---
+
+## Part 4: Architectural Integrity Issues
+*These are design-level problems that cut across multiple tables and cannot be fixed by adding a single field.*
+
+---
+
+### 4.1 The CQRS Invariant Is Stated But Not Enforced [CRITICAL]
+
+**The thesis's stated principle (§3.4, line 1943):**
+*"The partitioning choice balances transparency and tamper-resistance with practical storage and privacy constraints."*
+
+**The actual problem:**
+The thesis defines `CREDIT_PASSPORT` (when added per Fix 1.1) and `BORROWING_LIMIT` as off-chain tables. Both of these are projections of on-chain state. But the integrity constraints table (§3.3.5) does not specify any policy that prevents Express.js API handlers from updating these tables directly, bypassing the event listener. Without enforcement, a developer will write `UPDATE credit_passport SET risk_tier = 'Gold' WHERE borrower_id = ?` directly in an Express handler — and the DB will silently diverge from chain state.
+
+**Recommended enforcement mechanisms (all needed together):**
+
+1. **Row-Level Security (RLS) policy:** Create a dedicated PostgreSQL role `event_listener` that is the ONLY role permitted to UPDATE/INSERT on projection tables (`CREDIT_PASSPORT`, `COLLATERAL_POSITION`, `BORROWING_LIMIT`). The Express API role has SELECT only on these tables.
+
+2. **Table comment:** Add a PostgreSQL comment `COMMENT ON TABLE credit_passport IS 'READ-ONLY projection of CreditPassport SBT events. Writable only by event_listener role.'` on each projection table.
+
+3. **In the thesis:** Add a subsection explicitly listing which tables are "projection tables" (event-listener-owned) vs "application tables" (Express-owned). This is a formal architectural distinction that currently lives only in the prior analysis document, not in the thesis itself.
+
+---
+
+### 4.2 Borrowing Limit Sync Protocol Is Unspecified [HIGH]
+
+**The thesis says (data partitioning table, line 1932):**
+*"Borrowing limit computations: Off-chain with on-chain enforcement. Complex temporal aggregation; results committed as on-chain constraints."*
+
+**The problem:**
+"Results committed as on-chain constraints" is a critical claim that is never specified. Which smart contract function receives the committed limit? Who calls it? What prevents the off-chain computation from being wrong and the on-chain system from enforcing a bad limit? Is there a dispute mechanism?
+
+**What's needed:**
+
+The thesis should specify the sync protocol explicitly:
+
+```
+1. Event listener receives LoanRepaid/LoanDisbursed event
+2. Updates TRANSACTION table
+3. Recomputes 6-month and 1-year rolling windows from TRANSACTION table
+4. If computed limit differs from on_chain_enforced_limit in BORROWING_LIMIT:
+   4a. Express API calls LocalBank.updateBorrowingLimit(borrowerId, newLimit)
+   4b. On receipt of BorrowingLimitUpdated event, listener updates BORROWING_LIMIT row
+5. sync_discrepancy_flag is cleared
+```
+
+Without this specification, the "authoritative enforcement on-chain" claim is architecturally hollow.
+
+---
+
+### 4.3 SESSIONS Recursive Trigger Performance Concern [MEDIUM]
+
+**The thesis says (§3.3.3, line 1884):**
+*"This is enforced by a CHECK constraint in conjunction with a trigger that walks the ancestry chain before INSERT."*
+
+**The problem:**
+A recursive trigger that walks the ancestry chain before each session INSERT is a correctness mechanism that can become a performance bottleneck for long-running agents with deep session lineage chains. In the worst case, a session with N ancestors requires N separate queries before each new session can be created.
+
+**Recommended fix:**
+Replace the recursive trigger with a **closure table pattern**:
+
+```sql
+CREATE TABLE session_ancestor (
+    session_id       UUID NOT NULL REFERENCES sessions(session_id),
+    ancestor_id      UUID NOT NULL REFERENCES sessions(session_id),
+    depth            INT NOT NULL,  -- 1 = direct parent, 2 = grandparent, etc.
+    PRIMARY KEY (session_id, ancestor_id)
+);
+```
+
+On INSERT of a new session, add rows to `session_ancestor` by copying the parent's rows with `depth + 1`. The cycle check becomes `WHERE ancestor_id = NEW.session_id` — a single indexed lookup. This also makes lineage traversal O(1) lookups instead of recursive queries.
+
+---
+
+### 4.4 LOAN_REQUEST status ENUM Does Not Cover Oracle States [HIGH]
+
+**The problem:**
+`LOAN_REQUEST.status` is referenced in the index strategy as filtering "active vs closed loans." The oracle architecture defines a multi-step state machine. If both the application lifecycle states (PENDING_REVIEW, APPROVED, REJECTED, DISBURSED) and the oracle states (COMMIT_PENDING, COMMITTED, DON_REQUESTED, SCORE_REVEALED) are crammed into a single `status` field, the ENUM becomes semantically overloaded and queries like "how many loans are pending human review" become ambiguous (could be PENDING_REVIEW or could be COMMITTED-but-not-yet-reviewed).
+
+**Fix:**
+Separate into two columns (per Fix 2.1):
+- `status`: Application lifecycle ENUM (DRAFT, SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED, DISBURSED, CANCELLED)
+- `oracle_state`: Oracle pipeline ENUM (NONE, COMMIT_PENDING, COMMITTED, DON_REQUESTED, SCORE_REVEALED)
+
+Both columns together fully describe where the loan application is in its lifecycle.
+
+---
+
+### 4.5 Missing Materialized View for MCP Agent Queries [MEDIUM]
+
+**The prior analysis mentioned this; it's confirmed by reading the thesis.**
+The MCP tool `get_account_state` (described in the agent harness appendix) would need to join: `BORROWER`, `CREDIT_PASSPORT`, `COLLATERAL_POSITION`, `LOAN` (active), `INSTALLMENT` (next due), `SAVINGS_ACCOUNT`, `BORROWING_LIMIT`. That is 6–7 table joins on every agent call.
+
+**Add to the schema documentation:**
+```sql
+CREATE MATERIALIZED VIEW mv_client_dashboard AS
+SELECT
+    b.borrower_id,
+    b.wallet_address,
+    b.kyc_level,
+    cp.credit_score,
+    cp.risk_tier,
+    bl.six_month_remaining,
+    bl.one_year_remaining,
+    count(l.loan_id) FILTER (WHERE l.status = 'ACTIVE') AS active_loan_count,
+    max(i.due_date) FILTER (WHERE i.status = 'PENDING') AS next_installment_due,
+    sum(sa.balance) AS total_savings_balance
+FROM borrower b
+LEFT JOIN credit_passport cp USING (borrower_id)
+LEFT JOIN borrowing_limit bl USING (borrower_id)
+LEFT JOIN loan l USING (borrower_id)
+LEFT JOIN installment i USING (loan_id)
+LEFT JOIN savings_account sa USING (borrower_id)
+GROUP BY b.borrower_id, b.wallet_address, b.kyc_level,
+         cp.credit_score, cp.risk_tier,
+         bl.six_month_remaining, bl.one_year_remaining;
+
+CREATE UNIQUE INDEX ON mv_client_dashboard (borrower_id);
+```
+
+Refresh strategy: `REFRESH MATERIALIZED VIEW CONCURRENTLY mv_client_dashboard` triggered by the event listener after processing any event that modifies the component tables.
+
+---
+
+### 4.6 WALLET_ADDRESS Uniqueness Breaks for Multi-Chain [MEDIUM]
+
+`BORROWER.wallet_address` has a UNIQUE constraint. In a single-chain prototype this is correct. However, the thesis specifies CCIP cross-chain operations and SBT mirroring. The same user will have the same wallet address on multiple EVM chains — but their `CREDIT_PASSPORT` state, `COLLATERAL_POSITION`, and `BORROWING_LIMIT` may differ per chain.
+
+**For the prototype:** The current UNIQUE constraint is acceptable.
+**Document as a known limitation:** *"The UNIQUE constraint on `wallet_address` in BORROWER assumes single-chain operation. Multi-chain extension (Phase IV CCIP) requires decoupling the identity record from chain-specific state by adding a `chain_id` column to `BORROWER` and changing the UNIQUE constraint to `(wallet_address, chain_id)`."*
+
+---
+
+## Part 5: Naming and Taxonomy Cleanup
+
+These are lower-priority but affect document quality and implementer experience.
+
+---
+
+### 5.1 Unified Table Naming Convention
+
+The current entity names mix casing conventions: `WORLD_BANK`, `LOCAL_BANK`, `LOAN_REQUEST` (consistent UPPER_SNAKE), but then `idx_aiml_score` references `AI_ML_LOG` — a different name from the entity `AI_ML_SECURITY`. Establish and enforce: all PostgreSQL table names are `lower_snake_case` in DDL; entity names in the thesis text use `UPPER_SNAKE_CASE` for readability. The two forms should be mechanically derivable from each other (uppercase the DDL name). Currently `AI_ML_SECURITY` → DDL would be `ai_ml_security`, but the index says `ai_ml_log`. These need reconciling.
+
+### 5.2 "BORROWER" vs "CLIENT" — Pick One in All Tables
+
+Once the decision from Fix 1.4 is made, find-and-replace across the entire document. Specifically check:
+- Figure captions (ERD figures reference "CLIENT" in some cases)
+- Appendix functional dependencies (reference `client_id` in BORROWING_LIMIT at line 1786)
+- Index definitions (`idx_loan_client_active` on `LOAN(client_id, status)`)
+
+### 5.3 "AI_CHATBOT_LOG" in Entity List vs "AGENT_CONVERSATION_TURN" Conceptually
+
+The current name `AI_CHATBOT_LOG` suggests a log of chatbot sessions. The agent is Qwen3-8B, not a "chatbot" in the traditional sense. Given the thesis's careful actor taxonomy and MCP tool framework, rename this entity to something more precise: `AGENT_CONVERSATION_TURN` or `LLM_INTERACTION_LOG`. This better describes what it stores and distinguishes it clearly from `CHAT_MESSAGE` (human-to-human banking communication).
+
+---
+
+## Part 6: Revised Phased Implementation Addendum
+
+The prior analysis gave a 4-phase table rollout. Based on the Chapter 3 read, add the following to that plan:
+
+**Phase I additions (must have before first integration test):**
+- Fix ALL internal consistency defects from Part 1 above (renaming, entity count, CHECK constraint)
+- Add `contract_address`, `chain_id`, `last_synced_block` to `WORLD_BANK`, `NATIONAL_BANK`, `LOCAL_BANK`
+- Add `oracle_state` to `LOAN_REQUEST`
+- Resolve `CREDIT_PASSPORT` entity (add it formally or remove from figures)
+- Create `CREDIT_PASSPORT` and `CREDIT_PASSPORT_HISTORY` tables
+
+**Phase II additions:**
+- `GROUP_CONSENT` table (required before GroupLendingPool goes live)
+- `INTEREST_RATE_TIER` versioning columns
+- `TRANCHED_POOL_SUBSCRIPTION` table
+- `session_ancestor` closure table (replace recursive trigger)
+- RLS policy separating event_listener from Express roles
+
+**Phase III additions:**
+- `KYC_VERIFICATION_REQUEST` table
+- `SESSION_KEY_PERMISSION` normalized table
+- `ORACLE_HEARTBEAT_MONITOR` table
+- `NETTING_COORDINATOR_STATE` table
+- `mv_client_dashboard` materialized view
+- `LOAN_RISK_ASSESSMENT`, `SHAP_EXPLANATION`, `ML_MODEL_REGISTRY`, `FEATURE_VECTOR`, `SECURITY_ANOMALY_EVENT` (from prior analysis)
+
+**Phase IV additions:**
+- All ZKP/VC tables (`KYC_PROVIDER_REGISTRY`, `VERIFIABLE_CREDENTIAL`, `KYC_ZK_PROOF`, `AML_ZK_PROOF`)
+- Multi-chain wallet address decoupling (`chain_id` added to `BORROWER`)
+- All CCIP tables from prior analysis
+
+---
+
+## Summary Priority Matrix
+
+| # | Issue | Severity | Effort | Phase |
+|---|-------|----------|--------|-------|
+| 1.1 | CREDIT_PASSPORT not in entity table | CRITICAL | Low | I |
+| 1.2 | AI_ML_SECURITY naming split (4 names) | CRITICAL | Low | I |
+| 1.3 | AI_CHATBOT_LOG vs CHAT_MESSAGE boundary | HIGH | Low | I |
+| 1.4 | BORROWER/CLIENT rename half-applied | HIGH | Low | I |
+| 1.5 | BANK_USER CHECK missing World Bank branch | HIGH | Low | I |
+| 1.6 | MARKET_DATA claims Chainlink data incorrectly | HIGH | Medium | I |
+| 1.7 | Index appendix references non-existent table names | HIGH | Low | I |
+| 2.1 | oracle_state column missing from LOAN_REQUEST | CRITICAL | Low | I |
+| 2.2 | contract_address missing from institution tables | CRITICAL | Low | I |
+| 2.3 | Event log FKs missing from LOAN/INSTALLMENT | CRITICAL | Medium | I |
+| 2.4 | TRANSACTION type discrimination missing | HIGH | Low | I |
+| 2.5 | INTEREST_RATE_TIER has no versioning | HIGH | Medium | II |
+| 2.6 | BORROWING_LIMIT has no sync timestamp | HIGH | Low | I |
+| 2.7 | session_key_scope JSON not normalized | MEDIUM | Medium | III |
+| 2.8 | Extended tables missing contract anchor fields | MEDIUM | Low | II |
+| 3.1 | GROUP_CONSENT table missing | HIGH | Low | II |
+| 3.2 | TRANCHED_POOL_SUBSCRIPTION missing | MEDIUM | Low | II |
+| 3.3 | NETTING_COORDINATOR_STATE missing | MEDIUM | Medium | III |
+| 3.4 | KYC_VERIFICATION_REQUEST missing | MEDIUM | Low | III |
+| 3.5 | ORACLE_HEARTBEAT_MONITOR missing | MEDIUM | Low | III |
+| 3.6 | EIP-7702 session contract unregistered | LOW | Low | III |
+| 4.1 | CQRS invariant not enforced by DB roles | CRITICAL | Medium | I |
+| 4.2 | Borrowing limit sync protocol unspecified | HIGH | Medium | II |
+| 4.3 | Recursive session trigger performance | MEDIUM | Medium | II |
+| 4.4 | status ENUM overloaded with oracle states | HIGH | Low | I |
+| 4.5 | Materialized view for agent queries missing | MEDIUM | Medium | III |
+| 4.6 | wallet_address UNIQUE breaks multi-chain | MEDIUM | Low | IV |
+| 5.x | Naming consistency across document | HIGH | Low | I |
+
+**Total new entities identified beyond prior analysis:** 9 tables, 1 materialized view
+**Total fields to add to existing entities:** 20+ specific columns across 7 tables
+**Total internal consistency defects:** 7 critical/high issues detectable by examiners
+
+---
+
+*Document based on full read of Pre-thesis_v30_final.tex Chapter 3 (lines 1459–3754), Appendix A (lines 4484–4585), and cross-referenced against the prior architecture analysis and enhanced_blockchain_db_architecture.html.*

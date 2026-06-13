@@ -11,7 +11,7 @@ sequenceDiagram
     participant MCP as MCP Tools
     participant SC as Contract
 
-    rect rgb(245,245,245)
+    rect rgb(235,245,252)
         Note over U,WS: (a) Client-bank chat (core path)
         U->>FE: Open support thread
         FE->>API: Authenticate + open WS
@@ -22,7 +22,7 @@ sequenceDiagram
         API-->>U: Deliver via WebSocket
     end
 
-    rect rgb(238,238,238)
+    rect rgb(228,240,250)
         Note over U,SC: (b) Optional MCP agent (Phase III-IV, not MVT)
         U->>FE: Apply for 150 USDC loan
         FE->>API: Stream message (SSE)

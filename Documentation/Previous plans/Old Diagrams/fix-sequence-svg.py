@@ -17,7 +17,7 @@ SEQUENCE_TEXT_RE = re.compile(
 
 NOTE_GROUP_RE = re.compile(
     r'(<g data-et="note"[^>]*>)'
-    r'(<rect x="([\d.]+)" y="([\d.]+)" fill="#EDF2AE" stroke="#666" '
+    r'(<rect x="([\d.]+)" y="([\d.]+)" fill="(?:#EDF2AE|#F6F6F6|#EBF5FC)" stroke="#666" '
     r'width="([\d.]+)" height="([\d.]+)" class="note"/>)'
     r'<text x="[\d.]+" y="[\d.]+"[^>]*class="noteText"[^>]*>'
     r'(<tspan x="[\d.]+">([^<]*)</tspan>)'
@@ -34,6 +34,7 @@ ACTOR_GROUP_RE = re.compile(
     re.DOTALL,
 )
 
+NOTE_FILL = "#EBF5FC"  # very light blue (replaces Mermaid default yellow #EDF2AE)
 NOTE_PAD = 10.0
 BADGE_LIFT = 14.0
 BADGE_RADIUS = 10.0
@@ -63,7 +64,7 @@ def _fix_notes(text: str) -> str:
         cx = x_f + w_f / 2
         cy = new_y + new_h / 2
         rect = (
-            f'<rect x="{x_f}" y="{new_y}" fill="#EDF2AE" stroke="#666" '
+            f'<rect x="{x_f}" y="{new_y}" fill="{NOTE_FILL}" stroke="#666" '
             f'width="{w_f}" height="{new_h}" class="note"/>'
         )
         label = (

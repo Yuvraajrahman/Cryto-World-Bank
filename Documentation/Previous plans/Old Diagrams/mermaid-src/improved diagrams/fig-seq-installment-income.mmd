@@ -9,7 +9,7 @@ sequenceDiagram
     participant SC as LocalBank
     participant DB as PostgreSQL
 
-    rect rgb(245,245,245)
+    rect rgb(235,245,252)
         Note over U,DB: (a) Installment payment loop
         loop For each scheduled installment
             U->>FE: Pay installment N
@@ -24,7 +24,7 @@ sequenceDiagram
         Note right of API: overdue via Automation (Ph II)
     end
 
-    rect rgb(238,238,238)
+    rect rgb(228,240,250)
         Note over U,DB: (b) Income verification
         U->>FE: Upload income document
         FE->>API: POST /income

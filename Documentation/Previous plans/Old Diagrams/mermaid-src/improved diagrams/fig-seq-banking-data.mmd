@@ -10,7 +10,7 @@ sequenceDiagram
     participant API as Backend
     participant U as Borrower
 
-    rect rgb(245,245,245)
+    rect rgb(235,245,252)
         Note over WBA,U: (a) Hierarchical capital flow
         WBA->>WB: allocateCapital(NB)
         Note right of WB: require ratio >= min
@@ -19,7 +19,7 @@ sequenceDiagram
         LB-->>API: pool funded
     end
 
-    rect rgb(238,238,238)
+    rect rgb(228,240,250)
         Note over WBA,U: (b) Market-data retrieval
         U->>API: GET /market
         Note right of API: cache miss?
@@ -28,7 +28,7 @@ sequenceDiagram
         API-->>U: prices (cached 10s)
     end
 
-    rect rgb(230,230,230)
+    rect rgb(220,235,248)
         Note over WBA,U: (c) Borrowing-limit calculation
         U->>API: POST /loans
         API->>LB: read SBT + tier

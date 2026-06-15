@@ -1,0 +1,87 @@
+Figure bundle for Pre-thesis v33 (Diagrams/)
+==========================================
+Sources: .svg (Ch* hand diagrams + fig-* exports).
+LaTeX includes generated .pdf via \ThesisIncludeGraphics / \BalancedDiagram etc.
+
+Rebuild all PDFs from SVG:
+  cd "v33 development"
+  ./Diagrams/build-pdfs.sh
+
+Compile (from v33 development/):
+  pdflatex Pre-thesis_v33.tex && pdflatex Pre-thesis_v33.tex
+
+Diagrams referenced in Pre-thesis_v33.tex (52 figures)
+------------------------------------------------------
+bracu_logo_12-0-2022
+Ch1_system-overview-four-tier-stack
+Ch1_six-banking-functions
+Ch1_cross-tier-lending-flows
+fig-three-layer-arch
+fig-component-architecture
+fig-blockchain-stack
+fig-oracle-architecture
+fig-erd-core
+fig-erd-extended
+fig-eer-model
+fig-data-partitioning
+Ch3_actor-permission-matrix
+fig-tier-model
+fig-five-stage-funnel
+fig-agent-six-step-pipeline
+fig-kinked-rate-curve
+fig-liquidation-engine
+fig-savings-vault
+fig-credit-passport
+Ch3_multi-entity-cross-tier-operations
+Ch3_use-case-nine-actor-taxonomy
+fig-activity-lending
+fig-activity-onboarding-id
+fig-activity-aux
+Ch3_data-flow-diagrams
+fig-seq-loan-flow
+fig-seq-installment-income
+fig-seq-banking-data
+fig-seq-chat-chatbot
+fig-hierarchical-banking
+fig-group-lending-lifecycle
+fig-governance-dual-path
+fig-sar-aml-workflow
+fig-defense-in-depth
+fig-security-controls
+fig-agile-process
+fig-aiml-pipeline
+fig-ml-explainability
+fig-realtime-dashboard
+Ch4_loan-lifecycle-state-machine
+Ch4_four-phase-roadmap-sdlc
+fig-phase-effort-bar
+fig-optional-agent-addon
+Ch4_dev-verification-toolchain
+Ch4_design-decisions-alternatives
+fig-revenue-by-tier
+fig-apr-spread
+fig-local-llm-compact
+fig-local-llm
+
+SVG sources present but not included in v33 thesis (spare / legacy aliases)
+---------------------------------------------------------------------------
+Ch1_multi-entity-co-funding-mechanisms
+cwb_architecture
+fig-banking-functions          (alias of Ch1_six-banking-functions)
+fig-banking-modules
+fig-ccip-bridge
+fig-compliance-identity
+fig-cross-tier-lending           (alias of Ch1_cross-tier-lending-flows)
+fig-design-decisions             (alias of Ch4_design-decisions-alternatives)
+fig-dev-toolchain                (alias of Ch4_dev-verification-toolchain)
+fig-dfd-suite
+fig-intro-system-overview        (alias of Ch1_system-overview-four-tier-stack)
+fig-market-tam-pie
+fig-multi-entity-ops             (alias of Ch3_multi-entity-cross-tier-operations)
+fig-permission-matrix            (alias of Ch3_actor-permission-matrix)
+fig-phase-roadmap
+fig-revenue-mix-pie
+fig-sdlc-agile
+fig-tx-state-machine
+fig-usecase-actors
+bokhtiar-sign.svg / mahir-sign.svg  (signature assets, not in thesis body)

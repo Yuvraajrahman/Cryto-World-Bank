@@ -1,0 +1,19 @@
+---
+title: Five-Stage Retail Onboarding Funnel
+---
+flowchart TB
+  S1["<b>Stage 1</b> — Browse catalogue<br/><i>100% visitors · zero friction</i>"]
+  S2["<b>Stage 2</b> — Wallet or ERC-4337 account<br/><i>~72% retain</i>"]
+  S3["<b>Stage 3</b> — KYC document upload<br/><i>~48% retain</i>"]
+  S4["<b>Stage 4</b> — First USDC loan<br/><i>~31% retain</i>"]
+  S5["<b>Stage 5</b> — Power user + group lending<br/><i>~18% retain</i>"]
+
+  S1 ==> S2 ==> S3 ==> S4 ==> S5
+
+  classDef s1 fill:#E8F0FE,stroke:#000,color:#111
+  classDef s2 fill:#E8F0FE,stroke:#000,color:#111
+  classDef s3 fill:#F0F0F0,stroke:#000,color:#111
+  classDef s4 fill:#F0F0F0,stroke:#000,color:#111
+  classDef s5 fill:#F0F0F0,stroke:#000,color:#111
+  class S1,S2 s1
+  class S3,S4,S5 s3

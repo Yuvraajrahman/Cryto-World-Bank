@@ -1,0 +1,21 @@
+---
+title: Component Architecture — Planning Phase
+---
+flowchart LR
+  UI["React UI<br/>primary path"] --> API[Express.js API]
+  AG["MCP Agent Ph.III<br/>dashed — same API"] -.-> API
+  API --> PG[(PostgreSQL)]
+  API --> ML[FastAPI ML]
+  API --> RD[(Redis)]
+  API --> SC[Smart Contracts]
+  API --> CL[Chainlink Package]
+  CL --> SC
+
+  style UI fill:#E8F0FE,stroke:#000
+  style API fill:#E8F0FE,stroke:#000
+  style AG fill:#FFFFFF,stroke:#000,stroke-dasharray:6 4
+  style PG fill:#F0F0F0,stroke:#000
+  style ML fill:#F0F0F0,stroke:#000
+  style RD fill:#F0F0F0,stroke:#000
+  style SC fill:#E8F0FE,stroke:#000
+  style CL fill:#F0F0F0,stroke:#000

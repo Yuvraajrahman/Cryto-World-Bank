@@ -1,0 +1,48 @@
+---
+title: Enhanced EER Model
+---
+flowchart TB
+  subgraph ISA1["Generalisation: INSTITUTION (disjoint d)"]
+    INST((INSTITUTION))
+    WB[WORLD_BANK]
+    NB[NATIONAL_BANK]
+    LB[LOCAL_BANK]
+    INST --> WB & NB & LB
+  end
+
+  subgraph ISA2["Generalisation: BANK_USER (total participation)"]
+    BU((BANK_USER))
+    WBU[WorldBankUser]
+    NBU[NationalBankUser]
+    LBU[LocalBankUser]
+    BU ==> WBU & NBU & LBU
+  end
+
+  subgraph WEAK["Weak entity + identifying relationship"]
+    LOAN[LOAN]
+    INSTL["INSTALLMENT<br/>partial key: installment_number"]
+    LOAN ==>|CONTAINS identifying| INSTL
+  end
+
+  subgraph MULTI["Multi-valued attribute"]
+    BORR[BORROWER]
+    IP{{INCOME_PROOF}}
+    BORR -.-> IP
+  end
+
+  subgraph AGG["Aggregation"]
+    LRQ[LOAN_REQUEST]
+    LRA[LOAN_RISK_ASSESSMENT]
+    LRQ -.-> LRA
+  end
+
+  LB --> BORR
+  BORR --> LRQ
+
+  style INST fill:#F0F0F0,stroke:#000
+  style BU fill:#F0F0F0,stroke:#000
+  style WB fill:#E8F0FE,stroke:#000
+  style NB fill:#E8F0FE,stroke:#000
+  style LB fill:#E8F0FE,stroke:#000
+  style INSTL fill:#FFFFFF,stroke:#000,stroke-dasharray:4 4
+  style IP fill:#F0F0F0,stroke:#000

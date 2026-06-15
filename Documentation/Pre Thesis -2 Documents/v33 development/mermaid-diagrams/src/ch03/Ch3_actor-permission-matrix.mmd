@@ -1,0 +1,25 @@
+---
+title: Actor Permission Matrix
+---
+flowchart TB
+  subgraph MATRIX["Primary actions × roles"]
+    direction TB
+    H["<b>Action</b> | Client | LB Admin | NB Admin | WB Admin | AI Agent"]
+    R1["View own loan status | YES | YES* | YES* | YES* | READ"]
+    R2["Submit loan application | YES | — | — | — | WRITE†"]
+    R3["Pay installment | YES | — | — | — | WRITE†"]
+    R4["Approve / reject loan | — | YES | — | — | —"]
+    R5["Freeze client account | — | YES | YES | YES | —"]
+    R6["Set borrowing rate | — | — | YES | YES | —"]
+    R7["Change reserve ratio | — | — | — | YES | —"]
+    R8["Generate SAR report | — | YES | YES | YES | —"]
+    R9["View audit logs | — | YES* | YES* | YES | —"]
+    H --> R1 --> R2 --> R3 --> R4 --> R5 --> R6 --> R7 --> R8 --> R9
+  end
+
+  LEG["† Agent write requires explicit human confirmation · * own tier only"]
+
+  classDef hdr fill:#E8F0FE,stroke:#000,color:#111
+  classDef row fill:#FFFFFF,stroke:#000,color:#111
+  class H hdr
+  class R1,R2,R3,R4,R5,R6,R7,R8,R9 row

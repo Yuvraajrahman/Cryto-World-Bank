@@ -1,0 +1,17 @@
+---
+title: Layered Blockchain & Application Stack
+---
+flowchart TB
+  L5["L5 Presentation<br/>React 18 + ERC-4337 account abstraction"]
+  L4["L4 API & Services<br/>Express.js · FastAPI · WebSocket · EIP-712"]
+  L3["L3 Data<br/>PostgreSQL 16 (3NF) · Redis · IPFS"]
+  L2["L2 Smart-Contract Platform<br/>Solidity 0.8.20 · OpenZeppelin v5 · UUPS · TimeLock · RBAC"]
+  L1["L1 Settlement<br/>Polygon zkEVM Cardona (live) · Ethereum Sepolia (Certora only)"]
+
+  L5 --> L4 --> L3 --> L2 --> L1
+
+  style L5 fill:#E8F0FE,stroke:#000
+  style L4 fill:#F0F0F0,stroke:#000
+  style L3 fill:#E8F0FE,stroke:#000
+  style L2 fill:#F0F0F0,stroke:#000
+  style L1 fill:#E8F0FE,stroke:#000

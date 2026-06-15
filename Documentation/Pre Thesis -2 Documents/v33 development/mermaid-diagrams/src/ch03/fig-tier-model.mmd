@@ -1,0 +1,23 @@
+---
+title: Client Limits & Bank-Level Syndication
+---
+flowchart TB
+  WB["Tier 1 — World Bank<br/>Global reserve · governance · rate parameters"]
+  NB["Tier 2 — National Bank<br/>Capital allocation · SAR review · freeze authority"]
+  LB["Tier 3 — Local Bank<br/>Retail origination · prudent lending ceiling"]
+  RC["Tier 4 — Retail Client<br/>KYC level + Credit Passport cap enforced on-chain"]
+
+  RC -->|loans only via home Local Bank| LB
+  LB -->|allocateCapital upward| NB
+  NB -->|reserve reporting| WB
+  LB -.->|exposure above prudent ceiling| SYN["SyndicatedLoan<br/>Lead + co-lenders · not direct NB/WB client access"]
+  SYN --> NB
+
+  NOTE["Max loan enforced via kycLevel wallet + SBT tier;<br/>simultaneous-loan cap read by GroupLendingPool"]
+
+  style WB fill:#E8F0FE,stroke:#000
+  style NB fill:#E8F0FE,stroke:#000
+  style LB fill:#F0F0F0,stroke:#000
+  style RC fill:#F0F0F0,stroke:#000
+  style SYN fill:#E8F0FE,stroke:#000
+  style NOTE fill:#FFFFFF,stroke:#444

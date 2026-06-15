@@ -1,0 +1,29 @@
+---
+title: Sequence — Loan Approval with Reject Alternative
+---
+sequenceDiagram
+  autonumber
+  participant C as Client
+  participant FE as Frontend
+  participant API as Express API
+  participant ML as FastAPI ML
+  participant DON as Chainlink DON
+  participant SC as LoanController
+  participant AP as Approver
+
+  C->>FE: Submit USDC loan request
+  FE->>API: POST /loans EIP-712 signed
+  API->>SC: applyLoan — status SUBMITTED
+  API->>ML: Assemble features + SHAP
+  ML-->>API: risk score + explanation
+  API->>DON: commit-reveal oracle request
+  DON->>SC: SCORE_REVEALED on-chain
+  API->>AP: Authority Brief
+
+  alt Approve
+    AP->>SC: approveLoan + allocateCapital
+    SC-->>C: USDC disbursed
+  else Reject
+    AP->>SC: rejectLoan reason
+    SC-->>C: rejected + logged reason
+  end

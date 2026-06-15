@@ -1,0 +1,41 @@
+---
+title: Chainlink Oracle Architecture
+---
+flowchart LR
+  subgraph OFF["(a) Off-chain ML"]
+    F1[Feature engineering]
+    F2[RF + Isolation Forest + SHAP]
+    F3[Risk score payload]
+    F1 --> F2 --> F3
+  end
+
+  subgraph DON["(b) Chainlink Functions DON"]
+    D1[Commit-reveal consensus]
+    D2[Signed attestation]
+    D1 --> D2
+  end
+
+  subgraph ON["(c) On-chain LoanController"]
+    O1[State machine]
+    O2[gates on SCORE_REVEALED]
+    O3[approveLoan / rejectLoan]
+    O1 --> O2 --> O3
+  end
+
+  subgraph CL["Chainlink services"]
+    A1[Automation overdue triggers]
+    A2[Price Feeds FX display]
+    A3[Proof of Reserve]
+  end
+
+  F3 --> D1
+  D2 --> O1
+  CL -.-> ON
+
+  FALLBACK["Prototype fallback: commit-reveal relay until Phase III"]
+
+  style OFF fill:#F0F0F0,stroke:#000
+  style DON fill:#E8F0FE,stroke:#000
+  style ON fill:#F0F0F0,stroke:#000
+  style CL fill:#E8F0FE,stroke:#000
+  style FALLBACK fill:#FFFFFF,stroke:#444

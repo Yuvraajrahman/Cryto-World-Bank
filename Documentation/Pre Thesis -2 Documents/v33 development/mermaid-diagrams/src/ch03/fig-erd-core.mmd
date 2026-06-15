@@ -1,0 +1,69 @@
+---
+title: Core System ERD
+---
+erDiagram
+  INSTITUTION ||--o| WORLD_BANK : "ISA"
+  INSTITUTION ||--o{ NATIONAL_BANK : "ISA"
+  INSTITUTION ||--o{ LOCAL_BANK : "ISA"
+  INSTITUTION ||--o{ BANK_USER : employs
+  LOCAL_BANK ||--o{ BORROWER : registers
+  BORROWER ||--o{ LOAN_REQUEST : submits
+  LOCAL_BANK ||--o{ LOAN_REQUEST : receives
+  LOAN_REQUEST ||--|| LOAN : originates
+  LOAN ||--|{ INSTALLMENT : "weak entity"
+  LOAN ||--o{ TRANSACTION : posts
+  BORROWER ||--o{ INCOME_PROOF : "1:N"
+  LOAN_REQUEST ||--|| LOAN_RISK_ASSESSMENT : scores
+  BORROWER ||--|| CREDIT_PASSPORT : holds
+
+  INSTITUTION {
+    int institution_id PK
+    string institution_type
+  }
+  WORLD_BANK {
+    int institution_id PK
+  }
+  NATIONAL_BANK {
+    int institution_id PK
+    string country_code FK
+  }
+  LOCAL_BANK {
+    int institution_id PK
+    int bank_tier_type FK
+  }
+  BANK_USER {
+    int bank_user_id PK
+    int institution_id FK
+  }
+  BORROWER {
+    int borrower_id PK
+    string wallet_address
+  }
+  LOAN_REQUEST {
+    int request_id PK
+    string oracle_state
+  }
+  LOAN {
+    int loan_id PK
+    decimal principal
+  }
+  INSTALLMENT {
+    int loan_id FK
+    int installment_number
+  }
+  TRANSACTION {
+    int transaction_id PK
+    int loan_id FK
+  }
+  INCOME_PROOF {
+    int proof_id PK
+    int borrower_id FK
+  }
+  LOAN_RISK_ASSESSMENT {
+    int assessment_id PK
+    int loan_request_id FK
+  }
+  CREDIT_PASSPORT {
+    int borrower_id PK
+    int credit_score
+  }

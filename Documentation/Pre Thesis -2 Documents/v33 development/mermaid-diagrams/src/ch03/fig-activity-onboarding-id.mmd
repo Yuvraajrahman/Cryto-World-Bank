@@ -1,0 +1,21 @@
+---
+title: Retail Onboarding & Identity — Four Swimlanes
+---
+flowchart TB
+  S(( )) --> U1[L0 browse — no wallet]
+  U1 --> D1{Wants to borrow?}
+  D1 -->|no| END(( ))
+  D1 -->|yes| D2{Has wallet?}
+  D2 -->|no| U2[ERC-4337 smart account + Paymaster]
+  D2 -->|yes| U3[Connect MetaMask]
+  U2 --> U4[Upload KYC L1 documents]
+  U3 --> U4
+  U4 --> D3{Higher limit L2/L3?}
+  D3 -->|yes| K1[KYC provider VC + zk proof]
+  D3 -->|no| C1[CLIENT role + tier limits]
+  K1 --> C1
+  C1 --> C2[Credit Passport SBT mint]
+  C2 --> END
+
+  style S fill:#000,stroke:#000
+  style END fill:#fff,stroke:#000

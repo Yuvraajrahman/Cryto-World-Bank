@@ -1,0 +1,27 @@
+---
+title: On-Chain vs Off-Chain Data Partitioning
+---
+flowchart LR
+  subgraph ON["On-chain EVM"]
+    O1[Reserve balances]
+    O2[Loan state machine]
+    O3[Role bindings RBAC]
+    O4[Credit Passport SBT]
+  end
+
+  subgraph OFF["Off-chain PostgreSQL"]
+    F1[KYC documents PII]
+    F2[ML scores + SHAP logs]
+    F3[Agent action logs]
+    F4[Sessions + chat]
+    F5[CHAINLINK_PRICE_ROUND cache]
+  end
+
+  ON <-->|Event Listener sync| OFF
+  OFF <-->|Borrowing limit enforcement| ON
+
+  NOTE["Limits computed off-chain;<br/>enforced on-chain at disbursement"]
+
+  style ON fill:#E8F0FE,stroke:#000
+  style OFF fill:#F0F0F0,stroke:#000
+  style NOTE fill:#FFFFFF,stroke:#444

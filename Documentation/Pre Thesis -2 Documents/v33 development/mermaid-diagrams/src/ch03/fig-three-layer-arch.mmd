@@ -1,0 +1,22 @@
+---
+title: Four-Layer Application Architecture
+---
+flowchart TB
+  subgraph PRES["Presentation Layer"]
+    L1["React 18 · TypeScript · Wagmi/Viem · WebSocket"]
+    AG["MCP Agent Ph.III — Qwen3-8B + MCP<br/>(dashed: same API as React)"]
+  end
+  L2["Smart-Contract Layer<br/>WorldBankReserve · NationalBank · LocalBank · LoanController · SBT + 12 planned modules"]
+  L3["Off-Chain Services<br/>Express REST API · PostgreSQL · FastAPI ML · Event Listener · Redis"]
+  L4["Chainlink Infrastructure<br/>Functions · Automation · Price Feeds · Proof of Reserve"]
+
+  L1 --> L2
+  AG -.-> L2
+  L2 --> L3
+  L3 --> L4
+
+  style PRES fill:#E8F0FE,stroke:#000
+  style AG fill:#FFFFFF,stroke:#000,stroke-dasharray:6 4
+  style L2 fill:#E8F0FE,stroke:#000
+  style L3 fill:#F0F0F0,stroke:#000
+  style L4 fill:#F0F0F0,stroke:#000

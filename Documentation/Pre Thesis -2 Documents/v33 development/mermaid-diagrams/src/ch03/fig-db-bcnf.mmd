@@ -1,0 +1,22 @@
+---
+title: BCNF — Old Design vs Fixed Design
+---
+flowchart LR
+  subgraph OLD["Old design — BCNF violated"]
+    O1["LOCAL_BANK stores rate columns"]
+    FD_BAD["FD: bank_tier_type → rates<br/>✗ determinant not superkey"]
+    O1 --> FD_BAD
+  end
+
+  subgraph FIXED["Fixed design — BCNF satisfied"]
+    F1["INTEREST_RATE_TIER<br/>tier_id PK"]
+    FD_OK["FD: tier_id → all attributes<br/>✓ tier_id is superkey"]
+    F1 --> FD_OK
+  end
+
+  OLD -->|extract INTEREST_RATE_TIER| FIXED
+
+  style OLD fill:#F0F0F0,stroke:#000
+  style FIXED fill:#E8F0FE,stroke:#000
+  style FD_BAD fill:#F0F0F0,stroke:#444,stroke-dasharray:4 4
+  style FD_OK fill:#E8F0FE,stroke:#000

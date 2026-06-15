@@ -1,0 +1,31 @@
+---
+title: LiquidationEngine — Tier HF Models and Lifecycle
+---
+flowchart TB
+  subgraph MODELS["Tier-specific Health Factor models"]
+    direction LR
+    M1["Retail collateral<br/><b>HF = C × LT / D</b><br/>Liquidate when HF < 1.0"]
+    M2["Group lending pool<br/><b>HF_group = Σcollateral × LT / Σdebt</b><br/>Joint liability shared"]
+    M3["Credit-based retail<br/><b>No HF</b><br/>SBT riskTier downgrade on default"]
+    M4["Institutional tiers<br/><b>HF_inst = (reserve − min) / borrowing</b>"]
+  end
+
+  subgraph FLOW["On-chain liquidation lifecycle"]
+    direction LR
+    F1[Chainlink price feed update] --> F2{HF < 1.0?}
+    F2 -->|no| F2a[Continue monitoring]
+    F2 -->|yes| F3["liquidate(loanId)"]
+    F3 --> F4["Pay liquidator 5–8% bonus"]
+    F4 --> F5{Local reserve < 15%?}
+    F5 -->|yes| F6[Queue at National Bank<br/>lowest HF first]
+    F5 -->|no| F7[Complete — event indexed]
+  end
+
+  MODELS ~~~ FLOW
+
+  classDef panel fill:#F0F0F0,stroke:#000,color:#111
+  classDef accent fill:#E8F0FE,stroke:#000,color:#111
+  classDef decision fill:#FFFFFF,stroke:#000,color:#111
+  class M1,M2,M3,M4 panel
+  class F1,F3,F4,F6,F7 accent
+  class F2,F5 decision

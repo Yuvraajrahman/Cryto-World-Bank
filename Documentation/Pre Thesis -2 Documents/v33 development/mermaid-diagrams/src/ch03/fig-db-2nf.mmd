@@ -1,0 +1,22 @@
+---
+title: 2NF — Partial Dependency Removal
+---
+flowchart TB
+  subgraph BAD["Before 2NF — partial dependency"]
+    BADT["INSTALLMENT_DETAIL<br/>PK loan_id + installment_number<br/>borrower_wallet ✗ depends only on loan_id"]
+    FDX["✗ loan_id → borrower_wallet"]
+    BADT --> FDX
+  end
+
+  subgraph GOOD["After 2NF — CWB design"]
+    LOAN["LOAN<br/>loan_id PK · borrower_wallet"]
+    INST["INSTALLMENT<br/>PK loan_id + installment_number<br/>due_date · amount_due · status"]
+    FDOK["✓ loan_id, installment_number → due_date, amount_due, status"]
+    LOAN -->|1:N| INST
+    INST --> FDOK
+  end
+
+  BAD -.->|decompose| GOOD
+
+  style BAD fill:#F0F0F0,stroke:#444
+  style GOOD fill:#E8F0FE,stroke:#000

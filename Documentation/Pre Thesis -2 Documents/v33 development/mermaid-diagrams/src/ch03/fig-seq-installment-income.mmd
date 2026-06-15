@@ -1,0 +1,26 @@
+---
+title: Sequence — Installment + Income Verification
+---
+sequenceDiagram
+  autonumber
+  rect rgb(232, 240, 254)
+    note over C,SBT: (a) Installment payment loop — CEI pattern
+    participant C as Client
+    participant FE as Frontend
+    participant SC as LoanController
+    participant SBT as CreditPassport
+    C->>FE: Pay installment
+    FE->>SC: processInstallment CEI
+    SC->>SBT: update on final payment
+    SC-->>C: receipt + balance
+  end
+
+  rect rgb(240, 240, 240)
+    note over C,KYC: (b) Income verification
+    participant API as Express API
+    participant KYC as KYC Provider
+    C->>API: Open-banking consent
+    API->>KYC: verify income documents
+    KYC-->>API: VC attestation
+    API-->>C: borrowing limit updated
+  end

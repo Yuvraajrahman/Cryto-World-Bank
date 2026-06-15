@@ -1,0 +1,58 @@
+---
+title: Use Case — Nine-Actor Taxonomy
+---
+flowchart LR
+  subgraph ACT_L["Primary actors"]
+    direction TB
+    A1["A1 Retail Client<br/>L0–L3"]
+    A2["A2 Local Bank Admin"]
+    A3["A3 National Bank Admin"]
+    A4["A4 World Bank Admin"]
+    A5["A5 AI Agent<br/>Phase III"]
+  end
+
+  subgraph SYS["Crypto World Bank Platform"]
+    direction TB
+    subgraph UC_STD["Standard use cases"]
+      UC1(["UC1 Register KYC"])
+      UC2(["UC2 Apply USDC Loan"])
+      UC3(["UC3 Review Approve Loan"])
+      UC4(["UC4 Pay Installment"])
+      UC9(["UC9 Reserve Governance"])
+      UC11(["UC11 Compliance SAR"])
+    end
+    subgraph UC_ME["Multi-entity — shaded"]
+      UC5(["UC5 Solidarity Group"])
+      UC6(["UC6 InterBank Lending"])
+      UC7(["UC7 Upward Deposit"])
+      UC8(["UC8 Syndicated Loan"])
+    end
+    subgraph UC_PH3["Phase III — dashed"]
+      UC10(["UC10 Agent Banking"])
+    end
+    UC2 -. include .-> UC1
+    UC3 -. oracle .-> UC_ORA([Oracle callback])
+  end
+
+  subgraph ACT_R["External actors"]
+    direction TB
+    A6["A6 Regulator"]
+    A7["A7 Chainlink DON"]
+    A8["A8 Validator"]
+    A9["A9 Auditor"]
+  end
+
+  A1 --> UC1 & UC2 & UC4 & UC5
+  A2 --> UC3 & UC11
+  A3 --> UC6 & UC7 & UC9 & UC11
+  A4 --> UC8 & UC9 & UC11
+  A5 -.-> UC10
+  A6 --> UC11
+  A7 --> UC_ORA
+  A8 --> UC9
+  A9 --> UC11
+
+  classDef me fill:#E8F0FE,stroke:#000,color:#111
+  classDef ph3 fill:#FFFFFF,stroke:#000,color:#111,stroke-dasharray:6 4
+  class UC5,UC6,UC7,UC8 me
+  class UC10,A5 ph3

@@ -1,0 +1,18 @@
+---
+title: Credit Passport SBT Lifecycle
+---
+stateDiagram-v2
+  direction LR
+  [*] --> NOT_ISSUED
+  NOT_ISSUED --> ACTIVE : KYC verified + mint SBT
+  ACTIVE --> UPGRADED : full installment repayment
+  ACTIVE --> DOWNGRADED : default — never revoked
+  DOWNGRADED --> ACTIVE : cure — tier retained
+  UPGRADED --> ACTIVE : maintenance / new cycle
+
+  note right of ACTIVE
+    Non-transferable SBT
+    ICreditPassport.getScore wallet
+    read-only for GroupPool,
+    peer Local Banks, external protocols
+  end note

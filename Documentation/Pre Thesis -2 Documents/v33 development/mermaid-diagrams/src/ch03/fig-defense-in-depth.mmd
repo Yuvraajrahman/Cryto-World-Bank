@@ -1,0 +1,18 @@
+---
+title: Five-Layer Defense-in-Depth
+---
+flowchart TB
+  OPS["<b>L5 Operations</b><br/>Safe multisig · key rotation · bug bounty"]
+  RUN["<b>L4 Runtime</b><br/>Tenderly · The Graph · WebSocket · anomaly detection"]
+  AIML["<b>L3 AI / ML</b><br/>Chainlink Functions · model registry · SHAP guard"]
+  APP["<b>L2 Application</b><br/>EIP-712 sign-in · JWT · rate limits"]
+  CORE["<b>L1 Smart contracts</b><br/>OpenZeppelin v5 · UUPS · TimeLock · RBAC · ReentrancyGuard"]
+
+  OPS --> RUN --> AIML --> APP --> CORE
+
+  NOTE["Outer layers must be breached before reaching on-chain contract logic"]
+
+  classDef outer fill:#F0F0F0,stroke:#000,color:#111,stroke-width:2px
+  classDef inner fill:#E8F0FE,stroke:#000,color:#111,stroke-width:2.5px
+  class OPS,RUN,AIML,APP outer
+  class CORE inner

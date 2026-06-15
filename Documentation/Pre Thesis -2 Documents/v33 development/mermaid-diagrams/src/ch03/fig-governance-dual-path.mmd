@@ -1,0 +1,26 @@
+---
+title: Governance Dual-Path — Standard vs Emergency
+---
+flowchart TB
+  subgraph STD["Standard Path"]
+    S1[Proposal submitted]
+    S2[TimeLock 48h delay]
+    S3[Safe 3-of-5 multisig vote]
+    S4[Execute parameter change on-chain]
+    S1 --> S2 --> S3 --> S4
+  end
+
+  subgraph EMG["Emergency Path"]
+    E1[Security Council 4-of-7]
+    E2[Pre-approved action window 2h]
+    E3[Mandatory 48h public disclosure]
+    E1 --> E2 --> E3
+  end
+
+  AUDIT[Immutable audit trail + regulatory notification A6]
+  S4 --> AUDIT
+  E3 --> AUDIT
+
+  style STD fill:#E8F0FE,stroke:#000
+  style EMG fill:#F0F0F0,stroke:#000
+  style AUDIT fill:#FFFFFF,stroke:#444

@@ -1,0 +1,24 @@
+---
+title: 1NF — Before and After
+---
+flowchart LR
+  subgraph BEFORE["Before 1NF — violation"]
+    B1["BORROWER<br/>borrower_id PK<br/>name · wallet<br/>income_proof_1<br/>income_proof_2<br/>income_proof_3"]
+  end
+
+  subgraph AFTER["After 1NF — fixed"]
+    B2["BORROWER<br/>borrower_id PK<br/>name · wallet · kyc_level"]
+    IP["INCOME_PROOF<br/>proof_id PK<br/>borrower_id FK<br/>document_type · file_hash"]
+    B2 -->|1:N| IP
+  end
+
+  BEFORE -.->|decompose repeating group| AFTER
+
+  ANN["Multi-valued attribute extracted → 1NF achieved"]
+
+  style BEFORE fill:#F0F0F0,stroke:#444
+  style AFTER fill:#E8F0FE,stroke:#000
+  style B1 fill:#F0F0F0,stroke:#000
+  style B2 fill:#E8F0FE,stroke:#000
+  style IP fill:#E8F0FE,stroke:#000
+  style ANN fill:#FFFFFF,stroke:#444

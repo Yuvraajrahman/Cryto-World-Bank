@@ -1,0 +1,22 @@
+---
+title: 3NF — Transitive Dependency Removal
+---
+flowchart TB
+  subgraph BAD["Before 3NF — transitive FD"]
+    LBB["LOCAL_BANK<br/>institution_id PK<br/>bank_tier_type<br/>base_rate · kink_utilisation · max_rate"]
+    FD1["institution_id → bank_tier_type → rates"]
+    LBB --> FD1
+  end
+
+  subgraph GOOD["After 3NF — extracted entity"]
+    LB["LOCAL_BANK<br/>institution_id PK<br/>bank_tier_type FK_ref"]
+    TIER["INTEREST_RATE_TIER<br/>tier_id PK<br/>base_rate · kink_utilisation · max_rate"]
+    LB -->|FK| TIER
+  end
+
+  BAD -.->|extract| GOOD
+  ANN["Transitive FD eliminated — rates in dedicated entity"]
+
+  style BAD fill:#F0F0F0,stroke:#444
+  style GOOD fill:#E8F0FE,stroke:#000
+  style ANN fill:#FFFFFF,stroke:#444

@@ -58,3 +58,27 @@ Documentation/Previou\ plans/
 *.lot
 *.out
 *.toc
+*.synctex.gz
+Documentation/**/*.aux
+Documentation/**/*.log
+Documentation/**/*.lof
+Documentation/**/*.lot
+Documentation/**/*.out
+Documentation/**/*.toc
+Documentation/**/*.synctex.gz
+
+# Generated thesis PDFs (rebuild: pdflatex in the overleaf folder)
+Documentation/**/Thesis ID*.pdf
+Documentation/**/Pre-thesis*.pdf
+Documentation/**/main.pdf
+
+# Word exports and local conversion tooling
+Documentation/**/*.docx
+Documentation/**/.docx-venv/
+
+# Diagram PDFs — regenerate: Diagrams/build-pdfs.sh (requires Chrome)
+Documentation/**/Diagrams/*.pdf
+
+# Mermaid pipeline outputs — regenerate: mermaid-diagrams/build/build-mermaid.sh
+Documentation/**/mermaid-diagrams/pdf/
+Documentation/**/mermaid-diagrams/svg/

@@ -1,0 +1,17 @@
+---
+title: Group Lending Lifecycle
+---
+flowchart TB
+  S(( )) --> G1[Form solidarity group 3–10 members]
+  G1 --> G2[Joint liability + GROUP_CONSENT]
+  G2 --> D{All members KYC L2+?}
+  D -->|no| R[Reject / remediate KYC]
+  D -->|yes| G3[Pool contribution to GroupLendingPool]
+  G3 --> G4[Disburse to nominated member]
+  G4 --> G5[Rotate leader / shared repay cycle]
+  G5 --> E(( ))
+  R --> E
+
+  style G1 fill:#E8F0FE,stroke:#000
+  style G2 fill:#E8F0FE,stroke:#000
+  style G3 fill:#E8F0FE,stroke:#000

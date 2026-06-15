@@ -1,0 +1,44 @@
+---
+title: USDC Loan Lifecycle — Five Swimlanes
+---
+flowchart TB
+  subgraph LANE_C["Retail Client"]
+    S((●)) --> C1[Check SBT ceiling + DTI limit]
+    C1 --> D1{Within limit?}
+    D1 -->|no| END((◎))
+    D1 -->|yes| C2[Submit EIP-712 loan request]
+    C2 --> C3[Repay installments — SBT updated]
+    C3 --> C4[Final payment — loan CLOSED]
+    C4 --> END
+  end
+
+  subgraph LANE_O["Local Bank Approver"]
+    C2 --> O1[Review Authority Brief SHAP]
+    O1 --> D3{Approve loan?}
+    D3 -->|reject| END
+  end
+
+  subgraph LANE_SC["LoanController SC"]
+    C2 --> SC1[applyLoan — SUBMITTED]
+    SC1 --> SC2[DISBURSED + schedule]
+    D3 -->|approve| SC2
+    SC2 --> C3
+  end
+
+  subgraph LANE_OR["Chainlink DON"]
+    SC1 --> OR1[commit-reveal risk score]
+    OR1 --> D2{Fraud threshold?}
+    D2 -->|fail| END
+    D2 -->|pass| O1
+  end
+
+  subgraph LANE_T["National / World Bank"]
+    D3 -->|approve| T1[allocateCapital + reserve-ratio gate]
+    T1 --> SC2
+  end
+
+  classDef lane fill:#F7F7F7,stroke:#444,color:#111
+  classDef action fill:#E8F0FE,stroke:#000,color:#111
+  classDef gate fill:#FFFFFF,stroke:#000,color:#111
+  class C1,C2,C3,C4,O1,SC1,SC2,OR1,T1 action
+  class D1,D2,D3 gate

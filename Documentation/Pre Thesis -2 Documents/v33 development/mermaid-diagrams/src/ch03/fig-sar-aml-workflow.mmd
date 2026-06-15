@@ -1,0 +1,16 @@
+---
+title: SAR AML Workflow — Five Steps
+---
+flowchart TB
+  S(( )) --> S1["1. Isolation Forest anomaly_score > 0.75"]
+  S1 --> S2["2. LOAN_RISK_ASSESSMENT + SECURITY_EVENT_LOG"]
+  S2 --> S3["3. aml-alert event bus → compliance queue"]
+  S3 --> D{Officer review}
+  D -->|false positive| FP[Dismiss + audit_logs reason]
+  D -->|confirmed| C1["4. SAR in audit_logs + INSTITUTION_MESSAGE escalation"]
+  C1 --> C2["5. freezeAccount via onlyApprover modifier"]
+  FP --> E(( ))
+  C2 --> E
+
+  style S1 fill:#E8F0FE,stroke:#000
+  style C2 fill:#F0F0F0,stroke:#000

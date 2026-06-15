@@ -1,0 +1,71 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "darkMode": false,
+    "background": "#FFFFFF",
+    "primaryColor": "#E8F0FE",
+    "primaryBorderColor": "#000000",
+    "primaryTextColor": "#111111",
+    "secondaryColor": "#F0F0F0",
+    "secondaryBorderColor": "#000000",
+    "secondaryTextColor": "#111111",
+    "tertiaryColor": "#FFFFFF",
+    "tertiaryBorderColor": "#000000",
+    "lineColor": "#000000",
+    "textColor": "#111111",
+    "mainBkg": "#FFFFFF",
+    "nodeBorder": "#000000",
+    "clusterBkg": "#F7F7F7",
+    "clusterBorder": "#444444",
+    "titleColor": "#000000",
+    "actorBorder": "#000000",
+    "actorBkg": "#E8F0FE",
+    "actorTextColor": "#111111",
+    "actorLineColor": "#444444",
+    "signalColor": "#000000",
+    "signalTextColor": "#111111",
+    "labelBoxBkgColor": "#F0F0F0",
+    "labelBoxBorderColor": "#000000",
+    "labelTextColor": "#111111",
+    "noteBorderColor": "#000000",
+    "noteBkgColor": "#F0F0F0",
+    "noteTextColor": "#111111",
+    "activationBorderColor": "#000000",
+    "activationBkgColor": "#E8F0FE",
+    "sequenceNumberColor": "#444444",
+    "fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif",
+    "fontSize": "17px"
+  },
+  "themeCSS": ".nodeLabel, .edgeLabel, .label, .actor, .messageText, .noteText { font-family: Helvetica Neue, Helvetica, Arial, sans-serif !important; } .node rect, .node polygon, .node circle, .cluster rect, .actor { stroke-width: 1.6px !important; } .flowchart-link { stroke-width: 1.6px !important; } .messageLine0, .messageLine1 { stroke-width: 1.5px !important; } .entityBox { stroke-width: 1.5px !important; } #mermaid svg { max-width: none !important; }",
+  "flowchart": {
+    "curve": "basis",
+    "padding": 24,
+    "diagramPadding": 28,
+    "nodeSpacing": 60,
+    "rankSpacing": 72,
+    "htmlLabels": true,
+    "useMaxWidth": false
+  },
+  "sequence": {
+    "showSequenceNumbers": true,
+    "mirrorActors": false,
+    "messageAlign": "center",
+    "actorMargin": 100,
+    "boxMargin": 14,
+    "messageMargin": 48,
+    "diagramMarginX": 36,
+    "diagramMarginY": 24,
+    "width": 200,
+    "useMaxWidth": false
+  },
+  "er": {
+    "layoutDirection": "TB",
+    "minEntityWidth": 160,
+    "minEntityHeight": 88,
+    "entityPadding": 16,
+    "useMaxWidth": false
+  },
+  "state": {
+    "useMaxWidth": false
+  }
+}

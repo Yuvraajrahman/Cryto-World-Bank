@@ -1,0 +1,18 @@
+---
+title: SavingsVault and FixedDeposit Closed Loop
+---
+flowchart LR
+  DEP[Depositor USDC] --> SV[SavingsVault ERC-4626]
+  DEP --> FD[FixedDeposit ERC-7540]
+  SV --> POOL[Local Bank lending pool]
+  FD --> POOL
+  POOL --> LOAN[Loan disbursement]
+  LOAN --> INST[Installment repayment]
+  INST --> SPLIT["Interest split<br/>depositor yield · InsuranceFund · protocol revenue"]
+  SPLIT --> SV
+
+  style DEP fill:#F0F0F0,stroke:#000
+  style SV fill:#E8F0FE,stroke:#000
+  style FD fill:#E8F0FE,stroke:#000
+  style POOL fill:#F0F0F0,stroke:#000
+  style SPLIT fill:#E8F0FE,stroke:#000

@@ -1,0 +1,27 @@
+---
+title: Four-Tier Capital Flow — Hierarchical Banking
+---
+flowchart TB
+  WB["World Bank Reserve<br/>min 15% reserve"]
+  NB1["National Bank A"]
+  NB2["National Bank B"]
+  LB1["Local Bank 1"]
+  LB2["Local Bank 2"]
+  LB3["Local Bank 3"]
+  RC["Retail Clients"]
+
+  WB ==>|allocateCapital thick| NB1 & NB2
+  NB1 ==>|allocateCapital| LB1 & LB2
+  NB2 ==>|allocateCapital| LB3
+  LB1 & LB2 & LB3 ==>|loan disbursement| RC
+  RC -.->|repayment cascade| LB1 & LB2 & LB3
+  LB1 <-.->|InterBankLendingPool| LB2
+  LB3 -.->|UpwardDepositFacility r_up < r_down − δ| NB2
+
+  style WB fill:#E8F0FE,stroke:#000
+  style NB1 fill:#E8F0FE,stroke:#000
+  style NB2 fill:#E8F0FE,stroke:#000
+  style LB1 fill:#F0F0F0,stroke:#000
+  style LB2 fill:#F0F0F0,stroke:#000
+  style LB3 fill:#F0F0F0,stroke:#000
+  style RC fill:#FFFFFF,stroke:#000

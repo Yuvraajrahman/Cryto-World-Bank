@@ -1,0 +1,41 @@
+---
+title: Extended ERD — Products and Multi-Entity
+---
+erDiagram
+  BORROWER ||--o{ SAVINGS_ACCOUNT : owns
+  BORROWER ||--o{ FIXED_DEPOSIT : owns
+  BORROWER ||--o{ CURRENT_ACCOUNT : owns
+  LOCAL_BANK ||--o{ SAVINGS_ACCOUNT : hosts
+  LOCAL_BANK ||--o{ LOAN_GROUP : manages
+  LOAN_GROUP ||--o{ GROUP_MEMBER : includes
+  BORROWER ||--o{ GROUP_MEMBER : joins
+  LOAN_REQUEST ||--o{ GROUP_CONSENT : requires
+  LOCAL_BANK ||--|| INSURANCE_FUND : funds
+  INSTITUTION ||--o{ INTERBANK_LOAN : lends
+  INSTITUTION ||--o{ INTERBANK_LOAN : borrows
+  LOCAL_BANK ||--o{ UPWARD_DEPOSIT : sends
+  NATIONAL_BANK ||--o{ UPWARD_DEPOSIT : receives
+  INSTITUTION ||--o{ SYNDICATE : leads
+  SYNDICATE ||--o{ SYNDICATE_MEMBER : splits
+  INSTITUTION ||--o{ TRANCHED_POOL : sponsors
+  INSTITUTION ||--o{ TREASURY_SWAP : initiates
+  NETTING_BATCH ||--o{ NETTING_ENTRY : contains
+
+  SAVINGS_ACCOUNT { int account_id PK }
+  FIXED_DEPOSIT { int deposit_id PK }
+  CURRENT_ACCOUNT { int account_id PK }
+  LOAN_GROUP { int group_id PK }
+  GROUP_MEMBER {
+    int group_id FK
+    int borrower_id FK
+  }
+  GROUP_CONSENT { int consent_id PK }
+  INSURANCE_FUND { int fund_id PK }
+  INTERBANK_LOAN { int loan_id PK }
+  UPWARD_DEPOSIT { int deposit_id PK }
+  SYNDICATE { int syndicate_id PK }
+  SYNDICATE_MEMBER { int syndicate_id FK }
+  TRANCHED_POOL { int pool_id PK }
+  TREASURY_SWAP { int swap_id PK }
+  NETTING_BATCH { int batch_id PK }
+  NETTING_ENTRY { int entry_id PK }

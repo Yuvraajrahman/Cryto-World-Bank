@@ -1,0 +1,21 @@
+---
+title: Client Banking Session — Fork Join Three Paths
+---
+flowchart TB
+  S(( )) --> A1[EIP-712 sign-in + JWT]
+  A1 --> A2[Chainlink price prefetch]
+  A2 --> F{{fork}}
+
+  F --> B1["Branch A — React dashboard<br/>fetch loans · submit action · contract call"]
+  F --> B2["Branch B — WebSocket chat<br/>human bank officer session"]
+  F --> B3["Branch C — MCP Agent dashed<br/>read context · human confirm · write tool"]
+
+  B1 --> J{{join}}
+  B2 --> J
+  B3 --> J
+  J --> A3[AGENT_CONVERSATION_TURN + session close]
+  A3 --> E(( ))
+
+  style B3 stroke-dasharray:6 4,fill:#FFFFFF,stroke:#000
+  style S fill:#000,stroke:#000
+  style E fill:#fff,stroke:#000

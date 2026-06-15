@@ -1,0 +1,41 @@
+---
+title: Data Flow Diagrams
+---
+flowchart TB
+  subgraph L0["Level 0 — Context diagram"]
+    direction LR
+    RC[Retail Client]
+    LBA[Local Bank Admin]
+    NBA[National Bank Admin]
+    WBA[World Bank Admin]
+    REG[Regulator A6]
+    CL[Chainlink Oracles]
+    P0((CWB Platform))
+    RC & LBA & NBA & WBA --> P0
+    P0 <--> CL
+    REG --> P0
+  end
+
+  subgraph L1A["Level 1 — Core lending subsystem"]
+    direction LR
+    P1[1.0 Originate] --> D1[(LOAN_REQUEST)]
+    D1 --> P2[2.0 ML score] --> D3[(ML scores)]
+    D3 --> P3[3.0 Disburse + installments] --> D2[(LOAN)]
+  end
+
+  subgraph L1B["Level 1 — Deposits · interbank · FX · netting"]
+    direction LR
+    P4[SavingsVault mobilization] --> D4[(Reserves)]
+    P5[InterBankLendingPool] --> D4
+    P6[TreasurySwap] --> D4
+    P7[NettingEngine] --> D5[(NETTING_BATCH)]
+  end
+
+  L0 ~~~ L1A ~~~ L1B
+
+  classDef store fill:#FFFFFF,stroke:#000,color:#111
+  classDef proc fill:#E8F0FE,stroke:#000,color:#111
+  classDef ext fill:#F0F0F0,stroke:#000,color:#111
+  class D1,D2,D3,D4,D5 store
+  class P1,P2,P3,P4,P5,P6,P7 proc
+  class RC,LBA,NBA,WBA,REG,CL ext

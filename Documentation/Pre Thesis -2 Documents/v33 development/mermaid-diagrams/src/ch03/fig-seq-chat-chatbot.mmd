@@ -1,0 +1,25 @@
+---
+title: Sequence — WebSocket Chat + MCP Agent
+---
+sequenceDiagram
+  autonumber
+  rect rgb(240, 240, 240)
+    note over C,BO: (a) Client–bank chat over authenticated WebSocket
+    participant C as Client
+    participant WS as WebSocket API
+    participant BO as Bank Officer
+    C->>WS: open authenticated session
+    WS->>BO: route message
+    BO-->>C: officer reply
+  end
+
+  rect rgb(232, 240, 254)
+    note over C,SC: (b) MCP agent — Phase III Must deliverable
+    participant AG as MCP Agent
+    participant SC as Smart Contract
+    C->>AG: natural language query
+    AG->>SC: read tool on-chain context
+    AG-->>C: propose action summary
+    C->>AG: human confirmation
+    AG->>SC: EIP-7702 session key write + AGENT_ACTION_LOG
+  end

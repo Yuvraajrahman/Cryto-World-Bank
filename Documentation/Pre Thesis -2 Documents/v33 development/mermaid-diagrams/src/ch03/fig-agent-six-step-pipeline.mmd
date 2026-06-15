@@ -1,0 +1,22 @@
+---
+title: Conversational Agent Six-Step Pipeline
+---
+flowchart LR
+  S1["1. On-chain<br/>context injection"]
+  S2["2. Qwen3-8B<br/>reasoning"]
+  S3["3. Tool<br/>selection"]
+  S4["4. Read / Write<br/>routing"]
+  S5["5. Human<br/>confirmation gate"]
+  S6["6. MCP write +<br/>AGENT_ACTION_LOG"]
+
+  S1 --> S2 --> S3 --> S4 --> S5 --> S6
+  S4 -.->|write path only| S5
+
+  READ["Solid arrows = read path"]
+  WRITE["Dashed = write path requires confirm"]
+
+  style S1 fill:#E8F0FE,stroke:#000
+  style S2 fill:#E8F0FE,stroke:#000
+  style S4 fill:#F0F0F0,stroke:#000
+  style S5 fill:#E8F0FE,stroke:#000
+  style S6 fill:#E8F0FE,stroke:#000

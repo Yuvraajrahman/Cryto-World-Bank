@@ -1,0 +1,176 @@
+<svg width="100%" viewBox="0 0 680 1060" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>CWB System Architecture</title>
+  <desc>Combined architecture diagram covering smart contracts, oracle/ML integration, data partitioning, and cross-tier capital flows.</desc>
+  <defs>
+    <style>
+      text { font-family: sans-serif; fill: #111; }
+      .th { font-size: 14px; font-weight: 500; fill: #111; }
+      .ts { font-size: 12px; font-weight: 400; fill: #444; }
+      rect.box { fill: #f5f5f5; stroke: #aaa; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- CONTRACT ARCHITECTURE -->
+  <text class="th" x="40" y="28" dominant-baseline="central">Contract architecture</text>
+  <line x1="40" y1="36" x2="640" y2="36" stroke="#aaa" stroke-width="0.5"/>
+
+  <rect x="36" y="46" width="608" height="220" rx="10" fill="none" stroke="#aaa" stroke-width="0.5" stroke-dasharray="5 3"/>
+  <text class="ts" x="48" y="63" dominant-baseline="central">Phase I–II</text>
+
+  <rect x="48"  y="72" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="99"  y="92" text-anchor="middle" dominant-baseline="central">WorldBankReserve</text>
+  <rect x="164" y="72" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="215" y="92" text-anchor="middle" dominant-baseline="central">NationalBank</text>
+  <rect x="280" y="72" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="331" y="92" text-anchor="middle" dominant-baseline="central">LocalBank</text>
+  <rect x="396" y="72" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="447" y="92" text-anchor="middle" dominant-baseline="central">SavingsVault</text>
+  <rect x="512" y="72" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="563" y="92" text-anchor="middle" dominant-baseline="central">FixedDeposit</text>
+
+  <rect x="48"  y="126" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="99"  y="146" text-anchor="middle" dominant-baseline="central">GroupLendingPool</text>
+  <rect x="164" y="126" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="215" y="146" text-anchor="middle" dominant-baseline="central">FXModule</text>
+  <rect x="280" y="126" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="331" y="146" text-anchor="middle" dominant-baseline="central">InsuranceFund</text>
+  <rect x="396" y="126" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="447" y="146" text-anchor="middle" dominant-baseline="central">CurrentAccount</text>
+  <rect x="512" y="126" width="102" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="563" y="146" text-anchor="middle" dominant-baseline="central">TreasurySwap</text>
+
+  <rect x="48"  y="180" width="182" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="139" y="200" text-anchor="middle" dominant-baseline="central">InterBankLendingPool</text>
+  <rect x="246" y="180" width="182" height="40" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="337" y="200" text-anchor="middle" dominant-baseline="central">UpwardDepositFacility</text>
+  <rect x="444" y="180" width="170" height="40" rx="4" fill="#e8e8e8" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="529" y="200" text-anchor="middle" dominant-baseline="central">LoanController</text>
+
+  <rect x="36" y="278" width="608" height="54" rx="10" fill="none" stroke="#aaa" stroke-width="0.5" stroke-dasharray="3 3"/>
+  <text class="ts" x="48" y="292" dominant-baseline="central">Phase III stretch</text>
+  <rect x="60"  y="300" width="152" height="26" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="136" y="313" text-anchor="middle" dominant-baseline="central">SyndicatedLoan</text>
+  <rect x="228" y="300" width="136" height="26" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="296" y="313" text-anchor="middle" dominant-baseline="central">TranchedPool</text>
+  <rect x="380" y="300" width="144" height="26" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="452" y="313" text-anchor="middle" dominant-baseline="central">NettingEngine</text>
+
+  <!-- ORACLE & ML -->
+  <text class="th" x="40" y="358" dominant-baseline="central">Oracle &amp; ML integration</text>
+  <line x1="40" y1="366" x2="640" y2="366" stroke="#aaa" stroke-width="0.5"/>
+
+  <rect x="36" y="376" width="190" height="96" rx="8" fill="#f0f0f0" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="131" y="396" text-anchor="middle" dominant-baseline="central">Off-chain ML</text>
+  <line x1="48" y1="406" x2="214" y2="406" stroke="#aaa" stroke-width="0.5" opacity="0.4"/>
+  <text class="ts" x="131" y="421" text-anchor="middle" dominant-baseline="central">Random Forest</text>
+  <text class="ts" x="131" y="439" text-anchor="middle" dominant-baseline="central">Isolation Forest</text>
+  <text class="ts" x="131" y="457" text-anchor="middle" dominant-baseline="central">Composite risk score s</text>
+
+  <rect x="36" y="484" width="190" height="36" rx="8" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="131" y="502" text-anchor="middle" dominant-baseline="central">SHAP explanations</text>
+
+  <path d="M226 424 L280 424" fill="none" stroke="#666" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <text class="ts" x="253" y="418" text-anchor="middle">score s</text>
+
+  <rect x="282" y="376" width="180" height="52" rx="8" fill="#f0f0f0" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="372" y="393" text-anchor="middle" dominant-baseline="central">Chainlink Functions</text>
+  <text class="ts" x="372" y="412" text-anchor="middle" dominant-baseline="central">primary oracle</text>
+
+  <rect x="282" y="440" width="180" height="36" rx="8" fill="none" stroke="#aaa" stroke-width="0.5" stroke-dasharray="4 2"/>
+  <text class="th" x="372" y="458" text-anchor="middle" dominant-baseline="central">Commit-reveal relay</text>
+
+  <path d="M462 402 L529 402 L529 376" fill="none" stroke="#666" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <text class="ts" x="514" y="396" text-anchor="middle">SCORE_REVEALED</text>
+
+  <rect x="36" y="534" width="190" height="36" rx="8" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="131" y="552" text-anchor="middle" dominant-baseline="central">Chainlink Automation</text>
+
+  <rect x="282" y="494" width="180" height="36" rx="4" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="372" y="512" text-anchor="middle" dominant-baseline="central">Price Feeds</text>
+
+  <path d="M226 552 L267 552 L267 458 L280 458" fill="none" stroke="#666" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <text class="ts" x="253" y="547" text-anchor="middle">overdue</text>
+  <path d="M462 512 L529 512 L529 360 L447 360 L447 220" fill="none" stroke="#999" stroke-width="0.5" stroke-dasharray="4 2" marker-end="url(#arrow)"/>
+
+  <!-- DATA MODEL -->
+  <text class="th" x="40" y="598" dominant-baseline="central">Data model &amp; partitioning</text>
+  <line x1="40" y1="606" x2="640" y2="606" stroke="#aaa" stroke-width="0.5"/>
+
+  <rect x="36" y="616" width="280" height="160" rx="8" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="176" y="634" text-anchor="middle" dominant-baseline="central">On-chain</text>
+  <line x1="48" y1="644" x2="304" y2="644" stroke="#aaa" stroke-width="0.5" opacity="0.4"/>
+  <text class="ts" x="60" y="662" dominant-baseline="central">· Balances, RBAC, reserve ratios</text>
+  <text class="ts" x="60" y="680" dominant-baseline="central">· Loan state machine</text>
+  <text class="ts" x="60" y="698" dominant-baseline="central">· Committed risk scores</text>
+  <text class="ts" x="60" y="716" dominant-baseline="central">· Credit Passport SBT (zk-KYC)</text>
+  <text class="ts" x="60" y="734" dominant-baseline="central">· ZKP identity (Circom / Groth16)</text>
+  <text class="ts" x="60" y="752" dominant-baseline="central">· ERC-4337 Paymaster (gas-free T4)</text>
+
+  <rect x="364" y="616" width="280" height="160" rx="8" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="504" y="634" text-anchor="middle" dominant-baseline="central">Off-chain (PostgreSQL · 20 entities · 3NF)</text>
+  <line x1="376" y1="644" x2="632" y2="644" stroke="#aaa" stroke-width="0.5" opacity="0.4"/>
+  <text class="ts" x="380" y="662" dominant-baseline="central">· PII, KYC documents</text>
+  <text class="ts" x="380" y="680" dominant-baseline="central">· SHAP JSON audit logs</text>
+  <text class="ts" x="380" y="698" dominant-baseline="central">· ML model outputs &amp; history</text>
+  <text class="ts" x="380" y="716" dominant-baseline="central">· Installments, market data</text>
+  <text class="ts" x="380" y="734" dominant-baseline="central">· Agent session logs (optional)</text>
+  <text class="ts" x="380" y="752" dominant-baseline="central">· Indexed chain events</text>
+
+  <path d="M316 696 L362 696" fill="none" stroke="#999" stroke-width="0.5" stroke-dasharray="3 2" marker-end="url(#arrow)"/>
+  <text class="ts" x="339" y="690" text-anchor="middle">sync</text>
+
+  <!-- CAPITAL FLOWS -->
+  <text class="th" x="40" y="806" dominant-baseline="central">Cross-tier capital flows</text>
+  <line x1="40" y1="814" x2="640" y2="814" stroke="#aaa" stroke-width="0.5"/>
+
+  <rect x="220" y="824" width="240" height="40" rx="6" fill="#e8e8e8" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="340" y="840" text-anchor="middle" dominant-baseline="central">World Bank Reserve</text>
+  <text class="ts" x="340" y="856" text-anchor="middle" dominant-baseline="central">Tier 1</text>
+
+  <rect x="220" y="882" width="240" height="40" rx="6" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="340" y="898" text-anchor="middle" dominant-baseline="central">National Banks</text>
+  <text class="ts" x="340" y="914" text-anchor="middle" dominant-baseline="central">Tier 2</text>
+
+  <rect x="220" y="940" width="240" height="40" rx="6" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="340" y="956" text-anchor="middle" dominant-baseline="central">Local Banks</text>
+  <text class="ts" x="340" y="972" text-anchor="middle" dominant-baseline="central">Tier 3</text>
+
+  <rect x="220" y="998" width="240" height="40" rx="6" fill="none" stroke="#aaa" stroke-width="0.5"/>
+  <text class="th" x="340" y="1014" text-anchor="middle" dominant-baseline="central">End Clients</text>
+  <text class="ts" x="340" y="1030" text-anchor="middle" dominant-baseline="central">Tier 4 · zero-gas via Paymaster</text>
+
+  <line x1="280" y1="864" x2="280" y2="882" stroke="#444" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="280" y1="922" x2="280" y2="940" stroke="#444" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="280" y1="980" x2="280" y2="998" stroke="#444" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <text class="ts" x="274" y="876" text-anchor="end">allocateCapital</text>
+  <text class="ts" x="274" y="934" text-anchor="end">allocateCapital</text>
+  <text class="ts" x="274" y="992" text-anchor="end">allocateCapital</text>
+
+  <line x1="400" y1="998" x2="400" y2="980" stroke="#444" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="400" y1="940" x2="400" y2="922" stroke="#444" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <line x1="400" y1="882" x2="400" y2="864" stroke="#444" stroke-width="0.5" marker-end="url(#arrow)"/>
+  <text class="ts" x="406" y="991">UpwardDepositFacility</text>
+  <text class="ts" x="406" y="933">UpwardDepositFacility</text>
+  <text class="ts" x="406" y="875">UpwardDepositFacility</text>
+
+  <path d="M220 902 L140 902 L140 942 L220 942" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="4 2"/>
+  <text class="ts" x="136" y="918" text-anchor="end">InterBank</text>
+  <text class="ts" x="136" y="932" text-anchor="end">LendingPool</text>
+  <path d="M220 960 L140 960 L140 978 L220 978" fill="none" stroke="#888" stroke-width="0.5" stroke-dasharray="4 2"/>
+  <text class="ts" x="136" y="971" text-anchor="end">same-tier</text>
+
+  <rect x="554" y="824" width="88" height="214" rx="6" fill="none" stroke="#aaa" stroke-width="0.5" stroke-dasharray="3 2"/>
+  <text class="th" x="598" y="840" text-anchor="middle" dominant-baseline="central">Retail</text>
+  <line x1="560" y1="848" x2="636" y2="848" stroke="#aaa" stroke-width="0.5" opacity="0.4"/>
+  <text class="ts" x="566" y="866" dominant-baseline="central">Savings</text>
+  <text class="ts" x="566" y="884" dominant-baseline="central">Fixed deposits</text>
+  <text class="ts" x="566" y="902" dominant-baseline="central">Installment loans</text>
+  <text class="ts" x="566" y="920" dominant-baseline="central">FX display</text>
+  <text class="ts" x="566" y="938" dominant-baseline="central">Insurance buffer</text>
+  <text class="ts" x="566" y="956" dominant-baseline="central">Group lending</text>
+  <text class="ts" x="566" y="974" dominant-baseline="central">Syndication</text>
+  <line x1="554" y1="1018" x2="462" y2="1018" stroke="#444" stroke-width="0.5" marker-end="url(#arrow)"/>
+</svg>

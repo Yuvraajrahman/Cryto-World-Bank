@@ -1,0 +1,24 @@
+---
+title: Multi-Entity Cross-Tier Capital Operations
+---
+flowchart TB
+  subgraph R1[" "]
+    direction LR
+    A["<b>(a) InterBankLendingPool</b><br/>Same-tier USDC pools · kinked r_IB at U*=90%<br/>Default: reserve → InsuranceFund → parent"]
+    B["<b>(b) UpwardDepositFacility</b><br/>Surplus to parent tier · r_up < r_down − δ<br/>Daily 20% cap · net 30% exposure cap"]
+    C["<b>(c) SyndicatedLoan</b><br/>Lead arranger + co-lenders<br/>Pro-rata shares to one borrower"]
+  end
+
+  subgraph R2[" "]
+    direction LR
+    D["<b>(d) TranchedPool</b><br/>Senior first-loss protection<br/>Junior tranche · waterfall recovery"]
+    E["<b>(e) TreasurySwap</b><br/>Cross-tier institutional FX / asset swap<br/>Oracle-priced execution"]
+    F["<b>(f) NettingEngine</b><br/>Multilateral gross-to-net settlement<br/><i>Future Work — ERD stubs only</i>"]
+  end
+
+  classDef panel fill:#F0F0F0,stroke:#000,color:#111
+  classDef accent fill:#E8F0FE,stroke:#000,color:#111
+  classDef future fill:#FFFFFF,stroke:#444,color:#111,stroke-dasharray:5 4
+  class A,C,E panel
+  class B,D accent
+  class F future

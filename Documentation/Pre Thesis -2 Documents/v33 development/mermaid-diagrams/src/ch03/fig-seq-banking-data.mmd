@@ -1,0 +1,35 @@
+---
+title: Sequence — Capital Flow · Market Data · Borrowing Limit
+---
+sequenceDiagram
+  autonumber
+  rect rgb(232, 240, 254)
+    note over LB,WB: (a) Hierarchical capital + reserve-ratio gates
+    participant LB as Local Bank
+    participant NB as National Bank
+    participant WB as World Bank
+    LB->>NB: allocateCapital request
+    NB->>WB: reserve ratio validation
+    WB-->>NB: approved allocation
+    NB-->>LB: capital credited
+  end
+
+  rect rgb(240, 240, 240)
+    note over CL,DB: (b) Market data — cached Chainlink feeds
+    participant CL as Chainlink Feed
+    participant EL as Event Listener
+    participant DB as PostgreSQL
+    CL->>EL: latestRoundData
+    EL->>DB: CHAINLINK_PRICE_ROUND cache
+  end
+
+  rect rgb(232, 240, 254)
+    note over API,SC: (c) Borrowing limit — SBT read before ML score
+    participant API as Express API
+    participant SBT as CreditPassport
+    participant ML as FastAPI ML
+    participant SC as LocalBank SC
+    API->>SBT: getScore wallet
+    API->>ML: features + passport tier
+    API->>SC: updateBorrowingLimit if changed
+  end

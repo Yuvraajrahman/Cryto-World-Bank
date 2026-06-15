@@ -1,0 +1,29 @@
+---
+title: Smart-Contract Security Controls (3 panels)
+---
+flowchart LR
+  subgraph PANEL_A["(a) UUPS Upgrade Path"]
+    U1[Implementation contract]
+    U2[Proxy ERC-1967]
+    U3[TimeLock 48h]
+    U4[Safe 3-of-5 multisig]
+    U4 --> U3 --> U2 --> U1
+  end
+
+  subgraph PANEL_B["(b) EIP-712 Sign-In"]
+    E1[Wallet signs typed data v4]
+    E2[Domain separator check]
+    E3[JWT issued 15 min TTL]
+    E1 --> E2 --> E3
+  end
+
+  subgraph PANEL_C["(c) Pause Registry"]
+    P1[Function → pause state map]
+    P2[Granular per-function pause]
+    P3[The Graph indexes events]
+    P1 --> P2 --> P3
+  end
+
+  style PANEL_A fill:#E8F0FE,stroke:#000
+  style PANEL_B fill:#F0F0F0,stroke:#000
+  style PANEL_C fill:#E8F0FE,stroke:#000

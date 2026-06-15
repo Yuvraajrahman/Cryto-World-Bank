@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto World Bank — Chapters 1 & 2 Interactive Study</title>
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --surface: #111827;
+      --surface-2: #1a2234;
+      --border: #2a3548;
+      --text: #e8edf5;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --accent-2: #06b6d4;
+      --accent-3: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --tier-1: #f59e0b;
+      --tier-2: #3b82f6;
+      --tier-3: #06b6d4;
+      --tier-4: #10b981;
+      --radius: 14px;
+      --shadow: 0 8px 32px rgba(0,0,0,.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px; z-index: 1000;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+      width: 0%; transition: width .15s;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 3px; left: 0; right: 0; z-index: 999;
+      background: rgba(10,14,23,.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: .6rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem; overflow-x: auto;
+    }
+    nav .logo { font-weight: 700; font-size: .9rem; white-space: nowrap; color: var(--accent-2); }
+    nav a {
+      color: var(--muted); text-decoration: none; font-size: .78rem;
+      white-space: nowrap; padding: .3rem .6rem; border-radius: 6px;
+      transition: color .2s, background .2s;
+    }
+    nav a:hover, nav a.active { color: var(--text); background: var(--surface-2); }
+
+    /* ── Layout ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 5rem 1.5rem 4rem; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center; padding: 3rem 0 4rem;
+      opacity: 0; transform: translateY(30px);
+      animation: fadeUp .8s .2s forwards;
+    }
+    .hero .badge {
+      display: inline-block; padding: .35rem 1rem; border-radius: 999px;
+      background: rgba(59,130,246,.15); color: var(--accent); font-size: .8rem;
+      font-weight: 600; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 1.2rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; line-height: 1.15;
+      background: linear-gradient(135deg, var(--text) 30%, var(--accent-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p { color: var(--muted); font-size: 1.1rem; max-width: 640px; margin: 1rem auto 0; }
+
+    /* ── Chapter divider ── */
+    .chapter-divider {
+      text-align: center; padding: 3rem 0 2rem;
+      opacity: 0; transform: translateY(20px);
+    }
+    .chapter-divider.visible { animation: fadeUp .7s forwards; }
+    .chapter-divider .ch-num {
+      font-size: 4rem; font-weight: 900; opacity: .08; line-height: 1;
+    }
+    .chapter-divider h2 {
+      font-size: 1.8rem; margin-top: -.5rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .chapter-divider .subtitle { color: var(--muted); margin-top: .5rem; }
+
+    /* ── Sections ── */
+    section.study-section {
+      margin-bottom: 3rem; opacity: 0; transform: translateY(40px);
+      transition: opacity .6s, transform .6s;
+    }
+    section.study-section.visible { opacity: 1; transform: translateY(0); }
+
+    .section-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow);
+      position: relative; overflow: hidden;
+    }
+    .section-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .8s .3s;
+    }
+    section.study-section.visible .section-card::before { transform: scaleX(1); }
+
+    .section-tag {
+      display: inline-block; font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: .25rem .7rem; border-radius: 6px; margin-bottom: .8rem;
+    }
+    .tag-ch1 { background: rgba(59,130,246,.15); color: var(--accent); }
+    .tag-ch2 { background: rgba(139,92,246,.15); color: var(--accent-3); }
+
+    .section-card h3 { font-size: 1.35rem; margin-bottom: .6rem; }
+    .section-card .source { color: var(--accent-2); font-size: .85rem; font-weight: 600; margin-bottom: 1rem; }
+    .section-card p { color: var(--muted); margin-bottom: .9rem; }
+    .section-card p strong, .section-card li strong { color: var(--text); }
+    .section-card ul { padding-left: 1.2rem; color: var(--muted); margin-bottom: .9rem; }
+    .section-card li { margin-bottom: .4rem; }
+
+    .insight-box {
+      background: rgba(6,182,212,.08); border-left: 3px solid var(--accent-2);
+      padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0;
+      font-size: .92rem; color: var(--text);
+    }
+    .gap-box {
+      background: rgba(245,158,11,.08); border-left: 3px solid var(--warning);
+      padding: 1rem 1.2rem; border-radius: 0 8px 8px 0; margin: 1rem 0;
+      font-size: .92rem; color: var(--text);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .5; } }
+    @keyframes flowDown {
+      0% { transform: translateY(-8px); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(60px); opacity: 0; }
+    }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+    @keyframes growBar { from { width: 0; } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes splitLine {
+      0% { transform: scaleX(0); }
+      100% { transform: scaleX(1); }
+    }
+    @keyframes coinSpin {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+
+    /* ── Hierarchy visual ── */
+    .hierarchy {
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+      margin: 1.5rem 0; position: relative;
+    }
+    .tier {
+      width: clamp(200px, 70%, 340px); padding: .9rem 1.2rem;
+      border-radius: 10px; text-align: center; font-weight: 600; font-size: .9rem;
+      position: relative; opacity: 0; transform: scale(.8);
+      transition: opacity .5s, transform .5s;
+    }
+    section.study-section.visible .tier { opacity: 1; transform: scale(1); }
+    section.study-section.visible .tier:nth-child(1) { transition-delay: .2s; }
+    section.study-section.visible .tier:nth-child(3) { transition-delay: .4s; }
+    section.study-section.visible .tier:nth-child(5) { transition-delay: .6s; }
+    section.study-section.visible .tier:nth-child(7) { transition-delay: .8s; }
+
+    .tier-1 { background: rgba(245,158,11,.2); border: 1px solid var(--tier-1); color: var(--tier-1); }
+    .tier-2 { background: rgba(59,130,246,.2); border: 1px solid var(--tier-2); color: var(--tier-2); }
+    .tier-3 { background: rgba(6,182,212,.2); border: 1px solid var(--tier-3); color: var(--tier-3); }
+    .tier-4 { background: rgba(16,185,129,.2); border: 1px solid var(--tier-4); color: var(--tier-4); }
+
+    .tier-arrow {
+      width: 2px; height: 28px; background: var(--border); position: relative;
+      opacity: 0; transition: opacity .4s;
+    }
+    section.study-section.visible .tier-arrow { opacity: 1; }
+    .tier-arrow::after {
+      content: '▼'; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+      font-size: .6rem; color: var(--muted);
+    }
+
+    .money-particle {
+      position: absolute; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--success); left: 50%; transform: translateX(-50%);
+      animation: flowDown 2s infinite; pointer-events: none;
+    }
+
+    /* ── Flat vs Hierarchy compare ── */
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;
+    }
+    @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    .compare-box {
+      border-radius: 10px; padding: 1.2rem; text-align: center;
+      border: 1px solid var(--border); position: relative; overflow: hidden;
+    }
+    .compare-box h4 { font-size: .85rem; margin-bottom: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+    .compare-box.traditional { background: rgba(59,130,246,.06); }
+    .compare-box.defi { background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.3); }
+
+    .flat-pool {
+      width: 100%; height: 80px; border-radius: 50% / 30%;
+      background: rgba(239,68,68,.15); border: 2px dashed rgba(239,68,68,.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; color: var(--danger); margin: .5rem 0;
+      animation: float 3s ease-in-out infinite;
+    }
+    .flat-dots { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+    .flat-dots span {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--danger); opacity: .6;
+      animation: pulse 2s infinite;
+    }
+    .flat-dots span:nth-child(2) { animation-delay: .3s; width: 20px; height: 20px; }
+    .flat-dots span:nth-child(3) { animation-delay: .6s; }
+    .flat-dots span:nth-child(4) { animation-delay: .9s; width: 18px; height: 18px; }
+
+    /* ── Problem cards ── */
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0;
+    }
+    @media (max-width: 700px) { .problem-grid { grid-template-columns: 1fr; } }
+
+    .problem-card {
+      background: var(--surface-2); border-radius: 10px; padding: 1.2rem;
+      text-align: center; border: 1px solid var(--border);
+      opacity: 0; transform: translateY(20px);
+      transition: opacity .5s, transform .5s;
+    }
+    section.study-section.visible .problem-card { opacity: 1; transform: translateY(0); }
+    section.study-section.visible .problem-card:nth-child(1) { transition-delay: .3s; }
+    section.study-section.visible .problem-card:nth-child(2) { transition-delay: .5s; }
+    section.study-section.visible .problem-card:nth-child(3) { transition-delay: .7s; }
+
+    .problem-icon { font-size: 2rem; margin-bottom: .5rem; }
+    .problem-card h4 { font-size: .9rem; margin-bottom: .4rem; }
+    .problem-card .stat { font-size: 1.5rem; font-weight: 800; color: var(--warning); }
+    .problem-card p { font-size: .8rem; color: var(--muted); margin: 0; }
+
+    /* ── Contribution cards ── */
+    .contrib-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.5rem 0;
+    }
+    @media (max-width: 600px) { .contrib-grid { grid-template-columns: 1fr; } }
+
+    .contrib-card {
+      background: var(--surface-2); border-radius: 10px; padding: 1.2rem;
+      border: 1px solid var(--border); position: relative;
+      opacity: 0; transform: translateX(-20px);
+      transition: opacity .5s, transform .5s, border-color .3s;
+      cursor: default;
+    }
+    .contrib-card:hover { border-color: var(--accent); }
+    section.study-section.visible .contrib-card { opacity: 1; transform: translateX(0); }
+    section.study-section.visible .contrib-card:nth-child(1) { transition-delay: .2s; }
+    section.study-section.visible .contrib-card:nth-child(2) { transition-delay: .35s; }
+    section.study-section.visible .contrib-card:nth-child(3) { transition-delay: .5s; }
+    section.study-section.visible .contrib-card:nth-child(4) { transition-delay: .65s; }
+
+    .contrib-num {
+      font-size: 2rem; font-weight: 900; opacity: .12; position: absolute; top: .5rem; right: .8rem;
+    }
+    .contrib-card h4 { font-size: .95rem; margin-bottom: .4rem; color: var(--accent-2); }
+    .contrib-card p { font-size: .82rem; margin: 0; }
+
+    /* ── F1 Score chart ── */
+    .bar-chart { margin: 1.5rem 0; }
+    .bar-row { display: flex; align-items: center; gap: .8rem; margin-bottom: .7rem; }
+    .bar-label { width: 130px; font-size: .78rem; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .bar-track { flex: 1; height: 28px; background: var(--surface-2); border-radius: 6px; overflow: hidden; }
+    .bar-fill {
+      height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: .6rem;
+      font-size: .75rem; font-weight: 700; color: #fff; width: 0;
+      transition: width 1.2s cubic-bezier(.22,1,.36,1);
+    }
+    section.study-section.visible .bar-fill.raw { width: 8%; background: var(--danger); transition-delay: .4s; }
+    section.study-section.visible .bar-fill.behavioral { width: 80%; background: var(--success); transition-delay: .7s; }
+
+    /* ── Isolation Forest canvas area ── */
+    .iso-demo {
+      background: var(--surface-2); border-radius: 10px; padding: 1rem;
+      margin: 1.5rem 0; position: relative; min-height: 200px;
+    }
+    .iso-canvas-wrap { position: relative; width: 100%; height: 180px; }
+    .iso-dot {
+      position: absolute; width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent); transition: all .6s;
+    }
+    .iso-dot.anomaly {
+      background: var(--danger); width: 14px; height: 14px;
+      box-shadow: 0 0 12px rgba(239,68,68,.6);
+    }
+    .iso-line {
+      position: absolute; background: rgba(245,158,11,.5); transform-origin: left;
+      transform: scaleX(0); height: 2px;
+    }
+    section.study-section.visible .iso-line { animation: splitLine .8s forwards; }
+    .iso-controls { display: flex; gap: .5rem; margin-top: .8rem; justify-content: center; }
+    .iso-btn {
+      background: var(--accent); color: #fff; border: none; padding: .4rem 1rem;
+      border-radius: 6px; cursor: pointer; font-size: .8rem; transition: background .2s;
+    }
+    .iso-btn:hover { background: #2563eb; }
+    .iso-legend { text-align: center; font-size: .78rem; color: var(--muted); margin-top: .5rem; }
+
+    /* ── SHAP vs LIME ── */
+    .vs-grid {
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: .8rem; align-items: center;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 600px) { .vs-grid { grid-template-columns: 1fr; } .vs-divider { display: none; } }
+
+    .vs-card {
+      background: var(--surface-2); border-radius: 10px; padding: 1.2rem;
+      border: 1px solid var(--border); text-align: center;
+    }
+    .vs-card.winner { border-color: var(--success); box-shadow: 0 0 20px rgba(16,185,129,.15); }
+    .vs-card h4 { margin-bottom: .6rem; }
+    .vs-metric { font-size: .78rem; color: var(--muted); margin: .3rem 0; }
+    .vs-metric .val { font-weight: 700; }
+    .vs-divider { font-size: 1.5rem; font-weight: 900; color: var(--muted); }
+
+    .shap-outputs {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0;
+    }
+    @media (max-width: 600px) { .shap-outputs { grid-template-columns: 1fr; } }
+    .shap-out {
+      background: var(--surface-2); border-radius: 8px; padding: .8rem;
+      font-size: .78rem; text-align: center; border: 1px solid var(--border);
+      opacity: 0; transform: translateY(10px);
+      transition: opacity .4s, transform .4s;
+    }
+    section.study-section.visible .shap-out { opacity: 1; transform: translateY(0); }
+    section.study-section.visible .shap-out:nth-child(1) { transition-delay: .3s; }
+    section.study-section.visible .shap-out:nth-child(2) { transition-delay: .5s; }
+    section.study-section.visible .shap-out:nth-child(3) { transition-delay: .7s; }
+    .shap-out .icon { font-size: 1.4rem; margin-bottom: .3rem; }
+
+    /* ── Reentrancy animation ── */
+    .reentry-demo {
+      display: flex; gap: 1rem; align-items: flex-start; margin: 1.5rem 0; flex-wrap: wrap;
+      justify-content: center;
+    }
+    .contract-box {
+      width: 140px; padding: 1rem; border-radius: 10px; text-align: center;
+      font-size: .8rem; font-weight: 600; position: relative;
+      border: 2px solid var(--border); background: var(--surface-2);
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .contract-box.active { border-color: var(--danger); box-shadow: 0 0 16px rgba(239,68,68,.3); }
+    .contract-box.safe { border-color: var(--success); }
+    .reentry-arrow {
+      font-size: 1.2rem; color: var(--danger); align-self: center;
+      opacity: 0; transition: opacity .3s;
+    }
+    .reentry-arrow.show { opacity: 1; animation: pulse 1s infinite; }
+    .reentry-controls { width: 100%; text-align: center; margin-top: .5rem; }
+
+    /* ── Literature map ── */
+    .lit-map {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1.5rem 0;
+    }
+    @media (max-width: 700px) { .lit-map { grid-template-columns: 1fr; } }
+
+    .lit-item {
+      background: var(--surface-2); border-radius: 10px; padding: 1rem;
+      border: 1px solid var(--border); font-size: .8rem;
+      opacity: 0; transform: scale(.9);
+      transition: opacity .5s, transform .5s;
+    }
+    section.study-section.visible .lit-item { opacity: 1; transform: scale(1); }
+    section.study-section.visible .lit-item:nth-child(1) { transition-delay: .2s; }
+    section.study-section.visible .lit-item:nth-child(2) { transition-delay: .4s; }
+    section.study-section.visible .lit-item:nth-child(3) { transition-delay: .6s; }
+
+    .lit-item .lit-source { color: var(--accent-2); font-weight: 600; margin-bottom: .4rem; }
+    .lit-gap {
+      grid-column: 1 / -1; text-align: center; padding: 1rem;
+      background: rgba(245,158,11,.1); border: 1px dashed var(--warning);
+      border-radius: 10px; font-weight: 600; color: var(--warning);
+      opacity: 0; transition: opacity .6s .8s;
+    }
+    section.study-section.visible .lit-gap { opacity: 1; }
+
+    /* ── Group lending ── */
+    .group-visual {
+      display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap;
+      margin: 1.5rem 0; position: relative;
+    }
+    .group-member {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--surface-2); border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700; position: relative;
+      opacity: 0; transform: scale(0);
+      transition: opacity .4s, transform .4s;
+    }
+    section.study-section.visible .group-member { opacity: 1; transform: scale(1); }
+    section.study-section.visible .group-member:nth-child(1) { transition-delay: .1s; }
+    section.study-section.visible .group-member:nth-child(2) { transition-delay: .2s; }
+    section.study-section.visible .group-member:nth-child(3) { transition-delay: .3s; }
+    section.study-section.visible .group-member:nth-child(4) { transition-delay: .4s; }
+    section.study-section.visible .group-member:nth-child(5) { transition-delay: .5s; }
+
+    .group-ring {
+      position: absolute; width: 200px; height: 200px;
+      border: 2px dashed rgba(6,182,212,.3); border-radius: 50%;
+      top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+      transition: transform .8s .6s;
+    }
+    section.study-section.visible .group-ring { transform: translate(-50%, -50%) scale(1); }
+
+    .repay-stat {
+      text-align: center; margin: 1rem 0;
+    }
+    .repay-stat .big { font-size: 2.5rem; font-weight: 900; color: var(--success); }
+
+    /* ── Regulation cards ── */
+    .reg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    @media (max-width: 600px) { .reg-grid { grid-template-columns: 1fr; } }
+
+    .reg-card {
+      border-radius: 10px; padding: 1.2rem; border: 1px solid var(--border);
+      opacity: 0; transform: translateY(15px);
+      transition: opacity .5s, transform .5s;
+    }
+    section.study-section.visible .reg-card { opacity: 1; transform: translateY(0); }
+    section.study-section.visible .reg-card:nth-child(1) { transition-delay: .3s; }
+    section.study-section.visible .reg-card:nth-child(2) { transition-delay: .5s; }
+
+    .reg-card.mica { background: rgba(59,130,246,.08); border-color: rgba(59,130,246,.3); }
+    .reg-card.genius { background: rgba(139,92,246,.08); border-color: rgba(139,92,246,.3); }
+    .reg-card h4 { margin-bottom: .5rem; }
+    .reg-card ul { font-size: .82rem; }
+
+    /* ── GNN + Fed Learning ── */
+    .ml-ext-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    @media (max-width: 600px) { .ml-ext-grid { grid-template-columns: 1fr; } }
+
+    .ml-ext {
+      background: var(--surface-2); border-radius: 10px; padding: 1.2rem;
+      border: 1px solid var(--border);
+    }
+    .ml-ext h4 { color: var(--accent-3); margin-bottom: .5rem; font-size: .95rem; }
+
+    .gnn-graph {
+      width: 100%; height: 120px; position: relative; margin: .8rem 0;
+    }
+    .gnn-node {
+      position: absolute; width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent-3);
+    }
+    .gnn-node.ring { background: var(--danger); animation: pulse 1.5s infinite; }
+
+    .fed-visual {
+      display: flex; flex-direction: column; align-items: center; gap: .5rem; margin: .8rem 0;
+    }
+    .fed-tier-row { display: flex; gap: .5rem; align-items: center; }
+    .fed-bank {
+      padding: .4rem .7rem; border-radius: 6px; font-size: .7rem; font-weight: 600;
+      background: var(--surface); border: 1px solid var(--border);
+    }
+    .fed-arrow { color: var(--accent-2); font-size: .8rem; }
+    .fed-weights {
+      font-size: .65rem; color: var(--success); animation: pulse 2s infinite;
+    }
+
+    /* ── Summary map ── */
+    .summary-map {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: .6rem; margin: 1.5rem 0;
+    }
+    .map-node {
+      background: var(--surface-2); border-radius: 8px; padding: .7rem;
+      text-align: center; font-size: .72rem; border: 1px solid var(--border);
+      opacity: 0; transform: scale(.8);
+      transition: opacity .4s, transform .4s, border-color .3s;
+      cursor: pointer;
+    }
+    .map-node:hover { border-color: var(--accent); }
+    section.study-section.visible .map-node { opacity: 1; transform: scale(1); }
+
+    /* ── Bottom line ── */
+    .bottom-line {
+      text-align: center; padding: 2rem;
+      background: linear-gradient(135deg, rgba(59,130,246,.1), rgba(139,92,246,.1));
+      border-radius: var(--radius); border: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    .bottom-line blockquote {
+      font-size: 1.05rem; font-style: italic; color: var(--text);
+      max-width: 700px; margin: 0 auto 1rem;
+      line-height: 1.7;
+    }
+    .bottom-line .tags { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
+    .bottom-line .tag {
+      font-size: .72rem; padding: .3rem .7rem; border-radius: 999px;
+      background: var(--surface-2); color: var(--muted); border: 1px solid var(--border);
+    }
+
+    /* ── Collateral demo ── */
+    .collateral-demo {
+      display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+      margin: 1.5rem 0; flex-wrap: wrap;
+    }
+    .collateral-side { text-align: center; }
+    .collateral-side .amount {
+      font-size: 1.8rem; font-weight: 800;
+    }
+    .collateral-side .label { font-size: .78rem; color: var(--muted); }
+    .collateral-side.deposit .amount { color: var(--warning); }
+    .collateral-side.borrow .amount { color: var(--accent-2); }
+    .collateral-arrow { font-size: 2rem; color: var(--muted); }
+    .collateral-bar {
+      width: 200px; height: 12px; background: var(--surface-2); border-radius: 6px;
+      overflow: hidden; margin: .5rem auto;
+    }
+    .collateral-fill {
+      height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--warning));
+      width: 0; transition: width 1.5s .5s;
+    }
+    section.study-section.visible .collateral-fill { width: 135%; }
+
+    /* ── Toggle quiz ── */
+    .quiz-toggle {
+      background: var(--surface-2); border-radius: 10px; padding: 1rem;
+      margin: 1rem 0; border: 1px solid var(--border);
+    }
+    .quiz-toggle summary {
+      cursor: pointer; font-weight: 600; color: var(--accent-2);
+      font-size: .9rem;
+    }
+    .quiz-toggle p { margin-top: .6rem; font-size: .85rem; }
+
+    /* ── Scroll-to-top ── */
+    #scroll-top {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 998;
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--accent); color: #fff; border: none; cursor: pointer;
+      font-size: 1.2rem; box-shadow: var(--shadow);
+      opacity: 0; transform: translateY(20px); transition: opacity .3s, transform .3s;
+    }
+    #scroll-top.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Phase table ── */
+    .phase-table-wrap { overflow-x: auto; margin: 1.5rem 0; border-radius: 10px; border: 1px solid var(--border); }
+    .phase-table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    .phase-table th, .phase-table td { padding: .65rem .8rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .phase-table th { background: var(--surface-2); color: var(--accent-2); font-weight: 700; }
+    .phase-table tr:hover td { background: rgba(59,130,246,.06); }
+    .phase-table .phase-num { font-weight: 800; color: var(--accent); white-space: nowrap; }
+    .phase-table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+
+    /* ── Security layers stack ── */
+    .sec-layers { display: flex; flex-direction: column; gap: .5rem; margin: 1.5rem 0; }
+    .sec-layer {
+      display: flex; align-items: center; gap: 1rem; padding: .8rem 1rem;
+      border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2);
+      opacity: 0; transform: translateX(-20px);
+      transition: opacity .5s, transform .5s, border-color .3s;
+    }
+    section.study-section.visible .sec-layer { opacity: 1; transform: translateX(0); }
+    section.study-section.visible .sec-layer:nth-child(1) { transition-delay: .15s; }
+    section.study-section.visible .sec-layer:nth-child(2) { transition-delay: .3s; }
+    section.study-section.visible .sec-layer:nth-child(3) { transition-delay: .45s; }
+    section.study-section.visible .sec-layer:nth-child(4) { transition-delay: .6s; }
+    section.study-section.visible .sec-layer:nth-child(5) { transition-delay: .75s; }
+    .sec-layer .layer-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .sec-layer .layer-name { font-weight: 600; font-size: .85rem; }
+    .sec-layer .layer-desc { font-size: .75rem; color: var(--muted); }
+    .sec-layer.active-layer { border-color: var(--success); box-shadow: 0 0 12px rgba(16,185,129,.15); }
+
+    /* ── Oracle chain compare ── */
+    .oracle-chains { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1.5rem 0; }
+    @media (max-width: 600px) { .oracle-chains { grid-template-columns: 1fr; } }
+    .oracle-chain {
+      text-align: center; padding: 1rem; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .oracle-chain.best { border-color: var(--success); background: rgba(16,185,129,.08); }
+    .oracle-chain.worse { border-color: var(--warning); background: rgba(245,158,11,.06); }
+    .oracle-chain h4 { font-size: .85rem; margin-bottom: .5rem; }
+    .oracle-accuracy { font-size: 1.6rem; font-weight: 800; }
+    .oracle-chain.best .oracle-accuracy { color: var(--success); }
+    .oracle-chain.worse .oracle-accuracy { color: var(--warning); }
+
+    /* ── SLR stat grid ── */
+    .slr-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+    @media (max-width: 600px) { .slr-stats { grid-template-columns: 1fr; } }
+    .slr-stat {
+      text-align: center; padding: 1rem; border-radius: 10px;
+      background: var(--surface-2); border: 1px solid var(--border);
+    }
+    .slr-stat .num { font-size: 1.8rem; font-weight: 900; color: var(--accent-2); }
+    .slr-stat .lbl { font-size: .72rem; color: var(--muted); margin-top: .3rem; }
+
+    /* ── ZKP two-circuit ── */
+    .zkp-flow {
+      display: flex; align-items: center; justify-content: center; gap: .8rem;
+      flex-wrap: wrap; margin: 1.5rem 0;
+    }
+    .zkp-circuit {
+      flex: 1; min-width: 140px; max-width: 200px; padding: 1rem;
+      border-radius: 10px; text-align: center; border: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .zkp-circuit h4 { font-size: .8rem; color: var(--accent-3); margin-bottom: .4rem; }
+    .zkp-circuit p { font-size: .72rem; color: var(--muted); margin: 0; }
+    .zkp-plus { font-size: 1.5rem; color: var(--muted); }
+
+    /* ── PRISMA badge ── */
+    .prisma-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .5rem 1rem; border-radius: 999px; margin: 1rem 0;
+      background: rgba(139,92,246,.12); border: 1px solid rgba(139,92,246,.3);
+      font-size: .82rem; color: var(--accent-3); font-weight: 600;
+    }
+
+    /* ── LookAhead bar ── */
+    .bar-fill.lookahead { background: linear-gradient(90deg, var(--accent-3), var(--success)); }
+    section.study-section.visible .bar-fill.lookahead { width: 89.66%; transition-delay: 1s; }
+
+    /* ── Learn path ── */
+    .learn-path {
+      background: linear-gradient(135deg, rgba(6,182,212,.08), rgba(59,130,246,.08));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.5rem; margin-bottom: 2rem;
+    }
+    .learn-path h3 { font-size: 1rem; margin-bottom: .8rem; color: var(--accent-2); }
+    .learn-steps { display: flex; flex-direction: column; gap: .5rem; }
+    .learn-step {
+      display: flex; gap: .8rem; align-items: flex-start; font-size: .85rem; color: var(--muted);
+    }
+    .learn-step .step-n {
+      flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--accent); color: #fff; font-size: .7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .learn-step a { color: var(--accent-2); text-decoration: none; }
+    .learn-step a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<nav id="main-nav">
+  <span class="logo">CWB Study</span>
+  <a href="#ch1-intro">Ch.1 Intro</a>
+  <a href="#ch1-hierarchy">Hierarchy</a>
+  <a href="#ch1-problems">Problems</a>
+  <a href="#ch1-contributions">Contributions</a>
+  <a href="#ch1-methodology">Phases</a>
+  <a href="#ch1-oracle">Oracle</a>
+  <a href="#ch2-intro">Ch.2 Intro</a>
+  <a href="#s21">§2.1 Flat DeFi</a>
+  <a href="#s22">§2.2 ML Fraud</a>
+  <a href="#s23">§2.3 Isolation Forest</a>
+  <a href="#s24">§2.4 SHAP</a>
+  <a href="#s25">§2.5 CBDC</a>
+  <a href="#s26">§2.6 Security</a>
+  <a href="#s211">§2.11 ZKP</a>
+  <a href="#s27">§2.7 Gap</a>
+  <a href="#s28">§2.8 Groups</a>
+  <a href="#s29">§2.9 Regulation</a>
+  <a href="#s210">§2.10 ML Ext</a>
+  <a href="#summary">Summary</a>
+</nav>
+
+<div class="container">
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <div class="hero">
+    <div class="badge">Pre-Thesis Study Guide</div>
+    <h1>Crypto World Bank<br>Chapters 1 &amp; 2</h1>
+    <p>An interactive visual walkthrough of the thesis architecture and literature review — updated for v32 with 8 new IEEE/ACM sources. Scroll to learn, click to explore.</p>
+  </div>
+
+  <!-- Learning path -->
+  <div class="learn-path hero" style="animation-delay:.5s">
+    <h3>📚 Suggested learning path (45 min)</h3>
+    <div class="learn-steps">
+      <div class="learn-step"><span class="step-n">1</span><span><strong>Chapter 1 (15 min):</strong> <a href="#ch1-core">Core argument</a> → <a href="#ch1-hierarchy">4-tier hierarchy</a> → <a href="#ch1-methodology">4 phases</a> → <a href="#ch1-contributions">4 contributions</a></span></div>
+      <div class="learn-step"><span class="step-n">2</span><span><strong>Chapter 2 gap (10 min):</strong> <a href="#s21">Why DeFi is flat</a> (Werner) → <a href="#s27">What's still missing</a></span></div>
+      <div class="learn-step"><span class="step-n">3</span><span><strong>ML &amp; security (15 min):</strong> <a href="#s22">Behavioral fraud ML</a> → <a href="#s24">SHAP explainability</a> → <a href="#s26">Layered security</a> (Chaliasos + Chen + LookAhead)</span></div>
+      <div class="learn-step"><span class="step-n">4</span><span><strong>Identity &amp; wrap-up (5 min):</strong> <a href="#s211">ZKP KYC</a> → <a href="#summary">Source map</a></span></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CHAPTER 1 ═══════════ -->
+  <div class="chapter-divider" id="ch1-intro">
+    <div class="ch-num">01</div>
+    <h2>Chapter 1 — The Short Version</h2>
+    <p class="subtitle">The big picture: what the thesis proposes and why it matters</p>
+  </div>
+
+  <!-- Core Argument -->
+  <section class="study-section" id="ch1-core">
+    <div class="section-card">
+      <span class="section-tag tag-ch1">Chapter 1</span>
+      <h3>The Core Argument</h3>
+      <p>The thesis proposes a <strong>"Crypto World Bank"</strong> — not a real bank, but a <strong>research prototype</strong> showing that blockchain can mirror how international development finance actually works.</p>
+      <p>Real-world finance moves money through <strong>layers</strong>: World Bank → national banks → local banks → individuals. But today's DeFi protocols like <strong>Aave</strong> are completely <strong>flat</strong> — everyone uses the same pool, no hierarchy, no institutional roles.</p>
+
+      <div class="compare-grid">
+        <div class="compare-box traditional">
+          <h4 style="color:var(--accent)">Traditional Finance</h4>
+          <div class="hierarchy" style="margin:.5rem 0">
+            <div class="tier tier-1" style="width:90%;font-size:.7rem;padding:.5rem">World Bank</div>
+            <div class="tier-arrow" style="height:16px"></div>
+            <div class="tier tier-2" style="width:80%;font-size:.7rem;padding:.5rem">National Bank</div>
+            <div class="tier-arrow" style="height:16px"></div>
+            <div class="tier tier-3" style="width:70%;font-size:.7rem;padding:.5rem">Local Bank</div>
+            <div class="tier-arrow" style="height:16px"></div>
+            <div class="tier tier-4" style="width:60%;font-size:.7rem;padding:.5rem">Client</div>
+          </div>
+        </div>
+        <div class="compare-box defi">
+          <h4 style="color:var(--danger)">DeFi (Aave, etc.)</h4>
+          <div class="flat-pool">Single Shared Pool</div>
+          <div class="flat-dots">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <p style="font-size:.75rem;margin-top:.5rem">Sovereign fund &amp; individual wallet — same rules</p>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        This project combines the <strong>institutional hierarchy</strong> of development finance with the <strong>programmability</strong> of blockchain.
+      </div>
+    </div>
+  </section>
+
+  <!-- Hierarchy Architecture -->
+  <section class="study-section" id="ch1-hierarchy">
+    <div class="section-card">
+      <span class="section-tag tag-ch1">Chapter 1 · Architecture</span>
+      <h3>Four-Tier Hierarchy</h3>
+      <p>Capital flows downward through enforced smart-contract tiers. Each tier has distinct roles, reserve requirements, and rate structures.</p>
+
+      <div class="hierarchy" id="hierarchy-viz">
+        <div class="tier tier-1">🏛️ World Bank — Reserve Authority</div>
+        <div class="tier-arrow"><div class="money-particle" style="animation-delay:0s"></div></div>
+        <div class="tier tier-2">🏦 National Bank — Wholesale Distribution</div>
+        <div class="tier-arrow"><div class="money-particle" style="animation-delay:.7s"></div></div>
+        <div class="tier tier-3">🏪 Local Bank — Retail Lending</div>
+        <div class="tier-arrow"><div class="money-particle" style="animation-delay:1.4s"></div></div>
+        <div class="tier tier-4">👤 Client — Borrower / Depositor</div>
+      </div>
+
+      <p>Watch the green particles — they represent capital flowing <strong>downward</strong> from the reserve authority to end clients, just like real development finance.</p>
+    </div>
+  </section>
+
+  <!-- Three Problems -->
+  <section class="study-section" id="ch1-problems">
+    <div class="section-card">
+      <span class="section-tag tag-ch1">Chapter 1 · Motivation</span>
+      <h3>Three Problems Traditional Finance Has</h3>
+      <p>DeFi fixed transparency and speed — but created only flat pools. These are the problems the thesis addresses:</p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-icon">💤</div>
+          <h4>Idle Capital</h4>
+          <div class="stat">Nostro/Vostro</div>
+          <p>Capital sits idle in correspondent banking accounts instead of reaching borrowers</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🐌</div>
+          <h4>Slow &amp; Expensive</h4>
+          <div class="stat">$42 · 2–5 days</div>
+          <p>Average cost and time for a single cross-border transfer</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🚫</div>
+          <h4>Financial Exclusion</h4>
+          <div class="stat">1.4B</div>
+          <p>Adults worldwide remain unbanked with no access to formal credit</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Four Contributions -->
+  <section class="study-section" id="ch1-contributions">
+    <div class="section-card">
+      <span class="section-tag tag-ch1">Chapter 1 · Contributions</span>
+      <h3>Four Research Contributions</h3>
+      <p>Each contribution maps directly to a literature gap filled in Chapter 2.</p>
+
+      <div class="contrib-grid">
+        <div class="contrib-card">
+          <span class="contrib-num">01</span>
+          <h4>Four-Tier Hierarchy</h4>
+          <p>Enforced in smart contracts with reserve-ratio checks at every tier — no prior DeFi protocol has this.</p>
+        </div>
+        <div class="contrib-card">
+          <span class="contrib-num">02</span>
+          <h4>Solidarity Group Lending</h4>
+          <p>Mutual liability encoded in Solidity — programmable joint liability with cryptographic enforcement.</p>
+        </div>
+        <div class="contrib-card">
+          <span class="contrib-num">03</span>
+          <h4>Oracle-Mediated AI/ML Fraud Detection</h4>
+          <p>Random Forest + Isolation Forest with SHAP explainability — behavioral features, not raw transactions.</p>
+        </div>
+        <div class="contrib-card">
+          <span class="contrib-num">04</span>
+          <h4>ZK Proof Identity Pathway</h4>
+          <p>Privacy-preserving KYC — prove eligibility without exposing personal data on-chain.</p>
+        </div>
+      </div>
+
+      <div class="gap-box">
+        <strong>Deployment target:</strong> Polygon zkEVM Cardona testnet — a research prototype, not a production bank. Every claim about novelty is qualified.
+      </div>
+    </div>
+  </section>
+
+  <!-- Methodology / Phases -->
+  <section class="study-section" id="ch1-methodology">
+    <div class="section-card">
+      <span class="section-tag tag-ch1">Chapter 1 · Methodology</span>
+      <h3>Four-Phase Implementation Plan</h3>
+      <p>Pre-Thesis 1 covers requirements and design. The final thesis runs implementation across <strong>four phases</strong> — each with concrete deliverables and deployment targets.</p>
+
+      <div class="phase-table-wrap">
+        <table class="phase-table">
+          <thead>
+            <tr><th>Phase</th><th>Primary Deliverables</th><th>Contract Scope</th><th>Deployment</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="phase-num">Phase I</td>
+              <td>Four-tier scaffold, wallet auth, frontend skeleton, PostgreSQL (31 entities), Chainlink PoR, Groth16 KYC circuit</td>
+              <td>WorldBankReserve, NationalBank, LocalBank</td>
+              <td>Polygon zkEVM Cardona, Ethereum Sepolia</td>
+            </tr>
+            <tr>
+              <td class="phase-num">Phase II</td>
+              <td>Loan lifecycle, borrowing limits, deposit mobilisation, GroupLendingPool, InterBankLendingPool</td>
+              <td>SavingsVault, LoanContract, GroupLendingPool, UpwardDepositFacility</td>
+              <td>Polygon zkEVM Cardona</td>
+            </tr>
+            <tr>
+              <td class="phase-num">Phase III</td>
+              <td>RF + Isolation Forest + SHAP via Chainlink Functions, syndicated/tranched/netting contracts, Foundry + Tenderly</td>
+              <td>SyndicatedLoan, TranchedPool, NettingEngine, FXModule, LiquidationEngine</td>
+              <td>Polygon zkEVM Cardona, Ethereum Sepolia</td>
+            </tr>
+            <tr>
+              <td class="phase-num">Phase IV</td>
+              <td>Certora formal proofs, zkAML velocity circuit, full audit pipeline</td>
+              <td>All contracts + on-chain zkSNARK verifier</td>
+              <td>Polygon zkEVM Cardona (ZK proofs)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="font-size:.85rem;color:var(--muted)">Stack: Solidity 0.8.20 · React 18 + TypeScript · Express + FastAPI · scikit-learn · Circom 2.0 · testnet USDC pools.</p>
+    </div>
+  </section>
+
+  <!-- Oracle Problem -->
+  <section class="study-section" id="ch1-oracle">
+    <div class="section-card">
+      <span class="section-tag tag-ch1">Chapter 1 · Oracle Problem</span>
+      <h3>Bridging Off-Chain AI to On-Chain Contracts</h3>
+      <p>Smart contracts can't see the outside world. CWB's Random Forest fraud scores live off-chain — they must reach the <code>LocalBank</code> contract via an <strong>oracle</strong>.</p>
+
+      <ul style="font-size:.88rem;color:var(--muted);margin:1rem 0;padding-left:1.2rem">
+        <li><strong>Centralized relay</strong> — fast, but re-introduces trust (prototype fallback)</li>
+        <li><strong>Chainlink Functions</strong> — DON consensus, 30–60s latency, Phase III primary</li>
+        <li><strong>Commit-reveal</strong> — hash score first, reveal after decision window</li>
+      </ul>
+
+      <h4 style="margin:1.2rem 0 .5rem;font-size:.9rem">Why Polygon for retail oracle feeds? [157]</h4>
+      <p style="font-size:.85rem">A CAAW 2025 study measured <strong>50 million Chainlink price-feed data points</strong> across 8 chains (December 2024):</p>
+
+      <div class="oracle-chains">
+        <div class="oracle-chain best">
+          <h4>Polygon</h4>
+          <div class="oracle-accuracy">High ✓</div>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:.4rem">Retail-tier oracle chain — CWB Cardona target</p>
+        </div>
+        <div class="oracle-chain worse">
+          <h4>Ethereum Mainnet</h4>
+          <div class="oracle-accuracy">Volatile</div>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:.4rem">Higher deviations under market stress</p>
+        </div>
+        <div class="oracle-chain worse">
+          <h4>zkSync</h4>
+          <div class="oracle-accuracy">Volatile</div>
+          <p style="font-size:.72rem;color:var(--muted);margin-top:.4rem">Same pattern as mainnet</p>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <strong>Deployment hierarchy:</strong> Polygon zkEVM Cardona for retail ML-score + price feeds; Ethereum Sepolia for high-value institutional flows. Commit-reveal hedges oracle accuracy risk.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ CHAPTER 2 ═══════════ -->
+  <div class="chapter-divider" id="ch2-intro">
+    <div class="ch-num">02</div>
+    <h2>Chapter 2 — The Detailed Version</h2>
+    <p class="subtitle">Literature review — <strong>139 sources</strong> screened PRISMA-style (updated v32), each informing a design decision</p>
+    <div class="prisma-badge">📊 PRISMA synthesis: 614 identified → 114 full-text → 139 included (+8 IEEE/ACM 2024–2026)</div>
+  </div>
+
+  <!-- §2.1 Werner -->
+  <section class="study-section" id="s21">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.1</span>
+      <div class="source">Werner et al. (2022) — ACM Systematization of Knowledge</div>
+      <h3>Why DeFi Lending is Structurally "Flat"</h3>
+      <p>This is the <strong>most important source</strong> in the entire thesis. Werner et al. surveyed every type of DeFi protocol and found lending platforms are uniformly <strong>pool-based and over-collateralized</strong> with <strong>no institutional hierarchy</strong>.</p>
+      <p>A billion-dollar sovereign wealth fund and an individual with a crypto wallet access the <strong>exact same pool</strong> under the same rules. There's no concept of a "national bank" or "local bank" in any existing protocol.</p>
+
+      <h4 style="margin:1rem 0 .5rem;font-size:.95rem">What is Over-Collateralization?</h4>
+      <div class="collateral-demo">
+        <div class="collateral-side deposit">
+          <div class="amount">$150 ETH</div>
+          <div class="label">You must deposit</div>
+        </div>
+        <div class="collateral-arrow">→</div>
+        <div class="collateral-side borrow">
+          <div class="amount">$100 USDC</div>
+          <div class="label">To borrow</div>
+        </div>
+      </div>
+      <div class="collateral-bar"><div class="collateral-fill"></div></div>
+      <p style="text-align:center;font-size:.8rem;color:var(--muted)">Aave requires 125–150% collateral — immediately excludes 1.4B unbanked adults with no digital assets</p>
+
+      <div class="gap-box">This is the <strong>structural gap</strong> the entire thesis enters.</div>
+
+      <details class="quiz-toggle">
+        <summary>🧠 Quick Check: Why can't an unbanked farmer use Aave?</summary>
+        <p>Because Aave requires you to deposit more crypto than you want to borrow. Someone with no digital assets has nothing to deposit — they're locked out by design, not by accident.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- §2.2 Palaiokrassas -->
+  <section class="study-section" id="s22">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.2</span>
+      <div class="source">Palaiokrassas et al. (2024) — 54M+ DeFi transactions, 23 protocols</div>
+      <h3>Machine Learning for Fraud Detection</h3>
+      <p>Analyzed over <strong>54 million DeFi transactions</strong>. The crucial finding: <strong>behavioral features</strong> dramatically outperform raw transaction data.</p>
+
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">Raw features<br><span style="font-size:.65rem">amount, gas paid</span></div>
+          <div class="bar-track"><div class="bar-fill raw">F1: 0.08</div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Behavioral features<br><span style="font-size:.65rem">patterns over time</span></div>
+          <div class="bar-track"><div class="bar-fill behavioral">F1: 0.76–0.85</div></div>
+        </div>
+      </div>
+
+      <div class="compare-grid" style="margin-top:1rem">
+        <div class="compare-box" style="background:rgba(239,68,68,.06)">
+          <h4 style="color:var(--danger)">Raw Transaction Feature</h4>
+          <p style="font-size:.85rem;margin:0">"Amount transferred: $500"<br>"Gas paid: 0.002 ETH"</p>
+          <p style="font-size:.75rem;color:var(--danger);margin-top:.5rem">Fraudsters camouflage these easily</p>
+        </div>
+        <div class="compare-box" style="background:rgba(16,185,129,.06)">
+          <h4 style="color:var(--success)">Behavioral Feature</h4>
+          <p style="font-size:.85rem;margin:0">"Flash loan interactions in last 30 min: 7"<br>"Borrow-to-repay ratio this week: 0.2"</p>
+          <p style="font-size:.75rem;color:var(--success);margin-top:.5rem">Patterns across time expose fraud</p>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <strong>F1 Score explained:</strong> Harmonic mean of precision and recall. 0.08 = essentially random. 0.76–0.85 = real detection. CWB's Random Forest adopts behavioral feature engineering.
+      </div>
+
+      <h4 style="margin:1.5rem 0 .5rem;font-size:.9rem;color:var(--accent-3)">NEW: 1,585-Study PRISMA Synthesis [155]</h4>
+      <div class="slr-stats">
+        <div class="slr-stat"><div class="num">1,585</div><div class="lbl">Studies screened (IEEE, ACM, ScienceDirect 2020–2025)</div></div>
+        <div class="slr-stat"><div class="num">~95%</div><div class="lbl">XGBoost accuracy (centralised supervised)</div></div>
+        <div class="slr-stat"><div class="num">~91%</div><div class="lbl">FedAvg accuracy (federated, privacy-preserving)</div></div>
+      </div>
+      <p style="font-size:.85rem">Centralised ML is faster; federated learning preserves privacy — exactly the trade-off CWB's cross-tier FL design must navigate.</p>
+
+      <h4 style="margin:1.2rem 0 .5rem;font-size:.9rem;color:var(--accent-3)">NEW: LookAhead Adversarial Contract Detection [152]</h4>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">ContractWard [50]<br><span style="font-size:.65rem">prior SOTA</span></div>
+          <div class="bar-track"><div class="bar-fill raw" style="width:62%">~0.62 F1</div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">LookAhead (FSE 2025)<br><span style="font-size:.65rem">pre-execution scan</span></div>
+          <div class="bar-track"><div class="bar-fill lookahead">F1: 0.8966 · FPR 0.16%</div></div>
+        </div>
+      </div>
+      <p style="font-size:.82rem;color:var(--muted)">LookAhead unveils adversarial contracts <em>before</em> they execute — 44.4% improvement over prior best. Phase IV security pipeline benchmarks against this.</p>
+    </div>
+  </section>
+
+  <!-- §2.3 Isolation Forest -->
+  <section class="study-section" id="s23">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.3</span>
+      <div class="source">Liu et al. (2008) — Isolation Forest algorithm</div>
+      <h3>Isolation Forest for Anomaly Detection</h3>
+      <p>CWB's <strong>secondary fraud detector</strong> — used when you don't have labeled fraud data. Instead of modeling "normal" and flagging deviations, it <strong>directly isolates anomalies</strong>.</p>
+      <p>Anomalies are few and different — they require <strong>fewer partitions</strong> to isolate. Normal points in dense clusters need many splits.</p>
+
+      <div class="iso-demo">
+        <div class="iso-canvas-wrap" id="iso-canvas"></div>
+        <div class="iso-controls">
+          <button class="iso-btn" id="iso-split-btn">Draw Random Split Lines</button>
+          <button class="iso-btn" id="iso-reset-btn" style="background:var(--surface);border:1px solid var(--border)">Reset</button>
+        </div>
+        <div class="iso-legend">Short path length to isolate = likely anomaly (red dot far from cluster)</div>
+      </div>
+
+      <div class="insight-box">
+        Labeled fraud datasets are rare in DeFi. Unusual wallet behavior — like someone suddenly borrowing across 50 wallets in a coordinated ring — can be detected <strong>without any labels at all</strong>.
+      </div>
+    </div>
+  </section>
+
+  <!-- §2.4 SHAP vs LIME -->
+  <section class="study-section" id="s24">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.4</span>
+      <div class="source">Adom et al. (2022) — SHAP vs LIME comparison</div>
+      <h3>SHAP vs LIME for Explainability</h3>
+      <p>Why the thesis chose <strong>SHAP</strong> over LIME for explaining loan decisions. Both tell you which features influenced a prediction — but they work differently.</p>
+
+      <div class="vs-grid">
+        <div class="vs-card">
+          <h4>LIME</h4>
+          <div class="vs-metric">Speed: <span class="val" style="color:var(--success)">Fast ⚡</span></div>
+          <div class="vs-metric">Consistency: <span class="val" style="color:var(--danger)">Noisy ✗</span></div>
+          <div class="vs-metric">Method: <span class="val">Local linear approximation</span></div>
+          <p style="font-size:.78rem;margin-top:.5rem;color:var(--muted)">Perturbs input slightly, fits simple model nearby. Quick but unstable across runs.</p>
+        </div>
+        <div class="vs-divider">VS</div>
+        <div class="vs-card winner">
+          <h4>SHAP ✓</h4>
+          <div class="vs-metric">Speed: <span class="val" style="color:var(--warning)">Slower</span></div>
+          <div class="vs-metric">Consistency: <span class="val" style="color:var(--success)">Principled ✓</span></div>
+          <div class="vs-metric">Method: <span class="val">Shapley values (game theory)</span></div>
+          <p style="font-size:.78rem;margin-top:.5rem;color:var(--muted)">Calculates each feature's fair contribution across all orderings. Mathematically defensible.</p>
+        </div>
+      </div>
+
+      <p>EU regulators require banks to explain automated credit decisions (GDPR "right to explanation"). SHAP's consistency makes it the defensible choice.</p>
+
+      <h4 style="margin:1rem 0 .5rem;font-size:.9rem">CWB's Three SHAP Output Formats</h4>
+      <div class="shap-outputs">
+        <div class="shap-out">
+          <div class="icon">👤</div>
+          <strong>Retail Client</strong><br>Plain-language decline reason
+        </div>
+        <div class="shap-out">
+          <div class="icon">📊</div>
+          <strong>Authority Brief</strong><br>SHAP waterfall dashboard
+        </div>
+        <div class="shap-out">
+          <div class="icon">📋</div>
+          <strong>Compliance</strong><br>Full inference audit trail
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2.5 CBDC -->
+  <section class="study-section" id="s25">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.5</span>
+      <div class="source">Tan (2023, IMF) — Two-Tier CBDC Model</div>
+      <h3>From Two-Tier CBDC to Four-Tier CWB</h3>
+      <p>Tan modeled CBDC distribution and concluded a <strong>two-tier model</strong> is appropriate: central bank issues, commercial banks handle retail. CWB extends this to four tiers.</p>
+
+      <div class="compare-grid">
+        <div class="compare-box traditional">
+          <h4 style="color:var(--accent)">IMF Two-Tier CBDC</h4>
+          <div class="hierarchy" style="margin:.5rem 0">
+            <div class="tier tier-1" style="width:85%;font-size:.75rem;padding:.5rem">Central Bank</div>
+            <div class="tier-arrow" style="height:14px"></div>
+            <div class="tier tier-2" style="width:70%;font-size:.75rem;padding:.5rem">Commercial Banks</div>
+            <div class="tier-arrow" style="height:14px"></div>
+            <div class="tier tier-4" style="width:55%;font-size:.75rem;padding:.5rem">Retail Clients</div>
+          </div>
+        </div>
+        <div class="compare-box" style="background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.3)">
+          <h4 style="color:var(--tier-4)">CWB Four-Tier</h4>
+          <div class="hierarchy" style="margin:.5rem 0">
+            <div class="tier tier-1" style="width:90%;font-size:.65rem;padding:.4rem">World Bank</div>
+            <div class="tier-arrow" style="height:10px"></div>
+            <div class="tier tier-2" style="width:80%;font-size:.65rem;padding:.4rem">National Bank</div>
+            <div class="tier-arrow" style="height:10px"></div>
+            <div class="tier tier-3" style="width:70%;font-size:.65rem;padding:.4rem">Local Bank</div>
+            <div class="tier-arrow" style="height:10px"></div>
+            <div class="tier tier-4" style="width:60%;font-size:.65rem;padding:.4rem">Client</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        The World Bank doesn't hand loans directly to farmers in rural Kenya. It funds national development banks → regional institutions → microfinance lenders → farmers. <strong>Same principle, more tiers.</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2.6 Security -->
+  <section class="study-section" id="s26">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.6 · Updated v32</span>
+      <div class="source">Atzei [7] · Chaliasos ICSE 2024 [150] · Chen ICSE 2026 [151] · LookAhead FSE 2025 [152]</div>
+      <h3>Smart Contract Security — Layered Defense</h3>
+      <p>Atzei et al. (2017) catalogued reentrancy, access control, and overflow — still foundational. But DeFi losses hit <strong>$11.21 billion</strong> by March 2025 [151]. One tool is not enough.</p>
+
+      <div class="reentry-demo" id="reentry-demo">
+        <div class="contract-box" id="contract-a">
+          Contract A<br><small>Balance: $<span id="balance-display">100</span></small>
+        </div>
+        <div class="reentry-arrow" id="reentry-arrow-1">→</div>
+        <div class="contract-box" id="contract-b">
+          Contract B<br><small>Attacker</small>
+        </div>
+        <div class="reentry-arrow" id="reentry-arrow-2">↩</div>
+      </div>
+      <div class="reentry-controls">
+        <button class="iso-btn" id="reentry-btn">Simulate Reentrancy Attack</button>
+        <button class="iso-btn" id="reentry-safe-btn" style="background:var(--success)">Show CWB Defense</button>
+      </div>
+
+      <div class="gap-box" style="margin-top:1rem">
+        <strong>Chaliasos et al. (ICSE 2024) [150]:</strong> Existing security tools could have prevented only <strong>8%</strong> of real-world exploit losses ($149M of $2.3B). All preventable cases were <em>reentrancy</em>.
+      </div>
+
+      <h4 style="margin:1.2rem 0 .6rem;font-size:.9rem">CWB's 5-Layer Security Pipeline (click to highlight)</h4>
+      <div class="sec-layers" id="sec-layers">
+        <div class="sec-layer" data-layer="1"><span class="layer-icon">🔒</span><div><div class="layer-name">1. ReentrancyGuard + Solidity 0.8.20</div><div class="layer-desc">OpenZeppelin mutex, built-in overflow checks, RBAC modifiers</div></div></div>
+        <div class="sec-layer" data-layer="2"><span class="layer-icon">🔍</span><div><div class="layer-name">2. Slither (static analysis)</div><div class="layer-desc">Pre-deployment bytecode and pattern scanning</div></div></div>
+        <div class="sec-layer" data-layer="3"><span class="layer-icon">🧪</span><div><div class="layer-name">3. Mythril (symbolic execution)</div><div class="layer-desc">Explores execution paths for hidden vulnerabilities</div></div></div>
+        <div class="sec-layer" data-layer="4"><span class="layer-icon">📡</span><div><div class="layer-name">4. Tenderly runtime monitoring (Phase III)</div><div class="layer-desc">Chen [151]: layered contracts need runtime CFI — not just pre-deploy scans</div></div></div>
+        <div class="sec-layer" data-layer="5"><span class="layer-icon">📐</span><div><div class="layer-name">5. Certora formal verification (Phase IV)</div><div class="layer-desc">Mathematical proofs: reserve ratio never below minimum</div></div></div>
+      </div>
+
+      <p style="font-size:.85rem;color:var(--muted)">LookAhead [152] adds adversarial-contract scanning (F1 0.8966) as the benchmark ceiling for Phase IV monitoring.</p>
+    </div>
+  </section>
+
+  <!-- §2.7 Literature Gap -->
+  <section class="study-section" id="s27">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.7</span>
+      <div class="source">Cross-Tier Capital Flows — Literature Synthesis</div>
+      <h3>What Exists vs. What's Missing</h3>
+      <p>Three sources inform the multi-directional lending modules — but none compose into a single four-tier DeFi lending specification.</p>
+
+      <div class="lit-map">
+        <div class="lit-item">
+          <div class="lit-source">Project Pine (NY Fed/BIS, 2025)</div>
+          Hierarchy of smart contracts for central bank operations — factory contracts spawning facility contracts with reserve checks. Validates CWB's layered contract-factory pattern.
+        </div>
+        <div class="lit-item">
+          <div class="lit-source">Bindseil (2020, ECB)</div>
+          CBDC interest rates should be tiered — lower for deposits going up, higher for loans going down. Informs CWB's asymmetric rate structure and natural spread.
+        </div>
+        <div class="lit-item">
+          <div class="lit-source">Dong, Qiu &amp; Xu (2023)</div>
+          Blockchain cross-tier financing in supply chains — transparent ledger lets capital reach deep-tier participants that traditional delegate financing misses.
+        </div>
+        <div class="lit-gap">
+          ⚠ THE GAP: No prior work specifies DeFi lending with reserve-ratio enforcement at all four tiers simultaneously
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2.8 Group Lending -->
+  <section class="study-section" id="s28">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.8</span>
+      <div class="source">Grameen Bank → On-Chain Solidarity Groups</div>
+      <h3>Group Lending — From Microfinance to Blockchain</h3>
+      <p>Grameen Bank (Bangladesh), BRAC, and ASA pioneered solidarity lending: <strong>5–20 borrowers</strong> form a group, take loans collectively, and are <strong>mutually liable</strong>.</p>
+
+      <div class="group-visual" style="min-height:220px">
+        <div class="group-ring"></div>
+        <div class="group-member">A</div>
+        <div class="group-member">B</div>
+        <div class="group-member">C</div>
+        <div class="group-member">D</div>
+        <div class="group-member">E</div>
+      </div>
+
+      <div class="repay-stat">
+        <div class="big">95%+</div>
+        <div style="color:var(--muted);font-size:.85rem">Real-world repayment rate — driven by social pressure, weekly meetings, peer monitoring</div>
+      </div>
+
+      <div class="gap-box">
+        <strong>Honest limitation:</strong> On-chain version encodes mutual liability but <strong>cannot replicate social pressure</strong>. GroupLendingPool = programmable joint liability, not digitized Grameen.
+      </div>
+
+      <h4 style="margin:1.2rem 0 .5rem;font-size:.9rem;color:var(--accent-2)">NEW: IEEE Microloan Prototype [156]</h4>
+      <p style="font-size:.85rem">A 2025 IEEE platform uses Ethereum smart contracts + MetaMask + React.js for the full loan lifecycle (application → ranking → repayment → wallet). Structurally analogous to CWB's <code>GroupLendingPool</code> Local Bank interface — closest technical precedent to the CWB stack (not just MFI economics literature).</p>
+    </div>
+  </section>
+
+  <!-- §2.9 Regulation -->
+  <section class="study-section" id="s29">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.9</span>
+      <div class="source">MiCA (EU, Dec 2024) &amp; GENIUS Act (US, Jul 2025)</div>
+      <h3>Stablecoin Regulation</h3>
+      <p>Two laws published after most DeFi protocols were designed fundamentally change the landscape. The thesis reads these as <strong>validation</strong>, not obstacles.</p>
+
+      <div class="reg-grid">
+        <div class="reg-card mica">
+          <h4>🇪🇺 EU MiCA Regulation</h4>
+          <ul>
+            <li>Fiat-pegged tokens = "electronic-money tokens"</li>
+            <li>1:1 reserve backing required</li>
+            <li>Issuer authorization before public offering</li>
+            <li>Regular audits mandated</li>
+          </ul>
+        </div>
+        <div class="reg-card genius">
+          <h4>🇺🇸 US GENIUS Act</h4>
+          <ul>
+            <li>First federal payment-stablecoin framework</li>
+            <li>Similar reserve &amp; disclosure obligations</li>
+            <li>Signed July 2025</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-box defi">
+          <h4 style="color:var(--danger)">Borrowing in ETH</h4>
+          <p style="font-size:.85rem">Borrow 0.5 ETH at $2,000<br>→ ETH rallies 50%<br>→ Debt now worth $4,000</p>
+          <p style="font-size:.75rem;color:var(--danger)">Happened twice in 5 years</p>
+        </div>
+        <div class="compare-box" style="background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.3)">
+          <h4 style="color:var(--success)">Borrowing in USDC</h4>
+          <p style="font-size:.85rem">Borrow $1,000 USDC<br>→ Still $1,000 USDC<br>→ No volatility risk</p>
+          <p style="font-size:.75rem;color:var(--success)">MiCA/GENIUS-compliant &amp; regulator-friendly</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2.10 GNN + Fed Learning -->
+  <section class="study-section" id="s210">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.10</span>
+      <div class="source">GNN &amp; Federated Learning Extensions</div>
+      <h3>Advanced ML Modules (Future Extensions)</h3>
+
+      <div class="ml-ext-grid">
+        <div class="ml-ext">
+          <h4>Graph Neural Networks (GNNs)</h4>
+          <p style="font-size:.85rem">DeFi fraud often involves <strong>coordinated rings</strong> — groups of wallets acting together. Individual transaction features miss this.</p>
+          <div class="gnn-graph" id="gnn-graph"></div>
+          <p style="font-size:.78rem;color:var(--muted)">Cheng et al. (2024): &gt;70% detection at &lt;1% false-positive rate vs. flat ML baselines</p>
+        </div>
+        <div class="ml-ext">
+          <h4>Federated Learning (FedAvg)</h4>
+          <p style="font-size:.85rem">Banks cooperate on fraud detection but can't share raw data. Each Local Bank trains locally, shares only <strong>model weights</strong> upward.</p>
+          <div class="fed-visual">
+            <div class="fed-tier-row">
+              <div class="fed-bank">Local Bank A</div>
+              <div class="fed-bank">Local Bank B</div>
+              <div class="fed-bank">Local Bank C</div>
+            </div>
+            <div class="fed-weights">↑ weights only (no raw data) ↑</div>
+            <div class="fed-tier-row">
+              <div class="fed-bank" style="border-color:var(--accent)">National Bank — Aggregator</div>
+            </div>
+          </div>
+          <p style="font-size:.78rem;color:var(--muted)">PrivChain-AI (2025): 94.7% accuracy across multiple banks</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2.11 ZKP Identity -->
+  <section class="study-section" id="s211">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">§2.11 · NEW v32</span>
+      <div class="source">ACM Trans. Web 2026 [153, 154] · Piper TU Berlin [R8] · zkAML [R19]</div>
+      <h3>Zero-Knowledge Proofs for Compliance-Aware DeFi Identity</h3>
+      <p>Contribution 4 specifies a <strong>two-circuit</strong> architecture: prove you're eligible without revealing personal data on-chain.</p>
+
+      <div class="zkp-flow">
+        <div class="zkp-circuit">
+          <h4>Circuit 1: zkKYC</h4>
+          <p>Groth16 proof of age-range eligibility. Poseidon hash commitment. No PII on-chain.</p>
+        </div>
+        <div class="zkp-plus">+</div>
+        <div class="zkp-circuit">
+          <h4>Circuit 2: zkAML</h4>
+          <p>Proves wallet velocity &amp; sanctions compliance without revealing transaction graph [R19].</p>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-box" style="background:rgba(139,92,246,.06)">
+          <h4 style="color:var(--accent-3)">ACM Trans. Web [153]</h4>
+          <p style="font-size:.82rem;margin:0">ZKP + SSI + DID + smart contracts for interoperable payments. Validates W3C DID/VC + Groth16 design.</p>
+        </div>
+        <div class="compare-box" style="background:rgba(139,92,246,.06)">
+          <h4 style="color:var(--accent-3)">ACM Trans. Web [154]</h4>
+          <p style="font-size:.82rem;margin:0">Web3 KYC innovations survey — zkLogin, zkKYC as leading privacy primitives for FinTech.</p>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <strong>Empirical benchmarks:</strong> ZKP verification is faster and cheaper than plaintext on-chain KYC; ~70% fewer data fields exposed to verifiers — aligns with EU MiCA privacy-by-design [R36].
+      </div>
+
+      <details class="quiz-toggle">
+        <summary>🧠 Quick Check: Why two circuits instead of one?</summary>
+        <p>KYC proves <em>who you are</em> (age, eligibility) at onboarding. zkAML proves <em>how your wallet behaves</em> (velocity, sanctions) continuously. Different data, different circuits, same privacy guarantee.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ═══════════ SUMMARY ═══════════ -->
+  <section class="study-section" id="summary">
+    <div class="section-card">
+      <span class="section-tag tag-ch2">Summary</span>
+      <h3>How Key Sources Map to Design Decisions</h3>
+
+      <div class="summary-map" id="summary-map">
+        <div class="map-node" data-target="s21">Werner → Flat DeFi Gap</div>
+        <div class="map-node" data-target="s22">Palaiokrassas → Behavioral ML</div>
+        <div class="map-node" data-target="s22">SLR [155] → 1,585 studies</div>
+        <div class="map-node" data-target="s22">LookAhead [152] → F1 0.8966</div>
+        <div class="map-node" data-target="s23">Liu → Isolation Forest</div>
+        <div class="map-node" data-target="s24">Adom → SHAP Explainability</div>
+        <div class="map-node" data-target="s25">Tan/IMF → 4-Tier Hierarchy</div>
+        <div class="map-node" data-target="s26">Chaliasos [150] → 8% preventable</div>
+        <div class="map-node" data-target="s26">Chen [151] → Runtime CFI</div>
+        <div class="map-node" data-target="s27">Pine/Bindseil/Dong → Capital Flows</div>
+        <div class="map-node" data-target="s28">Grameen + IEEE [156] → Groups</div>
+        <div class="map-node" data-target="s29">MiCA/GENIUS → USDC Choice</div>
+        <div class="map-node" data-target="s211">ACM Web [153,154] → ZKP KYC</div>
+        <div class="map-node" data-target="ch1-oracle">Chainlink [157] → Oracle</div>
+        <div class="map-node" data-target="s210">Cheng/PrivChain → ML Extensions</div>
+      </div>
+
+      <h4 style="margin:1.5rem 0 .8rem;font-size:.9rem">Three new key findings (v32)</h4>
+      <ul style="font-size:.88rem;color:var(--muted);padding-left:1.2rem;margin-bottom:1.5rem">
+        <li style="margin-bottom:.5rem"><strong style="color:var(--text)">Security must be layered</strong> — no single tool prevents enough attacks; Slither + Mythril + Tenderly + Certora is the evidence-backed minimum.</li>
+        <li style="margin-bottom:.5rem"><strong style="color:var(--text)">ZKP KYC is academically mature</strong> — 2026 ACM papers validate the two-circuit Contribution 4 design.</li>
+        <li style="margin-bottom:.5rem"><strong style="color:var(--text)">Fraud literature is now systematically surveyed</strong> — evaluate CWB ML against 1,585-study synthesis, not individual papers alone.</li>
+      </ul>
+
+      <div class="bottom-line">
+        <blockquote>
+          "DeFi and institutional finance have developed in parallel for years without ever converging on a governance-aware, multi-tier design."
+        </blockquote>
+        <div class="tags">
+          <span class="tag">Testnet prototype only</span>
+          <span class="tag">Claims are qualified</span>
+          <span class="tag">$25K loan → &lt;$0.15 gas on Polygon L2</span>
+          <span class="tag">139 sources · 157 bibliography entries</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<button id="scroll-top" title="Back to top">↑</button>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Scroll progress bar ──
+  const progressBar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (scrollTop / docHeight * 100) + '%';
+  });
+
+  // ── Intersection Observer for section animations ──
+  const sections = document.querySelectorAll('.study-section, .chapter-divider');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  // ── Active nav link ──
+  const navLinks = document.querySelectorAll('#main-nav a');
+  const navSections = [];
+  navLinks.forEach(link => {
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) navSections.push({ id, el, link });
+  });
+  window.addEventListener('scroll', () => {
+    let current = navSections[0]?.id;
+    navSections.forEach(({ id, el }) => {
+      if (el.getBoundingClientRect().top <= 120) current = id;
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  });
+
+  // ── Scroll to top ──
+  const scrollTopBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('show', window.scrollY > 400);
+  });
+  scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // ── Summary map click navigation ──
+  document.querySelectorAll('.map-node').forEach(node => {
+    node.addEventListener('click', () => {
+      const target = document.getElementById(node.dataset.target);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // ── Isolation Forest interactive demo ──
+  const isoCanvas = document.getElementById('iso-canvas');
+  const isoSplitBtn = document.getElementById('iso-split-btn');
+  const isoResetBtn = document.getElementById('iso-reset-btn');
+  let isoDots = [];
+  let isoLines = [];
+
+  function createIsoDots() {
+    isoCanvas.innerHTML = '';
+    isoDots = [];
+    isoLines = [];
+    const w = isoCanvas.offsetWidth;
+    const h = isoCanvas.offsetHeight;
+
+    // Cluster of normal dots
+    for (let i = 0; i < 35; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'iso-dot';
+      const cx = w * 0.55 + (Math.random() - 0.5) * w * 0.35;
+      const cy = h * 0.5 + (Math.random() - 0.5) * h * 0.5;
+      dot.style.left = cx + 'px';
+      dot.style.top = cy + 'px';
+      isoCanvas.appendChild(dot);
+      isoDots.push({ el: dot, x: cx, y: cy, anomaly: false, splits: 0 });
+    }
+
+    // Anomaly dot — far from cluster
+    const anomaly = document.createElement('div');
+    anomaly.className = 'iso-dot anomaly';
+    const ax = w * 0.12 + Math.random() * w * 0.1;
+    const ay = h * 0.15 + Math.random() * h * 0.15;
+    anomaly.style.left = ax + 'px';
+    anomaly.style.top = ay + 'px';
+    isoCanvas.appendChild(anomaly);
+    isoDots.push({ el: anomaly, x: ax, y: ay, anomaly: true, splits: 0 });
+  }
+
+  function drawIsoSplit() {
+    const w = isoCanvas.offsetWidth;
+    const h = isoCanvas.offsetHeight;
+    const isHorizontal = Math.random() > 0.5;
+    const pos = isHorizontal ? Math.random() * h : Math.random() * w;
+
+    const line = document.createElement('div');
+    line.className = 'iso-line';
+    if (isHorizontal) {
+      line.style.cssText = `left:0;top:${pos}px;width:100%;height:2px;animation-delay:${isoLines.length * 0.15}s`;
+    } else {
+      line.style.cssText = `left:${pos}px;top:0;width:2px;height:100%;animation-delay:${isoLines.length * 0.15}s`;
+    }
+    isoCanvas.appendChild(line);
+    isoLines.push({ isHorizontal, pos });
+
+    isoDots.forEach(dot => {
+      const isolated = isHorizontal
+        ? (dot.anomaly ? dot.y < pos : false)
+        : (dot.anomaly ? dot.x < pos : false);
+      if (isolated || (dot.anomaly && isoLines.length <= 2)) {
+        dot.splits++;
+        if (dot.anomaly && dot.splits >= 1) {
+          dot.el.style.boxShadow = '0 0 20px rgba(239,68,68,.8)';
+          dot.el.style.transform = 'scale(1.5)';
+        }
+      }
+    });
+  }
+
+  isoSplitBtn.addEventListener('click', drawIsoSplit);
+  isoResetBtn.addEventListener('click', createIsoDots);
+  createIsoDots();
+
+  // ── Reentrancy attack simulation ──
+  const contractA = document.getElementById('contract-a');
+  const contractB = document.getElementById('contract-b');
+  const balanceDisplay = document.getElementById('balance-display');
+  const arrow1 = document.getElementById('reentry-arrow-1');
+  const arrow2 = document.getElementById('reentry-arrow-2');
+  const reentryBtn = document.getElementById('reentry-btn');
+  const reentrySafeBtn = document.getElementById('reentry-safe-btn');
+  let balance = 100;
+  let attacking = false;
+
+  reentryBtn.addEventListener('click', async () => {
+    if (attacking) return;
+    attacking = true;
+    contractA.classList.remove('safe');
+    contractB.classList.remove('safe');
+    balance = 100;
+    balanceDisplay.textContent = balance;
+
+    for (let i = 0; i < 5; i++) {
+      contractA.classList.add('active');
+      arrow1.classList.add('show');
+      await sleep(600);
+      contractB.classList.add('active');
+      arrow2.classList.add('show');
+      await sleep(400);
+      balance = Math.max(0, balance - 25);
+      balanceDisplay.textContent = balance;
+      await sleep(500);
+      arrow1.classList.remove('show');
+      arrow2.classList.remove('show');
+      contractB.classList.remove('active');
+      await sleep(300);
+      contractA.classList.remove('active');
+      await sleep(200);
+    }
+    attacking = false;
+  });
+
+  reentrySafeBtn.addEventListener('click', () => {
+    contractA.classList.remove('active');
+    contractB.classList.remove('active');
+    arrow1.classList.remove('show');
+    arrow2.classList.remove('show');
+    contractA.classList.add('safe');
+    contractB.classList.add('safe');
+    balance = 100;
+    balanceDisplay.textContent = balance;
+    attacking = false;
+  });
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // ── GNN graph visualization ──
+  const gnnGraph = document.getElementById('gnn-graph');
+  function buildGnnGraph() {
+    gnnGraph.innerHTML = '';
+    const w = gnnGraph.offsetWidth;
+    const h = gnnGraph.offsetHeight;
+
+    const nodes = [
+      { x: 0.2, y: 0.3, ring: true }, { x: 0.35, y: 0.2, ring: true },
+      { x: 0.5, y: 0.35, ring: true }, { x: 0.3, y: 0.55, ring: true },
+      { x: 0.45, y: 0.55, ring: true },
+      { x: 0.75, y: 0.25, ring: false }, { x: 0.85, y: 0.5, ring: false },
+      { x: 0.7, y: 0.7, ring: false }, { x: 0.15, y: 0.75, ring: false },
+    ];
+
+    const edges = [
+      [0,1],[1,2],[0,3],[3,4],[1,4],[2,4],
+      [5,6],[6,7],[5,7],
+    ];
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+
+    edges.forEach(([a, b]) => {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      const isRing = nodes[a].ring && nodes[b].ring;
+      line.setAttribute('x1', nodes[a].x * w);
+      line.setAttribute('y1', nodes[a].y * h);
+      line.setAttribute('x2', nodes[b].x * w);
+      line.setAttribute('y2', nodes[b].y * h);
+      line.setAttribute('stroke', isRing ? 'rgba(239,68,68,.5)' : 'rgba(139,92,246,.3)');
+      line.setAttribute('stroke-width', isRing ? '2' : '1');
+      svg.appendChild(line);
+    });
+    gnnGraph.appendChild(svg);
+
+    nodes.forEach((n, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'gnn-node' + (n.ring ? ' ring' : '');
+      dot.style.left = (n.x * w - 6) + 'px';
+      dot.style.top = (n.y * h - 6) + 'px';
+      gnnGraph.appendChild(dot);
+    });
+  }
+  buildGnnGraph();
+  window.addEventListener('resize', buildGnnGraph);
+
+  // ── Stagger summary map nodes on visible ──
+  const summarySection = document.getElementById('summary');
+  const mapObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      document.querySelectorAll('.map-node').forEach((node, i) => {
+        node.style.transitionDelay = (i * 0.08) + 's';
+      });
+    }
+  }, { threshold: 0.3 });
+  mapObserver.observe(summarySection);
+
+  // ── Security layers click-to-highlight ──
+  document.querySelectorAll('.sec-layer').forEach(layer => {
+    layer.style.cursor = 'pointer';
+    layer.addEventListener('click', () => {
+      document.querySelectorAll('.sec-layer').forEach(l => l.classList.remove('active-layer'));
+      layer.classList.add('active-layer');
+    });
+  });
+
+  // ── Auto-cycle security layers when section visible ──
+  const secSection = document.getElementById('s26');
+  let layerInterval;
+  const layerObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      const layers = document.querySelectorAll('.sec-layer');
+      let i = 0;
+      clearInterval(layerInterval);
+      layerInterval = setInterval(() => {
+        layers.forEach(l => l.classList.remove('active-layer'));
+        layers[i % layers.length].classList.add('active-layer');
+        i++;
+      }, 1800);
+    } else {
+      clearInterval(layerInterval);
+    }
+  }, { threshold: 0.3 });
+  if (secSection) layerObserver.observe(secSection);
+
+})();
+</script>
+</body>
+</html>

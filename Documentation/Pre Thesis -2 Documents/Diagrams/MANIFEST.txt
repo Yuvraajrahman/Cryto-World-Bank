@@ -1,0 +1,14 @@
+Figure bundle for Pre-thesis v30 (Diagrams/)
+==========================================
+Sources: .svg (Ch* hand diagrams) and .mmd (fig-* mermaid, in Old Diagrams tree).
+LaTeX includes generated .pdf.
+
+Rebuild all PDFs:
+  ./Diagrams/build-pdfs.sh
+
+Or manually:
+  mmdc -i fig-foo.mmd -o Diagrams/fig-foo.pdf -b white --pdfFit   # mermaid
+  rsvg-convert -w 1200 -f pdf -o Diagrams/Ch1_foo.pdf Diagrams/Ch1_foo.svg
+
+Compile (from this directory):
+  pdflatex Pre-thesis_v30_final.tex && pdflatex Pre-thesis_v30_final.tex

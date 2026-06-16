@@ -588,11 +588,43 @@ The objectives of this project are:
 \item Document governance for future improvements, security analysis and feature improvements, role-based regulatory considerations, and a controlled rollout toward sandbox piloting.
 \end{enumerate}
 
+\section{Research Questions}
+\label{sec:research-questions}
+
+The research questions used in this study are as follows:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{RQ1:} Does this hierarchical blockchain-based lending architecture provide a more faithful and transparent capital allocation and transactions system than the existing centralized lending systems?
+\item \textbf{RQ2:} Can a lightweight off-chain analytical ML layer provide usable and auditable information to support critical decision-making activities to provide a better lending system?
+\item \textbf{RQ3:} Is the proposed architecture deployable in the existing testnets in public testnets while maintaining proper functionalities such as role-based access control, capital flow and reserve maintenance, for practical institutional banking use case?
+\item \textbf{RQ4:} Is it possible to create a system of auditable mechanisms into a deposit-funded lending and solidarity group lending system that is programmable, while preserving practical usability and adaptability for retail users?
+\end{enumerate}
+
+\section{Research Contribution}
+\label{sec:research-contribution}
+
+This work makes three research contributions:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Contribution 1 --- Four-Tier Hierarchical DeFi Architecture.}
+In our search, there are not prior published contribution that addressed tier-based, or more specifically four-tier-based hierarchy with reserve ratio controls at every tier, oracle-mediated ML-based explainable credit governance, mutual liability group lending system in a single architecture. Partial implementations are noticed in Maple Finance, Goldfinch, Morpho~V2, Aave Arc. However none of the models provide restricted programmable reserve ratio for each tier. We are extending the flat DeFi lending protocols which are widely-used in these major platforms, and proposing to improve the modular institutional credit~[43], addressing the gaps identified in the paper work of Werner et al.~[1] and Aspris and Svec (2025)~[118], who specified risk curation and modular curator layer for flat pool-based lending systems. The system also incorporates full cross-tier fund and lending transfer automation and testnet deployment.
+
+\item \textbf{Contribution 2 --- On-Chain Solidarity Group Lending.}
+Based on our search, there is not prior published mutual-liability group lending mechanism in solidarity/EVM that encodes group formation consent, installment distribution applied in smart contract logic. Similar approach can be noticed in Goldfinch's Backers/Senior Pool model which provides partial structures but does not implement per-member liability system. Our group lending function that is described in \texttt{GroupLendingPool}, implements a cryptographic enforcement to create a programmable joint liability system which is a closer design to BRAC/Grameen solidarity group lending system.
+
+\item \textbf{Contribution 3 --- Oracle-Mediated AI/ML Integration with Explainability.}
+We are integrating Random Forest for fraud detection, Isolation Forest for anomaly detection and SHAP for explainability. A combination of ML layers has been designed into the system architecture of the project to provide better security, and lending decision-making assistance. The ML layers are mostly off-chain. The design addresses the oracle problems of securely bridging on-chain and off-chain data.
+\end{enumerate}
+
 \section{Proposed Solution}
 \label{sec:proposed-solution}
 
-The Crypto World Bank will implement a four-tier on-chain lending model: Tier~1 World Bank reserve custodian $\to$ Tier~2 National Banks $\to$ Tier~3 Local Banks processing retail loans $\to$ Tier~4 clients building on-chain credit history (Figure~\ref{fig:intro-system-overview}), with six standard banking functions enforced on-chain---deposit mobilization, credit allocation, payment and settlement, risk intermediation, liquidity management, and ancillary services---rather than discretionary audit alone (Figure~\ref{fig:banking-functions}).
+The Crypto World Bank will implement a four-tier on-chain lending model: Tier~1 World Bank reserve custodian $\to$ Tier~2 National Banks $\to$ Tier~3 Local Banks processing retail loans $\to$ Tier~4 clients building on-chain credit history (Figure~\ref{fig:intro-system-overview}).
+
+\subsection{Banking Functions of the Platform}
 \label{sec:banking-functions}
+
+This platform is focused on six standard banking functions across four tiers (Figure~\ref{fig:banking-functions}).
 
 \begin{figure}[H]
 \centering
@@ -600,6 +632,15 @@ The Crypto World Bank will implement a four-tier on-chain lending model: Tier~1 
 \caption[Six banking functions of the platform]{Six banking functions enforced across the four-tier core}
 \label{fig:banking-functions}
 \end{figure}
+
+\begin{itemize}[noitemsep]
+\item \textbf{Deposit mobilization} --- \texttt{SavingsVault} records and reserve ratios.
+\item \textbf{Credit allocation} --- \texttt{allocateCapital} and \texttt{SyndicatedLoan} for multi-bank co-funding.
+\item \textbf{Payment \& settlement} --- atomic transfers; no nostro/vostro in-transit state.
+\item \textbf{Risk intermediation} --- reserve buffers, approver decision making, \texttt{LiquidationEngine}, oracle.
+\item \textbf{Liquidity management} --- \texttt{InterBankLendingPool} (same-tier), \texttt{UpwardDepositFacility} (surplus repatriation).
+\item \textbf{Ancillary services} --- FX oracles, \texttt{GroupLendingPool}, syndicated/tranched products, W3C DID/VC identity.
+\end{itemize}
 
 Banks also borrow from peers, park surplus with parent tiers, and syndicate large loans; the platform replicates four-tier downward flow, same-tier pools, upward deposits, and multi-bank co-funding on-chain (Figure~\ref{fig:cross-tier-lending}).
 \label{sec:cross-tier-lending}
@@ -844,6 +885,8 @@ Four points stand out after reviewing and Table~\ref{tab:protocol-comparison}:
 
 \section{Prototype Scope and Stack}
 \label{sec:prototype-scope}
+
+This chapter is specified in detail in two different sections. The architecture elements that are in the planned section are to be implemented by the final version of the project; the future work sections are not scheduled to deliver within the time limits for the planned build, but are specified in the paper to demonstrate the future scope and capabilities of the project. Table~\ref{tab:prototype-scope} shows an overall summary of what will be implemented and what can be achieved in the scheduled time period of four phases.
 
 \begin{table}[H]
 \centering

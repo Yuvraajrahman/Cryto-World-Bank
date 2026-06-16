@@ -1,0 +1,55 @@
+# CWB ML training pipeline — edit .env for dataset URL after BCCC approval
+
+dataset:
+  name: BCCC-DeFiFraudTrans-2025
+  # York BCCC requires form approval — paste direct link in .env as DATASET_URL
+  request_page: https://www.yorku.ca/research/bccc/ucs-technical/cybersecurity-datasets-cds/dataset-request/
+  local_paths:
+    - data/bccc.csv
+    - data/BCCC-DeFiFraudTrans-2025.csv
+    - data/bccc_defi_fraud.csv
+  download_target: data/bccc.csv
+  min_rows: 1000
+  label_column: null  # auto-detect if null
+  allow_synthetic_fallback: true  # pipeline test when BCCC not yet on disk
+
+training:
+  sample_size: 50000
+  seed: 42
+  test_size_holdout: 0.15
+  val_size_of_temp: 0.5
+  rf_trees: 100          # "epochs" for Random Forest = number of trees
+  rf_max_depth: 12
+  rf_chunks: 5           # checkpoint every N chunks (loadshedding-safe)
+  if_estimators: 100
+  shap_samples: 300
+  shap_examples_export: 5
+  resume: true
+
+environment:
+  min_python: "3.10"
+  min_free_disk_gb: 2
+  venv_dir: .venv
+  # Ubuntu i5-10400: sklearn uses all cores by default (n_jobs=-1 in train.py)
+
+ubuntu:
+  recommended_python: "3.12"
+  apt_packages:
+    - python3.12
+    - python3.12-venv
+    - python3-pip
+    - build-essential
+    - curl
+    - wget
+    - unzip
+    - tmux
+
+outputs:
+  artifacts_dir: artifacts
+  results_mmd_dir: results/mmd
+  results_svg_dir: results/svg
+  evidence_copy: true  # copy metrics.json to ../evidence/
+
+agent:
+  repo_backend_chatbot: ../../../../backend/src/routes/chatbot.ts
+  log_path: agent/agent_action_log.jsonl

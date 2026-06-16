@@ -1,0 +1,46 @@
+# CWB ML pipeline — Ubuntu (i5-10400, 32 GB RAM, loadshedding)
+
+device:
+  name: Ubuntu Linux
+  profile: ubuntu-i5-10400-32gb
+  notes: Primary training machine; use tmux + checkpoint resume after power cuts
+
+dataset:
+  name: BCCC-DeFiFraudTrans-2025
+  request_page: https://www.yorku.ca/research/bccc/ucs-technical/cybersecurity-datasets-cds/dataset-request/
+  local_paths:
+    - data/bccc.csv
+    - data/BCCC-DeFiFraudTrans-2025.csv
+    - data/bccc_defi_fraud.csv
+  download_target: data/bccc.csv
+  min_rows: 1000
+  label_column: null
+  allow_synthetic_fallback: true
+
+training:
+  sample_size: 50000
+  seed: 42
+  rf_trees: 100
+  rf_max_depth: 12
+  rf_chunks: 5
+  if_estimators: 100
+  shap_samples: 300
+  shap_examples_export: 5
+  resume: true
+  n_jobs: -1
+
+environment:
+  min_python: "3.10"
+  min_free_disk_gb: 2
+  venv_dir: .venv
+
+outputs:
+  artifacts_dir: artifacts
+  results_mmd_dir: results/mmd
+  results_svg_dir: results/svg
+  evidence_copy: true
+  evidence_subdir: ubuntu
+
+agent:
+  repo_backend_chatbot: ../../../../backend/src/routes/chatbot.ts
+  log_path: agent/agent_action_log.jsonl

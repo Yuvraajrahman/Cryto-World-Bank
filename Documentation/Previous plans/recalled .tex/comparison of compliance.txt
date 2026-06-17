@@ -1,0 +1,74 @@
+Compliance checkboxes (Thesis ID [P26101123] Pre - Thesis 1)
+Legend: ✓ Compliant  ~ Partial  ✗ Missing
+
+## Abstract
+- ✓ Abstract present and structured
+- ~ Nature-style “headline results” (expected later)
+
+## Background & Motivation
+- ✓ Rationale + sufficient context/background
+- ✓ Relevance to field discussed
+- ✓ Situated in current literature
+- ✓ Literature review summary table included
+
+## Aim & Research Question
+- ✓ Aim/objectives clearly communicated
+- ~ Research question(s) explicitly stated
+- ~ RQs linked to real-world needs (explicitly)
+- ~ RQs aligned to background/motivation (explicitly)
+
+## Data / Dev evidence (EDA / datasets / validation)
+- ✗ Dataset analysis (intra/inter) + generalizability via external dataset
+- ✗ EDA before/during/after cleaning + drift measures (PSI/JSD) + viz
+- ✗ Separate “not-trained-on” dataset evaluation
+- ~ Dev-related: simulation/data generation + visualizations (planned)
+
+## Methodology
+- ✓ Linked to theory/frameworks/algorithms
+- ~ Methods fully detailed for data collection/analysis (beyond plan)
+- ~ Alignment between RQs–methods–practicality (needs explicit RQs)
+- ✓ Ethical considerations addressed
+- ✗ FAIR + CARE principles
+- ~ Process flowcharts complete (no dead-ends) (not fully audited)
+- ✗ k-fold cross-validation
+- ~ Multiple models / sweeps / ensembles (planned)
+- ~ Multi-modal / hybrid solutions (mentioned/planned)
+
+## Findings / Results
+- ~ Findings/results reported (spec stage)
+- ~ Impacts/implications/use cases highlighted
+- ~ Visualizations for findings (mostly planned)
+
+## Result validation & explainability
+- ~ Performance metrics (planned)
+- ~ Interpretability / explainability (SHAP planned)
+- ~ Multiple XAI methods (not yet)
+
+## Conclusion
+- ~ Conclusions supported by results (spec stage)
+
+## Future work
+- ~ Practical implications/recommendations for practitioners
+
+## References
+- ✓ References relevant and up-to-date
+- ✓ Mix of recent + classic coverage
+- ~ References consistently discussed/linked in lit review
+- ~ Single reference style enforced (APA7/ACM/IEEE etc.)
+
+## Presentation
+- ~ Title appropriate (not checked here)
+- ~ Abstract concise without losing rigor
+- ✓ Intro storytelling + visuals
+- ~ Academic language/editing (needs polish)
+- ~ All figures/tables referenced in text (needs sweep)
+- ~ Thousand separators + right-aligned table numbers (inconsistent)
+- ~ Full form before abbreviations (needs sweep)
+- ✗ ORCID for all authors
+- ✗ Author order policy followed (not checked here)
+- ✓ Figures/diagrams are vector formats (PDF/SVG sources)
+
+## Plagiarism / similarity / AI-writing policy (process)
+- ✗ Similarity <4% verified
+- ✗ Grammar/spell check done (Turnitin etc.)
+- ✗ Generative-AI policy compliance verified/documented

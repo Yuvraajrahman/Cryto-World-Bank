@@ -33,7 +33,8 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2"
+    "@openzeppelin/contracts": "^5.0.2",
+    "exceljs": "^4.4.0"
   },
   "main": "index.js",
   "directories": {

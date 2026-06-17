@@ -1,0 +1,24 @@
+flowchart LR
+  DEP["Depositors"]
+  SV["SavingsVault (ERC-4626)<br/>variable yield"]
+  FD["FixedDeposit (ERC-7540)<br/>term-locked APY"]
+  LEND["Lending pool<br/>(loans to clients)"]
+  SPLIT{"Net interest split"}
+  IF["InsuranceFund"]
+  REV["Protocol revenue"]
+
+  DEP -->|"deposit USDC"| SV
+  DEP -->|"deposit USDC"| FD
+  SV --> LEND
+  FD --> LEND
+  LEND --> SPLIT
+  SPLIT -->|"depositor yield"| DEP
+  SPLIT --> IF
+  SPLIT --> REV
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class DEP apex;
+  class SV,FD,LEND,IF,REV mid;
+  class SPLIT dec;

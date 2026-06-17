@@ -1,0 +1,20 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '13px'}}}%%
+sequenceDiagram
+    autonumber
+    participant Client
+    participant Express as Express.js API
+    participant ML as FastAPI /v1/score
+    participant DB as PostgreSQL
+    participant LC as LoanController
+
+    Client->>Express: Submit loan application
+    Express->>ML: POST 22-D feature vector
+    ML->>ML: RF + IF + stacking to score s
+    ML->>DB: Insert LOAN_RISK_ASSESSMENT
+    ML-->>Express: s, SHAP top-3, anomaly report
+    Express->>LC: commitRiskScore(keccak256(s || nonce))
+    Note over LC: State SCORE_COMMITTED
+    Express->>LC: revealRiskScore(s, nonce)
+    Note over LC: State SCORE_REVEALED
+    LC-->>Express: approveLoan allowed only in SCORE_REVEALED
+    Express-->>Client: Await bank approver signature

@@ -1,0 +1,12 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '12px'}}}%%
+flowchart TB
+    subgraph rq2 ["RQ2 measurement plan (Phase IV)"]
+        direction TB
+        T1["Loan request tx<br/>target latency TBD"]
+        T2["ML /score inference<br/>under 50 ms laptop"]
+        T3["commitRiskScore tx<br/>gas + block time"]
+        T4["approveLoan + disburse<br/>gas + block time"]
+        T5["Installment repay tx<br/>gas + block time"]
+    end
+    T1 --> T2 --> T3 --> T4 --> T5
+    OUT["Export: latency ms + gas wei table<br/>Amoy or Sepolia testnet"]

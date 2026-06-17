@@ -1,0 +1,8 @@
+{
+  "path": "/Users/yuvraj/development/Cryto-World-Bank/Documentation/Pre Thesis -2 Documents/v33 development/ML pipeline - Mac M4/data/synthetic_bccc.csv",
+  "columns": 80,
+  "numeric_columns": 80,
+  "sample_rows_read": 5000,
+  "file_size_mb": 88.85,
+  "total_rows": 60000
+}

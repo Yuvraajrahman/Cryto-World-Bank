@@ -1,0 +1,19 @@
+flowchart TB
+  S1["1. On-chain context injection<br/>(balances, loan status, passport)"]
+  S2{"2. Read or write<br/>tool?"}
+  RD["Read tool &rarr; query API / DB &rarr; answer"]
+  S3["3. Human confirmation gate<br/>(present full parameters, await consent)"]
+  S4["4. MCP write-tool execution<br/>via EIP-7702 session key"]
+  S5["5. On-chain transaction"]
+  S6["6. Append-only AGENT_ACTION_LOG<br/>(tool, params, tx hash)"]
+
+  S1 --> S2
+  S2 -- read --> RD
+  S2 -- write --> S3 --> S4 --> S5 --> S6
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class S3 apex;
+  class S1,RD,S4,S5,S6 mid;
+  class S2 dec;

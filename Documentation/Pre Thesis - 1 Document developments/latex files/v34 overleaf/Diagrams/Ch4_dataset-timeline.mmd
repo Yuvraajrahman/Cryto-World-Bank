@@ -1,0 +1,14 @@
+flowchart LR
+  S1["Now (pre-thesis)<br/>synthetic_bccc.csv<br/>60k rows, 79 features<br/>pipeline validated (synthetic: true)"]
+  S2["BCCC-DeFiFraudTrans-2025<br/>request submitted to York BCCC<br/>(pending verification)"]
+  S3["On approval<br/>rerun pipeline --reset on real CSV<br/>(1,026,867 rows)"]
+  S4["Update Figure ml-eval + MVT item 8<br/>(no architectural change)"]
+
+  S1 --> S2 --> S3 --> S4
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef note fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class S1 apex;
+  class S2,S3 mid;
+  class S4 note;

@@ -1,0 +1,21 @@
+erDiagram
+  INSTITUTION ||--o| LOCAL_BANK : "ISA"
+  LOCAL_BANK ||--o{ BORROWER : "registers"
+  LOCAL_BANK ||--o{ SAVINGS_ACCOUNT : "holds"
+  LOCAL_BANK ||--|| INSURANCE_FUND : "funds"
+  LOCAL_BANK ||--o{ LOAN_GROUP : "operates"
+  LOAN_GROUP ||--o{ GROUP_MEMBER : "includes"
+  BORROWER ||--o{ GROUP_MEMBER : "joins"
+  BORROWER ||--o{ SAVINGS_ACCOUNT : "owns"
+  BORROWER ||--o{ FIXED_DEPOSIT : "owns"
+  BORROWER ||--o{ CURRENT_ACCOUNT : "owns"
+
+  INSTITUTION { bigint institution_id PK }
+  LOCAL_BANK { bigint institution_id PK }
+  BORROWER { bigint borrower_id PK }
+  SAVINGS_ACCOUNT { bigint account_id PK }
+  FIXED_DEPOSIT { bigint deposit_id PK }
+  CURRENT_ACCOUNT { bigint ca_id PK }
+  LOAN_GROUP { bigint group_id PK }
+  GROUP_MEMBER { bigint member_id PK }
+  INSURANCE_FUND { bigint fund_id PK }

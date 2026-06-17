@@ -1,0 +1,23 @@
+erDiagram
+  INSTITUTION ||--o{ INTERBANK_LOAN : "lends"
+  INSTITUTION ||--o{ UPWARD_DEPOSIT : "deposits"
+  INSTITUTION ||--o{ SYNDICATE : "leads"
+  SYNDICATE ||--o{ SYNDICATE_MEMBER : "has"
+  BORROWER ||--o{ SYNDICATE : "borrows via"
+  INSTITUTION ||--o{ TRANCHED_POOL : "sponsors"
+  TRANCHED_POOL ||--o{ TRANCHED_POOL_SUBSCRIPTION : "subscribed"
+  INSTITUTION ||--o{ TREASURY_SWAP : "initiates"
+  INSTITUTION ||--o{ NETTING_BATCH : "submits"
+  NETTING_BATCH ||--o{ NETTING_ENTRY : "settles"
+
+  INSTITUTION { bigint institution_id PK }
+  BORROWER { bigint borrower_id PK }
+  INTERBANK_LOAN { bigint ib_loan_id PK }
+  UPWARD_DEPOSIT { bigint ud_id PK }
+  SYNDICATE { bigint syndicate_id PK }
+  SYNDICATE_MEMBER { bigint member_institution_id PK }
+  TRANCHED_POOL { bigint pool_id PK }
+  TRANCHED_POOL_SUBSCRIPTION { bigint subscription_id PK }
+  TREASURY_SWAP { bigint swap_id PK }
+  NETTING_BATCH { bigint batch_id PK }
+  NETTING_ENTRY { bigint entry_id PK }

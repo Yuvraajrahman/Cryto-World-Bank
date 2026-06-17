@@ -1,0 +1,13 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px'}, 'flowchart': {'htmlLabels': false}}}%%
+flowchart LR
+    A["synthetic_bccc.csv\n60k rows, 79 features"] --> B["ML pipeline Mac M4\n./run.sh"]
+    B --> C["metrics.json\nsynthetic: true"]
+    B --> D["rf_model.pkl\nif_model.pkl"]
+    B --> E["shap_examples.json"]
+    C --> F["Diagrams\nfig-ml-metrics-bars"]
+    C --> G["Diagrams\nfig-ml-confusion-matrix"]
+    E --> H["Diagrams\nfig-ml-shap-importance"]
+    F --> I["Figure ml-eval\nPre-thesis_v33.tex"]
+    G --> I
+    H --> I
+    J["BCCC request\nsubmitted"] -.->|retrain on access| B

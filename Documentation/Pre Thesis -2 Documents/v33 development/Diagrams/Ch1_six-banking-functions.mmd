@@ -1,0 +1,40 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '22px', 'fontFamily': 'Inter, Helvetica Neue, Helvetica, Arial, sans-serif'}, 'flowchart': {'htmlLabels': true, 'curve': 'basis', 'padding': 20}}}%%
+flowchart LR
+    classDef tier1 fill:#000000,stroke:#000000,color:#ffffff
+    classDef tier2 fill:#2a2a2a,stroke:#2a2a2a,color:#ffffff
+    classDef tier3 fill:#666666,stroke:#666666,color:#ffffff
+    classDef tier4 fill:#f0f0f0,stroke:#000000,color:#111111
+    classDef fn fill:#f0f0f0,stroke:#000000,color:#111111
+    classDef banner fill:#e8e8e8,stroke:#000000,color:#111111
+
+    subgraph CORE["Four-tier on-chain banking core"]
+        direction TB
+        T1["<b>Tier 1 · World Bank Reserve</b><br/>Capital issuer · proof of reserve"]:::tier1
+        T2["<b>Tier 2 · National Banks</b><br/>Reserve ratio enforced"]:::tier2
+        T3["<b>Tier 3 · Local Banks</b><br/>Retail lending authority"]:::tier3
+        T4["<b>Tier 4 · Clients</b><br/>Individual · group · SME borrowers"]:::tier4
+        T1 ==> T2 ==> T3 ==> T4
+    end
+
+    subgraph FUNCS["Six banking functions enforced on-chain"]
+        direction TB
+        BANNER["Contract mappings below"]:::banner
+
+        subgraph ROW1[" "]
+            direction LR
+            F1["<b>1 · Deposit mobilization</b><br/>SavingsVault"]:::fn
+            F2["<b>2 · Credit allocation</b><br/>allocateCapital · SyndicatedLoan"]:::fn
+            F3["<b>3 · Payment &amp; settlement</b><br/>atomic USDC transfers"]:::fn
+        end
+
+        subgraph ROW2[" "]
+            direction LR
+            F4["<b>4 · Risk intermediation</b><br/>reserves · approvers · LiquidationEngine · oracle ML"]:::fn
+            F5["<b>5 · Liquidity management</b><br/>InterBankLendingPool · UpwardDepositFacility"]:::fn
+            F6["<b>6 · Ancillary services</b><br/>FX oracles · GroupLendingPool · W3C DID/VC"]:::fn
+        end
+
+        BANNER --> ROW1 --> ROW2
+    end
+
+    CORE --- FUNCS

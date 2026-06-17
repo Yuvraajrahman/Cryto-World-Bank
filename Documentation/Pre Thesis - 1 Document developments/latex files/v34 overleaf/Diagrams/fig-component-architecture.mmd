@@ -1,0 +1,43 @@
+flowchart TB
+  subgraph CLIENT["Client"]
+    direction LR
+    UI["React SPA<br/>&laquo;component&raquo;"]
+    WAL["Wallet (MetaMask)<br/>&laquo;external&raquo;"]
+  end
+  subgraph BACKEND["Off-Chain Backend"]
+    direction LR
+    API["Express REST API<br/>&laquo;component&raquo;"]
+    AUTH["Auth / RBAC<br/>&laquo;component&raquo;"]
+    MLS["ML scoring service<br/>&laquo;component&raquo;"]
+    LST["Event listener<br/>&laquo;component&raquo;"]
+    DB[("PostgreSQL<br/>&laquo;database&raquo;")]
+    CACHE[("Redis<br/>&laquo;cache&raquo;")]
+  end
+  subgraph CHAIN["Blockchain (EVM testnet)"]
+    SCS["Smart contracts<br/>four-tier hierarchy"]
+  end
+  subgraph EXT["External Services"]
+    direction LR
+    DON["Chainlink DON<br/>&laquo;external&raquo;"]
+    CG["CoinGecko API<br/>&laquo;external&raquo;"]
+  end
+
+  UI --> API
+  WAL --> SCS
+  API --> AUTH
+  API --> DB
+  API --> CACHE
+  API --> MLS
+  API --> SCS
+  LST --> SCS
+  LST --> DB
+  MLS --> DON
+  DON --> SCS
+  CG --> API
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef neutral fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class SCS apex;
+  class API,AUTH,MLS,LST,DB,CACHE mid;
+  class UI,WAL,DON,CG neutral;

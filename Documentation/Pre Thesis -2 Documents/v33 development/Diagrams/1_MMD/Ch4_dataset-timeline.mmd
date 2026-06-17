@@ -1,0 +1,6 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px'}, 'flowchart': {'htmlLabels': false}}}%%
+flowchart LR
+    A["Phase A\nSynthetic stand-in\npipeline validation"] --> B["Phase B\nYork BCCC request\nsubmitted"]
+    B --> C["Phase C\nDownload approved CSV"]
+    C --> D["Phase D\nRetrain pipeline\n--reset"]
+    D --> E["Phase E\nUpdate metrics +\nFigure ml-eval"]

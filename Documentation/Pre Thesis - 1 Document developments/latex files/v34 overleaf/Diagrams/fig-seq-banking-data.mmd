@@ -1,0 +1,33 @@
+sequenceDiagram
+  autonumber
+  actor WBA as WB Admin
+  participant WBR as WB Reserve
+  participant NBK as NationalBank
+  participant LBK as LocalBank
+  participant API as Express API
+  participant RD as Redis
+  participant CL as Chainlink
+  participant EL as Event Listener
+  participant DB as PostgreSQL
+
+  rect rgb(234, 241, 251)
+  note over WBA,LBK: Hierarchical capital allocation
+  WBA->>WBR: allocateCapital(nationalBank, amount)
+  WBR->>NBK: transfer (downward)
+  NBK->>LBK: allocate (downward)
+  end
+
+  rect rgb(242, 244, 247)
+  note over API,CL: Market-data read
+  API->>RD: cache lookup
+  API->>CL: latestRoundData() (authoritative)
+  CL-->>API: price, answeredInRound (staleness check)
+  end
+
+  rect rgb(234, 241, 251)
+  note over EL,LBK: Borrowing-limit sync
+  EL->>DB: recompute 6-mo / 1-yr windows
+  EL->>LBK: updateBorrowingLimit(borrowerId, limit)
+  LBK-->>EL: BorrowingLimitUpdated
+  EL->>DB: update BORROWING_LIMIT, clear discrepancy flag
+  end

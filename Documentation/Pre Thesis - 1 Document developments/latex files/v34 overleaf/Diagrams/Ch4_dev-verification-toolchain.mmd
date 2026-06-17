@@ -1,0 +1,29 @@
+flowchart TB
+  subgraph SC["Smart contracts"]
+    direction TB
+    T1["Solidity 0.8.20, OpenZeppelin"]
+    T2["Foundry (build, fuzz, invariants), Hardhat"]
+  end
+  subgraph SEC["Security &amp; verification"]
+    direction TB
+    T3["Slither (static), Mythril (symbolic)"]
+    T4["Echidna (property fuzz), Halmos / Certora (formal)"]
+  end
+  subgraph BE["Off-chain backend"]
+    direction TB
+    T5["Express.js API, PostgreSQL, event listener"]
+    T6["FastAPI ML service (RF + IF + stacking, SHAP)"]
+  end
+  subgraph FE["Frontend &amp; oracle"]
+    direction TB
+    T7["React + TypeScript dashboard, MCP agent"]
+    T8["Chainlink Functions / Automation / Price Feed / PoR"]
+  end
+
+  SC ~~~ SEC
+  SEC ~~~ BE
+  BE ~~~ FE
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class T1,T2,T3,T4,T5,T6,T7,T8 mid;

@@ -1,0 +1,34 @@
+sequenceDiagram
+  autonumber
+  actor C as Client
+  participant UI as React UI
+  participant AG as Agent (Qwen3-8B)
+  participant MCP as MCP Tools
+  participant API as Express API
+  participant SC as LocalBank
+  participant DB as PostgreSQL
+  actor A as LB Admin
+
+  rect rgb(242, 244, 247)
+  note over C,A: Human-to-human chat
+  C->>UI: send message
+  UI->>API: POST /chat
+  API->>DB: insert CHAT_MESSAGE
+  API->>A: notify
+  A-->>API: reply
+  API-->>C: message delivered
+  end
+
+  rect rgb(234, 241, 251)
+  note over C,DB: AI chatbot (Phase III, confirmation-gated)
+  C->>AG: ask question / request action
+  AG->>MCP: read tool (balance, loan status)
+  MCP->>API: query
+  API->>DB: SELECT
+  AG-->>C: answer + proposed action
+  C->>AG: confirm (human gate)
+  AG->>MCP: write tool (submit_loan_application)
+  MCP->>SC: tx (EIP-7702 session key)
+  AG->>DB: append AGENT_ACTION_LOG
+  AG-->>C: confirmation + tx hash
+  end

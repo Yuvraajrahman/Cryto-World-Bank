@@ -1,0 +1,23 @@
+flowchart TB
+  U["Client (authenticated wallet)"]
+  UI["React UI (thin client, streaming chat)"]
+  API["Express API: on-chain context injection (eth_call, 200 ms timeout)<br/>+ prompt-injection scan (Layer 2)"]
+  LLM["Qwen3-8B (llama.cpp, Q4_K_M)<br/>MCP tool selection"]
+  D{"Read or write<br/>tool?"}
+  RD["Read tool &rarr; query API / DB &rarr; grounded answer"]
+  CG["Human confirmation gate<br/>(affirmative consent in history)"]
+  SK["EIP-7702 session key<br/>(scoped, value-capped, 24h, revocable)"]
+  SC["Smart-contract transaction"]
+  LOG["AGENT_ACTION_LOG (append-only)"]
+  R["Streamed response to client"]
+
+  U --> UI --> API --> LLM --> D
+  D -- read --> RD --> R
+  D -- write --> CG --> SK --> SC --> LOG --> R
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class U,CG apex;
+  class UI,API,LLM,RD,SK,SC,LOG,R mid;
+  class D dec;

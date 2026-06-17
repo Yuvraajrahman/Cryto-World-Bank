@@ -1,0 +1,20 @@
+flowchart TB
+  P["Crypto World Bank<br/>(operates across all four tiers)"]
+  F1["Deposit Mobilization<br/>SavingsVault, FixedDeposit"]
+  F2["Credit Allocation<br/>allocateCapital, SyndicatedLoan"]
+  F3["Payment &amp; Settlement<br/>atomic on-chain transfers"]
+  F4["Risk Intermediation<br/>reserves, LiquidationEngine, oracle ML"]
+  F5["Liquidity Management<br/>InterBankLendingPool, UpwardDepositFacility"]
+  F6["Ancillary Services<br/>FX, GroupLendingPool, DID / VC"]
+
+  P --> F1
+  P --> F2
+  P --> F3
+  P --> F4
+  P --> F5
+  P --> F6
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class P apex;
+  class F1,F2,F3,F4,F5,F6 mid;

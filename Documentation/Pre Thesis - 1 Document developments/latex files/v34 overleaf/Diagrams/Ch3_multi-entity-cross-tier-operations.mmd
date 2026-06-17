@@ -1,0 +1,71 @@
+flowchart TB
+  subgraph BACK["Tier backbone"]
+    direction LR
+    WB["World Bank<br/>(Tier 1)"]
+    NB["National Bank<br/>(Tier 2)"]
+    LB["Local Bank<br/>(Tier 3)"]
+    CL["Client<br/>(Tier 4)"]
+    WB ==>|"allocate"| NB
+    NB ==>|"allocate"| LB
+    LB ==>|"loan"| CL
+    CL -.->|"repay"| LB
+    LB -.->|"surplus"| NB
+    NB -.->|"surplus"| WB
+  end
+
+  subgraph OP1["1. InterBankLendingPool &mdash; same-tier liquidity (1/7/30-day)"]
+    direction LR
+    NBa["National Bank A"] <-->|"IBLP_NB"| NBb["National Bank B"]
+    LBa["Local Bank A"] <-->|"IBLP_LB"| LBb["Local Bank B"]
+  end
+
+  subgraph OP2["2. UpwardDepositFacility &mdash; surplus repatriation"]
+    direction LR
+    LBu["Local Bank (surplus)"] -.->|"deposit"| NBu["National Bank"]
+    NBu -.->|"deposit"| WBu["World Bank"]
+  end
+
+  subgraph OP3["3. SyndicatedLoan &mdash; single-name exposure &gt; ceiling"]
+    direction LR
+    LEAD["Lead Arranger (LB)"]
+    CO1["Co-Lender 1"]
+    CO2["Co-Lender 2"]
+    SBORR["Borrower (via LB)"]
+    LEAD -->|"&ge; 90% commit"| SBORR
+    CO1 -->|"pro-rata shareBps"| SBORR
+    CO2 -->|"pro-rata shareBps"| SBORR
+  end
+
+  subgraph OP4["4. TranchedPool &mdash; senior / junior waterfall"]
+    direction LR
+    SEN["Senior<br/>(protected)"]
+    JUN["Junior<br/>(first-loss)"]
+    POOL["TranchedPool"]
+    TBORR["Borrower"]
+    SEN --> POOL
+    JUN --> POOL
+    POOL -->|"sr int &rarr; jr int &rarr; sr prin &rarr; jr prin"| TBORR
+  end
+
+  subgraph OP5["5. TreasurySwap &mdash; oracle-priced, atomic"]
+    direction LR
+    BW1["Bank wallet (asset A)"] <-->|"Chainlink price, 5-10 bps"| BW2["Bank wallet (asset B)"]
+  end
+
+  NETT["6. Multilateral NettingEngine (Future Work):<br/>batch settlement of IBLP + TreasurySwap obligations"]
+
+  WB ~~~ NBa
+  NBb ~~~ LBu
+  WBu ~~~ LEAD
+  SBORR ~~~ SEN
+  TBORR ~~~ BW1
+  BW2 ~~~ NETT
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef leaf fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef note fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class WB,WBu apex;
+  class NB,LB,NBa,NBb,LBa,LBb,LBu,NBu,LEAD,CO1,CO2,SBORR,SEN,JUN,POOL,TBORR,BW1,BW2 mid;
+  class CL leaf;
+  class NETT note;

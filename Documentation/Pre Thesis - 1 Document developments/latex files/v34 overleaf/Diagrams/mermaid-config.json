@@ -1,0 +1,81 @@
+{
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Georgia, 'Latin Modern Roman', 'Times New Roman', serif",
+    "fontSize": "16px",
+    "primaryColor": "#EAF1FB",
+    "primaryBorderColor": "#1B1B1B",
+    "primaryTextColor": "#111111",
+    "secondaryColor": "#F2F4F7",
+    "secondaryBorderColor": "#1B1B1B",
+    "secondaryTextColor": "#111111",
+    "tertiaryColor": "#FFFFFF",
+    "tertiaryBorderColor": "#8A8A8A",
+    "tertiaryTextColor": "#111111",
+    "lineColor": "#1B1B1B",
+    "textColor": "#111111",
+    "mainBkg": "#EAF1FB",
+    "nodeBorder": "#1B1B1B",
+    "clusterBkg": "#FFFFFF",
+    "clusterBorder": "#8A8A8A",
+    "titleColor": "#111111",
+    "edgeLabelBackground": "#FFFFFF",
+    "noteBkgColor": "#F2F4F7",
+    "noteBorderColor": "#8A8A8A",
+    "noteTextColor": "#111111",
+    "actorBkg": "#EAF1FB",
+    "actorBorder": "#1B1B1B",
+    "actorTextColor": "#111111",
+    "actorLineColor": "#8A8A8A",
+    "signalColor": "#1B1B1B",
+    "signalTextColor": "#111111",
+    "labelBoxBkgColor": "#F2F4F7",
+    "labelBoxBorderColor": "#1B1B1B",
+    "labelTextColor": "#111111",
+    "loopTextColor": "#111111",
+    "activationBkgColor": "#D6E4F7",
+    "activationBorderColor": "#1B1B1B",
+    "sequenceNumberColor": "#FFFFFF",
+    "attributeBackgroundColorOdd": "#FFFFFF",
+    "attributeBackgroundColorEven": "#F2F4F7",
+    "xyChart": {
+      "backgroundColor": "#FFFFFF",
+      "plotColorPalette": "#2E5A9C, #8A8A8A",
+      "titleColor": "#111111",
+      "xAxisLabelColor": "#111111",
+      "xAxisTitleColor": "#111111",
+      "xAxisTickColor": "#1B1B1B",
+      "xAxisLineColor": "#1B1B1B",
+      "yAxisLabelColor": "#111111",
+      "yAxisTitleColor": "#111111",
+      "yAxisTickColor": "#1B1B1B",
+      "yAxisLineColor": "#1B1B1B"
+    }
+  },
+  "themeCSS": ".node rect, .node polygon, .node circle, .node ellipse, .node path { stroke-width: 1.1px; } .er.entityBox { stroke-width: 1.1px; } .edgePath .path { stroke-width: 1.1px; } .flowchart-link { stroke-width: 1.1px; }",
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "linear",
+    "useMaxWidth": true,
+    "nodeSpacing": 48,
+    "rankSpacing": 58,
+    "padding": 8
+  },
+  "er": {
+    "useMaxWidth": true,
+    "layoutDirection": "TB",
+    "entityPadding": 12,
+    "fontSize": 14
+  },
+  "sequence": {
+    "useMaxWidth": true,
+    "mirrorActors": false,
+    "actorMargin": 42,
+    "boxMargin": 8,
+    "noteFontSize": 13,
+    "messageFontSize": 13
+  },
+  "xyChart": {
+    "useMaxWidth": true
+  }
+}

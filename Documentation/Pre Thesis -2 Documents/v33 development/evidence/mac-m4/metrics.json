@@ -1,0 +1,35 @@
+{
+  "dataset": "BCCC-DeFiFraudTrans-2025",
+  "subset": "mini",
+  "synthetic": true,
+  "n_train": 21000,
+  "n_val": 4500,
+  "n_test": 4500,
+  "n_features": 79,
+  "seed": 42,
+  "rf_trees": 80,
+  "device_profile": "mac-m4-air-16gb",
+  "models": [
+    "RandomForest",
+    "IsolationForest",
+    "LogisticStacking"
+  ],
+  "test": {
+    "precision": 0.7860545690775227,
+    "recall": 0.8066666666666666,
+    "f1": 0.7962272428164071,
+    "roc_auc": 0.884222024691358
+  },
+  "confusion_matrix": [
+    [
+      1756,
+      494
+    ],
+    [
+      435,
+      1815
+    ]
+  ],
+  "note": "Pipeline validation; full 1M train + 22-dim CWB mapping per Section 4.",
+  "generated_at": "2026-06-16T17:33:42.937477+00:00"
+}

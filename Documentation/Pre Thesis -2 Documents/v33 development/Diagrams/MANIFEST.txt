@@ -51,6 +51,12 @@ fig-security-controls
 fig-agile-process
 fig-aiml-pipeline
 fig-ml-explainability
+fig-ml-metrics-bars          (synthetic pipeline validation — mac-m4)
+fig-ml-confusion-matrix      (synthetic pipeline validation — mac-m4)
+fig-ml-shap-importance       (synthetic pipeline validation — mac-m4)
+fig-ml-pipeline-flow         (mermaid — training pipeline overview)
+fig-ml-results-dashboard     (mermaid — results summary)
+fig-ml-training-metrics-mmd    (mermaid — metric bars duplicate)
 fig-realtime-dashboard
 Ch4_loan-lifecycle-state-machine
 Ch4_four-phase-roadmap-sdlc

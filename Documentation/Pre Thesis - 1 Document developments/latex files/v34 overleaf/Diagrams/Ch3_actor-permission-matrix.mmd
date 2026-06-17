@@ -1,0 +1,44 @@
+flowchart LR
+  subgraph ACTORS["Actors"]
+    direction TB
+    CL["Client<br/>(Tier 4)"]
+    LB["LB Admin<br/>(Tier 3)"]
+    NB["NB Admin<br/>(Tier 2)"]
+    WB["WB Admin<br/>(Tier 1)"]
+    AG["AI Agent<br/>(retail, gated)"]
+  end
+  subgraph CAPS["Capabilities"]
+    direction TB
+    C1["Self-service<br/>apply / pay / submit KYC / view own"]
+    C2["Loan decisioning<br/>approve / reject"]
+    C3["Account control<br/>freeze account"]
+    C4["Rate &amp; cap config<br/>set rate / upgrade LB cap"]
+    C5["Reserve control<br/>change reserve ratio"]
+    C6["Compliance<br/>audit logs / generate SAR"]
+    C7["Public read<br/>reserve summary"]
+  end
+
+  CL ==> C1
+  CL --> C7
+  LB ==> C2
+  LB ==> C3
+  LB ==> C4
+  LB ==> C6
+  LB --> C7
+  NB ==> C3
+  NB ==> C4
+  NB ==> C6
+  NB --> C7
+  WB ==> C3
+  WB ==> C5
+  WB ==> C6
+  WB --> C7
+  AG -. "write (confirmation-gated)" .-> C1
+  AG -. read .-> C7
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef neutral fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class CL,LB,NB,WB apex;
+  class C1,C2,C3,C4,C5,C6,C7 mid;
+  class AG neutral;

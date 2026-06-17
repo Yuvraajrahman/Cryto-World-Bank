@@ -1,0 +1,34 @@
+%%{init: {'flowchart': {'rankSpacing': 26, 'nodeSpacing': 28}, 'themeVariables': {'fontSize': '22px'}}}%%
+flowchart TB
+  subgraph SPEC["Specified at pre-thesis (Must by final thesis)"]
+    direction TB
+    I1["1. Bank contracts<br/>deployed<br/>(Amoy / Sepolia)"]
+    I2["2. Loan E2E: request<br/>&rarr; approve &rarr;<br/>disburse &rarr; repay"]
+    I3["3. Reserve / limit<br/>enforcement<br/>on-chain"]
+    I4["4. FastAPI ML score:<br/>RF + IF + stacking"]
+    I5["5. SHAP + anomaly<br/>report +<br/>Authority Brief UI"]
+    I6["6. LOAN_RISK_<br/>ASSESSMENT<br/>row per inference"]
+    I11["11. MCP agent:<br/>3-5 tools + chat<br/>+ confirm gate"]
+    I1 ~~~ I2 ~~~ I3 ~~~ I4 ~~~ I5 ~~~ I6 ~~~ I11
+  end
+  subgraph PART["Design / partial"]
+    direction TB
+    I7["7. Commit-reveal<br/>score before<br/>approval (design)"]
+    I8["8. BCCC benchmark<br/>table (synthetic<br/>validation now)"]
+    I7 ~~~ I8
+  end
+  subgraph PLAN["Planned for final phases (Should)"]
+    direction TB
+    I9["9. 300-client Foundry<br/>sim or gas-cost table"]
+    I10["10. Open-source repo<br/>README +<br/>reproducible run"]
+    I12["12. LLM evaluation<br/>protocol (task /<br/>action / zero-bypass)"]
+    I9 ~~~ I10 ~~~ I12
+  end
+
+  classDef done fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef partial fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef planned fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class I1,I2,I3,I4,I5,I6,I11 done;
+  class I7,I8 partial;
+  class I9,I10,I12 planned;
+  linkStyle default stroke:#FFFFFF,stroke-width:0px;

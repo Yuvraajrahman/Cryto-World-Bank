@@ -79,6 +79,6 @@ Documentation/**/.docx-venv/
 # Diagram PDFs — regenerate: Diagrams/build-pdfs.sh (requires Chrome)
 Documentation/**/Diagrams/*.pdf
 
-# Mermaid pipeline outputs — regenerate: mermaid-diagrams/build/build-mermaid.sh
-Documentation/**/mermaid-diagrams/pdf/
-Documentation/**/mermaid-diagrams/svg/
+# Large local datasets (do not commit)
+Datasets/
+**/data/bccc.csv

@@ -1,0 +1,35 @@
+flowchart TB
+  subgraph PRES["Presentation Layer"]
+    direction LR
+    RX["React SPA<br/>+ wallet integration"]
+    AGT["Conversational Agent<br/>Qwen3-8B + MCP (Phase III)"]
+  end
+  subgraph OFF["Off-Chain Services Layer"]
+    direction LR
+    API["Express REST API"]
+    PG["PostgreSQL<br/>51 entities (3NF)"]
+    ML["FastAPI ML scoring"]
+    EL["Event listener"]
+    RD["Redis cache"]
+  end
+  subgraph SC["Smart-Contract Layer (EVM)"]
+    H["Four-tier lending hierarchy<br/>15 modular contracts"]
+  end
+  subgraph CL["Chainlink Infrastructure Layer"]
+    direction LR
+    FN["Functions"]
+    AU["Automation"]
+    PF["Price Feeds"]
+    POR["Proof of Reserve"]
+  end
+
+  PRES --> OFF
+  OFF --> SC
+  SC --> CL
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef neutral fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class H apex;
+  class FN,AU,PF,POR mid;
+  class RX,AGT,API,PG,ML,EL,RD neutral;

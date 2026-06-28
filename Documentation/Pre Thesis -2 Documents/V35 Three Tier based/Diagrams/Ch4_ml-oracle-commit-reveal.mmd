@@ -1,0 +1,23 @@
+flowchart TB
+  A1["1. Feature engineering<br/>18 behavioural + 4 application features (22-dim)"]
+  A2["2. Risk scoring<br/>Random Forest p_f + Isolation Forest a"]
+  A3["Stacking meta-learner (logistic)<br/>composite score s in [0,1]"]
+  A4["3. Commit: h = keccak256(s || nonce)<br/>commitRiskScore() to LoanController"]
+  A5["Reveal: (s, nonce) in next tx"]
+  A6["Contract state = SCORE_REVEALED<br/>(approval blocked until revealed)"]
+  D{"4. Threshold on s"}
+  T1["s &lt; 0.4: approver discretion to approve"]
+  T2["0.4 &le; s &lt; 0.7: mandatory manual review"]
+  T3["s &ge; 0.7: reject (on-chain reason code)"]
+
+  A1 --> A2 --> A3 --> A4 --> A5 --> A6 --> D
+  D -- low --> T1
+  D -- mid --> T2
+  D -- high --> T3
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class A6 apex;
+  class A1,A2,A3,A4,A5,T1,T2,T3 mid;
+  class D dec;

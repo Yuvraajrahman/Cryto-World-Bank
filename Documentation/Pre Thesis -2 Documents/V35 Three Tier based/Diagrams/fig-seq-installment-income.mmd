@@ -1,0 +1,31 @@
+sequenceDiagram
+  autonumber
+  actor C as Client
+  participant UI as React UI
+  participant API as Express API
+  participant SC as LocalBank
+  participant EL as Event Listener
+  participant DB as PostgreSQL
+  actor A as LB Admin
+
+  rect rgb(234, 241, 251)
+  note over C,DB: Installment payment
+  C->>UI: pay installment (n)
+  UI->>SC: payInstallment(loanId, n) [wallet signs]
+  SC->>SC: record payment, advance schedule
+  SC-->>EL: InstallmentPaid event
+  EL->>DB: update INSTALLMENT, TRANSACTION
+  EL->>API: recompute borrowing limit
+  API-->>C: receipt
+  end
+
+  rect rgb(242, 244, 247)
+  note over C,A: Income verification (KYC Level 2/3)
+  C->>UI: upload income proof
+  UI->>API: POST /income-proof
+  API->>DB: store INCOME_PROOF (document hash)
+  API->>A: queue for human review
+  A->>API: verify / reject
+  API->>DB: update KYC level
+  API-->>C: KYC level updated
+  end

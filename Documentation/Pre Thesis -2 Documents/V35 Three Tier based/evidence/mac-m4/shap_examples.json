@@ -1,0 +1,107 @@
+[
+  {
+    "row_index": 0,
+    "true_label": 0,
+    "top_features": [
+      {
+        "name": "nonce.nonce_average",
+        "shap_value": -0.08927242413995169,
+        "feature_value": -0.30600786209106445
+      },
+      {
+        "name": "values.values_average",
+        "shap_value": -0.08401555341545851,
+        "feature_value": -0.23182080686092377
+      },
+      {
+        "name": "number_of_from_address",
+        "shap_value": -0.05134219687306309,
+        "feature_value": -0.9398362040519714
+      }
+    ]
+  },
+  {
+    "row_index": 1,
+    "true_label": 1,
+    "top_features": [
+      {
+        "name": "values.values_standard_deviation",
+        "shap_value": -0.13003898921737356,
+        "feature_value": -0.31933313608169556
+      },
+      {
+        "name": "nonce.nonce_average",
+        "shap_value": 0.0786943365021154,
+        "feature_value": -0.3778998851776123
+      },
+      {
+        "name": "number_of_unique_from_address",
+        "shap_value": 0.040596295414773914,
+        "feature_value": -0.010354410856962204
+      }
+    ]
+  },
+  {
+    "row_index": 2,
+    "true_label": 0,
+    "top_features": [
+      {
+        "name": "number_of_unique_from_address",
+        "shap_value": -0.11363745824323326,
+        "feature_value": -0.5069074630737305
+      },
+      {
+        "name": "values.values_standard_deviation",
+        "shap_value": -0.07206374687470905,
+        "feature_value": -0.31948089599609375
+      },
+      {
+        "name": "nonce.nonce_average",
+        "shap_value": -0.04119658867807183,
+        "feature_value": -0.37515947222709656
+      }
+    ]
+  },
+  {
+    "row_index": 3,
+    "true_label": 0,
+    "top_features": [
+      {
+        "name": "number_of_unique_from_address",
+        "shap_value": -0.19769106676210077,
+        "feature_value": -0.5064309239387512
+      },
+      {
+        "name": "nonce.nonce_average",
+        "shap_value": -0.1191466506438397,
+        "feature_value": 0.4184667468070984
+      },
+      {
+        "name": "gas_used.gas_used_standard_deviation",
+        "shap_value": -0.03470341163882437,
+        "feature_value": -0.36259666085243225
+      }
+    ]
+  },
+  {
+    "row_index": 4,
+    "true_label": 0,
+    "top_features": [
+      {
+        "name": "number_of_unique_from_address",
+        "shap_value": -0.11970862850012315,
+        "feature_value": -0.5069074630737305
+      },
+      {
+        "name": "number_of_unique_to_address",
+        "shap_value": -0.08965020193811851,
+        "feature_value": 3.5321438312530518
+      },
+      {
+        "name": "nonce.nonce_average",
+        "shap_value": -0.08314738788499995,
+        "feature_value": 1.410783052444458
+      }
+    ]
+  }
+]

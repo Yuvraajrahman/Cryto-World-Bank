@@ -1,0 +1,23 @@
+flowchart TB
+  P1["Chainlink price feed updates collateral each block;<br/>HF recomputed (view-only)"]
+  D{"HF &lt; 1.0 ?"}
+  P2["liquidate(loanId) callable by any participant"]
+  P3["Transfer debt + 5-8% bonus in collateral to liquidator;<br/>credit record updated"]
+  P4["Emit LoanLiquidated(loanId, liquidator, bonusBps);<br/>indexed by event listener"]
+  WAIT["Hold (no action)"]
+
+  HF["HF models:<br/>retail: C&times;LT/D &nbsp; group: pool-level shared<br/>credit (no collateral): SBT downgrade<br/>institutional: (reserve - min)/borrowing"]
+
+  P1 --> D
+  D -- no --> WAIT
+  D -- yes --> P2 --> P3 --> P4
+  P1 -.-> HF
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  classDef note fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class P2 apex;
+  class P1,P3,P4 mid;
+  class D dec;
+  class HF,WAIT note;

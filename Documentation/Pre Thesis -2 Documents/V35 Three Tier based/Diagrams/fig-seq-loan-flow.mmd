@@ -1,0 +1,32 @@
+sequenceDiagram
+  autonumber
+  actor C as Client
+  participant UI as React UI
+  participant API as Express API
+  participant ML as ML Service
+  participant OR as Oracle
+  participant SC as LocalBank
+  participant EL as Event Listener
+  participant DB as PostgreSQL
+  actor A as LB Admin
+
+  C->>UI: submit loan application
+  UI->>API: POST /loans
+  API->>DB: insert LOAN_REQUEST (SUBMITTED)
+  API->>ML: score(borrower features)
+  ML-->>API: fraud_prob, anomaly_score, SHAP
+  API->>OR: commit risk score
+  OR->>SC: reveal score
+  API->>A: queue for review
+  alt approved
+    A->>API: approve
+    API->>SC: approveLoan()
+    SC->>SC: disburse USDC
+    SC-->>EL: LoanDisbursed event
+    EL->>DB: update LOAN (DISBURSED)
+    API-->>C: approved + funds available
+  else rejected
+    A->>API: reject(reason)
+    API->>DB: LOAN_REQUEST = REJECTED
+    API-->>C: rejection notice
+  end

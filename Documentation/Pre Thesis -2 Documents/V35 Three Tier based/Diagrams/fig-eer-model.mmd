@@ -1,0 +1,48 @@
+flowchart TB
+  subgraph SPEC1["Specialisation: INSTITUTION (disjoint, total)"]
+    direction TB
+    INST["INSTITUTION<br/>(supertype)"]
+    dI(("d"))
+    INST --- dI
+    dI --> WB["WORLD_BANK"]
+    dI --> NB["NATIONAL_BANK"]
+    dI --> LB["LOCAL_BANK"]
+  end
+  subgraph SPEC2["Specialisation: BANK_USER (disjoint)"]
+    direction TB
+    BU["BANK_USER<br/>(supertype)"]
+    dU(("d"))
+    BU --- dU
+    dU --> WBU["WorldBankUser"]
+    dU --> NBU["NationalBankUser"]
+    dU --> LBU["LocalBankUser"]
+  end
+  subgraph WEAK["Weak entity (identifying rel.)"]
+    direction TB
+    LOAN["LOAN"]
+    INSTAL[["INSTALLMENT<br/>(weak entity)"]]
+    LOAN ==>|"identifies (1..*)"| INSTAL
+  end
+  subgraph ASSOC["Association entity + multivalued attr."]
+    direction TB
+    BORR["BORROWER"]
+    LBANK["LOCAL_BANK"]
+    LR[["LOAN_REQUEST<br/>(association)"]]
+    IP["INCOME_PROOF<br/>(multivalued &rarr; entity)"]
+    BORR --- LR
+    LBANK --- LR
+    BORR -->|"1..*"| IP
+  end
+
+  dI ~~~ BU
+  dU ~~~ LOAN
+  INSTAL ~~~ BORR
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef leaf fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef disj fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  class INST,BU,LOAN,BORR,LBANK apex;
+  class WB,NB,LB,WBU,NBU,LBU,IP mid;
+  class INSTAL,LR leaf;
+  class dI,dU disj;

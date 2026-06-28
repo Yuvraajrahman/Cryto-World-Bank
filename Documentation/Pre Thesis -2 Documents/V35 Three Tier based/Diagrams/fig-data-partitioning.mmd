@@ -1,0 +1,30 @@
+flowchart TB
+  subgraph ON["On-Chain (EVM) &mdash; immutable, auditable"]
+    direction TB
+    O1["Reserve balances"]
+    O2["Loan requests &amp; approval / rejection events"]
+    O3["Repayment transactions"]
+    O4["Role bindings (RBAC)"]
+    O5["Borrowing-limit enforcement"]
+    O1 ~~~ O2 ~~~ O3 ~~~ O4 ~~~ O5
+  end
+  subgraph OFF["Off-Chain (PostgreSQL) &mdash; private, queryable"]
+    direction TB
+    F1["User profiles &amp; KYC documents"]
+    F2["Chat / session history"]
+    F3["ML risk features &amp; scores"]
+    F4["Security &amp; agent action logs"]
+    F5["Market data cache"]
+    F1 ~~~ F2 ~~~ F3 ~~~ F4 ~~~ F5
+  end
+  SYNC["Event listener<br/>borrowing-limit sync protocol"]
+
+  ON --> SYNC
+  OFF --> SYNC
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef neutral fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class O1,O2,O3,O4,O5 apex;
+  class F1,F2,F3,F4,F5 mid;
+  class SYNC neutral;

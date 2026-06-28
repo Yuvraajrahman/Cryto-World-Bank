@@ -1,0 +1,20 @@
+flowchart TB
+  WB["<b>World Bank Reserve</b><br/>Apex liquidity &amp; reserve rules"]
+  NB["<b>National Bank</b><br/>Regional capital allocation"]
+  LB["<b>Local Bank / MFI</b><br/>Retail &amp; group lending"]
+  CL["<b>Client</b><br/>Individuals &amp; solidarity groups"]
+
+  WB ==>|capital| NB
+  NB ==>|capital| LB
+  LB ==>|loans| CL
+  CL -.->|repayments| LB
+  LB -.->|deposits| NB
+  NB -.->|deposits| WB
+
+  classDef apex fill:#dce8f8,stroke:#1b1b1b,stroke-width:1.4px,color:#111111;
+  classDef mid  fill:#eef2f7,stroke:#1b1b1b,stroke-width:1.1px,color:#111111;
+  classDef leaf fill:#ffffff,stroke:#1b1b1b,stroke-width:1.1px,color:#111111;
+  class WB apex;
+  class NB mid;
+  class LB mid;
+  class CL leaf;

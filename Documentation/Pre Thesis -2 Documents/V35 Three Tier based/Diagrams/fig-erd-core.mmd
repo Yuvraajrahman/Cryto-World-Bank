@@ -1,0 +1,91 @@
+erDiagram
+  COUNTRY ||--o{ NATIONAL_BANK : "hosts"
+  INSTITUTION ||--|| WORLD_BANK : "ISA"
+  INSTITUTION ||--o| NATIONAL_BANK : "ISA"
+  INSTITUTION ||--o| LOCAL_BANK : "ISA"
+  WORLD_BANK ||--o{ NATIONAL_BANK : "allocates to"
+  NATIONAL_BANK ||--o{ LOCAL_BANK : "allocates to"
+  INSTITUTION ||--o{ BANK_USER : "employs"
+  LOCAL_BANK ||--o{ BORROWER : "registers"
+  BORROWER ||--o{ LOAN_REQUEST : "submits"
+  LOCAL_BANK ||--o{ LOAN_REQUEST : "receives"
+  LOAN_REQUEST ||--o| LOAN : "becomes"
+  LOAN ||--o{ INSTALLMENT : "schedules"
+  BORROWER ||--o{ TRANSACTION : "transacts"
+  BORROWER ||--|| BORROWING_LIMIT : "bounded by"
+  BORROWER ||--|| CREDIT_PASSPORT : "holds"
+  BORROWER ||--o{ INCOME_PROOF : "provides"
+  LOAN }o--|| ASSETS : "collateralised by"
+  LOCAL_BANK }o--|| INTEREST_RATE_TIER : "priced by"
+
+  COUNTRY {
+    char country_code PK
+    string default_stablecoin_symbol
+  }
+  INSTITUTION {
+    bigint institution_id PK
+    enum institution_type
+    string wallet_address
+  }
+  WORLD_BANK {
+    bigint institution_id PK,FK
+    int chain_id
+  }
+  NATIONAL_BANK {
+    bigint institution_id PK,FK
+    char country_code FK
+    bigint parent_world_bank_id FK
+  }
+  LOCAL_BANK {
+    bigint institution_id PK,FK
+    bigint national_bank_id FK
+  }
+  BANK_USER {
+    bigint bank_user_id PK
+    enum bank_type
+  }
+  BORROWER {
+    bigint borrower_id PK
+    string wallet_address UK
+    bigint registered_local_bank_id FK
+  }
+  LOAN_REQUEST {
+    bigint request_id PK
+    enum status
+    enum oracle_state
+  }
+  LOAN {
+    bigint loan_id PK
+    bigint loan_request_id FK
+  }
+  INSTALLMENT {
+    bigint loan_id PK,FK
+    int installment_number PK
+  }
+  TRANSACTION {
+    bigint transaction_id PK
+    enum transaction_type
+    enum direction
+  }
+  BORROWING_LIMIT {
+    bigint limit_id PK
+    bigint borrower_id UK
+    decimal on_chain_enforced_limit
+  }
+  CREDIT_PASSPORT {
+    bigint passport_id PK
+    int credit_score
+    enum risk_tier
+  }
+  INCOME_PROOF {
+    bigint proof_id PK
+  }
+  ASSETS {
+    bigint asset_id PK
+    string symbol UK
+  }
+  INTEREST_RATE_TIER {
+    bigint tier_id PK
+    decimal base_rate
+    decimal kink_utilisation
+  }

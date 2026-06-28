@@ -17,7 +17,7 @@ typechain-types/
 .env.*.local
 **/.env
 !**/.env.example
-
+#test
 # OS / editor
 .DS_Store
 *.log
@@ -53,6 +53,7 @@ backend/.data/
 # Documentation (archived / previous plans)
 Documentation/Previou\ plans/
 
+*.csv
 *.aux
 *.lof
 *.lot

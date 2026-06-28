@@ -1,0 +1,20 @@
+flowchart TB
+  SC["Smart-contract security controls (L1)"]
+  C1["Reentrancy: ReentrancyGuard + CEI<br/>(disburseLoan, processInstallment, allocateCapital)"]
+  C2["RBAC with role-expiry block numbers<br/>(avoids SWC-116 timestamp risk)"]
+  C3["UUPS upgrade (ERC-1822)<br/>_authorizeUpgrade gated on Safe 3-of-5"]
+  C4["Granular per-function pause<br/>(functionPaused[functionId])"]
+  C5["Overflow protection (Solidity 0.8.20);<br/>TWAP / circuit-breaker for flash-loan surface"]
+  C6["Audit pipeline: Slither + Mythril + Echidna + Halmos/Certora;<br/>Foundry fuzz + invariants; SWC Registry mapping"]
+
+  SC --> C1
+  SC --> C2
+  SC --> C3
+  SC --> C4
+  SC --> C5
+  SC --> C6
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class SC apex;
+  class C1,C2,C3,C4,C5,C6 mid;

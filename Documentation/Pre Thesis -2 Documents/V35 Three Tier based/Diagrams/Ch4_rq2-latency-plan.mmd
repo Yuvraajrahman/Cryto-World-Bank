@@ -1,0 +1,22 @@
+flowchart TB
+  RQ["RQ2: latency &amp; gas measurement plan"]
+  subgraph LAT["Latency targets"]
+    direction TB
+    L1["FastAPI /score: RF + IF + stacking &lt; 50 ms (laptop)"]
+    L2["Chainlink Functions oracle: 5-30 s, ~$0.10-$1.00 / call"]
+    L3["ML scored at origination only (not per installment);<br/>score caching + batch scoring for groups"]
+  end
+  subgraph GAS["Gas measurement"]
+    direction TB
+    G1["Per-function gas: disburse, repay, allocate, commit-reveal"]
+    G2["300-client Foundry simulation (deterministic seed)"]
+    G3["Gas-cost table in Appendix C (Phase IV)"]
+  end
+
+  RQ --> LAT
+  RQ --> GAS
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class RQ apex;
+  class L1,L2,L3,G1,G2,G3 mid;

@@ -1,0 +1,53 @@
+flowchart LR
+  A1["A1 Retail Client<br/>(KYC L1/L2/L3)"]
+  A2["A2 Local Bank Admin"]
+  A3["A3 National Bank Admin"]
+  A4["A4 World Bank Admin"]
+  A5["A5 AI Agent<br/>(Phase III, gated)"]
+
+  A6["A6 Regulatory Authority"]
+  A7["A7 Chainlink DON"]
+  A8["A8 Blockchain Validator"]
+  A9["A9 External Auditor"]
+
+  subgraph SYS["Crypto World Bank (system boundary)"]
+    direction TB
+    UC1(["Register &amp; KYC"])
+    UC2(["Submit loan application"])
+    UC3(["Pay installment"])
+    UC4(["View credit passport"])
+    UC5(["Approve / reject loan"])
+    UC6(["Freeze account"])
+    UC7(["Set rates &amp; caps"])
+    UC8(["Allocate capital"])
+    UC9(["Generate SAR"])
+    UC10(["Provide price / score feed"])
+    UC11(["Audit reserves (public)"])
+  end
+
+  A1 --- UC1
+  A1 --- UC2
+  A1 --- UC3
+  A1 --- UC4
+  A2 --- UC5
+  A2 --- UC6
+  A2 --- UC9
+  A3 --- UC7
+  A3 --- UC8
+  A4 --- UC8
+  A4 --- UC11
+  A5 -. gated .- UC2
+  A5 -. gated .- UC3
+  A5 -. read .- UC4
+  UC9 --- A6
+  A7 --- UC10
+  A8 --- UC2
+  A8 --- UC3
+  UC11 --- A9
+
+  classDef actor fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef ext fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  classDef uc fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class A1,A2,A3,A4 actor;
+  class A5,A6,A7,A8,A9 ext;
+  class UC1,UC2,UC3,UC4,UC5,UC6,UC7,UC8,UC9,UC10,UC11 uc;

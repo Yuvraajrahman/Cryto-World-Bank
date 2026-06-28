@@ -1,0 +1,16 @@
+flowchart TB
+  BAD["<b>BORROWER</b> &mdash; unnormalised (violates 1NF)<br/>borrower_id (PK)<br/>name<br/>income_proof_1, income_proof_2, &hellip; (repeating group)"]
+  R["Apply 1NF: remove the repeating group;<br/>store each proof as an atomic row in a separate entity"]
+  G1["<b>BORROWER</b><br/>borrower_id (PK)<br/>name"]
+  G2["<b>INCOME_PROOF</b><br/>proof_id (PK)<br/>borrower_id (FK)<br/>document_uri"]
+
+  BAD --> R
+  R --> G1
+  G1 -->|"1 : N"| G2
+
+  classDef bad fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  classDef note fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1px,color:#111111;
+  classDef good fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class BAD bad;
+  class R note;
+  class G1,G2 good;

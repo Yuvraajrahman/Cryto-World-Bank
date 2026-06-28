@@ -1,0 +1,21 @@
+flowchart TB
+  S(("start"))
+  A1["Form group (3-20 members)<br/>shared collateral or cold-start provisional tier"]
+  A2["Per-member multi-sig consent (GROUP_CONSENT)"]
+  A3["Disburse: Share_i = LoanTotal / N_members"]
+  A4["Members repay installments"]
+  D{"Default?"}
+  A5["Close cycle; SBT upgrade per member"]
+  A6["Collateral pool covers shortfall;<br/>else SBT riskTier downgrade (uncollateralised)"]
+  E(("end"))
+
+  S --> A1 --> A2 --> A3 --> A4 --> D
+  D -- no --> A5 --> E
+  D -- yes --> A6 --> E
+
+  classDef term fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef act fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class S,E term;
+  class A1,A2,A3,A4,A5,A6 act;
+  class D dec;

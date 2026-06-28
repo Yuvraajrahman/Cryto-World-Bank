@@ -1,0 +1,17 @@
+flowchart TB
+  subgraph PFr["Predicted: Fraud"]
+    direction TB
+    TP["TP = 1815<br/>(Actual Fraud)"]
+    FP["FP = 494<br/>(Actual Legitimate)"]
+  end
+  subgraph PLg["Predicted: Legitimate"]
+    direction TB
+    FN["FN = 435<br/>(Actual Fraud)"]
+    TN["TN = 1756<br/>(Actual Legitimate)"]
+  end
+  TP ~~~ FN
+
+  classDef good fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef err fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class TP,TN good;
+  class FP,FN err;

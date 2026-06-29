@@ -68,17 +68,15 @@ Documentation/**/*.out
 Documentation/**/*.toc
 Documentation/**/*.synctex.gz
 
-# Generated thesis PDFs (rebuild: pdflatex in the overleaf folder)
-Documentation/**/Thesis ID*.pdf
-Documentation/**/Pre-thesis*.pdf
-Documentation/**/main.pdf
+# Large binaries — keep locally; do not push (avoids GitHub HTTP timeouts)
+*.pdf
+*.PDF
+*.zip
+*.ZIP
 
 # Word exports and local conversion tooling
 Documentation/**/*.docx
 Documentation/**/.docx-venv/
-
-# Diagram PDFs — regenerate: Diagrams/build-pdfs.sh (requires Chrome)
-Documentation/**/Diagrams/*.pdf
 
 # Large local datasets (do not commit)
 Datasets/

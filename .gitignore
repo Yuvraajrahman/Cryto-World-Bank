@@ -68,9 +68,7 @@ Documentation/**/*.out
 Documentation/**/*.toc
 Documentation/**/*.synctex.gz
 
-# Large binaries — keep locally; do not push (avoids GitHub HTTP timeouts)
-*.pdf
-*.PDF
+# Archives — keep locally if large
 *.zip
 *.ZIP
 

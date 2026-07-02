@@ -865,15 +865,15 @@ I &
   PostgreSQL logical schema (51 entities; $\approx$13 tables migrated in Ph.~I),
   Chainlink Proof of Reserve, off-chain KYC scaffolding &
   WorldBankReserve, NationalBank, LocalBank &
-  Amoy/Sepolia (impl.); zkEVM (design pref.) \\
+  Sepolia/Amoy (impl.); zkEVM (design pref.) \\
 \rowcolor{RowShade}
 II &
   Loan application, approval, installment generation,
   borrowing-limit enforcement, deposit mobilisation,
   GroupLendingPool, InterBankLendingPool &
-  SavingsVault, LoanContract, GroupLendingPool,
+  SavingsVault, LoanController, GroupLendingPool,
   UpwardDepositFacility &
-  Amoy/Sepolia (impl.); zkEVM (design pref.) \\
+  Sepolia/Amoy (impl.); zkEVM (design pref.) \\
 III &
   Random Forest + Isolation Forest + SHAP pipeline
   (commit--reveal oracle; Functions stretch), SyndicatedLoan,
@@ -881,13 +881,13 @@ III &
   Foundry invariant suite, Tenderly monitoring &
   SyndicatedLoan, TranchedPool,
   FXModule, LiquidationEngine &
-  Amoy/Sepolia (impl.); zkEVM (design pref.) \\
+  Sepolia/Amoy (impl.); zkEVM (design pref.) \\
 \rowcolor{RowShade}
 IV &
   Consistency pass, evaluation evidence pack, simulation outputs,
   testnet manifest completion &
   All MVT contracts (as built) &
-  Amoy/Sepolia (impl.); zkEVM (design pref.) \\
+  Sepolia/Amoy (impl.); zkEVM (design pref.) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1002,7 +1002,7 @@ Atzei et al.~[7] define core EVM attack classes (reentrancy, access control), in
 \label{sec:lit-sbt}
 \label{sec:lit-institutional}
 
-MiCA~[58, 59] and the GENIUS Act~[60] require stablecoin reserves and issuer authorization---supporting USDC-first retail lending (Section~\ref{sec:stablecoin-first}). Beniiche~[40] and Pasdar~[41] frame the oracle problem; Chainlink accuracy varies by chain~[92], supporting single-chain deployment with commit--reveal fallback.
+MiCA~[58, 59] and the GENIUS Act~[60] require stablecoin reserves and issuer authorization---supporting USDC-first retail lending (Section~\ref{sec:stablecoin-first}). Beniiche~[40] and Pasdar~[41] frame the oracle problem as a trust, latency, and data-integrity challenge at the off-chain/on-chain boundary, supporting a single-chain prototype with commit--reveal fallback rather than a more operationally complex multi-chain oracle path.
 
 BIS/FSB data~[15, 23] document correspondent-banking delays and costs. Kim and Kim~[37] and Hartmann and Hasan~[33] inform gas-cost modeling. Weyl et al.~[94] and MicroSave~[57] motivate on-chain credit passports (Section~\ref{sec:credit-passport}). Ozili~[100] shows Nigeria's eNaira had 98.5\% wallet inactivity---barriers are trust-based, supporting MFI-led onboarding. Sygnum~[51], mBridge~[61], FundsChain~[25], and Kinexys~[26] show institutional blockchain adoption without retail lending hierarchies.
 
@@ -1058,7 +1058,7 @@ Qin et al.\ [92] & Flash-loan governance passes malicious proposals atomically (
 Piper et al.\ 2025 [45] + ZKP-KYC [45, 46] & ZKP + SSI + DID enables privacy-preserving KYC & Groth16 KYC circuit, W3C DID/VC choice & Contribution 4 \\
 MiCA [58, 59] + GENIUS [60] & Stablecoin issuers require 1:1 reserves, authorization, audits & USDC-first denomination as regulatory requirement & Denomination \\
 \rowcolor{RowShade}
-Chainlink accuracy [92] & Polygon high oracle accuracy vs Ethereum/zkSync under volatility & Single-chain Polygon deployment; oracle fallback & Infrastructure \\
+Beniiche [40] + Pasdar [41] & Oracle boundary introduces trust, latency, and integrity trade-offs & Single-chain prototype with commit--reveal fallback and deferred DON upgrade & Infrastructure \\
 Gudgeon et al.\ [42] & Utilization above 90\% causes liquidity crises empirically & Kink point at $U^{*} = 80\%$ in rate model & Rate model \\
 \bottomrule
 \end{tabular}%
@@ -1115,7 +1115,7 @@ Table~\ref{tab:prototype-scope} records design status only; no public-network de
 \renewcommand{\arraystretch}{0.88}
 \begin{table}[H]
 \centering
-\caption[Prototype scope and implementation status]{Prototype scope: specification vs.\ planned implementation (pre-thesis design record). \textit{Voice:} \textit{specified} = documented design; \textit{planned} = Phase~I--IV deliverable. Target chain: Polygon Amoy and/or Ethereum Sepolia.}
+\caption[Prototype scope and implementation status]{Prototype scope: specification vs.\ planned implementation (pre-thesis design record). \textit{Voice:} \textit{specified} = documented design; \textit{planned} = Phase~I--IV deliverable. Target chain: Ethereum Sepolia (primary) and/or Polygon Amoy (secondary).}
 \label{tab:prototype-scope}
 \begin{tabular}{@{}p{7.4cm}p{5.4cm}@{}}
 \toprule
@@ -1340,7 +1340,7 @@ NettingEngine & Multi-entity & Future Work & ERD stubs only; Section~\ref{sec:fu
 \textbf{Criterion} & \textbf{Selection} & \textbf{Justification} \\
 \midrule
 Platform & Ethereum Virtual Machine (EVM) & Largest EVM ecosystem; mature tooling. \\
-Network & Polygon Amoy PoS and/or Ethereum Sepolia (prototype implementation) & Free public testnets; zkEVM evaluated, not default prototype chain. \\
+Network & Ethereum Sepolia (primary) and/or Polygon Amoy PoS (secondary prototype implementation) & Free public testnets; zkEVM evaluated, not default prototype chain. \\
 Consensus & Public-testnet consensus (PoS/L1 testnet) & Stable testnet consensus; ZK settlement is a design preference only. \\
 Smart contract language & Solidity 0.8.20 & Industry standard; overflow-safe compiler; rich libraries. \\
 \bottomrule
@@ -1349,7 +1349,7 @@ Smart contract language & Solidity 0.8.20 & Industry standard; overflow-safe com
 \end{table}
 
 \vspace{2pt}
-\noindent\textit{\small This platform selection table compares candidate networks on cost, finality, throughput, and ecosystem maturity. Polygon zkEVM remains a design preference for ZK-anchored settlement, but the prototype implementation target is Amoy/Sepolia for stability-first delivery within the thesis timeline.}
+\noindent\textit{\small This platform selection table compares candidate networks on cost, finality, throughput, and ecosystem maturity. Polygon zkEVM remains a design preference for ZK-anchored settlement, but the prototype implementation target is Sepolia-first with Amoy as secondary fallback for stability-first delivery within the thesis timeline.}
 
 \begin{table}[H]
 \centering
@@ -1962,7 +1962,7 @@ Tables owned exclusively by the event listener (projection tables) include \text
 \section{Operating Context}
 \label{sec:operating-context}
 
-The Crypto World Bank is specified as a \textbf{blockchain-based institutional finance platform} on EVM-compatible infrastructure, not as a geographic pilot for a single rural market. The primary contribution is programmable hierarchical banking---reserve enforcement, tiered capital flow, on-chain auditability, and modular lending products---deployable on a stability-first prototype testnet (Polygon Amoy PoS and/or Ethereum Sepolia). Polygon zkEVM remains an evaluated option in the platform comparison tables rather than the default prototype deployment chain narrative.
+The Crypto World Bank is specified as a \textbf{blockchain-based institutional finance platform} on EVM-compatible infrastructure, not as a geographic pilot for a single rural market. The primary contribution is programmable hierarchical banking---reserve enforcement, tiered capital flow, on-chain auditability, and modular lending products---deployable on a stability-first prototype testnet (Ethereum Sepolia as primary, Polygon Amoy PoS as secondary). Polygon zkEVM remains an evaluated option in the platform comparison tables rather than the default prototype deployment chain narrative.
 
 Three design choices anchor the operating context. First, \textbf{stablecoin-denominated retail lending} (Section~\ref{sec:stablecoin-first}) limits liability-side volatility when collateral and loans use different asset types. Second, \textbf{low per-transaction gas cost} on zkEVM L2 makes high-frequency installment and reserve operations economically viable relative to Ethereum mainnet. Third, \textbf{optional account abstraction} (Section~\ref{sec:erc4337}) can simplify wallet onboarding for crypto-naive retail users without changing smart-contract role logic. Solidarity group lending (Section~\ref{sec:banking-products}) is a programmable product module informed by microfinance literature (BRAC, Grameen); it is not scoped to a specific country deployment. Institutional onboarding is planned through academic pilots, open-source replication, and regulatory sandbox partnerships (Section~\ref{sec:regulatory-compliance}).
 
@@ -2260,7 +2260,7 @@ Table~\ref{tab:credit-tiers} governs maximum loan limits and interest modifiers 
 \section{Single-Chain Deployment (Design Revision)}
 \label{sec:bridge}
 
-An initial design considered multi-chain deployment bridging Polygon zkEVM and Ethereum Sepolia to distribute retail and institutional traffic across separate networks. This approach was revised after security analysis identified cross-chain bridges as the highest-risk attack surface in DeFi---accounting for over \$1.1~billion in documented losses through Ronin (\$625M), Wormhole (\$320M), and Nomad (\$190M) exploits in 2022 alone. The revised architecture consolidates \textbf{all live contract deployment on a single EVM chain}. Polygon zkEVM remains the design-preference target (ZK validity proofs verified on Ethereum~L1), while the prototype implementation may deploy to stable public EVM testnets such as Polygon Amoy PoS and/or Ethereum Sepolia for operational stability, without changing the contract logic or the single-chain assumption.
+An initial design considered multi-chain deployment bridging Polygon zkEVM and Ethereum Sepolia to distribute retail and institutional traffic across separate networks. This approach was revised after security analysis identified cross-chain bridges as the highest-risk attack surface in DeFi---accounting for over \$1.1~billion in documented losses through Ronin (\$625M), Wormhole (\$320M), and Nomad (\$190M) exploits in 2022 alone. The revised architecture consolidates \textbf{all live contract deployment on a single EVM chain}. Polygon zkEVM remains the design-preference target (ZK validity proofs verified on Ethereum~L1), while the prototype implementation may deploy to stable public EVM testnets such as Ethereum Sepolia (primary) and/or Polygon Amoy PoS (secondary) for operational stability, without changing the contract logic or the single-chain assumption.
 
 Ethereum Sepolia is retained in the testing plan as a stable public EVM testnet option for prototype deployment when required, with no live asset bridge between networks. This simplification reduces attack surface and keeps Phases~I--II deliverable within the project timeline. Chen et al.~[31] validate multi-chain lending feasibility in the literature; the CWB adopts their throughput lessons without deploying a live CCIP or LayerZero bridge. Credit Passport SBT state, borrowing-limit enforcement, and loan lifecycle data remain single-chain on the chosen prototype testnet.
 
@@ -3352,7 +3352,7 @@ across work streams.}
 
 \textbf{Phase Objective:} Implement the core lending lifecycle on-chain and in the React UI: loan request, approval, installments, hierarchical bank registration, and borrowing-limit enforcement. The conversational agent is a \textbf{Phase~III Must deliverable}; Phase~II delivers agent schema prep only (DT-II.16).
 
-\textbf{Scope note:} Phase~II is scoped to the \textit{Minimum Viable Thesis} (MVT): hierarchical capital flow, basic loan lifecycle, deposit mobilisation, and core multi-entity contracts on Sepolia testnet (Table~\ref{tab:phase-deliverables}): \texttt{SavingsVault}, \texttt{LoanContract}, \texttt{GroupLendingPool}, \texttt{InterBankLendingPool}, and \texttt{UpwardDepositFacility}. \texttt{SyndicatedLoan}, \texttt{TranchedPool}, \texttt{FXModule}, and \texttt{LiquidationEngine} are Phase~III; \texttt{NettingEngine} is Future Work. Agent schema prep (\texttt{agent\_action\_log}, \texttt{SESSIONS}) is a Phase~II Should item; full agent build is Phase~III Must.
+\textbf{Scope note:} Phase~II is scoped to the \textit{Minimum Viable Thesis} (MVT): hierarchical capital flow, basic loan lifecycle, deposit mobilisation, and core multi-entity contracts on Sepolia testnet (Table~\ref{tab:phase-deliverables}): \texttt{SavingsVault}, \texttt{LoanController}, \texttt{GroupLendingPool}, \texttt{InterBankLendingPool}, and \texttt{UpwardDepositFacility}. \texttt{SyndicatedLoan}, \texttt{TranchedPool}, \texttt{FXModule}, and \texttt{LiquidationEngine} are Phase~III; \texttt{NettingEngine} is Future Work. Agent schema prep (\texttt{agent\_action\_log}, \texttt{SESSIONS}) is a Phase~II Should item; full agent build is Phase~III Must.
 
 \begin{table}[H]
 \centering
@@ -3533,7 +3533,7 @@ Phase~II is the heaviest workload. Sequence lending core first (Weeks~5--7), the
 
 \paragraph{Weeks 5--6 (loan state machine).}
 \begin{enumerate}[noitemsep]
-\item DT-II.01--03: \texttt{LoanContract} request, approval, installment schedule and payment. Backend Express routes mirror on-chain events.
+\item DT-II.01--03: \texttt{LoanController} request, approval, installment schedule and payment. Backend Express routes mirror on-chain events.
 \item DT-II.07: hierarchical bank registration UI (National $\to$ Local).
 \item Start DT-II.04: Credit Passport SBT stub or \texttt{kycLevel} mapping for borrowing limits.
 \end{enumerate}
@@ -3547,7 +3547,7 @@ Phase~II is the heaviest workload. Sequence lending core first (Weeks~5--7), the
 
 \paragraph{Weeks 8--9 (deposit + multi-entity PoC).}
 \begin{enumerate}[noitemsep]
-\item Deploy \texttt{SavingsVault} and \texttt{LoanContract} on Sepolia (Table~\ref{tab:phase-deliverables}).
+\item Deploy \texttt{SavingsVault} and \texttt{LoanController} on Sepolia (Table~\ref{tab:phase-deliverables}).
 \item One of: \texttt{GroupLendingPool} formation + consent flow \emph{or} \texttt{InterBankLendingPool} same-tier borrow demo (supervisor chooses priority at G1).
 \item DT-II.13--15 (Should): cron-based overdue checks (MVT), credit tiers, kinked rate --- schedule permitting; Chainlink Automation upgrade documented in Section~\ref{sec:oracle-architecture}.
 \end{enumerate}
@@ -3615,7 +3615,7 @@ Supervisor walks through README reproduction $\to$ reviews BCCC metrics table $\
 \textbf{Phase} & \textbf{Developer A (contracts / chain)} & \textbf{Developer B (backend / ML / UI)} & \textbf{Merge point} \\
 \midrule
 I & DT-I.01--07, Sepolia deploy & DT-I.12--17, Express scaffold & End Week~2: ABI + API contract review \\
-II & LoanContract, SBT limits, IBLP/Group pool & Express routes, React loan UI, DB event sync & End Week~6: E2E loan path \\
+II & LoanController, SBT limits, IBLP/Group pool & Express routes, React loan UI, DB event sync & End Week~6: E2E loan path \\
 III & Chainlink Functions, on-chain score gate & FastAPI ML, MCP server, agent UI & End Week~11: score gates approval \\
 IV & Foundry sim + fuzz & LLM eval, README, thesis tables & End Week~15: full MVT checklist \\
 \bottomrule
@@ -3676,7 +3676,7 @@ Anomaly Detection & Isolation Forest & Autoencoder & Unsupervised; no labelled d
 XAI Method & SHAP & LIME & Theoretical guarantees, regulatory fit \\
 Database & PostgreSQL & SQLite & 3NF support, async queries \\
 Hosting & Vercel + Render & Localhost only & \$0 cost, publicly accessible URL \\
-Network (primary) & Polygon Amoy PoS and/or Ethereum Sepolia & Polygon zkEVM Cardona & Stability-first prototype vs.\ ZK-anchored design preference \\
+Network (primary) & Ethereum Sepolia (primary) and/or Polygon Amoy PoS (secondary) & Polygon zkEVM Cardona & Stability-first prototype vs.\ ZK-anchored design preference \\
 Oracle mechanism & Commit-reveal relay (MVT) & Chainlink Functions (DON) & Always-available audited relay vs.\ DON-based upgrade when supported \\
 Agent tool framework & MCP tool server & Direct Express.js API & Defined schema = safety boundary; Phase~III Must \\
 Agent session auth & Human confirmation + standard wallet signing & EIP-7702 session keys & MVT relies on explicit consent; scoped session keys are Future Work \\
@@ -3722,7 +3722,7 @@ Database & PostgreSQL 3NF & SQLite & Concurrency (40\%), window queries (35\%), 
 
 \item \textbf{React + TypeScript} is beneficial as many Web3 libraries such as Wagmi, RainbowKit, Viem, and ethers.js are supported seamlessly. A vast community of developers exceeding 10~million exists for React making it simpler to access assistance and solutions.
 
-\item \textbf{EVM (Solidity)} is regarded as the most thoroughly examined smart contract system. Over \$100~billion is secured across various blockchains by it. Building and testing the project without incurring costs is possible on stable public EVM testnets (Polygon Amoy PoS and/or Ethereum Sepolia). Polygon zkEVM remains an evaluated option for a ZK-anchored settlement target, but it is not assumed for the prototype. Security tools provided by OpenZeppelin have been thoroughly tested to ensure the protection of contracts.
+\item \textbf{EVM (Solidity)} is regarded as the most thoroughly examined smart contract system. Over \$100~billion is secured across various blockchains by it. Building and testing the project without incurring costs is possible on stable public EVM testnets (Ethereum Sepolia as primary and/or Polygon Amoy PoS as secondary). Polygon zkEVM remains an evaluated option for a ZK-anchored settlement target, but it is not assumed for the prototype. Security tools provided by OpenZeppelin have been thoroughly tested to ensure the protection of contracts.
 
 \item \textbf{MUI (Material Design~3)} provides ready-made components for typical banking interface designs. The package contains various items such as data tables, form checks and layouts for dashboards. Utilizing MUI results in a time saving of around 40\% compared to starting from scratch.
 
@@ -4394,7 +4394,7 @@ The testing strategy covers four layers of the system, each with defined accepta
 \section{Discussion and Examiner Limitations}
 \label{sec:research-limitations}
 
-A structured literature scan (June~2026) identified five risks examiners are likely to probe. This section records them explicitly so the thesis does not over-claim.
+A structured literature scan (June~2026) identified six risks examiners are likely to probe. This section records them explicitly so the thesis does not over-claim.
 
 \paragraph{G1 --- Compound novelty vs.\ partial counterexamples.}
 Maple Finance, Goldfinch, Morpho~V2, and Aave Arc provide partial institutional-credit precedents on individual axes~[51, 67, 71]. The defensible claim is the \textit{compound} architecture (four-tier reserve enforcement + explainable oracle ML + programmable mutual liability), not ``no prior four-tier DeFi.''
@@ -4410,6 +4410,9 @@ On-chain mutual liability is cryptographic cosigning, not social solidarity~[72,
 
 \paragraph{G5 --- Oracle trust and economic viability.}
 Score-at-origination-only mitigates latency/cost; oracle collusion and model staleness remain open (Section~\ref{sec:ml-workload}). Certora reserve-invariant proofs are Future Work (Section~\ref{sec:future-work}); Foundry fuzz tests should list what is asserted, assumed, and out of scope~[77].
+
+\paragraph{G6 --- Preferred-creditor status and sovereign willingness to repay.}
+The default cascade in \texttt{InterBankLendingPool} and related reserve buffers resolves \textit{technical default}---insufficient escrowed collateral, missed installment flows, or reserve shortfall within the protocol. It does \textbf{not} create sovereign or institutional willingness to repay. Real multilateral development lending relies partly on preferred-creditor treatment, a diplomatic and reputational mechanism outside any smart contract's reach. CWB therefore does not claim to replicate treaty-backed enforcement or compel repayment from an unwilling institutional participant; that remains a legal and governance-layer question rather than a protocol property.
 
 \paragraph{Publication trajectory.}
 Primary venue targets aligned with CWB contributions: \textbf{AFT~2026} (DeFi systems; abstract deadline May~2026), \textbf{FMBC} (formal verification of reserve invariants), \textbf{IEEE Blockchain / ICBC} (hierarchical architecture), and \textbf{IEEE TIFS} (federated fraud + explainability). PhD-scale seeds: hierarchical GraphSAGE ablation, cross-tier FL with differential privacy, and zkAML + FATF Travel Rule integration (Section~\ref{sec:future-work}).
@@ -5028,7 +5031,7 @@ The result is a compliance posture that is defensible to European and American i
 The platform is designed as a global institutional L2 architecture; jurisdiction-specific deployment is future work. One illustrative regulatory context---Bangladesh, cited in the microfinance literature---is summarized here to show how a hierarchical on-chain bank would face real-world constraints. Three observations frame the path forward.
 
 \paragraph{Crypto remains effectively illegal for retail use in several jurisdictions as of 2025--2026.}
-In Bangladesh, Bangladesh Bank's longstanding 2018 circular treats crypto trading as a Foreign Exchange Regulation Act offence, and no subsequent statute has formally legalized retail crypto activity~[63]. The Crypto World Bank prototype is therefore planned exclusively on public EVM testnets (Polygon Amoy PoS and/or Ethereum Sepolia) using test tokens. No mainnet value transacts at pre-thesis stage.
+In Bangladesh, Bangladesh Bank's longstanding 2018 circular treats crypto trading as a Foreign Exchange Regulation Act offence, and no subsequent statute has formally legalized retail crypto activity~[63]. The Crypto World Bank prototype is therefore planned exclusively on public EVM testnets (Ethereum Sepolia as primary and/or Polygon Amoy PoS as secondary) using test tokens. No mainnet value transacts at pre-thesis stage.
 
 \paragraph{The CBDC trajectory is a credible legal path in many jurisdictions.}
 Several central banks have launched CBDC feasibility studies and pilots. The Crypto World Bank's positioning against mBridge and Agora (Section~\ref{sec:lit-institutional}) provides a direct upgrade path: when a jurisdiction issues a CBDC under the hierarchical distribution model that the Tan~(2023) IMF working paper~[5] describes, the platform's Tier~1 / Tier~2 contracts can settle in that CBDC without changing the four-tier architecture. ETH / USDC denomination in testnet is a stand-in for future CBDC or tokenized-deposit assets.
@@ -5069,6 +5072,8 @@ The Crypto World Bank faces a \textbf{bootstrap funding problem} analogous to th
 
 In the short term, a multi-signature wallet (3-of-5 signers representing different stakeholder groups) governs Tier~1 allocations. In the long term, an on-chain governance module (similar to Compound Governor Bravo) enables time-locked, snapshot-based voting with timelock delays---without issuing a native speculative CWB token in the thesis prototype (Section~\ref{sec:not-a-cex}).
 
+\noindent Unlike IBRD, which leverages callable capital to borrow cheaply in public bond markets, the CWB Tier~1 reserve compounds only through \textbf{re-lending velocity} inside the four-tier stablecoin system. Using the notation from Section~\ref{sec:intro}, annual origination capacity is bounded by initial Tier~1 reserve, the retained reserve ratio, and credit velocity rather than by AAA-rated capital-markets leverage. This is a deliberate simplification for MVT scope: the thesis models a stablecoin-first, reserve-constrained lending network, not a bond-funded multilateral balance sheet. Capital-markets leverage therefore remains explicitly out of scope for the prototype and is not assumed in the revenue-scale discussion of Chapter~\ref{ch:market-analysis}.
+
 \section{Prototype Scope and Limitations}
 
 At pre-thesis stage, the complete system is \textbf{specified} but not deployed. Planned implementation scope:
@@ -5087,7 +5092,7 @@ At pre-thesis stage, the complete system is \textbf{specified} but not deployed.
 \item \textbf{Banking product suite:} The extended banking product suite described in Section~\ref{sec:banking-products}, including savings accounts, fixed-term deposits, transactional accounts, group lending, FX conversion, and the insurance fund, is specified at the architectural and design level in this report. Smart contract implementation and testing of these modules is planned for the final thesis phase.
 \end{enumerate}
 
-The limitations above are consistent with a planning-phase pre-thesis; the complete system design is fully specified in this report and will be implemented and validated in the final thesis phase. Examiner-facing limitation analysis (G1--G5) is consolidated in Section~\ref{sec:research-limitations} (Chapter~\ref{ch:evaluation}).
+The limitations above are consistent with a planning-phase pre-thesis; the complete system design is fully specified in this report and will be implemented and validated in the final thesis phase. Examiner-facing limitation analysis (G1--G6) is consolidated in Section~\ref{sec:research-limitations} (Chapter~\ref{ch:evaluation}).
 
 \section{Accessibility Assessment: Hypothetical Retail Client}
 
@@ -5162,6 +5167,9 @@ Future work is split into \textbf{MVT completion} (final-thesis Must deliverable
 \item \textbf{Runtime monitoring.} Event-listener index, Tenderly alerts, live Reserve Transparency Dashboard (Section~\ref{sec:realtime}); The Graph is optional later.
 \item \textbf{Operational security and sandbox path.} Safe multisigs (Section~\ref{sec:defense-in-depth}); controlled pilot under MAS Project~Guardian or UAE DIFC sandbox (Section~\ref{sec:bangladesh-reg}).
 \end{enumerate}
+
+\paragraph{Development-finance policy extensions (post-MVT).}
+Four institutional-finance features are intentionally simplified in the current specification. First, CWB is currently a \textbf{commercial spread-lending} architecture in which each tier earns a positive margin; an IDA-style concessional or grant-funded window for the poorest borrowers is not modeled and is deferred to Future Work. Second, \textbf{sovereign/country-risk-adjusted pricing} is absent: National and Local Bank lending rates are flat prototype tiers rather than country-rating- or income-classification-sensitive curves. Third, \textbf{capital-weighted governance representation} is not implemented; the governance model is role-based and operationally motivated rather than linked to subscribed capital in the way multilateral banks allocate voting power. Fourth, \textbf{multi-currency or SDR-style reserve composition} is out of scope; the prototype remains single-currency and stablecoin-first, which simplifies settlement but leaves dollarization and local-currency mismatch questions to later policy work.
 
 \paragraph{Retail payments, remittance, and commerce (post-MVT).}
 \label{sec:future-retail-payments}
@@ -5499,7 +5507,7 @@ When the assembled prompt approaches the 32K-token window, the backend retains h
 \tableheadcolor
 \textbf{Toolset} & \textbf{Tools visible} \\
 \midrule
-\texttt{read\_only} & All 9 read tools (default when intent is uncertain). \\
+\texttt{read\_only} & Full-suite taxonomy (Future Work): all 9 read tools; the MVT deploys only the subset needed for the selected 3--5 tools. \\
 \texttt{loan\_actions} & \texttt{read\_only} $+$ loan, installment, and group write tools. \\
 \texttt{account\_management} & \texttt{read\_only} $+$ deposit, KYC, and reminder write tools. \\
 \bottomrule
@@ -5526,7 +5534,7 @@ Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook 
 \label{sec:local-llm}
 
 \paragraph{Purpose.}
-The in-product assistant is a \textbf{planned Phase~III Must deliverable} (Section~\ref{sec:optional-agent}), providing a plain-language interface alongside the React dashboard. It combines a locally hosted, privacy-preserving large language model (Qwen3-8B, Apache~2.0~licence) with a Model Context Protocol (MCP) tool server exposing 17 tools (9 read tools, including a session history search tool, and 8 write tools requiring human confirmation). The agent can both answer questions---via retrieval-augmented generation (RAG) from policy documents---and execute on-chain banking operations via write tools, subject to an explicit human confirmation gate before any state-modifying action is taken. Local hosting keeps conversation data on institutional infrastructure, supporting data-sovereignty requirements in regulated pilots. A client who prefers the React UI experiences no reduction in available functionality, since every operation the agent can perform is equally available through the standard dashboard.
+The in-product assistant is a \textbf{planned Phase~III Must deliverable} (Section~\ref{sec:optional-agent}), providing a plain-language interface alongside the React dashboard. It combines a locally hosted, privacy-preserving large language model (Qwen3-8B, Apache~2.0~licence) with a Model Context Protocol (MCP) tool server exposing a minimal MVT subset of \textbf{3--5 tools} (Section~\ref{sec:optional-agent}). The full \textbf{17-tool} suite (9 read tools, including a session history search tool, and 8 write tools requiring human confirmation) remains a specified Future Work expansion rather than the graded prototype baseline. The agent can both answer questions---via retrieval-augmented generation (RAG) from policy documents---and execute on-chain banking operations via the MVT write-tool subset, subject to an explicit human confirmation gate before any state-modifying action is taken. Local hosting keeps conversation data on institutional infrastructure, supporting data-sovereignty requirements in regulated pilots. A client who prefers the React UI experiences no reduction in available functionality, since every operation the agent can perform is equally available through the standard dashboard.
 
 \paragraph{Model and runtime (local development).}
 The inference endpoint follows the \textbf{OpenAI Chat Completions} contract (\texttt{/v1/chat/completions}) with \texttt{stream: true}, proxied from the project backend to a local service such as \texttt{http://127.0.0.1:1234}. During early development, the assistant used a locally hosted \textbf{Gemma-4-E4B} checkpoint (Google mixture-of-experts model, $\sim$26B total / 4B active parameters) via LM Studio in GGUF form (e.g., \texttt{Q4\_K\_M} quantization) for a laptop-friendly footprint. For the final thesis evaluation, the assistant is replaced by \textbf{Qwen3-8B} (Alibaba Cloud Qwen team, released April~28~2025, Apache~2.0~licence)~[67], a dense 8.19B-parameter causal language model with a 32K-token native context window (extendable to 131K tokens via YaRN scaling) and support for 100+ languages and dialects. A distinguishing architectural feature of Qwen3-8B is its \emph{switchable reasoning mode}: the model operates in \textbf{thinking mode} (chain-of-thought wrapped in \texttt{<think>} tokens, suited to multi-step compliance or policy questions) and \textbf{non-thinking mode} (direct, low-latency responses for general navigation queries), selectable per-turn with \texttt{/think} or \texttt{/no\_think} in the system prompt. For Q\&A and retrieval-augmented generation (RAG) queries, non-thinking mode is the default; thinking mode is activated only for the red-team regulatory-compliance prompts in the evaluation protocol of Section~\ref{sec:llm-eval}. For agent tool-calling, non-thinking mode is the default for read tools and confirmation summaries; thinking mode is activated for complex multi-step operations such as EMI calculation or group signature coordination. The per-user context namespace (see Section~\ref{sec:aiml-support}) is prepended to every system prompt as a structured JSON block, so the model has full account context before reading the user's message. The API model identifier is environment-driven; the integration layer remains identical for both models.
@@ -5568,7 +5576,7 @@ The \texttt{compression\_summary} field is injected only when this is a child se
 
 
 \paragraph{Security and limitations (prototype stance).}
-The agent's safety posture is enforced at four levels. (1)~\textbf{Tool-schema boundary:} the agent interacts with CWB exclusively through the 17 MCP tools --- it cannot execute arbitrary code, make unapproved API calls, or read data outside the tool schema. (2)~\textbf{Human confirmation gate:} every write tool requires explicit affirmative consent in the conversation history; the confirmation turn ID is logged as the audit reference. (3)~\textbf{Session key scope:} the EIP-7702 session key is scoped to specific tools, value-capped, time-bound to 24~hours, and revocable at any time. A session that attempts to call an out-of-scope tool is rejected at the key level, not just at the application level. (4)~\textbf{Prompt injection scanning and lifecycle hook middleware:} user-sourced content is scanned for injection patterns before entering the prompt (Layer~2 control, Section~\ref{sec:aiml-support}), and every write-tool HTTP POST is intercepted by a middleware stack that enforces the confirmation invariant at the application layer independently of the model's output. Together, these four levels form a defence-in-depth posture in which no single point of failure can circumvent a critical safety constraint. Hallucination risk is bounded by: (a) the injected on-chain state grounding account-specific answers, and (b) the refusal layer for regulatory and legal queries (100\% target on the red-team set, Section~\ref{sec:llm-eval}).
+The agent's safety posture is enforced at four levels. (1)~\textbf{Tool-schema boundary:} the agent interacts with CWB exclusively through the MVT MCP tool schema (\textbf{3--5 tools}) and cannot execute arbitrary code, make unapproved API calls, or read data outside that schema. The full 17-tool suite remains a specified but undeployed Future Work expansion. (2)~\textbf{Human confirmation gate:} every write tool requires explicit affirmative consent in the conversation history; the confirmation turn ID is logged as the audit reference. (3)~\textbf{Session key scope:} the EIP-7702 session key is scoped to specific tools, value-capped, time-bound to 24~hours, and revocable at any time. A session that attempts to call an out-of-scope tool is rejected at the key level, not just at the application level. (4)~\textbf{Prompt injection scanning and lifecycle hook middleware:} user-sourced content is scanned for injection patterns before entering the prompt (Layer~2 control, Section~\ref{sec:aiml-support}), and every write-tool HTTP POST is intercepted by a middleware stack that enforces the confirmation invariant at the application layer independently of the model's output. Together, these four levels form a defence-in-depth posture in which no single point of failure can circumvent a critical safety constraint. Hallucination risk is bounded by: (a) the injected on-chain state grounding account-specific answers, and (b) the refusal layer for regulatory and legal queries (100\% target on the red-team set, Section~\ref{sec:llm-eval}).
 \paragraph{Architecture diagram.}
 Figure~\ref{fig:local-llm-mermaid} shows the compact end-to-end request path; Figure~\ref{fig:local-llm-tikz} expands the same flow with component boundaries and authentication context.
 
@@ -5607,7 +5615,7 @@ Wallet Integration & Wagmi, RainbowKit, Viem & EIP-1193 compliant \\
 Build and Test & Hardhat & Automated test suite; deployment scripts \\
 Backend API & Express.js, Node.js & REST API; middleware architecture \\
 Database & PostgreSQL (designed) & 51 entities (31 core + 6 extension + 14 stubs), 3NF; relational integrity \\
-Target Network & Polygon Amoy PoS and/or Ethereum Sepolia (single-chain prototype) & Stable public testnets for delivery; Polygon zkEVM retained as evaluated design preference \\
+Target Network & Ethereum Sepolia (primary) and/or Polygon Amoy PoS (secondary single-chain prototype) & Stable public testnets for delivery; Polygon zkEVM retained as evaluated design preference \\
 AI Agent Engine & Qwen3-8B (llama.cpp, Q4\_K\_M) & MCP tool server; per-user context namespace; human confirmation gate \\
 MCP Tool Server & Minimal MVT tool subset (3--5 tools); prompt injection scanner; confirmation audit hook middleware & Exposes a small read+write surface to the agent with typed parameter schemas \\
 Session Keys & EIP-7702 (Future Work) & Scoped, time-bound, value-capped agent wallet authorisation \\
@@ -5632,7 +5640,7 @@ The complete banking architecture is designed around fifteen modular contracts. 
 \begin{itemize}[noitemsep]
 \item \textbf{World Bank Reserve Contract:} Reserve custody, deposit handling, national bank registration, capital allocation to national banks, system pause and unpause, emergency withdrawal, and system statistics.
 \item \textbf{National Bank Contract:} Local bank registration, borrowing from the World Bank reserve, capital allocation to local banks, and network status queries.
-\item \textbf{Local Bank Contract:} Client registration, loan application processing, approval and rejection workflows, installment generation and payment processing, approver management, user account management, and a \texttt{freezeAccount(clientId)} function gated by \texttt{onlyApprover} modifier, used by the SAR workflow (Section~\ref{sec:regulatory-compliance}) to suspend loan and payment operations for a flagged client pending compliance review.
+\item \textbf{Local Bank Contract:} Client registration, deposit routing, approver management, user account management, and a \texttt{freezeAccount(clientId)} function gated by \texttt{onlyApprover} modifier, used by the SAR workflow (Section~\ref{sec:regulatory-compliance}) to suspend loan and payment operations for a flagged client pending compliance review. Loan-application processing, approval / rejection workflows, and installment-state enforcement are handled via the owned \texttt{LoanController} state machine.
 \end{itemize}
 
 \textbf{Planned contracts -- Banking product suite (Phase~II):}
@@ -5661,7 +5669,7 @@ The complete banking architecture is designed around fifteen modular contracts. 
 \phantomsection
 \addcontentsline{toc}{chapter}{Appendix C: Planned Testnet Deployment Manifest}
 
-The following table is the \textbf{consolidated planned deployment manifest template} for the prototype public testnet deployment (Polygon Amoy PoS and/or Ethereum Sepolia). Polygon zkEVM remains an evaluated option in the platform comparison section; it is not the default narrative deployment chain for gates, MVT items, or phase deliverables. No contracts are claimed as live-deployed at pre-thesis submission. Addresses will be recorded in the project repository under \texttt{/deployments/testnet/} as phases complete and can be verified on the relevant block explorers.
+The following table is the \textbf{consolidated planned deployment manifest template} for the prototype public testnet deployment (Ethereum Sepolia as primary and/or Polygon Amoy PoS as secondary). Polygon zkEVM remains an evaluated option in the platform comparison section; it is not the default narrative deployment chain for gates, MVT items, or phase deliverables. No contracts are claimed as live-deployed at pre-thesis submission. Addresses will be recorded in the project repository under \texttt{/deployments/testnet/} as phases complete and can be verified on the relevant block explorers.
 
 \begin{table}[H]
 \centering
@@ -5684,7 +5692,7 @@ WorldBankReserve & Prototype testnet & \url{deployments/testnet/WorldBankReserve
 NationalBank (Scaffold) & Prototype testnet & \url{deployments/testnet/NationalBank.json} \\
 LocalBank (Scaffold) & Prototype testnet & \url{deployments/testnet/LocalBank.json} \\
 \rowcolor{RowShade}
-LendingController & Prototype testnet & \url{deployments/testnet/LendingController.json} \\
+LoanController & Prototype testnet & \url{deployments/testnet/LoanController.json} \\
 \bottomrule
 \end{tabular}
 \endgroup

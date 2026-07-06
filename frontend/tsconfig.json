@@ -16,8 +16,8 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./src",
-    "paths": { "@/*": ["*"] }
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"], "@shared/*": ["../shared/*"] }
   },
   "include": ["src"]
 }

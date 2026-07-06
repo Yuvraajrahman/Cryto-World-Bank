@@ -109,6 +109,7 @@
 
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{longtable}
 \usepackage{colortbl}
 \usepackage{multirow}
 \usepackage{float}
@@ -1115,7 +1116,7 @@ Table~\ref{tab:prototype-scope} records design status only; no public-network de
 \renewcommand{\arraystretch}{0.88}
 \begin{table}[H]
 \centering
-\caption[Prototype scope and implementation status]{Prototype scope: specification vs.\ planned implementation (pre-thesis design record). \textit{Voice:} \textit{specified} = documented design; \textit{planned} = Phase~I--IV deliverable. Target chain: Ethereum Sepolia (primary) and/or Polygon Amoy (secondary).}
+\caption[Prototype scope and implementation status]{Prototype scope: specification vs.\ planned implementation.}
 \label{tab:prototype-scope}
 \begin{tabular}{@{}p{7.4cm}p{5.4cm}@{}}
 \toprule
@@ -1128,28 +1129,31 @@ World Bank Reserve contract (Tier~1) & \tmarkPartial{} Specified (Ph.~I) \\
 Tier~2 National Bank contracts & \tmarkPartial{} Specified (Ph.~I) \\
 \rowcolor{RowShade}
 Tier~3 Local Bank contracts & \tmarkPartial{} Specified (Ph.~I) \\
-Cross-tier fund transfer & \tmarkPlanned{} Planned (Ph.~II) \\
+Cross-tier fund transfer --- single-hop \texttt{allocateCapital} & \tmarkPlanned{} Planned (Ph.~I) \\
 \rowcolor{RowShade}
+Cross-tier fund transfer --- cascading repayment / interest across tiers & \tmarkPlanned{} Planned (Ph.~II) \\
 Loan request / approval workflow & \tmarkPartial{} Specified (Ph.~II) \\
 Installment EMI auto-generation & \tmarkPlanned{} Planned (Ph.~II) \\
 \rowcolor{RowShade}
-SavingsVault / FixedDeposit contracts & \tmarkPlanned{} Planned (Ph.~II) \\
+SavingsVault & \tmarkPlanned{} Planned (Ph.~II) \\
+\rowcolor{RowShade}
+FixedDeposit & \tmarkPartial{} Specified; Stub --- migrates when contract ships \\
 GroupLendingPool & \tmarkPlanned{} Planned (Ph.~II) \\
 \rowcolor{RowShade}
 InterBankLendingPool & \tmarkPlanned{} Planned (Ph.~II) \\
 AI/ML fraud detection (Random Forest) & \tmarkPlanned{} Planned (Ph.~III) \\
 \rowcolor{RowShade}
 SHAP + anomaly explainability & \tmarkPlanned{} Planned (Ph.~III) \\
-Oracle (Chainlink Functions) & \tmarkPlanned{} Stretch (Ph.~III) \\
+Oracle (Chainlink Functions) & \tmarkPlanned{} Future Work (DT-III.01; commit--reveal is MVT path) \\
 \rowcolor{RowShade}
-ZKP KYC compliance layer & \tmarkPlanned{} Future Work \\
+ZKP KYC compliance layer & \tmarkPlanned{} Planned (Ph.~IV; DT-IV.06 Could) \\
 Testnet deployment (Amoy / Sepolia) & \tmarkPlanned{} Planned (Ph.~IV) \\
 \rowcolor{RowShade}
 AI Agent / MCP (minimal MVT) & \tmarkPlanned{} Planned (Ph.~III; retail only) \\
 Full MCP tool server (17 tools) & \tmarkPlanned{} Future Work \\
 \rowcolor{RowShade}
 Bank-authority AI agent & \tmarkPlanned{} Future Work \\
-EIP-7702 session keys & \tmarkPlanned{} Future Work \\
+EIP-7702 session keys & \tmarkPlanned{} Stretch (Ph.~III; DT-III.05 Should) \\
 Authority Brief UI (SHAP) & \tmarkPlanned{} Planned (Ph.~III) \\
 \rowcolor{RowShade}
 Chainlink Automation / Proof of Reserve & \tmarkPlanned{} Planned (Ph.~I--II) \\
@@ -1170,11 +1174,11 @@ SAR workflow (AML $\to$ freeze) & \tmarkPlanned{} Planned (Ph.~III) \\
 \section{Specifications and Requirements}
 \label{sec:specifications-requirements}
 
-Table~\ref{tab:functional-requirements} and Table~\ref{tab:nonfunctional-requirements} consolidate the functional and non-functional requirements that drive the architecture in this chapter and the implementation plan in Chapter~\ref{ch:methodology}. They subsume scattered capability rows from Table~\ref{tab:prototype-scope} and the MVT checklist (Chapter~\ref{ch:methodology}) into a single requirements view suitable for traceability (Section~\ref{sec:traceability}).
+Table~\ref{tab:functional-requirements} and Table~\ref{tab:nonfunctional-requirements} consolidate the functional and non-functional requirements that drive the architecture in this chapter and the implementation plan in Chapter~\ref{ch:methodology}. They subsume capability rows from Table~\ref{tab:prototype-scope}; the full feature inventory and MVT checklist are in Chapter~\ref{ch:methodology} (Table~\ref{tab:feature-list} and Table~\ref{tab:mvt-checklist}).
 
 \begin{table}[H]
 \centering
-\caption[Functional requirements (representative)]{Functional requirements (representative subset). Full module inventory remains in Table~\ref{tab:prototype-scope}.}
+\caption[Functional requirements (representative)]{Functional requirements (representative subset). Full feature inventory in Chapter~\ref{ch:methodology} (Table~\ref{tab:feature-list}); module status in Table~\ref{tab:prototype-scope}.}
 \label{tab:functional-requirements}
 \small
 \begin{tabular}{@{}p{1.2cm}p{4.2cm}p{8.8cm}@{}}
@@ -1273,7 +1277,7 @@ Loan \texttt{oracle\_state} and lifecycle enums \\
 \section{High-Level Architecture}
 \label{sec:high-level-arch}
 
-The system employs a \textbf{four-layer decentralised application architecture} (Figure~\ref{fig:three-layer-arch}): a presentation layer (React + wallet integration), a smart-contract layer (fifteen modular EVM contracts centred on the four-tier lending hierarchy), an off-chain services layer (Express REST API, PostgreSQL, FastAPI ML scoring, Chainlink oracle integration, event listener, and Redis cache), and a Chainlink infrastructure layer (Chainlink Functions, Automation, Price Feeds, and Proof of Reserve). A planned Phase~III conversational agent (Qwen3-8B + MCP tool server) attaches to the same API endpoints as the React UI and does not alter on-chain logic.
+The system employs a \textbf{four-layer decentralised application architecture} (Figure~\ref{fig:three-layer-arch}): a presentation layer (React + wallet integration), a smart-contract layer (seventeen modular EVM contracts centred on the four-tier lending hierarchy), an off-chain services layer (Express REST API, PostgreSQL, FastAPI ML scoring, Chainlink oracle integration, event listener, and Redis cache), and a Chainlink infrastructure layer (Chainlink Functions, Automation, Price Feeds, and Proof of Reserve). A planned Phase~III conversational agent (Qwen3-8B + MCP tool server) attaches to the same API endpoints as the React UI and does not alter on-chain logic.
 
 From a \textbf{Software Engineering} architecture-pattern perspective, the stack combines: \textit{layered architecture} (presentation $\to$ API $\to$ persistence $\to$ chain); \textit{client--server} (React and agent clients request services from Express and EVM nodes); \textit{repository pattern} (PostgreSQL as the shared off-chain data store accessed by API, listener, and ML services); and \textit{pipe-and-filter} (loan application flows through feature engineering $\to$ RF/IF scoring $\to$ SHAP explanation $\to$ commit--reveal oracle). Figure~\ref{fig:component-diagram} labels these interactions; Section~\ref{sec:design-limitations} records which integrations use zero-cost demonstration substitutes on the graded prototype path.
 
@@ -1302,22 +1306,24 @@ Figure~\ref{fig:component-diagram} shows component interactions. Core lending co
 \midrule
 WorldBankReserve & Tier~1 core & Specified (Phase~I) & Global reserve custody, national-bank registration, downward capital allocation. \\
 NationalBank & Tier~2 core & Specified (Phase~I) & Local-bank registration, upward borrowing, downward allocation. \\
-LocalBank & Tier~3 core & Specified (Phase~I) & Client onboarding, loan lifecycle, installments, \texttt{freezeAccount}. \\
+LocalBank & Tier~3 core & Specified (Phase~I) & Client onboarding, approver management, owns \texttt{LoanController}; \texttt{freezeAccount} (Phase~II+). \\
+LoanController & Lending state machine & Specified (Ph.~I shell; functional Ph.~II) & Loan request, approval, disbursement, installment state machine (DT-II.01--03); deployed by \texttt{LocalBank}. \\
 SavingsVault & Deposits & Specified (Phase~II) & Variable-yield savings, reserve-gated withdrawals. \\
-FixedDeposit & Deposits & Specified (Phase~II) & Term deposits with deterministic early-withdrawal penalty. \\
+FixedDeposit & Deposits & Specified; Stub --- migrates when contract ships & Term deposits with deterministic early-withdrawal penalty. \\
 GroupLendingPool & Group credit & Specified (Phase~II) & Solidarity-group formation, consent, mutual liability. \\
-FXModule & Treasury / FX & Specified (Phase~II) & Oracle-priced retail FX with disclosed spread. \\
-InsuranceFund & Risk buffer & Specified (Phase~II) & Default coverage buffer; Chainlink Proof of Reserve. \\
-CurrentAccount & Payments & Specified (Phase~II) & Transactional accounts and atomic peer transfers. \\
+FXModule & Treasury / FX & Planned (Phase~III) & Oracle-priced retail FX with disclosed spread. \\
+InsuranceFund & Risk buffer & Specified (Ph.~I, Should --- commonly deferred to Ph.~II; Table~\ref{tab:phaseI-deferred}) & Default coverage buffer; Chainlink Proof of Reserve. \\
+CurrentAccount & Payments & Specified; Stub --- migrates when contract ships & Transactional accounts and atomic peer transfers. \\
 InterBankLendingPool & Multi-entity & Specified (Phase~II) & Same-tier interbank liquidity pools per tier. \\
 UpwardDepositFacility & Multi-entity & Specified (Phase~II) & Upward surplus repatriation with yield spread. \\
 SyndicatedLoan & Multi-entity & Planned (Phase~III) & Multi-lender syndicate consent and disbursement. \\
 TranchedPool & Multi-entity & Planned (Phase~III) & Senior/junior tranching and waterfall recovery. \\
-TreasurySwap & Multi-entity & Specified (Phase~II) & Institutional oracle-priced asset swaps. \\
+TreasurySwap & Multi-entity & Planned (Phase~III) & Institutional oracle-priced asset swaps. \\
+LiquidationEngine & Risk / liquidation & Planned (Phase~III) & Health-factor monitoring; third-party liquidator bonus when $HF < 1.0$ (Section~\ref{sec:liquidation}). \\
 NettingEngine & Multi-entity & Future Work & ERD stubs only; Section~\ref{sec:future-work} \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{Smart Contract Inventory: Fifteen Modular Contracts Across Core, Product, and Multi-Entity Modules}
+\TableScreenshotEnd{Smart Contract Inventory: Seventeen Modular Contracts Across Core, Product, and Multi-Entity Modules}
 \end{table}
 
 \section{Blockchain Platform Selection}
@@ -1482,7 +1488,7 @@ This function is the FTX commingling safeguard described in Section~\ref{sec:def
 \section{Data Model and Database Design}
 \label{sec:data-model}
 
-The relational database schema comprises 51 normalized entities in Third Normal Form (3NF): 31 core prototype entities (Table~\ref{tab:db-entities}), six primary extension entities (Table~\ref{tab:db-entities-ext}), and 14 Phase~II--III banking-product and multi-entity entity stubs (Table~\ref{tab:db-entities-ext2}). All 51 are \textbf{fully specified} in this chapter for design completeness and ERD consistency; the graded prototype \textbf{physically migrates $\approx$21 tables} across Phases~I--III (Table~\ref{tab:db-implementation-tiers}). Stub entities carry PK, FK anchors, and one-sentence roles in Table~\ref{tab:db-entities-ext2} and are fully attribute-specified in Section~\ref{sec:multi-entity}. Two Phase~IV platform-configuration relations (\texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION}) are documented outside the 51-entity lending schema (Section~\ref{sec:db-impl-tiers}). Figure~\ref{fig:core-system-graph} presents the core entity-relationship overview, Figure~\ref{fig:erd-extended} presents extended product and multi-entity entities, and Figure~\ref{fig:eer} presents the Enhanced Entity-Relationship (EER) diagram with specialisation and weak-entity constructs.
+The relational database schema comprises 51 normalized entities in Third Normal Form (3NF): 31 core prototype entities (Table~\ref{tab:db-entities}), six primary extension entities (Table~\ref{tab:db-entities-ext}), and 14 Phase~II--III banking-product and multi-entity entity stubs (Table~\ref{tab:db-entities-ext2}). All 51 are \textbf{fully specified} in this chapter for design completeness and ERD consistency; the graded prototype \textbf{physically migrates $\approx$32 tables} across Phases~I--III (Table~\ref{tab:db-implementation-tiers}). Stub entities carry PK, FK anchors, and one-sentence roles in Table~\ref{tab:db-entities-ext2} and are fully attribute-specified in Section~\ref{sec:multi-entity}. Two Phase~IV platform-configuration relations (\texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION}) are documented outside the 51-entity lending schema (Section~\ref{sec:db-impl-tiers}). Figure~\ref{fig:core-system-graph} presents the core entity-relationship overview, Figure~\ref{fig:erd-extended} presents extended product and multi-entity entities, and Figure~\ref{fig:eer} presents the Enhanced Entity-Relationship (EER) diagram with specialisation and weak-entity constructs.
 
 \begin{figure}[H]
 \centering
@@ -1657,7 +1663,7 @@ NETTING\_ENTRY & \texttt{entry\_id} & Individual net position per institution pe
 \subsection{Logical Schema versus Physical Migration Tiers}
 \label{sec:db-impl-tiers}
 
-The 51-entity count describes the \textbf{complete logical data model} required for architectural consistency with the fifteen-contract inventory. The graded prototype does \textit{not} require 51 physical PostgreSQL tables at Gate~G1. Table~\ref{tab:db-implementation-tiers} maps every entity to an implementation tier: \textbf{M1} (migrate Phase~I, Gate~G1), \textbf{M2} (migrate Phase~II), \textbf{M3} (migrate Phase~III), \textbf{Stub} (ERD and FK anchors only until the matching contract ships), or \textbf{Future} (specified; no MVT migration). Approximately \textbf{13 + 8 + 5 = 21 tables} are physically migrated across Phases~I--III; the remainder stay documented stubs.
+The 51-entity count describes the \textbf{complete logical data model} required for architectural consistency with the seventeen-contract inventory. The graded prototype does \textit{not} require 51 physical PostgreSQL tables at Gate~G1. Table~\ref{tab:db-implementation-tiers} maps every entity to an implementation tier: \textbf{M1} (migrate Phase~I, Gate~G1), \textbf{M2} (migrate Phase~II), \textbf{M3} (migrate Phase~III), \textbf{Stub} (ERD and FK anchors only until the matching contract ships), or \textbf{Future} (specified; no MVT migration). Approximately \textbf{13 + 12 + 7 = 32 tables} are physically migrated across Phases~I--III; the remainder stay documented stubs.
 
 \paragraph{Platform-configuration relations (outside the 51-entity count).}
 \texttt{CHAIN\_REGISTRY} (deployment chain IDs, RPC endpoints, EIP-7702 delegation contract addresses) and \texttt{SESSION\_KEY\_PERMISSION} (normalised MCP tool allowlists per session) are Phase~IV platform-configuration tables. They are referenced in Sections~\ref{sec:onboarding} and~\ref{sec:optional-agent} but are \textit{not} included in the 51-entity lending schema because they hold deployment metadata rather than banking-domain state.
@@ -1957,6 +1963,42 @@ Tables owned exclusively by the event listener (projection tables) include \text
 \BalancedDiagram{fig-data-partitioning}
 \caption[On-chain versus off-chain data partitioning]{On-chain versus off-chain data partitioning}
 \label{fig:data-partitioning}
+\end{figure}
+
+\subsection{Financial Data Authority and Lifecycle}
+\label{sec:financial-data-lifecycle}
+
+On-chain contract state is the \textbf{authoritative source of truth} for settlement: reserve balances, loan lifecycle transitions, role bindings, and enforced borrowing limits. PostgreSQL holds workflow metadata, PII, ML inference records, and \textbf{read-only projections} synchronised from chain events by the event listener (FR-07; Section~\ref{sec:realtime}). Where the two layers disagree after a confirmed transaction, the on-chain record prevails; projection tables exist for fast queries and dashboards, not for independent financial ledgering.
+
+\paragraph{Retail loan write path.}
+The end-to-end flow for a standard retail loan is: (1)~the client submits an application (wallet-signed \texttt{requestLoan} on \texttt{LocalBank}, with optional off-chain document hash in \texttt{LOAN\_REQUEST}); (2)~the ML service scores features off-chain and the commit--reveal oracle records the risk score on-chain (Section~\ref{sec:oracle-architecture}); (3)~the Local Bank approver signs \texttt{approveLoan}, which atomically updates loan state and disburses funds; (4)~the event listener ingests \texttt{LoanRequested}, \texttt{LoanApproved}, and \texttt{LoanDisbursed} events into \texttt{BLOCKCHAIN\_EVENT\_LOG} and updates \texttt{LOAN}, \texttt{INSTALLMENT}, and projection tables (Figure~\ref{fig:seq-loan-flow}). Repayments follow the same pattern: \texttt{payInstallment} on-chain, then listener projection.
+
+\begin{table}[H]
+\centering
+\caption[Financial data read paths by consumer]{Financial data read paths by consumer.}
+\label{tab:financial-read-paths}
+\begin{tabular}{p{3.2cm}p{4.2cm}p{6.1cm}}
+\toprule
+\tableheadcolor
+\textbf{Consumer} & \textbf{Authoritative read} & \textbf{Off-chain supplement} \\
+\midrule
+Approver queue & On-chain pending loans + \texttt{BLOCKCHAIN\_EVENT\_LOG} & \texttt{LOAN\_RISK\_ASSESSMENT} (SHAP, anomaly score); income proofs \\
+Borrower dashboard & Active loan state via chain or indexer API & KYC status, chat, application drafts \\
+Reserve / tier admin & \texttt{getReserveSummary()} on tier contracts & Listener-cached events for history charts \\
+Agent (Phase~III) & Projection tables (\texttt{CREDIT\_PASSPORT}, \texttt{BORROWING\_LIMIT}, active \texttt{LOAN}) & \texttt{SESSIONS}, \texttt{AGENT\_ACTION\_LOG} (tx-hash link) \\
+\bottomrule
+\end{tabular}
+\TableScreenshotEnd{Financial Data Read Paths: On-Chain Authority with Off-Chain Query Supplements}
+\end{table}
+
+\vspace{2pt}
+\noindent\textit{\small At MVT scope, loan denomination may use \texttt{MockUSDC} or native ETH on the demonstration testnet (Table~\ref{tab:design-vs-demo}); the authority rules above are unchanged---only the settlement asset differs.}
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{fig-financial-data-lifecycle}
+\caption[Financial data authority and lifecycle]{Financial data authority and lifecycle: on-chain settlement state, off-chain workflow and projections, and the event-listener bridge.}
+\label{fig:financial-data-lifecycle}
 \end{figure}
 
 \section{Operating Context}
@@ -3008,9 +3050,7 @@ Ethereum mainnet &
 \chapter{Methodology}
 \label{ch:methodology}
 
-This project and its planning have been structured in accordance with the final-year project evaluation rubrics.
-
-\noindent\textbf{Scope framing.} The final thesis deliverable comprises \textbf{blockchain banking} (smart-contract hierarchy, on-chain lending lifecycle, oracle-mediated risk scoring) and a \textbf{conversational agent layer} (Qwen3-8B + MCP, Phase~III Must). The React UI and agent are co-primary client interfaces; both call the same Express.js API and smart contracts. Write operations through either path require wallet or session-key signing and, for agent-initiated actions, an explicit human confirmation gate. Section~\ref{sec:optional-agent} specifies the agent pipeline; Section~\ref{sec:aiml-support} covers the ML oracle that gates approver decisions independently of the agent.
+This project paper is constructed to match with the final year project evaluation rubrics. Full development work has been distributed to 4 phases, and priority of all the capability sections has been divided to Must, Should and Future work. The Must and Should priority sections are to be completed by the end of the development and testing phase, Future Work sections have been specified only, to show the Potential of the project by extending its functionality and development scopes.
 
 \begin{table}[H]
 \centering
@@ -3033,91 +3073,265 @@ LLM evaluation protocol & Should (Ph.~IV) & Red-team + task accuracy (Section~\r
 \section{Minimum Viable Thesis (MVT) Checklist}
 \label{sec:mvt-checklist}
 
-Examiners should treat the items below as the \textbf{graded deliverable boundary} for the final thesis. Everything outside this checklist is either pre-thesis design (this report) or explicitly deferred Future Work. The three \textbf{primary research contributions} are Contribution~1 (hierarchical architecture), Contribution~3 (oracle-mediated explainable ML, extended by the Phase~III conversational agent), and Contribution~2 (solidarity group lending \textit{specification}); all other modules support or extend these claims.
-
 \begin{table}[H]
 \centering
-\caption[MVT module boundary: primary contributions vs.\ future work]{MVT module boundary: primary contributions vs.\ future work.}
+\caption[MVT deliverable checklist]{MVT deliverable checklist.}
 \label{tab:contributions-vs-future}
-\begin{tabular}{p{4.2cm}p{2.2cm}p{7.8cm}}
-\toprule
-\tableheadcolor
-\textbf{Module} & \textbf{Status} & \textbf{Examiner expectation} \\
-\midrule
-Four-tier smart-contract hierarchy & \textbf{Primary (C1)} & Must deploy + test on public testnet; reserve and RBAC demonstrated \\
-Oracle-mediated RF + IF + SHAP pipeline & \textbf{Primary (C3)} & Must train, benchmark, and show Authority Brief + audit log (Section~\ref{sec:ml-workload}) \\
-Solidarity \texttt{GroupLendingPool} spec & \textbf{Primary (C2)} & Specification + minimal PoC sufficient; full mutual-liability lifecycle is a Phase~II deliverable (Table~\ref{tab:phase-deliverables}) \\
-GNN (GraphSAGE) ablation & Future Work & Literature motivation only (Section~\ref{sec:lit-gnn}); not MVT \\
-Federated learning across banks & Future Work & Literature motivation only (Section~\ref{sec:lit-fl}); not MVT \\
-zkAML / Groth16 zkKYC circuits & Future Work & Off-chain KYC at MVT; circuits deferred (Section~\ref{sec:future-work}) \\
-CCIP cross-chain bridge & Assumed infra & Single-chain testnet sufficient for MVT; CCIP is integration, not research novelty \\
-Certora reserve-invariant proofs & Future Work & Foundry fuzz suite is MVT+ stretch (Section~\ref{sec:foundry}) \\
-MCP conversational agent & \textbf{Primary (C3 ext.)} & Must deploy in Phase~III: 3--5-tool MCP + chat UI + confirmation gate; one write operation demonstrated E2E (MVT item~11); full 17-tool suite is Future Work \\
-ERC-4337 full Paymaster stack & Stretch & WalletConnect path sufficient for MVT demo \\
-Multi-entity lend / fund / FX suite (IBLP, UpwardDeposit, SavingsVault; SyndicatedLoan, TranchedPool, TreasurySwap) & \textbf{Primary arch. (C1 ext.)} & Fully specified Ch.~3 (\S\ref{sec:multi-entity}); IBLP / UpwardDeposit / SavingsVault in Phase~II; Syndicated / Tranched / TreasurySwap in Phase~III (Table~\ref{tab:phase-deliverables}); demo of one flow recommended \\
-Syndicated / tranched lending suite & Stretch (Phase~III) & Specified; demo of one flow recommended \\
-NettingEngine (partial settlement, challenge periods) & Future Work & ERD stubs only; Section~\ref{sec:future-work} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption[MVT deliverable checklist]{MVT deliverable checklist: numbered acceptance criteria.}
 \label{tab:mvt-checklist}
-\begin{tabular}{p{0.5cm}p{4.8cm}p{1.6cm}p{6.3cm}}
+\small
+\begin{tabular}{p{0.5cm}p{9.2cm}p{1.8cm}p{1.8cm}}
 \toprule
 \tableheadcolor
-\textbf{\#} & \textbf{Deliverable} & \textbf{Phase} & \textbf{Done when (acceptance criterion)} \\
+\textbf{\#} & \textbf{Deliverable} & \textbf{Priority} & \textbf{Phase} \\
 \midrule
-1 & World / National / Local Bank contracts deployed on Polygon Amoy and/or Ethereum Sepolia & I & Addresses in Appendix~C manifest; role-gated functions callable \\
-2 & Loan request $\to$ approver review $\to$ disbursement $\to$ one installment repayment (E2E) & II & Screen recording + tx hashes on block explorer \\
-3 & Reserve-ratio / borrowing-limit enforcement visible on-chain & II & Hardhat or Foundry test proves revert on violation \\
-4 & FastAPI ML service: RF + IF + stacking $\to$ composite score $s$ & II--III & \texttt{POST /score} returns JSON in $<$50\,ms on laptop \\
-5 & SHAP + anomaly deviation report + Authority Brief UI & II--III & Approver sees brief on sample loan; decline shows top-3 SHAP reasons \\
-6 & \texttt{LOAN\_RISK\_ASSESSMENT} row per inference & III & DB row contains \texttt{shap\_vector}, \texttt{model\_id} (FK $\to$ \texttt{MODEL\_REGISTRY}), \texttt{loan\_request\_id} \\
-7 & Commit-reveal score commit before approval & III & Contract in \texttt{SCORE\_REVEALED} before \texttt{approveLoan} succeeds \\
-8 & BCCC-DeFiFraudTrans benchmark table (precision, recall, F1, AUC) & II--III & Table~\ref{tab:ml-bccc-results} + Figure~\ref{fig:ml-eval}: 50k-address subsample; full corpus retrain deferred \\
-9 & 300-client Foundry simulation OR documented gas-cost table & IV & Local Anvil/Hardhat run with deterministic seed; gas table + manifest in Appendix~C; live testnet demo optional (5--10 clients) \\
-10 & Open-source repo README with MVT run instructions & IV & Panel can reproduce steps 1--5 and agent loan-apply demo (item~11) from README \\
-11 & MCP conversational agent: 3--5-tool server + chat UI + human confirmation gate & III & Screen recording: client submits loan via agent; \texttt{AGENT\_ACTION\_LOG} row + confirmation turn recorded; write blocked without consent \\
-12 & LLM evaluation protocol (task accuracy, action accuracy, zero bypass) & IV (Should) & Section~\ref{sec:llm-eval} metrics reported if schedule permits; red-team set started in Phase~III \\
-13 & Slither + Mythril audit reports on World Bank / National Bank / Local Bank contracts & IV & Reports archived in Appendix~B; zero unresolved Slither high-severity findings \\
-14 & Foundry fuzz + invariant suite on reentrancy-critical functions (\texttt{disburseLoan}, \texttt{processInstallment}, \texttt{allocateCapital}) & II--IV & \texttt{forge test} fuzz + invariant suite green in CI; gas table reproducible \\
-15 & 2-of-3 Safe multisig holding \texttt{WorldBankAdmin} before first inspectable testnet deployment & I & Safe address in Appendix~C manifest; privileged calls route through Safe, not an EOA \\
-16 & Tenderly alert rules live for 3 demo-critical triggers (large disbursement, reserve-ratio drop, governance pause) & III--IV (Should) & Alert fires on a recorded test transaction; screenshot/log archived in Appendix~C \\
-\multicolumn{4}{l}{\textit{Optional (not graded for MVT pass): GNN ablation, Certora proof, Echidna fuzzing, Halmos verification, zkAML, CCIP bridge, full 6-trigger Tenderly set, hardware-wallet signer, key-rotation schedule.}} \\
+1 & Four-tier bank contracts on testnet & Must & I \\
+2 & Loan lifecycle E2E (request, approve, disburse, repay) & Must & II \\
+3 & On-chain reserve and borrowing limits & Must & II \\
+4 & ML risk scoring (RF + IF + stacking) & Must & III \\
+5 & SHAP explainability and Authority Brief UI & Must & III \\
+6 & Risk assessment audit row per inference & Must & III \\
+7 & Commit--reveal score gate before approval & Must & III \\
+8 & BCCC fraud-detection benchmark & Must & III \\
+9 & 300-client simulation or gas-cost table & Must & IV \\
+10 & README with reproduction instructions & Must & IV \\
+11 & MCP agent (3--5 tools + confirmation gate) & Must & III \\
+12 & LLM evaluation protocol & Should & IV \\
+13 & Contract audit reports (Slither + Mythril) & Must & IV \\
+14 & Foundry fuzz and invariant tests & Must & IV \\
+15 & Safe multisig for World Bank admin & Must & I \\
+16 & Tenderly monitoring alerts & Should & IV \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent\textbf{Pre-thesis vs.\ final thesis.} At \textbf{pre-thesis submission}, items 1--8 and 11 may remain \textit{specified} rather than \textit{deployed}; this report satisfies that stage by providing contract interfaces, the ML workload plan (Section~\ref{sec:ml-workload}), agent pipeline specification (Section~\ref{sec:optional-agent}), diagrams, and the checklist above. At \textbf{final thesis submission}, items 1--8, 11, 13, 14, and 15 are \textbf{Must} for a defensible pass; items 9--10, 12, and 16 are \textbf{Should}. Figure~\ref{fig:mvt-status} summarises which MVT items are satisfied at pre-thesis versus deferred to the final thesis.
+\section{List of Features}
+\label{sec:feature-list}
 
-\begin{figure}[H]
-\centering
-\BalancedDiagram{Ch4_mvt-status}
-\caption[MVT deliverable status at pre-thesis]{MVT deliverable status at pre-thesis}
-\label{fig:mvt-status}
-\end{figure}
+Table~\ref{tab:feature-list} lists the complete list of features of the full project. The Must features will be completed during the development phases, Should and Stretch features are extensions of the main Must features, and Specified features are documented but not yet implemented, Future Work features are to show the potential improvements of the project and some of these features might be deliverable by the end of the project as special features.
+
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{0.88}
+\begin{longtable}{@{}>{\centering\arraybackslash}p{0.5cm}>{\raggedright\arraybackslash}p{9.0cm}>{\raggedright\arraybackslash}p{2.2cm}>{\centering\arraybackslash}p{1.6cm}@{}}
+\caption[Complete feature inventory]{Complete feature inventory by category, priority, and implementation phase.}
+\label{tab:feature-list} \\
+\toprule
+\tableheadcolor
+\tableheadfont \# & \tableheadfont Feature & \tableheadfont Priority & \tableheadfont Phase \\
+\midrule
+\endfirsthead
+\multicolumn{4}{r}{\small\itshape Table~\thetable{} (continued)} \\[2pt]
+\toprule
+\tableheadcolor
+\tableheadfont \# & \tableheadfont Feature & \tableheadfont Priority & \tableheadfont Phase \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\small\itshape Table~\thetable{} (continued on next page)} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\multicolumn{4}{@{}l@{}}{\textit{Core platform and hierarchy}} \\
+\rowcolor{RowShade}
+1 & Four-tier banking hierarchy (World $\to$ National $\to$ Local $\to$ Client) & Must & I \\
+2 & Role-based access control (RBAC) on contracts and API & Must & I \\
+\rowcolor{RowShade}
+3 & World Bank Reserve --- global capital custody & Must & I \\
+4 & National Bank --- jurisdiction-level allocation & Must & I \\
+\rowcolor{RowShade}
+5 & Local Bank --- retail operations hub & Must & I \\
+6 & Downward capital allocation (\texttt{allocateCapital}) & Must & I \\
+\rowcolor{RowShade}
+7 & Hierarchical bank registration (National $\to$ Local) & Must & II \\
+8 & Reserve-ratio enforcement before downward allocation & Must & II \\
+\rowcolor{RowShade}
+9 & MockUSDC / testnet stablecoin for lending & Must & I \\
+10 & 2-of-3 Safe multisig for \texttt{WorldBankAdmin} & Must & I \\
+\rowcolor{RowShade}
+11 & Contract pause / unpause (emergency controls) & Must & I \\
+12 & Single-chain deployment (Sepolia / Amoy) & Must & I--IV \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Retail lending lifecycle}} \\
+\rowcolor{RowShade}
+13 & Loan request submission (on-chain + UI) & Must & II \\
+14 & Approver review workflow (approve / reject / request info) & Must & II \\
+\rowcolor{RowShade}
+15 & Loan disbursement to client wallet & Must & II \\
+16 & Installment schedule generation & Must & II \\
+\rowcolor{RowShade}
+17 & Installment payment processing & Must & II \\
+18 & On-chain loan state machine (\texttt{PENDING\_SCORE} $\to$ \texttt{ACTIVE}) & Must & II \\
+\rowcolor{RowShade}
+19 & Borrowing limits (six-month / one-year rolling caps) & Must & II \\
+20 & Collateral-based lending (LTV) & Must & II \\
+\rowcolor{RowShade}
+21 & Credit-based lending (no collateral, SBT-gated) & Should & II \\
+22 & Kinked interest rate model (utilization-based) & Should & II \\
+\rowcolor{RowShade}
+23 & Credit tier schedule (Bronze $\to$ Diamond) & Should & II \\
+24 & Overdue installment checks (cron / Chainlink Automation) & Should & II \\
+\rowcolor{RowShade}
+25 & Loan history and transaction tracking UI & Should & II \\
+26 & Income verification document upload and review & Should & II \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Deposits and savings products}} \\
+\rowcolor{RowShade}
+27 & SavingsVault --- variable-yield savings (ERC-4626) & Should & II \\
+28 & FixedDeposit --- term deposits (30/90/180/365 days) & Specified & II+ \\
+\rowcolor{RowShade}
+29 & Current / checking account (atomic transfers) & Specified & II+ \\
+30 & Deposit-to-lending pool integration & Should & II \\
+\rowcolor{RowShade}
+31 & Interest split (depositor / InsuranceFund / protocol) & Should & II \\
+32 & Withdrawal gated by reserve ratio & Must & II \\
+\rowcolor{RowShade}
+33 & InsuranceFund (5\% interest capture, default coverage) & Should & II \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Group and solidarity lending}} \\
+\rowcolor{RowShade}
+34 & Group formation (3--20 members) & Must (C2) & II \\
+35 & Multi-signature group consent & Must (C2) & II \\
+\rowcolor{RowShade}
+36 & Per-member disbursement share & Must (C2) & II \\
+37 & Shared collateral / mutual liability & Must (C2) & II \\
+\rowcolor{RowShade}
+38 & Over-indebtedness controls (DTI, cooling-off, max two group loans) & Should & II \\
+39 & Group credit history on SBT & Should & II \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Multi-entity and cross-tier operations}} \\
+\rowcolor{RowShade}
+40 & InterBankLendingPool --- same-tier peer lending (1/7/30 day) & Should & II \\
+41 & UpwardDepositFacility --- surplus repatriation to parent tier & Should & II \\
+\rowcolor{RowShade}
+42 & SyndicatedLoan --- multi-bank co-funding & Stretch & III \\
+43 & TranchedPool --- senior/junior tranches & Stretch & III \\
+\rowcolor{RowShade}
+44 & TreasurySwap --- cross-tier treasury FX & Should & III \\
+45 & FXModule --- oracle-priced retail FX & Should & III \\
+\rowcolor{RowShade}
+46 & Dual-currency facility (fiat $\leftrightarrow$ crypto) & Specified & III \\
+47 & Cascading repayment / interest across tiers & Should & II \\
+\rowcolor{RowShade}
+48 & NettingEngine --- multilateral settlement & Future Work & --- \\
+49 & Trade finance / escrow letters of credit & Future Work & --- \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Credit passport and identity}} \\
+\rowcolor{RowShade}
+50 & On-chain Credit Passport (Soulbound Token) & Must & II \\
+51 & Credit score, tier, and repayment history on SBT & Must & II \\
+\rowcolor{RowShade}
+52 & Tier-based max loan limits and rate modifiers & Should & II \\
+53 & Wallet authentication (MetaMask / WalletConnect) & Must & I \\
+\rowcolor{RowShade}
+54 & EIP-712 typed-data login + JWT session & Must & I--II \\
+55 & Five-stage retail onboarding funnel & Should & I--II \\
+\rowcolor{RowShade}
+56 & Tiered KYC (Level~1 / Level~2) & Must & I--II \\
+57 & Off-chain KYC document storage (hash-linked) & Must & I--II \\
+\rowcolor{RowShade}
+58 & ERC-4337 account abstraction (gasless onboarding) & Stretch & III \\
+59 & Groth16 zkKYC / zkAML circuits & Future Work & --- \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{AI/ML risk and explainability}} \\
+\rowcolor{RowShade}
+60 & Random Forest fraud probability scoring & Must (C3) & III \\
+61 & Isolation Forest anomaly detection & Must (C3) & III \\
+\rowcolor{RowShade}
+62 & Stacking meta-learner (calibrated composite score) & Must (C3) & III \\
+63 & SHAP explainability (top-$k$ features) & Must (C3) & III \\
+\rowcolor{RowShade}
+64 & Authority Brief UI for approvers & Must (C3) & II--III \\
+65 & Commit--reveal oracle score gate before approval & Must & III \\
+\rowcolor{RowShade}
+66 & \texttt{LOAN\_RISK\_ASSESSMENT} audit row per inference & Must & III \\
+67 & BCCC-DeFiFraudTrans benchmark evaluation & Must & II--III \\
+\rowcolor{RowShade}
+68 & Chainlink Functions DON oracle & Future Work & --- \\
+69 & GNN (GraphSAGE) ablation & Future Work & --- \\
+\rowcolor{RowShade}
+70 & Federated learning across banks & Future Work & --- \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Conversational agent}} \\
+\rowcolor{RowShade}
+71 & Qwen3-8B local LLM chat interface & Must & III \\
+72 & MCP tool server (3--5 tools at MVT) & Must & III \\
+\rowcolor{RowShade}
+73 & Human confirmation gate for all write tools & Must & III \\
+74 & Read tools: account state, loan status, requirements & Must & III \\
+\rowcolor{RowShade}
+75 & Write tools: loan application, installment payment & Must & III \\
+76 & RAG over policy documents (Q\&A path) & Must & III \\
+\rowcolor{RowShade}
+77 & Live on-chain context injection per turn & Must & III \\
+78 & Three-tier prompt assembly (Stable / Context / Volatile) & Must & III \\
+\rowcolor{RowShade}
+79 & Prompt injection scanning & Must & III \\
+80 & \texttt{AGENT\_ACTION\_LOG} audit trail & Must & III \\
+\rowcolor{RowShade}
+81 & Full 17-tool MCP suite & Future Work & --- \\
+82 & EIP-7702 scoped session keys for agent & Stretch & III \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Frontend, API, and data layer}} \\
+\rowcolor{RowShade}
+83 & React + TypeScript dashboard (mobile-first) & Must & I--II \\
+84 & Reserve transparency dashboard & Should & III \\
+\rowcolor{RowShade}
+85 & Five-state transaction UX machine (idle $\to$ success/error) & Should & II \\
+86 & PostgreSQL event listener (on-chain $\to$ DB sync) & Must & I--II \\
+\rowcolor{RowShade}
+87 & Real-time notifications (WebSocket / Socket.IO) & Should & III \\
+88 & Client--bank chat & Should & II \\
+\rowcolor{RowShade}
+89 & Express.js REST API with RBAC & Must & I--II \\
+90 & FastAPI ML inference service & Must & II--III \\
+\rowcolor{RowShade}
+91 & API rate limiting and correlation-ID tracing & Should & II \\
+92 & The Graph subgraph (optional query layer) & Future Work & --- \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Security, governance, and compliance}} \\
+\rowcolor{RowShade}
+93 & Five-layer defense-in-depth architecture & Specified & I--IV \\
+94 & ReentrancyGuard + CEI pattern on contracts & Must & I--II \\
+\rowcolor{RowShade}
+95 & LiquidationEngine (health factor, liquidator bonus) & Should & III \\
+96 & SAR workflow (anomaly $\to$ freeze account) & Should & III \\
+\rowcolor{RowShade}
+97 & Governance timelock + snapshot voting & Specified & III+ \\
+98 & Slither + Mythril static analysis & Must & IV \\
+\rowcolor{RowShade}
+99 & Foundry fuzz + invariant test suite & Must & II--IV \\
+100 & Tenderly monitoring alerts & Should & III--IV \\
+\rowcolor{RowShade}
+101 & Regulatory read-only audit access & Specified & III+ \\
+102 & GDPR-style data minimisation (hash-only on-chain) & Specified & I--IV \\
+\midrule
+\multicolumn{4}{@{}l@{}}{\textit{Evaluation and operations}} \\
+\rowcolor{RowShade}
+103 & 300-client Foundry / Hardhat simulation & Must & IV \\
+104 & LLM red-team evaluation protocol & Should & IV \\
+\rowcolor{RowShade}
+105 & Open-source README with reproduction steps & Must & IV \\
+\end{longtable}
+\endgroup
 
 \section{Development Methodology}
 
-We adopted a \textbf{lightweight Agile/Scrum} methodology tailored for an academic prototype with a fixed \textbf{16-week} development window (four phases, Weeks~1--16). The iterative approach enables incremental delivery of demonstrable features while accommodating evolving requirements inherent in research-oriented development. Figure~\ref{fig:phase-roadmap} maps these phases to SDLC stages and supervisor gates.
+We have developed a plan to adapt lightweight Agile/Scrum Methodology for the prototype build with an estimated development window of 16 weeks. This iterative approach enables us to explore and improve the demonstrable features that include the minimum requirements and advanced research oriented features. These feature development phases have been mapped to SDLC stages in Figure~\ref{fig:phase-roadmap}.
 
-The following points summarize how Agile will be applied:
+Agile Methodology application process:
 \begin{itemize}[noitemsep]
-\item \textbf{Phase Duration:} A period of 3--5 weeks is allocated depending on the phase (4 phases total; 16 weeks overall).
-\item \textbf{Team Size:} A group of two developers will be assigned (thesis project). The work will be focused on the thesis project.
-\item \textbf{Weekly Sync:} A weekly gathering will occur to assess progress. Issues will be identified during these meetings. Plans will also be developed in these sessions alongside progress checks.
-\item \textbf{Phase Planning:} A one-hour planning session takes place at the start of every implementation phase to allocate development tasks and confirm priorities.
-\item \textbf{Phase Review and Retrospective:} A review of completed work occurs at every phase's conclusion. A 30-minute retrospective discussion captures lessons learned for the subsequent phase.
-\item \textbf{Supervisor gates:} A formal supervisor meeting at the end of each implementation phase (G1--G4; Section~\ref{sec:supervisor-gates}). The team demonstrates runnable artifacts (deployed contracts, E2E recordings, test output) and obtains written scope confirmation before opening the next phase's Must tasks.
+\item \textbf{Phase duration:} each phase is designed for 3--5 weeks, total 4 phases, total estimated time --- 16 weeks.
+\item \textbf{Team Size:} 2 developers
+\item \textbf{Weekly Sync:} One weekly meeting will be conducted on Tuesday. Completion of each feature, testing and next development plans will be discussed in these meetings, based on the opinion and suggestions received from the supervisor.
+\item \textbf{Phase Planning and review:} After completion of each phase, a long reflective phase meeting will be arranged, to organize and plan upcoming weeks.
 \end{itemize}
 
 \subsection{Process Model Selection}
 \label{sec:process-model-selection}
+\label{sec:mvc-pattern}
 
-Table~\ref{tab:process-model-comparison} records why \textbf{Agile/Scrum within an incremental four-phase plan} was chosen over rigid Waterfall or pure Spiral models for this academic prototype. The decision follows Software Engineering process-model criteria: requirements stability, risk profile, and need for demonstrable increments at supervisor gates.
+Based on the Software engineering process for a blockchain project, a development plan of Agile/Scrum with incremental phases has been chosen. Other models such as Waterfall, Spiral, V-Model have some flaws that do not meet the requirements to successfully build all the features.
 
 \begin{table}[H]
 \centering
@@ -3138,30 +3352,18 @@ V-Model & Maps to test levels in Ch.~\ref{ch:evaluation} & Too rigid for researc
 \end{tabular}
 \end{table}
 
-\subsection{Model--View--Controller and Version Control}
-\label{sec:mvc-pattern}
-
-The repository root follows a conventional \textbf{Model--View--Controller (MVC)} separation taught in Software Engineering:
-
-\begin{itemize}[noitemsep]
-\item \textbf{View} --- \texttt{frontend/}: React components render loan forms, reserve dashboards, and the Authority Brief; wallet signing is initiated from the view layer via Wagmi/RainbowKit.
-\item \textbf{Controller} --- \texttt{backend/}: Express.js routes validate input (Pydantic-equivalent middleware), enforce RBAC, orchestrate ML scoring calls, and submit signed transactions to the EVM node.
-\item \textbf{Model} --- \texttt{contracts/} (on-chain state machines) and PostgreSQL (off-chain projections): authoritative lending state lives on-chain; the database is an eventually consistent read model updated by the event listener.
-\end{itemize}
-
-\noindent\textbf{Version control.} The monorepo uses Git with \texttt{main} as the integration branch. Smart-contract changes are validated by \texttt{npm run test:contracts} (Hardhat) before merge; API changes by \texttt{backend/} Vitest suites. Commit hooks strip automated attribution trailers (root \texttt{scripts/install-git-hooks.sh}). Deployment addresses and phase evidence are recorded under \texttt{Documentation/Pre Thesis -2 Documents/V35 /evidence/}.
+The project is built in the main branch from the root section. It follows a conventional \textbf{Model--View--Controller (MVC)} architecture for separation in root. \textbf{Model} --- \texttt{contracts/}: on-chain state machines and PostgreSQL (off-chain projections), \textbf{View} --- \texttt{frontend/} (React components), \textbf{Controller} --- \texttt{backend/}. For version control the repository is managed with git command, with consistency and compatibility checks, validated by \texttt{npm run test:contracts} (Hardhat) before each merge into main branch.
 
 \section{Planned AI/ML Support and Risk-Score Wiring}
 \label{sec:aiml-support}
 
-The AI/ML layer is not three separate models added to a static lending workflow; it is an integrated pipeline that produces a single risk score per loan and feeds it on-chain through the commit--reveal oracle of Section~\ref{sec:oracle-architecture}. Figure~\ref{fig:ml-oracle-commit-reveal} shows the MVT oracle gate; Figure~\ref{fig:ml-explainability} covers explainability outputs. The pipeline has four stages:
+The purpose of the AI/ML layer is to provide a risk score per loan approval that will be delivered on-chain through the commit--reveal oracle (Section~\ref{sec:oracle-architecture}). The oracle gate design has been shown in Figure~\ref{fig:ml-oracle-commit-reveal}. ML scoring and explainability outputs have been shown in Section~\ref{sec:ml-explainability}, and the rest of the benchmarks and evaluations have been reported in Chapter~\ref{ch:evaluation}.
 
-\begin{enumerate}[noitemsep]
-\item \textbf{Feature engineering.} For each loan application, the FastAPI service computes 18 behavioral features (rolling-window transaction count, average inter-transaction interval, on-chain repayment history, group-membership flag, wallet-graph distance to flagged addresses) and 4 application features (requested amount, KYC level, income-hash freshness, ZKP credential expiry).
-\item \textbf{Risk scoring.} A Random Forest classifier returns a fraud probability $p_f \in [0,1]$ (a true calibrated probability, computed via Platt scaling applied to the raw tree vote proportion). An Isolation Forest returns an anomaly score $a \in [0,1]$ where values approaching 1 indicate anomalies; this is a path-length-based score (see List of Formulas), \textit{not} a probability. The two outputs are combined via a stacking meta-learner (logistic regression) fitted on a held-out validation set, yielding a calibrated composite score $s \in [0,1]$. The default meta-learner weights are approximately 0.7 for $p_f$ and 0.3 for the calibrated anomaly signal; in the prototype these serve as initial placeholders to be re-fitted on any labeled data that becomes available. A direct linear combination of a probability and a non-probability score would produce a statistically uninterpretable output; the stacking approach ensures $s$ is always a valid probability estimate.
-\item \textbf{Commit-reveal oracle.} The service publishes \(h = \mathrm{keccak256}(s \,\|\, \text{nonce})\) to the LoanController contract via \texttt{commitRiskScore}, then reveals $(s, \text{nonce})$ in a subsequent transaction. The LoanController enforces a state machine: approval is only permitted in the \texttt{SCORE\_REVEALED} state, preventing any approver from bypassing the ML step. Section~\ref{sec:oracle-architecture} covers the cryptographic detail.
-\item \textbf{Decision threshold.} The contract applies a governance-configured threshold calibrated against the expected fraud rate: $s < 0.4$ enables approver discretion to approve, $0.4 \le s < 0.7$ requires mandatory manual review, and $s \ge 0.7$ rejects the loan with an on-chain reason code. These thresholds are prototype defaults derived from the class imbalance expected in DeFi lending datasets (estimated fraud prevalence 2--5\%); they must be recalibrated against the actual training data distribution before any production deployment. The \texttt{auto-approve} language used elsewhere in the document is a simplification; the contract always requires an approver to sign the final disbursement transaction.
-\end{enumerate}
+\textbf{Risk Scoring:} A sequential step combines Random Forest classifier and Isolation Forest to provide fraud probability and anomaly scores, and these scores are evaluated within $s \in [0,1]$.
+
+\textbf{Commit--reveal oracle:} This commits a hash of $(s, \text{nonce})$ to \texttt{LoanController}, then each transaction comes with a risk score.
+
+\textbf{Decision threshold:} A minimum and maximum threshold of the value of score $(s)$ is maintained for loan approval decisions: approval consideration ($s < 0.4$), manual review ($0.4 \le s < 0.7$), or rejection ($s \ge 0.7$).
 
 \begin{figure}[H]
 \centering
@@ -3170,31 +3372,27 @@ The AI/ML layer is not three separate models added to a static lending workflow;
 \label{fig:ml-oracle-commit-reveal}
 \end{figure}
 
-\noindent Measured BCCC benchmarks, explainability outputs, on-chain simulation design, smart-contract tests, and research-question evaluation criteria are reported in Chapter~\ref{ch:evaluation} (Sections~\ref{sec:eval-method}--\ref{sec:research-limitations}). This chapter retains the \textit{pipeline specification} only.
-
 \section{Conversational Agent (Phase III--IV)}
 \label{sec:optional-agent}
 
-The React dashboard with wallet-signed transactions and the CWB agent layer are \textbf{co-primary client interfaces}. The agent is a \textbf{Phase~III Must deliverable} (LLM evaluation in Phase~IV, MVT items~11--12) that sits alongside the standard web interface, not a replacement for it. The full MCP tool schema is in Table~\ref{tab:mcp-tools}; ML explainability for approvers is documented in Section~\ref{sec:ml-explainability} and does not depend on the agent.
+The conversational agent that has been designed to assist the clients to better navigate the platform is planned to be completed by Phase~III. It is an auxiliary feature that works alongside the standard web UI for those who may not be familiar with the banking system of the project and have less domain knowledge and want to understand the platform and how to navigate with it. The schema of the full MCP agent has been shown in Table~\ref{tab:mcp-tools}; explainability for approvers is documented in Chapter~\ref{ch:evaluation}.
 
-\paragraph{Agent six-step pipeline (summary).} Clients may perform every banking operation directly through the UI; for clients who prefer plain-language interaction --- particularly first-time users unfamiliar with DeFi form flows --- the agent provides an equivalent path. Both the manual UI and the agent call the same Express.js API endpoints and the same smart contracts; the agent does not gate or modify the manual flow. The six-step pipeline integrates the Qwen3-8B model with the live on-chain context injection layer (Section~\ref{sec:local-llm}) and the MCP tool server described below:
+\paragraph{Agent six-step pipeline.} Clients are expected to interact with the frontend UI like any other typical user-friendly banking website. The agent works as a guiding assistant and its tool-calling abilities use the same Express.js API endpoints; the same smart contracts are considered for functionalities. This six-step pipeline lets the Qwen3-8B model have access to the live on-chain context injection layer that helps the agent process related instant and consistent information that is relevant to how a client is interacting with the platform. The layers have been described shortly below:
 
 \begin{enumerate}[noitemsep]
-\item \textbf{User message arrives} at the React frontend and is forwarded to the Express.js backend over Server-Sent Events (SSE).
-\item \textbf{Agent brain (Qwen3-8B) reads live on-chain context.} The Express.js context injection layer prepends the client's full account state (loan status, SBT risk tier, pool utilisation, credit score, active installments) as structured JSON into the system prompt before the model processes the user message.
-\item \textbf{Q\&A path.} If the request is informational, the agent retrieves relevant policy documents via RAG (ChromaDB) and generates a grounded reply. No tool calls are made.
-\item \textbf{Action request path.} If the request implies a state-modifying operation, the agent identifies the applicable MCP write tool, assembles the full parameter set from the injected context, and presents a concise confirmation summary: \emph{``You are requesting a loan of 150~USDC for 6~months at 8.5\% APR. Your monthly installment would be 26.25~USDC. Shall I proceed?''}
-\item \textbf{Human confirmation gate.} The agent pauses and waits for explicit affirmative consent (\emph{``Yes, proceed''} or equivalent). No write tool is ever called without a confirmation turn in the conversation history. If the client responds ambiguously three times, the agent pauses for 10~minutes and logs the incident to \texttt{AGENT\_ACTION\_LOG}.
-\item \textbf{Execute via MCP write tool, monitor, and notify.} After confirmation, the agent calls the appropriate write tool, which POSTs to the Express.js banking API. If an EIP-7702 session key is active, it signs the resulting on-chain transaction within its approved scope. The agent polls for status and notifies the client: \emph{``Your loan application has been submitted. Reference: L-4821. Bank approval typically takes 24~hours.''}
+\item \textbf{User enters the platform and interacts with the agent:} frontend interaction is recorded and forwarded via the Express.js backend over Server-Sent Events (SSE).
+\item \textbf{Agent model with live on-chain context:} The Express.js context injection layer provides the client's information to the model (credit score, active installments, loan status, SBT risk tier, pool utilisation). The model receives this information about the user before the conversation prompt by the user, to process relevant information about the client to assist them.
+\item \textbf{Q\&A:} For this part of the conversation between the agent and client, the agent only processes relevant information about the client via RAG (ChromaDB) and maintains formal conversation with the client, and does not call any tools.
+\item \textbf{Action request:} After a formal conversation with the client, if the client requests a state-modifying action such as requesting a loan, the agent will choose and prepare MCP write tools, assemble the full parameter set from the injected context, and show a concise summary of action on behalf of the client. Ex: \emph{``You are requesting a loan of 150~USDC for 6~months at 8.5\% APR. Your monthly installment would be 26.25~USDC. Shall I proceed?''}
+\item \textbf{Human confirmation gate:} The agent will wait until a confirmation of affirmation for the action that has been prepared to initiate the loan process. The MCP agent writing tools will not be initiated until a positive response has been received from the client side. If a client responds with vague actions three times, the agent does not make the tool calls, pauses the agent service for 10~minutes, and logs this interaction to \texttt{AGENT\_ACTION\_LOG}.
+\item \textbf{MCP write tool functionality:} If a successful conversation is established with the client, the agent takes confirmation from the client to initiate the loan request process; with a positive response the agent initiates write tools and accesses the Express.js banking API, then checks for an EIP-7702 session key---if active, it signs the on-chain transaction approval request. The agent gives a confirmation that the request has been forwarded and notifies the client that the loan application has been submitted, shows a reference number, and how long the approval might take.
 \end{enumerate}
 
-\paragraph{MCP tool server (MVT: minimal tool subset).}
-
-At MVT scope the agent interacts with CWB through a \textbf{minimal typed tool schema} (3--5 tools). This schema is the safety boundary: the agent cannot access any data or perform any operation not explicitly defined in the tool list below. The full 17-tool banking suite is an explicit Future Work expansion after the MVT is stable and secured.
+\paragraph{MCP tool server.} For the MVT scope the agent has been designed for 3--5 tools for a minimal typed tool schema. The specified 17 tools have been designed for future work, and some of these tools may be included in this prototype build if they can be delivered in the allocated time, after the MVT scope has been secured.
 
 \begin{table}[H]
 \centering
-\caption[MCP tool server (MVT subset)]{MCP tool server (MVT subset): minimal typed tools exposed to the conversational agent. The full 17-tool suite is Future Work.}
+\caption[MCP tool server (MVT subset)]{MCP tool server (MVT subset). The full 17-tool suite is Future Work.}
 \label{tab:mcp-tools}
 \begin{tabular}{p{4.8cm}p{1.4cm}p{6.3cm}}
 \toprule
@@ -3204,66 +3402,11 @@ At MVT scope the agent interacts with CWB through a \textbf{minimal typed tool s
 \texttt{get\_account\_state}       & READ & SBT tier, loan count, savings balance \\
 \texttt{get\_loan\_status}         & READ & Active loans + next installment \\
 \texttt{get\_requirements}         & READ & Documents + KYC needed for a given loan amount \\
-\texttt{submit\_loan\_application} & WRITE$^{\dagger}$ & POST /api/loan/apply \\
-\texttt{pay\_installment}          & WRITE$^{\dagger}$ & POST /api/installment/pay \\
+\texttt{submit\_loan\_application} & WRITE & POST /api/loan/apply \\
+\texttt{pay\_installment}          & WRITE & POST /api/installment/pay \\
 \bottomrule
 \end{tabular}
-
-\vspace{4pt}
-\noindent\small$^{\dagger}$\textit{All write tools require an explicit human confirmation step before execution. The agent assembles the full parameter set, presents a plain-language summary, and waits for affirmative consent. No write tool is ever called without a confirmation turn recorded in the conversation history. Each tool maps to the same Express.js API endpoint used by the standard web UI; the agent calls these endpoints on behalf of the client only after receiving explicit confirmation, mirroring the deliberate action a client would take manually.}
 \end{table}
-
-\paragraph{Authority Brief example (approver dashboard).}
-
-The Authority Brief is rendered on every loan application (React UI or agent). It presents the ML risk assessment from Section~\ref{sec:ml-explainability} in human-readable form:
-
-\begin{verbatim}
-AUTHORITY BRIEF -- Loan Application #4821
--------------------------------------------------
-Client tier:         Silver  (score: 512)
-Requested amount:    150 USDC
-Duration:            6 months
-Collateral:          75 USDC (50% LTV)
-
-ML Risk Score:       0.23  (LOW RISK)
-SHAP breakdown:
-  + On-time repayment rate:    +0.41  (reduces risk)
-  + Loan-to-income ratio:      +0.18  (within safe range)
-  - Wallet age:                -0.09  (account < 6 months)
-  - No prior completed loans:  -0.27  (no repayment history)
-
-ML system recommendation:   APPROVE (decision support only)
-Suggested interest:     Base rate - 0.5% (Silver tier)
-
-[ APPROVE ]   [ REQUEST MORE INFO ]   [ DECLINE ]
-\end{verbatim}
-
-\noindent The React UI displays the decision to the client; the agent may additionally monitor the on-chain approval event and notify the client (Phase~III).
-
-\subsection{Reasonable custom-model angle (minimal but publishable)}
-\label{sec:custom-model-angle}
-
-\paragraph{Model A: domain-constrained intent + parameter extraction.}
-To make the agent safer and more controllable than a single end-to-end LLM, the thesis includes a small \textbf{intent router} trained to classify user utterances into a closed set of banking intents and extract a typed parameter object. The model's output is validated against the MCP tool schema, and any missing/invalid fields force a clarification turn (no tool call).
-\begin{itemize}[noitemsep]
-  \item \textbf{Label set (examples):} \texttt{GetAccountState}, \texttt{GetLoanStatus}, \texttt{GetRequirements}, \texttt{SubmitLoanApplication}, \texttt{PayInstallment}, \texttt{OutOfScope}.
-  \item \textbf{Training data:} a project-owned utterance set built from (i) templated paraphrases (loan amount/duration/APR), (ii) curated real prompts from pilot testers (anonymised), and (iii) adversarial prompts (\texttt{OutOfScope}, prompt-injection attempts). Labels include the intent and a JSON target for parameters (e.g.\ \texttt{\{amount\_usdc:150, months:6\}}).
-  \item \textbf{Model choice:} a compact text encoder (e.g.\ DistilBERT/MiniLM) fine-tuned for intent classification plus a lightweight token/slot extractor, or a single sequence-to-JSON model constrained by a JSON schema; either is trained and evaluated offline and versioned in the \texttt{MODEL\_REGISTRY}.
-  \item \textbf{Maintenance:} new utterances from \texttt{AGENT\_ACTION\_LOG} are sampled weekly; misclassifications are added to the labeled set; a regression suite asserts no new build increases \texttt{OutOfScope} false negatives or write-intent false positives beyond a fixed threshold.
-\end{itemize}
-
-\paragraph{Model B: Authority Brief generator calibration.}
-The Authority Brief is safety-critical because it influences bank approver decisions. Instead of letting the LLM freely summarise risk, the thesis specifies a calibrated generator constrained to: (i) only cite fields present in the structured risk object (\texttt{score}, top-$k$ SHAP features, rule-based reason codes), and (ii) always emit a fixed-format template.
-\begin{itemize}[noitemsep]
-  \item \textbf{Inputs:} the canonical \texttt{LoanRiskAssessment} record (model version hash, calibrated score, SHAP top-$k$, anomaly score, policy thresholds, and a deterministic rule trace).
-  \item \textbf{Training/evaluation:} collect a small gold set of 50--100 briefs written by a supervisor/approver using the same inputs; fine-tune a compact model or apply preference calibration (pairwise ``better brief'' judgments). Evaluate with factuality checks (no field hallucination), template compliance rate, and approver agreement on the final decision rationale.
-  \item \textbf{Maintenance:} any change to thresholds, feature schema, or model versions triggers regeneration of the gold set for a sample window and a re-run of the factuality+format tests before deployment.
-\end{itemize}
-
-\paragraph{Harness implementation detail (appendix).}
-Per-user context injection, three-tier prompt assembly, session lineage, context compression, toolset scoping, and lifecycle-hook middleware are fully specified in Appendix~\ref{app:agent-harness}. Section~\ref{sec:optional-agent} summarises the six-step pipeline; the appendix documents Phase~III--IV implementation detail.
-
-\noindent Agent capabilities (installment reminders, credit-tier coaching, EMI calculator, group-signature coordination, KYC guidance) reuse the same MCP tool server without additional model infrastructure; see Appendix~\ref{app:agent-harness}.
 
 \section{Real-Time Dashboard Pipeline and Runtime Monitoring}
 \label{sec:realtime}
@@ -3280,7 +3423,7 @@ Once core contracts and event schemas are stable, a subgraph may be added as an 
 A Node.js service listens on the selected testnet WebSocket endpoint for the same set of events and pushes notifications to the client's browser via Socket.IO. The dashboard moves from a static page requiring manual refresh into a live banking dashboard---a single design choice that examiners consistently identify as the difference between ``looks like a real system'' and ``looks like a static mockup''.
 
 \paragraph{Tenderly monitoring.}
-Six critical alerts are planned for the testnet contracts: single disbursement over 5~ETH-equivalent, repeated loan requests from one wallet (>3 in 60 minutes), reserve-ratio drop below 20\%, failed \texttt{disburseLoan} calls, role-grant events, and any pause / unpause governance action. Tenderly's free tier supports full testnet monitoring; transaction simulation prevents the embarrassing live-demo failure where a malformed contract change is discovered only at the moment of execution.
+\textbf{MVT-graded triggers (3):} single disbursement over 5~ETH-equivalent, reserve-ratio drop below 20\%, and any pause / unpause governance action (MVT item~16; Section~\ref{tab:defense-layers}). \textbf{Optional stretch triggers (3):} repeated loan requests from one wallet ($>$3 in 60 minutes), failed \texttt{disburseLoan} calls, and role-grant events---the full six-trigger Tenderly set referenced as optional at MVT item~16. Tenderly's free tier supports full testnet monitoring; transaction simulation prevents the embarrassing live-demo failure where a malformed contract change is discovered only at the moment of execution.
 
 \section{Transaction-State Machine for Frontend UX}
 \label{sec:tx-state-machine}
@@ -3333,8 +3476,9 @@ DT-I.14 & Must & React frontend shell --- Vite build, routing, layout components
 DT-I.15 & Must & WalletConnect integration --- wallet connection, address display, network switching & 2 \\
 DT-I.16 & Should & Sessions and assets tables integration in frontend (dashboard stubs) & 2 \\
 DT-I.17 & Should & Credit tier and interest rate schedule display & 2 \\
-\multicolumn{3}{l}{\textit{Phase~I total estimated effort (Must-have):}} & \textit{30 days} \\
-\multicolumn{3}{l}{\textit{Phase~I total estimated effort (all priorities):}} & \textit{48 days} \\
+DT-I.18 & Must & Safe 2-of-3 multisig setup and \texttt{WorldBankAdmin} role transfer (MVT item~15) & 1 \\
+\multicolumn{3}{l}{\textit{Phase~I total estimated effort (Must-have):}} & \textit{31 days} \\
+\multicolumn{3}{l}{\textit{Phase~I total estimated effort (all priorities):}} & \textit{51 days} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3377,8 +3521,8 @@ DT-II.13 & Should & Installment due-date checks: Node.js cron (MVT demo path) or
 DT-II.14 & Should & Credit tier schedule in Credit Passport SBT (Bronze $\to$ Diamond) & 3 \\
 DT-II.15 & Should & \texttt{interest\_rate\_tier} table integration with Kinked Rate Model & 2 \\
 DT-II.16 & Should & \texttt{agent\_action\_log} + \texttt{SESSIONS} schema migration (agent audit trail foundation) & 3 \\
-\multicolumn{3}{l}{\textit{Phase~II total estimated effort (Must-have):}} & \textit{33 days} \\
-\multicolumn{3}{l}{\textit{Phase~II total estimated effort (all priorities):}} & \textit{36 days} \\
+\multicolumn{3}{l}{\textit{Phase~II total estimated effort (Must-have):}} & \textit{28 days} \\
+\multicolumn{3}{l}{\textit{Phase~II total estimated effort (all priorities):}} & \textit{68 days} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3412,8 +3556,8 @@ DT-III.11 & Should & SAR workflow: Isolation Forest $\to$ aml-alert $\to$ \textt
 DT-III.12 & Should & Reserve Transparency Dashboard: live queries to event-listener index (Graph optional later) & 3 \\
 DT-III.13 & Could & GraphSAGE GNN ablation & 5 \\
 DT-III.14 & Could & Federated learning aggregator & 7 \\
-\multicolumn{3}{l}{\textit{Phase~III total estimated effort (Must-have):}} & \textit{44 days} \\
-\multicolumn{3}{l}{\textit{Phase~III total estimated effort (all priorities):}} & \textit{69 days} \\
+\multicolumn{3}{l}{\textit{Phase~III total estimated effort (Must-have):}} & \textit{29 days} \\
+\multicolumn{3}{l}{\textit{Phase~III total estimated effort (all priorities):}} & \textit{77 days} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3440,8 +3584,10 @@ DT-IV.05 & Should & AML pre-check hook (Hook~3): Isolation Forest anomaly score 
 DT-IV.06 & Could & Groth16 zkKYC circuit (Circom~2.0): government-ID possession proof without revealing PII; circuit design and input/output specification & 5 \\
 DT-IV.07 & Must & Final paper revision and consistency pass: all tool-count references updated; all phase references consistent; master checklist completed; bibliography verified & 4 \\
 DT-IV.08 & Must & Red-team testing and documentation: 20-payload injection red-team set; 20 bypass-attempt set; 10 session key scope enforcement scenarios; results documented in evaluation subsections & 3 \\
-\multicolumn{3}{l}{\textit{Phase~IV total estimated effort (Must-have):}} & \textit{21 days} \\
-\multicolumn{3}{l}{\textit{Phase~IV total estimated effort (all priorities):}} & \textit{38 days} \\
+DT-IV.09 & Must & Slither + Mythril audit run on World/National/Local Bank contracts; triage and archive report (MVT item~13) & 2 \\
+DT-IV.10 & Should & Tenderly alert configuration: 3 demo-critical triggers + README reproduction pass (MVT items~10, 16) & 2 \\
+\multicolumn{3}{l}{\textit{Phase~IV total estimated effort (Must-have):}} & \textit{16 days} \\
+\multicolumn{3}{l}{\textit{Phase~IV total estimated effort (all priorities):}} & \textit{40 days} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3453,10 +3599,10 @@ DT-IV.08 & Must & Red-team testing and documentation: 20-payload injection red-t
 \tableheadcolor
 \textbf{Phase} & \textbf{Focus} & \textbf{Weeks} & \textbf{Tasks} & \textbf{Key deliverables} \\
 \midrule
-I & Foundation and infrastructure & 1--4 & DT-I.01--17 & Contract hierarchy, \texttt{MockUSDC}, core DB schema, React shell \\
-II & Core banking and on-chain lifecycle & 5--9 & DT-II.01--19 & Lending workflow, SBT limits, cron/Automation triggers \\
+I & Foundation and infrastructure & 1--4 & DT-I.01--18 & Contract hierarchy, \texttt{MockUSDC}, core DB schema, React shell \\
+II & Core banking and on-chain lifecycle & 5--9 & DT-II.01--16 & Lending workflow, SBT limits, cron/Automation triggers \\
 III & AI/ML oracle pipeline + conversational agent & 10--13 & DT-III.01--14 & Commit--reveal oracle, ML pipeline, MCP agent (minimal toolset), dashboard \\
-IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--08 & Foundry, simulation, evaluation pack, testnet deploy \\
+IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--10 & Foundry, simulation, evaluation pack, testnet deploy \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3481,7 +3627,7 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--08 & Foundry, s
 \section{Supervisor-Gated Sequential Plan}
 \label{sec:supervisor-gates}
 
-The four-phase register above (DT-I.01--IV.08) is organised for \textbf{incremental demonstration}: after each phase the team schedules a \textbf{supervisor review gate} before starting the next phase. Each gate requires a runnable artifact---deployed contracts, passing tests, a screen recording, or a live UI walkthrough---not slide-only progress. Internal weekly syncs continue within a phase; the supervisor gate is the formal checkpoint that locks scope for the subsequent phase.
+The four-phase register above (DT-I.01--IV.10) is organised for \textbf{incremental demonstration}: after each phase the team schedules a \textbf{supervisor review gate} before starting the next phase. Each gate requires a runnable artifact---deployed contracts, passing tests, a screen recording, or a live UI walkthrough---not slide-only progress. Internal weekly syncs continue within a phase; the supervisor gate is the formal checkpoint that locks scope for the subsequent phase.
 
 \subsection{Gate model and timeline}
 
@@ -3496,7 +3642,7 @@ The four-phase register above (DT-I.01--IV.08) is organised for \textbf{incremen
 \textbf{Gate} & \textbf{When} & \textbf{Demonstration package (bring to meeting)} & \textbf{MVT items / exit criterion} \\
 \midrule
 G0 & Week~0 (kickoff) & Ch.~3 architecture PDF; ERD; phase plan (this section); empty monorepo with README run instructions & Supervisor confirms phase boundaries and demonstration target (Sepolia primary; zkEVM comparison-only) \\
-G1 & End Week~4 & Sepolia-deployed World/National/Local Bank + \texttt{MockUSDC}; WalletConnect demo; PostgreSQL \textbf{13 M1 tables} migrated (Table~\ref{tab:db-implementation-tiers}); RBAC tests; $\leq$5\,min screen recording of \texttt{allocateCapital} & MVT~\#1; DT-I.01--04, I.04a, I.12--15 complete \\
+G1 & End Week~4 & Sepolia-deployed World/National/Local Bank + \texttt{MockUSDC}; WalletConnect demo; PostgreSQL \textbf{13 M1 tables} migrated (Table~\ref{tab:db-implementation-tiers}); RBAC tests; $\leq$5\,min screen recording of \texttt{allocateCapital} & MVT~\#1; DT-I.01--04, I.04a, I.12--15, I.18 complete \\
 G2 & End Week~9 & Screen recording: loan request $\to$ approver approve $\to$ disbursement $\to$ one installment; reserve-ratio revert test; SavingsVault or GroupLendingPool minimal PoC & MVT~\#2--3; core Phase~II contracts on prototype testnet \\
 G3 & End Week~13 & FastAPI \texttt{/v1/score} live; Authority Brief on approver dashboard; commit--reveal score commit before \texttt{approveLoan}; agent chat submits loan with confirmation gate (minimal tool subset) & MVT~\#4--8, \#11; DT-III.02--07 complete \\
 G4 & End Week~16 & Local 300-client simulation output; LLM eval report; fuzz suite summary; Appendix~C manifest populated; README reproduces G1--G3 demos & MVT~\#9--12; thesis submission package \\
@@ -3514,7 +3660,7 @@ Work proceeds in three parallel tracks that merge at Gate~G1. Weeks~1--2 priorit
 \begin{enumerate}[noitemsep]
 \item \textbf{Track A --- Smart contracts:} DT-I.01--04, I.04a (\texttt{MockUSDC}). Deliverable: local Hardhat/Foundry suite with role-gated \texttt{allocateCapital} smoke test.
 \item \textbf{Track B --- Database:} DT-I.12--13 (13 M1 tables per Table~\ref{tab:db-implementation-tiers}, indexes, FK constraints). Deliverable: \texttt{prisma migrate} or SQL dump; ERD screenshot matching M1 subset.
-\item \textbf{Track C --- DevOps:} DT-I.11 (Sepolia primary RPC via Alchemy, chain IDs, faucet script). Deliverable: \texttt{/deployments/testnet/} folder stub and deploy script dry-run.
+\item \textbf{Track C --- DevOps:} Sepolia primary RPC via Alchemy, chain IDs, and faucet script (folded into DT-I.14--15 network wiring). Deliverable: \texttt{/deployments/testnet/} folder stub and deploy script dry-run.
 \end{enumerate}
 
 \paragraph{Weeks 3--4 (integration + first deploy).}
@@ -3596,7 +3742,8 @@ Submit loan via React with live Authority Brief $\to$ show score commit on-chain
 \begin{enumerate}[noitemsep]
 \item DT-IV.07: thesis consistency pass; populate Appendix~C manifest with deployed testnet addresses (Amoy/Sepolia).
 \item DT-IV.03 (Future Work): Certora CVL specs on Sepolia --- no bridged assets (Section~\ref{sec:bridge}).
-\item DT-IV.10 equivalent: README with step-by-step reproduction of G1--G3 demos (MVT~\#10).
+\item DT-IV.09: Slither + Mythril audit on tier contracts; triage and archive report (MVT item~13).
+\item DT-IV.10: Tenderly alert configuration (3 demo-critical triggers) + README with step-by-step reproduction of G1--G3 demos (MVT items~10, 16).
 \end{enumerate}
 
 \paragraph{G4 demo script (final submission review).}
@@ -3817,10 +3964,10 @@ server, adhering to the Open/Closed Principle.
 \section{Implementation Feasibility and Demonstration Scope}
 \label{sec:impl-feasibility}
 
-The phase task registers (DT-I.01--IV.08), MVT checklist (Table~\ref{tab:mvt-checklist}), and module inventory in Chapter~3 remain the \textbf{authoritative project record}. They preserve full research traceability---every integration studied, every Future Work module specified, and every production upgrade path documented. What follows does not delete any of that work; it defines which register items are on the \textbf{demonstration critical path} for a zero-cost, stability-first prototype within the 16-week window.
+The phase task registers (DT-I.01--IV.10), MVT checklist (Table~\ref{tab:mvt-checklist}), and module inventory in Chapter~3 remain the \textbf{authoritative project record}. They preserve full research traceability---every integration studied, every Future Work module specified, and every production upgrade path documented. What follows does not delete any of that work; it defines which register items are on the \textbf{demonstration critical path} for a zero-cost, stability-first prototype within the 16-week window.
 
 \paragraph{Feasibility framing.}
-Phase~I originally estimated 29 Must-have person-days in four weeks for a two-developer team---achievable for core contracts, schema, and frontend shell, but not if all Should tasks (48 total person-days) are treated as gate blockers. Table~\ref{tab:phaseI-deferred} therefore separates Phase~I Should items that move to later phases without removing them from the register. Table~\ref{tab:spec-vs-demo-priority} classifies every major module as either \textit{specified only}, \textit{demonstration Must}, or \textit{demonstration Should}, making explicit that syndicated lending, tranched pools, ZKP circuits, and Certora proofs remain valuable design contributions even when implementation is deferred. Table~\ref{tab:zero-cost-prereqs} lists free infrastructure to register before coding begins.
+Phase~I originally estimated 30 Must-have person-days in four weeks for a two-developer team---achievable for core contracts, schema, and frontend shell, but not if all Should tasks ($\approx$20 person-days) are treated as gate blockers. Table~\ref{tab:phaseI-deferred} therefore separates Phase~I Should items that move to later phases without removing them from the register. Table~\ref{tab:spec-vs-demo-priority} classifies every major module as either \textit{specified only}, \textit{demonstration Must}, or \textit{demonstration Should}, making explicit that syndicated lending, tranched pools, ZKP circuits, and Certora proofs remain valuable design contributions even when implementation is deferred. Table~\ref{tab:zero-cost-prereqs} lists free infrastructure to register before coding begins.
 
 \begin{table}[H]
 \centering
@@ -3969,7 +4116,7 @@ Certora proofs &
 \end{table}
 
 \paragraph{Revised Phase~I demonstration focus.}
-After deferring Should tasks in Table~\ref{tab:phaseI-deferred}, the realistic Phase~I Must workload is approximately 30 person-days across two developers ($\approx$15 days each over four weeks), leaving buffer for testnet debugging. The G1 demonstration package comprises: (i)~three tier contracts plus \texttt{MockUSDC} live on Sepolia; (ii)~capital-flow demo (\texttt{allocateCapital} chain); (iii)~passing RBAC Foundry/Hardhat tests; (iv)~WalletConnect React dashboard reading live reserve balance; (v)~PostgreSQL \textbf{13 M1 tables} migrated with seed data (Table~\ref{tab:db-implementation-tiers}); and (vi)~a $\leq$5-minute screen recording as the MVT~\#1 artifact.
+After deferring Should tasks in Table~\ref{tab:phaseI-deferred}, the realistic Phase~I Must workload is approximately 31 person-days across two developers ($\approx$15--16 days each over four weeks), leaving buffer for testnet debugging. The G1 demonstration package comprises: (i)~three tier contracts plus \texttt{MockUSDC} live on Sepolia; (ii)~capital-flow demo (\texttt{allocateCapital} chain); (iii)~passing RBAC Foundry/Hardhat tests; (iv)~WalletConnect React dashboard reading live reserve balance; (v)~PostgreSQL \textbf{13 M1 tables} migrated with seed data (Table~\ref{tab:db-implementation-tiers}); and (vi)~a $\leq$5-minute screen recording as the MVT~\#1 artifact.
 
 \begin{table}[H]
 \centering
@@ -4016,7 +4163,7 @@ Ollama + Qwen3-8B (local GPU) &
 \paragraph{Demonstration-day operations.}
 For supervisor gates and final examination, the recommended setup runs the full backend stack (Express.js, FastAPI, PostgreSQL, Ollama) \textbf{locally on the development workstation}, with the React frontend optionally on Vercel. This eliminates Render cold-start delays, ngrok tunnel instability, and cloud-provider outages during live demonstration. A pre-recorded agent demo video serves as backup evidence for MVT item~11 if GPU inference is slow. These operational choices are limitations of the demonstration environment, not retractions of the cloud-deployment design in Section~\ref{sec:realtime}.
 
-\noindent\textbf{Relationship to the four-phase plan.} Tables~\ref{tab:phase-deliverables},~\ref{tab:supervisor-gates}, and the DT task registers above should be read together with Tables~\ref{tab:design-vs-demo},~\ref{tab:db-implementation-tiers},~\ref{tab:phaseI-deferred}, and~\ref{tab:spec-vs-demo-priority}: the phase plan states \textit{what the project studies and schedules}; the feasibility and implementation-tier tables state \textit{what must actually run for a defensible zero-cost demonstration}. The logical schema specifies 51 entities; approximately 21 are physically migrated across Phases~I--III.
+\noindent\textbf{Relationship to the four-phase plan.} Tables~\ref{tab:phase-deliverables},~\ref{tab:supervisor-gates}, and the DT task registers above should be read together with Tables~\ref{tab:design-vs-demo},~\ref{tab:db-implementation-tiers},~\ref{tab:phaseI-deferred}, and~\ref{tab:spec-vs-demo-priority}: the phase plan states \textit{what the project studies and schedules}; the feasibility and implementation-tier tables state \textit{what must actually run for a defensible zero-cost demonstration}. The logical schema specifies 51 entities; approximately 32 are physically migrated across Phases~I--III.
 
 
 
@@ -5158,7 +5305,8 @@ Future work is split into \textbf{MVT completion} (final-thesis Must deliverable
 \begin{enumerate}[noitemsep]
 \item \textbf{Complete hierarchical lending implementation.} End-to-end wiring of cross-tier fund transfers between World Bank Reserve, National Bank, and Local Bank contracts---capital distribution, interest accrual, installment scheduling, cascading repayment---against Appendix~B sketches.
 \item \textbf{Stablecoin-first deployment.} USDC default at retail tiers (Section~\ref{sec:stablecoin-first}); MiCA / GENIUS Act mapping validated against deployed configuration (Section~\ref{sec:mica-compliance}).
-\item \textbf{Liquidation Engine, SavingsVault, FixedDeposit, GroupLendingPool.} Phase~II deposit-and-credit suite with over-indebtedness controls (Section~\ref{sec:over-indebt}).
+\item \textbf{SavingsVault, FixedDeposit, GroupLendingPool.} Phase~II deposit-and-credit suite with over-indebtedness controls (Section~\ref{sec:over-indebt}).
+\item \textbf{LiquidationEngine.} Phase~III risk module for health-factor monitoring and third-party liquidation (Section~\ref{sec:liquidation}).
 \item \textbf{Multi-entity operations.} \texttt{InterBankLendingPool} and \texttt{UpwardDepositFacility} as Phase~II deliverables (Table~\ref{tab:phase-deliverables}); \texttt{SyndicatedLoan} and \texttt{TranchedPool} as Phase~III stretch goals beyond the MVT minimum (Section~\ref{sec:multi-entity}). \texttt{NettingEngine} is Future Work (Section~\ref{sec:future-work}).
 \item \textbf{AI/ML pipeline integration (core MVT).} Commit--reveal oracle at loan origination; RF + IF + SHAP + Authority Brief (Sections~\ref{sec:ml-explainability},~\ref{sec:ml-workload}); Chainlink Functions retained as a stretch upgrade when supported; BCCC subsample benchmark at pre-thesis (Table~\ref{tab:ml-bccc-results}); full-corpus table after Phase~III retrain.
 \item \textbf{Conversational agent (Phase~III MVT).} MCP tool server (minimal 3--5 tools), chat UI, human confirmation gate, and one E2E write demonstration (Section~\ref{sec:optional-agent}; MVT item~11); LLM evaluation protocol (Section~\ref{sec:llm-eval}; MVT item~12).
@@ -5634,32 +5782,34 @@ Event Indexing & PostgreSQL event listener & Stability-first indexing baseline (
 
 \chapter{Smart Contract Capabilities}
 
-The complete banking architecture is designed around fifteen modular contracts. The three-contract lending core is specified at pre-thesis stage; the remaining twelve modules are planned across Phases~II and~III of the final thesis phase.
+The complete banking architecture is designed around seventeen modular contracts. The four-contract lending core (\texttt{WorldBankReserve}, \texttt{NationalBank}, \texttt{LocalBank}, \texttt{LoanController}) is specified at pre-thesis stage; the remaining thirteen modules are planned across Phases~II and~III of the final thesis phase.
 
 \textbf{Specified core contracts (Phase~I target):}
 \begin{itemize}[noitemsep]
 \item \textbf{World Bank Reserve Contract:} Reserve custody, deposit handling, national bank registration, capital allocation to national banks, system pause and unpause, emergency withdrawal, and system statistics.
 \item \textbf{National Bank Contract:} Local bank registration, borrowing from the World Bank reserve, capital allocation to local banks, and network status queries.
-\item \textbf{Local Bank Contract:} Client registration, deposit routing, approver management, user account management, and a \texttt{freezeAccount(clientId)} function gated by \texttt{onlyApprover} modifier, used by the SAR workflow (Section~\ref{sec:regulatory-compliance}) to suspend loan and payment operations for a flagged client pending compliance review. Loan-application processing, approval / rejection workflows, and installment-state enforcement are handled via the owned \texttt{LoanController} state machine.
+\item \textbf{Local Bank Contract:} Client registration, deposit routing, approver management, user account management, and a \texttt{freezeAccount(clientId)} function gated by \texttt{onlyApprover} modifier, used by the SAR workflow (Section~\ref{sec:regulatory-compliance}) to suspend loan and payment operations for a flagged client pending compliance review. Owns a \texttt{LoanController} instance for loan-application processing, approval / rejection workflows, and installment-state enforcement.
+\item \textbf{LoanController Contract:} On-chain loan state machine (request, approve, reject, disburse, installment payment); specified as a Phase~I deploy shell with functional logic completed in Phase~II (DT-II.01--03).
 \end{itemize}
 
 \textbf{Planned contracts -- Banking product suite (Phase~II):}
 \begin{itemize}[noitemsep]
 \item \textbf{SavingsVault Contract:} Standard savings account management, variable yield accrual, withdrawal processing, and deposit-to-lending pool integration.
-\item \textbf{FixedDeposit Contract:} Term deposit creation, lock period enforcement, agreed APY accrual, early withdrawal penalty calculation, and maturity release.
+\item \textbf{FixedDeposit Contract:} Term deposit creation, lock period enforcement, agreed APY accrual, early withdrawal penalty calculation, and maturity release (Stub until contract ships).
 \item \textbf{GroupLendingPool Contract:} Group formation, multi-signature consent recording, shared collateral management, per-member disbursement, mutual liability enforcement, and group credit history recording.
-\item \textbf{FXModule Contract:} Oracle-priced currency conversion, spread calculation, dual-currency lending denomination support, and conversion audit trail.
-\item \textbf{InsuranceFund Contract:} Captures 5\% of all interest collected across the lending hierarchy, processes default coverage disbursement claims, and publishes its reserve balance to Chainlink Proof of Reserve for external verifiability.
-\item \textbf{CurrentAccount Contract:} Transactional account management, atomic peer transfers, recurring payment scheduling, and payroll deposit handling.
+\item \textbf{InsuranceFund Contract:} Captures 5\% of all interest collected across the lending hierarchy, processes default coverage disbursement claims, and publishes its reserve balance to Chainlink Proof of Reserve for external verifiability (Phase~I Should, commonly deferred to Phase~II).
+\item \textbf{CurrentAccount Contract:} Transactional account management, atomic peer transfers, recurring payment scheduling, and payroll deposit handling (Stub until contract ships).
 \end{itemize}
 
 \textbf{Planned contracts -- Multi-entity and cross-tier operations (Phases~II and~III):}
 \begin{itemize}[noitemsep]
 \item \textbf{InterBankLendingPool Contract} (Section~\ref{sec:interbank-pool}): one instance per tier (\texttt{IBLP\_NB}, \texttt{IBLP\_LB}). Short-tenor (1 / 7 / 30 day) same-tier borrowing with a utilization-kinked rate model bounded by the tier-above downward rate; default cascade through reserve buffer~$\to$~InsuranceFund~$\to$~parent-tier backstop.
 \item \textbf{UpwardDepositFacility Contract} (Section~\ref{sec:upward-flow}): role-restricted extension of SavingsVault accounting that lets a lower-tier bank deposit excess reserves into its parent tier, earning a strictly lower yield than the downward borrowing rate; withdrawal gate enforces depositor reserve-ratio safety.
+\item \textbf{FXModule Contract} (Phase~III): oracle-priced currency conversion, spread calculation, dual-currency lending denomination support, and conversion audit trail.
+\item \textbf{LiquidationEngine Contract} (Phase~III, Section~\ref{sec:liquidation}): health-factor monitoring; pays third-party liquidators a bonus when $HF < 1.0$.
 \item \textbf{SyndicatedLoan Contract} (Section~\ref{sec:syndicated-lending}): syndicate proposal, subscription window, supermajority on-chain consent vote (75\%-by-capital-share), atomic disbursement, pro-rata interest and recovery distribution; supports cross-tier syndication (mixed NB / LB co-funders).
 \item \textbf{TranchedPool Contract} (Section~\ref{sec:tranched-pools}): senior / junior tranching with a subordination-ratio policy, waterfall interest and principal payments, first-loss absorption by the junior tranche; suitable for risk-segmented institutional and impact-aligned capital.
-\item \textbf{TreasurySwap Contract} (Section~\ref{sec:treasury-fx}): oracle-priced atomic asset swap restricted to wallets holding a banking role; cross-tier asset exchange (e.g., NB ETH treasury~$\to$~USDC) with a tighter spread than retail FX; post-swap reserve-ratio invariant enforced before state change.
+\item \textbf{TreasurySwap Contract} (Phase~III, Section~\ref{sec:treasury-fx}): oracle-priced atomic asset swap restricted to wallets holding a banking role; cross-tier asset exchange (e.g., NB ETH treasury~$\to$~USDC) with a tighter spread than retail FX; post-swap reserve-ratio invariant enforced before state change.
 \item \textbf{NettingEngine Contract} (Future Work, Section~\ref{sec:future-work}): multilateral netting with partial settlement and challenge-period dispute resolution---not specified at implementation depth in this report.
 \end{itemize}
 
@@ -5673,7 +5823,7 @@ The following table is the \textbf{consolidated planned deployment manifest temp
 
 \begin{table}[H]
 \centering
-\caption[Planned testnet deployment manifest]{Planned testnet deployment manifest (consolidated Phase~IV template; incremental Phase~I--III deploys on a single chosen prototype testnet).}
+\caption[Planned testnet deployment manifest]{Planned testnet deployment manifest (consolidated Phase~IV template; Phase~I--III rows populated incrementally on a single chosen prototype testnet).}
 \label{tab:cardona-manifest}
 \begingroup
 \footnotesize
@@ -5693,6 +5843,15 @@ NationalBank (Scaffold) & Prototype testnet & \url{deployments/testnet/NationalB
 LocalBank (Scaffold) & Prototype testnet & \url{deployments/testnet/LocalBank.json} \\
 \rowcolor{RowShade}
 LoanController & Prototype testnet & \url{deployments/testnet/LoanController.json} \\
+\rowcolor{RowShade}
+MockUSDC & Prototype testnet & \url{deployments/testnet/MockUSDC.json} \\
+SavingsVault & Prototype testnet & \url{deployments/testnet/SavingsVault.json} \\
+\rowcolor{RowShade}
+GroupLendingPool & Prototype testnet & \url{deployments/testnet/GroupLendingPool.json} \\
+InterBankLendingPool & Prototype testnet & \url{deployments/testnet/InterBankLendingPool.json} \\
+\rowcolor{RowShade}
+UpwardDepositFacility & Prototype testnet & \url{deployments/testnet/UpwardDepositFacility.json} \\
+LiquidationEngine & Prototype testnet & \url{deployments/testnet/LiquidationEngine.json} \\
 \bottomrule
 \end{tabular}
 \endgroup

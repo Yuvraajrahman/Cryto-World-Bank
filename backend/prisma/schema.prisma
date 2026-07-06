@@ -1,8 +1,5 @@
-// Prisma schema for Crypto World Bank
-// Mirrors the 15-entity 3NF model described in Chapter 3 of the thesis,
-// trimmed to the core tables needed by the current prototype. Additional
-// entities (installments, transactions, shap_explanations, etc.) should be
-// added as the backend catches up with the lending lifecycle.
+// Phase I (Gate G1) — 13 M1 tables per thesis Ch. 3 Table db-implementation-tiers.
+// Legacy chat/income models remain for the existing API until Phase II migration.
 
 generator client {
   provider = "prisma-client-js"
@@ -13,18 +10,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  OWNER
-  NATIONAL_BANK_ADMIN
-  LOCAL_BANK_ADMIN
-  APPROVER
-  BORROWER
-}
-
-enum BankTier {
+enum InstitutionType {
   WORLD
   NATIONAL
   LOCAL
+}
+
+enum BankUserRole {
+  WORLD_BANK_ADMIN
+  NATIONAL_BANK_ADMIN
+  LOCAL_BANK_ADMIN
+  APPROVER
+}
+
+enum KycLevel {
+  LEVEL_0
+  LEVEL_1
+  LEVEL_2
+  LEVEL_3
+}
+
+enum LoanRequestStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  DISBURSED
+  CANCELLED
 }
 
 enum LoanStatus {
@@ -34,6 +47,312 @@ enum LoanStatus {
   ACTIVE
   REPAID
   DEFAULTED
+}
+
+enum AssetSymbol {
+  ETH
+  MUSDC
+}
+
+// ---- M1 core (Phase I) ----
+
+model Country {
+  countryCode   String        @id @db.VarChar(3)
+  name          String
+  institutions  Institution[]
+  createdAt     DateTime      @default(now())
+}
+
+model Institution {
+  id              String           @id @default(cuid())
+  institutionType InstitutionType
+  name            String
+  onChainAddress  String?          @unique
+  countryCode     String?
+  country         Country?         @relation(fields: [countryCode], references: [countryCode])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  worldBank       WorldBank?
+  nationalBank    NationalBank?
+  localBank       LocalBank?
+  bankUsers       BankUser[]
+  borrowers       Borrower[]
+  loanRequests    LoanRequest[]
+  loans           Loan[]
+  assets          Asset[]
+
+  @@index([institutionType])
+}
+
+model WorldBank {
+  institutionId String      @id
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  lendingAprBps Int         @default(300)
+}
+
+model NationalBank {
+  institutionId     String      @id
+  institution       Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  parentWorldBankId String
+  lendingAprBps     Int         @default(500)
+  jurisdiction      String?
+}
+
+model LocalBank {
+  institutionId        String      @id
+  institution          Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  parentNationalBankId String
+  borrowAprBps         Int         @default(800)
+  region               String?
+}
+
+model BankUser {
+  id            String       @id @default(cuid())
+  institutionId String
+  institution   Institution  @relation(fields: [institutionId], references: [id])
+  walletAddress String       @unique
+  displayName   String?
+  role          BankUserRole
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Borrower {
+  id                     String        @id @default(cuid())
+  walletAddress          String        @unique
+  registeredLocalBankId  String
+  localBank              Institution   @relation(fields: [registeredLocalBankId], references: [id])
+  kycLevel               KycLevel      @default(LEVEL_0)
+  kycDocumentHash        String?
+  kycVerifiedAt          DateTime?
+  kycExpiry              DateTime?
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+
+  loanRequests LoanRequest[]
+  loans        Loan[]
+  creditPassport CreditPassportRecord?
+  borrowingLimit BorrowingLimit?
+  incomeProofs IncomeProof[]
+}
+
+model LoanRequest {
+  id              String            @id @default(cuid())
+  borrowerId      String
+  borrower        Borrower            @relation(fields: [borrowerId], references: [id])
+  localBankId     String
+  localBank       Institution         @relation(fields: [localBankId], references: [id])
+  principalWei    String
+  termMonths      Int
+  purpose         String?
+  docHash         String?
+  nidDocHash      String?
+  photoDocHash    String?
+  status          LoanRequestStatus   @default(DRAFT)
+  onChainRequestId String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  loan Loan?
+}
+
+// ---- M2 (Phase II) ----
+
+enum RiskTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+model CreditPassportRecord {
+  id               String   @id @default(cuid())
+  borrowerId       String   @unique
+  borrower         Borrower @relation(fields: [borrowerId], references: [id])
+  creditScore      Int      @default(300)
+  riskTier         RiskTier @default(SILVER)
+  openLoans        Int      @default(0)
+  completedCycles  Int      @default(0)
+  onChainAddress   String?
+  updatedAt        DateTime @updatedAt
+  createdAt        DateTime @default(now())
+}
+
+model BorrowingLimit {
+  id            String   @id @default(cuid())
+  borrowerId    String   @unique
+  borrower      Borrower @relation(fields: [borrowerId], references: [id])
+  maxPrincipalWei String
+  windowMonths  Int      @default(6)
+  usedWei       String   @default("0")
+  updatedAt     DateTime @updatedAt
+}
+
+model IncomeProof {
+  id           String             @id @default(cuid())
+  borrowerId   String
+  borrower     Borrower           @relation(fields: [borrowerId], references: [id])
+  documentHash String
+  monthlyUsd   Float?
+  status       VerificationStatus @default(PENDING)
+  reviewedBy   String?
+  createdAt    DateTime           @default(now())
+}
+
+model InterestRateTier {
+  id        String   @id @default(cuid())
+  tierName  String
+  minScore  Int
+  maxScore  Int
+  aprBps    Int
+  createdAt DateTime @default(now())
+}
+
+model LoanGroup {
+  id          String   @id @default(cuid())
+  localBankId String
+  onChainId   String?
+  status      String   @default("FORMING")
+  createdAt   DateTime @default(now())
+  members     GroupMember[]
+}
+
+model GroupMember {
+  id         String    @id @default(cuid())
+  groupId    String
+  group      LoanGroup @relation(fields: [groupId], references: [id])
+  borrowerId String
+  consented  Boolean   @default(false)
+}
+
+model UpwardDepositRecord {
+  id            String   @id @default(cuid())
+  depositorId   String
+  parentId      String
+  amountWei     String
+  onChainTxHash String?
+  createdAt     DateTime @default(now())
+}
+
+model InterbankLoanRecord {
+  id            String   @id @default(cuid())
+  lenderId      String
+  borrowerId    String
+  principalWei  String
+  tenorDays     Int
+  status        String   @default("ACTIVE")
+  onChainLoanId String?
+  createdAt     DateTime @default(now())
+}
+
+model SavingsAccount {
+  id            String   @id @default(cuid())
+  borrowerId    String
+  vaultAddress  String
+  sharesWei     String   @default("0")
+  createdAt     DateTime @default(now())
+}
+
+model AgentSession {
+  id        String   @id @default(cuid())
+  wallet    String
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  turns     AgentActionLog[]
+}
+
+model AgentActionLog {
+  id        String       @id @default(cuid())
+  sessionId String
+  session   AgentSession @relation(fields: [sessionId], references: [id])
+  toolName  String
+  payload   Json?
+  confirmed Boolean      @default(false)
+  createdAt DateTime     @default(now())
+}
+
+model Loan {
+  id            String     @id @default(cuid())
+  requestId     String     @unique
+  request       LoanRequest @relation(fields: [requestId], references: [id])
+  borrowerId    String
+  borrower      Borrower   @relation(fields: [borrowerId], references: [id])
+  localBankId   String
+  localBank     Institution @relation(fields: [localBankId], references: [id])
+  onChainLoanId String?    @unique
+  principalWei  String
+  aprBps        Int
+  termMonths    Int
+  status        LoanStatus @default(PENDING)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  installments Installment[]
+}
+
+model Installment {
+  id         String    @id @default(cuid())
+  loanId     String
+  loan       Loan      @relation(fields: [loanId], references: [id])
+  index      Int
+  amountWei  String
+  dueDate    DateTime
+  paid       Boolean   @default(false)
+  paidAt     DateTime?
+  txHash     String?
+
+  @@unique([loanId, index])
+}
+
+model BlockchainEventLog {
+  id          String   @id @default(cuid())
+  contract    String
+  eventName   String
+  txHash      String
+  blockNumber Int
+  logIndex    Int
+  payload     Json
+  createdAt   DateTime @default(now())
+
+  @@unique([txHash, logIndex])
+  @@index([contract, eventName])
+  @@map("BLOCKCHAIN_EVENT_LOG")
+}
+
+model Asset {
+  id            String      @id @default(cuid())
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+  symbol        AssetSymbol
+  contractAddress String?
+  decimals      Int         @default(18)
+  createdAt     DateTime    @default(now())
+
+  @@index([symbol])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  eventType  String
+  actorId    String?
+  actorType  String?
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([eventType])
+  @@map("AUDIT_LOGS")
+}
+
+// ---- Legacy API models (Phase II migration) ----
+
+enum UserRole {
+  OWNER
+  NATIONAL_BANK_ADMIN
+  LOCAL_BANK_ADMIN
+  APPROVER
+  BORROWER
 }
 
 enum VerificationStatus {
@@ -50,63 +369,12 @@ model User {
   email       String?  @unique
   role        UserRole @default(BORROWER)
   bankId      String?
-  bank        Bank?    @relation(fields: [bankId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   incomeVerification IncomeVerification?
-  loans              Loan[]              @relation("BorrowerLoans")
   messagesSent       ChatMessage[]       @relation("SentMessages")
   messagesReceived   ChatMessage[]       @relation("ReceivedMessages")
-}
-
-model Bank {
-  id             String   @id @default(cuid())
-  tier           BankTier
-  name           String
-  walletAddress  String   @unique
-  jurisdiction   String?
-  parentBankId   String?
-  parentBank     Bank?    @relation("ParentChild", fields: [parentBankId], references: [id])
-  childBanks     Bank[]   @relation("ParentChild")
-  createdAt      DateTime @default(now())
-
-  users User[]
-  loans Loan[]
-}
-
-model Loan {
-  id              String     @id @default(cuid())
-  onChainId       String     @unique
-  borrowerId      String
-  borrower        User       @relation("BorrowerLoans", fields: [borrowerId], references: [id])
-  localBankId     String
-  localBank       Bank       @relation(fields: [localBankId], references: [id])
-  principalWei    String
-  aprBps          Int
-  termMonths      Int
-  purpose         String?
-  status          LoanStatus @default(PENDING)
-  riskScore       Float?
-  shapExplanation Json?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-
-  installments Installment[]
-}
-
-model Installment {
-  id        String   @id @default(cuid())
-  loanId    String
-  loan      Loan     @relation(fields: [loanId], references: [id])
-  index     Int
-  amountWei String
-  dueDate   DateTime
-  paid      Boolean  @default(false)
-  paidAt    DateTime?
-  txHash    String?
-
-  @@unique([loanId, index])
 }
 
 model IncomeVerification {
@@ -140,18 +408,4 @@ model ChatMessage {
   receiver   User       @relation("ReceivedMessages", fields: [receiverId], references: [id])
   body       String
   createdAt  DateTime   @default(now())
-}
-
-model OnChainEvent {
-  id        String   @id @default(cuid())
-  contract  String
-  eventName String
-  txHash    String
-  blockNum  Int
-  logIndex  Int
-  payload   Json
-  createdAt DateTime @default(now())
-
-  @@unique([txHash, logIndex])
-  @@index([contract, eventName])
 }

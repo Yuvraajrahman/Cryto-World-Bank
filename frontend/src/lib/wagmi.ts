@@ -35,7 +35,7 @@ const connectors = connectorsForWallets(
 // pin public RPC endpoints (and allow overrides via env).
 const sepoliaRpc =
   (import.meta.env.VITE_SEPOLIA_RPC_URL as string | undefined)?.trim() ||
-  "https://rpc.sepolia.org";
+  "https://ethereum-sepolia-rpc.publicnode.com";
 const polygonAmoyRpc =
   (import.meta.env.VITE_POLYGON_AMOY_RPC_URL as string | undefined)?.trim() ||
   "https://rpc-amoy.polygon.technology";

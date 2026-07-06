@@ -3,6 +3,7 @@ import { pino } from "pino";
 import { config } from "./config";
 import { createApp } from "./app";
 import { startIndexer } from "./chain/indexer";
+import { startOverdueJob } from "./jobs/overdue";
 
 const logger = pino({
   transport: { target: "pino-pretty", options: { colorize: true } },
@@ -17,4 +18,7 @@ app.listen(config.port, () => {
   startIndexer(logger).catch((err) => {
     logger.warn({ err }, "indexer failed to start");
   });
+  const stopOverdue = startOverdueJob(logger);
+  process.on("SIGTERM", () => stopOverdue());
+  process.on("SIGINT", () => stopOverdue());
 });

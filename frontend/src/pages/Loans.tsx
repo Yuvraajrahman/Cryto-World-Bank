@@ -5,6 +5,8 @@ import { FilePlus2, Coins, ArrowUpRight, Filter } from "lucide-react";
 import { api, LoanDTO, LoanStatus } from "@/lib/api";
 import { formatDateTime } from "@/lib/utils";
 import { useSession } from "@/lib/store";
+import { useAccount } from "wagmi";
+import { contractsConfigured } from "@/lib/onChain";
 
 const statusStyle: Record<LoanStatus, string> = {
   PENDING: "badge-blue",
@@ -17,6 +19,8 @@ const statusStyle: Record<LoanStatus, string> = {
 
 export function Loans() {
   const user = useSession((s) => s.user);
+  const { address } = useAccount();
+  const onChain = contractsConfigured();
   const [loans, setLoans] = useState<LoanDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<LoanStatus | "ALL">("ALL");
@@ -24,6 +28,42 @@ export function Loans() {
   async function load() {
     setLoading(true);
     try {
+      const chainWallet = address;
+      if (onChain && chainWallet && user?.role === "BORROWER") {
+        const r = await api.get<{
+          onChain: Array<{
+            id: string;
+            principalEth: string;
+            status: string;
+            purpose?: string;
+            termMonths?: number;
+          }>;
+        }>(`/api/phase2/loans/history/${chainWallet}`);
+        const mapped: LoanDTO[] = (r.onChain ?? []).map((l) => ({
+          id: `chain_${l.id}`,
+          kind: "BORROWER",
+          borrowerId: user.id,
+          lenderBankId: "on-chain",
+          amount: Number(l.principalEth),
+          termMonths: l.termMonths ?? 6,
+          aprBps: 800,
+          purpose: l.purpose ?? "On-chain loan",
+          status: (l.status === "Active"
+            ? "ACTIVE"
+            : l.status === "Repaid"
+              ? "REPAID"
+              : l.status === "Pending"
+                ? "PENDING"
+                : "ACTIVE") as LoanStatus,
+          createdAt: new Date().toISOString(),
+          isInstallment: true,
+          installments: [],
+        }));
+        if (mapped.length > 0) {
+          setLoans(mapped);
+          return;
+        }
+      }
       if (user?.role === "BORROWER") {
         const r = await api.get<{ loans: LoanDTO[] }>("/api/loans/mine");
         setLoans(r.loans);

@@ -13,6 +13,10 @@ import { chatbotRouter } from "./routes/chatbot";
 import { incomeRouter } from "./routes/income";
 import { riskRouter } from "./routes/risk";
 import { aiRouter } from "./routes/ai";
+import { phase1Router } from "./routes/phase1";
+import { phase2Router } from "./routes/phase2";
+import { chainRouter } from "./routes/chain";
+import { briefRouter } from "./routes/brief";
 import { errorHandler } from "./middleware/error";
 
 // Builds the Express app without binding a port. index.ts wraps it in
@@ -90,6 +94,10 @@ export function createApp(): Express {
   app.use("/api/ai", aiRouter);
   app.use("/api/income", incomeRouter);
   app.use("/api/risk", riskRouter);
+  app.use("/api/phase1", phase1Router);
+  app.use("/api/phase2", phase2Router);
+  app.use("/api/chain", chainRouter);
+  app.use("/api/brief", briefRouter);
 
   app.use(errorHandler);
 

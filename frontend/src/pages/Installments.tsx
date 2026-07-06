@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAccount } from "wagmi";
+import { parseEther } from "viem";
 import toast from "react-hot-toast";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import {
@@ -13,9 +15,29 @@ import {
 } from "lucide-react";
 import { api, LoanDTO } from "@/lib/api";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { contractAddresses, localBankAbi } from "@/lib/contracts";
+import { contractsConfigured } from "@/lib/onChain";
+import { useOnChainTx } from "@/hooks/useOnChainTx";
+
+interface ChainActiveLoan {
+  id: string;
+  principalEth: number;
+  totalOwedEth: number;
+  totalPaidEth: number;
+  installmentCount: number;
+  installmentsPaid: number;
+  nextInstallmentEth: number;
+  isLumpSum: boolean;
+  purpose: string;
+}
 
 export function Installments() {
+  const { address, isConnected } = useAccount();
+  const onChain = contractsConfigured();
+  const { write, busy: chainBusy } = useOnChainTx(() => load());
+
   const [loans, setLoans] = useState<LoanDTO[]>([]);
+  const [chainLoans, setChainLoans] = useState<ChainActiveLoan[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState<number | null>(null);
@@ -23,15 +45,23 @@ export function Installments() {
   async function load() {
     setLoading(true);
     try {
+      if (onChain && address) {
+        const r = await api.get<{ loans: ChainActiveLoan[] }>(
+          `/api/chain/loans/borrower/${address}`,
+        );
+        setChainLoans(r.loans);
+        if (r.loans.length > 0 && !activeId) {
+          setActiveId(`chain_${r.loans[0].id}`);
+        }
+      }
+
       const r = await api.get<{ loans: LoanDTO[] }>("/api/loans/mine");
       const active = r.loans.filter(
         (l) => l.status === "ACTIVE" || l.status === "APPROVED",
       );
       setLoans(active);
-      if (active.length > 0 && !activeId) {
+      if (!onChain && active.length > 0 && !activeId) {
         setActiveId(active[0].id);
-      } else if (active.length === 0) {
-        setActiveId(null);
       }
     } finally {
       setLoading(false);
@@ -41,9 +71,36 @@ export function Installments() {
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [address]);
 
-  const loan = useMemo(() => loans.find((l) => l.id === activeId), [loans, activeId]);
+  const chainLoan = useMemo(
+    () =>
+      activeId?.startsWith("chain_")
+        ? chainLoans.find((l) => `chain_${l.id}` === activeId)
+        : undefined,
+    [chainLoans, activeId],
+  );
+
+  const loan = useMemo(
+    () => (activeId?.startsWith("chain_") ? undefined : loans.find((l) => l.id === activeId)),
+    [loans, activeId],
+  );
+
+  function payOnChain(l: ChainActiveLoan) {
+    if (!isConnected) {
+      toast.error("Connect MetaMask as borrower");
+      return;
+    }
+    if (!contractAddresses.localBank) return;
+    const value = l.isLumpSum ? l.totalOwedEth : l.nextInstallmentEth;
+    write({
+      address: contractAddresses.localBank,
+      abi: localBankAbi,
+      functionName: "payInstallment",
+      args: [BigInt(l.id)],
+      value: parseEther(value.toFixed(8)),
+    } as unknown as Parameters<typeof write>[0]);
+  }
 
   async function pay(index: number) {
     if (!loan) return;
@@ -73,7 +130,10 @@ export function Installments() {
     }
   }
 
-  if (!loading && loans.length === 0) {
+  const hasChain = onChain && chainLoans.length > 0;
+  const hasApi = loans.length > 0;
+
+  if (!loading && !hasChain && !hasApi) {
     return (
       <div className="space-y-8">
         <SectionHeader
@@ -95,6 +155,55 @@ export function Installments() {
     );
   }
 
+  if (chainLoan) {
+    const remaining = chainLoan.totalOwedEth - chainLoan.totalPaidEth;
+    return (
+      <div className="space-y-8">
+        <SectionHeader
+          eyebrow="Lifecycle"
+          title="On-chain repayment"
+          description={`Loan #${chainLoan.id} on LocalBank — ${chainLoan.purpose}`}
+        />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+          <div className="stat">
+            <div className="stat-label">Principal</div>
+            <div className="stat-value">{chainLoan.principalEth.toFixed(4)} ETH</div>
+          </div>
+          <div className="stat">
+            <div className="stat-label">Progress</div>
+            <div className="stat-value">
+              {chainLoan.installmentsPaid} / {chainLoan.installmentCount}
+            </div>
+          </div>
+          <div className="stat">
+            <div className="stat-label">Outstanding</div>
+            <div className="stat-value">{remaining.toFixed(4)} ETH</div>
+          </div>
+          <div className="stat">
+            <div className="stat-label">Next payment</div>
+            <div className="stat-value">
+              {(chainLoan.isLumpSum ? remaining : chainLoan.nextInstallmentEth).toFixed(4)} ETH
+            </div>
+          </div>
+        </div>
+        <div className="card p-6">
+          <button
+            className="btn-primary"
+            disabled={chainBusy}
+            onClick={() => payOnChain(chainLoan)}
+          >
+            <CircleDollarSign className="h-4 w-4" />
+            {chainBusy
+              ? "Confirm in wallet…"
+              : chainLoan.isLumpSum
+                ? "Repay full loan"
+                : `Pay installment #${chainLoan.installmentsPaid + 1}`}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const paidCount = loan?.installments.filter((x) => x.paid).length ?? 0;
   const total = loan?.installments.length ?? 0;
   const next = loan?.installments.find((x) => !x.paid);
@@ -112,12 +221,17 @@ export function Installments() {
         title="Installment Schedule"
         description="Your repayment plan lives on-chain. Pay a single installment, prepay, or audit any transition at a glance."
         right={
-          loans.length > 1 ? (
+          (hasChain ? chainLoans : loans).length > 1 ? (
             <select
               className="btn-ghost"
               value={activeId ?? ""}
               onChange={(e) => setActiveId(e.target.value)}
             >
+              {chainLoans.map((l) => (
+                <option key={l.id} value={`chain_${l.id}`}>
+                  On-chain #{l.id} — {l.principalEth} ETH
+                </option>
+              ))}
               {loans.map((l) => (
                 <option key={l.id} value={l.id}>
                   Loan #{l.id.split("_").pop()?.slice(0, 8)} — {l.amount} ETH
@@ -272,23 +386,6 @@ export function Installments() {
                                 </span>
                               ) : null}
                             </div>
-                            {x.txHash ? (
-                              <div className="mt-0.5 font-mono text-[11px] text-ink-200">
-                                tx {x.txHash.slice(0, 10)}…{x.txHash.slice(-4)}
-                              </div>
-                            ) : (
-                              <div className="mt-0.5 text-xs text-ink-200">
-                                {isOverdue ? (
-                                  <span className="inline-flex items-center gap-1 text-red-300">
-                                    <AlertTriangle className="h-3 w-3" /> Overdue
-                                  </span>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1">
-                                    <Clock className="h-3 w-3" /> Awaiting payment
-                                  </span>
-                                )}
-                              </div>
-                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">

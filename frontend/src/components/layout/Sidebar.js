@@ -1,6 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Landmark, Coins, FilePlus2, Receipt, MessageSquare, UserRound, ShieldAlert, Settings2, Network, LineChart, Inbox, Bot, Globe2, } from "lucide-react";
+import { LayoutDashboard, Landmark, Coins, FilePlus2, Receipt, MessageSquare, UserRound, ShieldAlert, Settings2, Network, LineChart, Inbox, Bot, Globe2, PiggyBank, Shield, } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/store";
 const ALL = [
@@ -16,6 +16,7 @@ const nav = [
     { to: "/app/reserve", label: "World Reserve", icon: Landmark, roles: ALL },
     { to: "/app/banks", label: "Bank Network", icon: Network, roles: ALL },
     { to: "/app/simulation", label: "Global simulation", icon: Globe2, roles: ALL },
+    { to: "/app/facilities", label: "Facilities", icon: PiggyBank, roles: ALL },
     {
         to: "/app/loans",
         label: "My Loans",
@@ -49,6 +50,12 @@ const nav = [
         to: "/app/admin",
         label: "Admin",
         icon: Settings2,
+        roles: ["OWNER", "NATIONAL_BANK_ADMIN"],
+    },
+    {
+        to: "/app/multisig",
+        label: "Multisig",
+        icon: Shield,
         roles: ["OWNER", "NATIONAL_BANK_ADMIN"],
     },
 ];

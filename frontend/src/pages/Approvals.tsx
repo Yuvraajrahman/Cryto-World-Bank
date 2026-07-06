@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import {
@@ -12,9 +13,28 @@ import {
   Sparkles,
 } from "lucide-react";
 import { api, LoanDTO, UserDTO } from "@/lib/api";
+import {
+  fetchAuthorityBrief,
+  fetchPendingLoansPhase2,
+  documentNidUrl,
+  documentPhotoUrl,
+  type PendingLoanRow,
+} from "@/lib/phase2";
 import { useSession } from "@/lib/store";
 import { formatDateTime } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { contractAddresses, localBankAbi } from "@/lib/contracts";
+import { contractsConfigured } from "@/lib/onChain";
+import { useOnChainTx } from "@/hooks/useOnChainTx";
+
+interface ChainPendingLoan {
+  id: string;
+  borrower: string;
+  principalEth: number;
+  aprBps: number;
+  termMonths: number;
+  purpose: string;
+}
 
 interface IncomeProofQueueItem {
   id: string;
@@ -41,6 +61,9 @@ type Tab = "LOANS" | "INCOME";
 
 export function Approvals() {
   const role = useSession((s) => s.role);
+  const { isConnected } = useAccount();
+  const onChain = contractsConfigured();
+  const { write, busy: chainBusy } = useOnChainTx(() => load());
   const canReviewLoans =
     role === "APPROVER" ||
     role === "LOCAL_BANK_ADMIN" ||
@@ -56,10 +79,37 @@ export function Approvals() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState<Record<string, string>>({});
   const [risk, setRisk] = useState<Record<string, RiskScoreResponse>>({});
+  const [chainLoans, setChainLoans] = useState<ChainPendingLoan[]>([]);
+  const [phase2Pending, setPhase2Pending] = useState<PendingLoanRow[]>([]);
+  const [briefs, setBriefs] = useState<Record<string, Record<string, unknown>>>({});
 
   async function load() {
     setLoading(true);
     try {
+      const chainPending = onChain
+        ? await api
+            .get<{ loans: ChainPendingLoan[] }>("/api/chain/loans/pending")
+            .catch(() => ({ loans: [] }))
+        : { loans: [] };
+      setChainLoans(chainPending.loans);
+
+      if (onChain) {
+        const p2 = await fetchPendingLoansPhase2();
+        setPhase2Pending(p2);
+        if (p2.length > 0 && chainPending.loans.length === 0) {
+          setChainLoans(
+            p2.map((p) => ({
+              id: p.id,
+              borrower: p.borrower,
+              principalEth: Number(p.principalEth),
+              aprBps: 800,
+              termMonths: 12,
+              purpose: p.purpose,
+            })),
+          );
+        }
+      }
+
       const loanRes = await api.get<{ loans: LoanDTO[] }>("/api/loans/queue");
       setLoans(loanRes.loans);
       const borrowerIds = Array.from(
@@ -89,6 +139,39 @@ export function Approvals() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function approveChain(loan: ChainPendingLoan) {
+    if (!isConnected) {
+      toast.error("Connect MetaMask as approver (account #3) or LB governor (#2)");
+      return;
+    }
+    if (!contractAddresses.localBank) return;
+    write({
+      address: contractAddresses.localBank,
+      abi: localBankAbi,
+      functionName: "approveLoan",
+      args: [BigInt(loan.id)],
+    });
+  }
+
+  async function rejectChain(loan: ChainPendingLoan) {
+    const reason = rejectReason[`chain_${loan.id}`]?.trim();
+    if (!reason || reason.length < 3) {
+      toast.error("Enter a reason (3+ chars)");
+      return;
+    }
+    if (!isConnected) {
+      toast.error("Connect MetaMask as approver");
+      return;
+    }
+    if (!contractAddresses.localBank) return;
+    write({
+      address: contractAddresses.localBank,
+      abi: localBankAbi,
+      functionName: "rejectLoan",
+      args: [BigInt(loan.id), reason],
+    });
+  }
 
   async function approve(loan: LoanDTO) {
     setActing(loan.id);
@@ -159,7 +242,16 @@ export function Approvals() {
     }
   }
 
-  const loanCount = loans.length;
+  async function loadBrief(loanId: string) {
+    try {
+      const b = await fetchAuthorityBrief(loanId);
+      setBriefs((prev) => ({ ...prev, [loanId]: b.authorityBrief as Record<string, unknown> }));
+    } catch {
+      toast.error("Authority Brief unavailable");
+    }
+  }
+
+  const loanCount = loans.length + chainLoans.length;
   const incomeCount = income.length;
 
   const filtered = useMemo(() => (tab === "LOANS" ? loans : []), [tab, loans]);
@@ -222,13 +314,100 @@ export function Approvals() {
       </div>
 
       {tab === "LOANS" ? (
-        filtered.length === 0 && !loading ? (
+        <>
+          {onChain && chainLoans.length > 0 ? (
+            <div className="space-y-3">
+              <div className="text-xs uppercase tracking-[0.22em] text-gold-300">
+                On-chain pending ({chainLoans.length})
+              </div>
+              {chainLoans.map((l) => {
+                const p2 = phase2Pending.find((p) => p.id === l.id);
+                const docId = p2?.documentRequestId;
+                const brief = briefs[l.id];
+                return (
+                <div key={l.id} className="card p-5 border-gold-700/30">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="font-medium text-ink-100">
+                        Loan #{l.id} · {l.principalEth.toFixed(4)} ETH
+                      </div>
+                      <div className="font-mono text-xs text-ink-200">
+                        {l.borrower.slice(0, 10)}… · {l.termMonths} mo ·{" "}
+                        {(l.aprBps / 100).toFixed(2)}% APR
+                      </div>
+                      <div className="mt-2 text-sm text-ink-100">{l.purpose}</div>
+                      {docId ? (
+                        <div className="mt-2 flex gap-2 text-xs">
+                          <a className="text-gold-300 underline" href={documentNidUrl(docId)} target="_blank" rel="noreferrer">
+                            View NID
+                          </a>
+                          <a className="text-gold-300 underline" href={documentPhotoUrl(docId)} target="_blank" rel="noreferrer">
+                            View photo
+                          </a>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                  {brief ? (
+                    <div className="mt-3 rounded-lg border border-gold-700/30 bg-gold-900/10 p-3 text-sm">
+                      <div className="flex items-center gap-2 text-gold-200">
+                        <Sparkles className="h-4 w-4" />
+                        Authority Brief: {String(brief.headline ?? brief.recommendation)}
+                      </div>
+                      <div className="mt-1 text-xs text-ink-200">
+                        Risk {String(brief.riskScore)} · {String(brief.recommendation)}
+                      </div>
+                    </div>
+                  ) : (
+                    <button className="btn-ghost mt-3 text-xs" onClick={() => loadBrief(l.id)}>
+                      <FileSearch className="mr-1 inline h-3 w-3" />
+                      Generate Authority Brief
+                    </button>
+                  )}
+                  <div className="mt-4">
+                    <input
+                      className="input mb-3"
+                      placeholder="Rejection reason (if rejecting)"
+                      value={rejectReason[`chain_${l.id}`] ?? ""}
+                      onChange={(e) =>
+                        setRejectReason((r) => ({
+                          ...r,
+                          [`chain_${l.id}`]: e.target.value,
+                        }))
+                      }
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        className="btn-primary"
+                        disabled={chainBusy}
+                        onClick={() => approveChain(l)}
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        Approve on-chain
+                      </button>
+                      <button
+                        className="btn-danger"
+                        disabled={chainBusy}
+                        onClick={() => rejectChain(l)}
+                      >
+                        <XCircle className="h-4 w-4" />
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+              })}
+            </div>
+          ) : null}
+
+          {filtered.length === 0 && chainLoans.length === 0 && !loading ? (
           <EmptyState
             icon={Inbox}
             title="No pending loan requests"
             description="When a borrower submits a request funded by your bank, it will appear here."
           />
-        ) : (
+          ) : (
           <div className="space-y-3">
             {filtered.map((l) => {
               const borrower = l.borrowerId ? borrowers[l.borrowerId] : undefined;
@@ -400,7 +579,8 @@ export function Approvals() {
               );
             })}
           </div>
-        )
+        )}
+        </>
       ) : income.length === 0 && !loading ? (
         <EmptyState
           icon={FileText}

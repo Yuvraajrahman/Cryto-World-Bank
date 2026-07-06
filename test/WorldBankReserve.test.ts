@@ -73,6 +73,17 @@ describe("WorldBankReserve — Tier 1 unit tests", () => {
     expect(await wb.totalAllocated()).to.equal(ethers.parseEther("40"));
   });
 
+  it("allocateCapital alias matches allocate", async () => {
+    const { wb, governor, nationalBank, depositor } = await deploy();
+    await depositor.sendTransaction({
+      to: await wb.getAddress(),
+      value: ethers.parseEther("10"),
+    });
+    await wb.connect(governor).registerNationalBank(nationalBank.address, "NB", "BD");
+    await wb.connect(governor).allocateCapital(nationalBank.address, ethers.parseEther("3"));
+    expect(await wb.totalAllocated()).to.equal(ethers.parseEther("3"));
+  });
+
   it("refuses to allocate more than the reserve balance", async () => {
     const { wb, governor, nationalBank } = await deploy();
     await wb.connect(governor).registerNationalBank(nationalBank.address, "NB", "BD");

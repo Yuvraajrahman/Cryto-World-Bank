@@ -29,7 +29,9 @@ export type LoanStatus =
   | "DEFAULTED";
 
 export type TxType =
+  | "LOAN_REQUESTED"
   | "LOAN_APPROVED"
+  | "LOAN_DISBURSED"
   | "INSTALLMENT_PAID"
   | "LOAN_REPAID"
   | "ALLOCATION"
@@ -314,7 +316,7 @@ function seed(): DB {
   const users: User[] = [
     {
       id: "usr_governor",
-      wallet: "0xDEa0000000000000000000000000000000000b17",
+      wallet: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       displayName: "World Bank Governor",
       email: "governor@cwb.example",
       role: "OWNER",
@@ -325,7 +327,7 @@ function seed(): DB {
     },
     {
       id: "usr_nb_admin_bd",
-      wallet: "0xBD00000000000000000000000000000000000Ad1",
+      wallet: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
       displayName: "Bangladesh NB Admin",
       role: "NATIONAL_BANK_ADMIN",
       bankId: "bank_nb_bd",
@@ -336,8 +338,8 @@ function seed(): DB {
     },
     {
       id: "usr_lb_admin_dhaka",
-      wallet: "0xD4KA00000000000000000000000000000000000A",
-      displayName: "Dhaka LB Admin",
+      wallet: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      displayName: "Dhaka LB Governor",
       role: "LOCAL_BANK_ADMIN",
       bankId: "bank_lb_dhaka",
       consecutivePaidLoans: 0,
@@ -347,7 +349,7 @@ function seed(): DB {
     },
     {
       id: "usr_approver_dhaka",
-      wallet: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1",
+      wallet: "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
       displayName: "Fatima Khan",
       role: "APPROVER",
       bankId: "bank_lb_dhaka",
@@ -358,7 +360,7 @@ function seed(): DB {
     },
     {
       id: "usr_borrower_demo",
-      wallet: "0xB0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0",
+      wallet: "0x15d34AAf54267DB7D7c367839AAf68A95aA83114",
       displayName: "Md. Bokhtiar Rahman",
       email: "bokhtiar@example.com",
       country: "Bangladesh",
@@ -371,7 +373,7 @@ function seed(): DB {
     },
     {
       id: "usr_borrower_new",
-      wallet: "0xCA11FED0000000000000000000000000000000C5",
+      wallet: "0x9965507D1a55bcC2695C58ba16FB37d819B0f4cf",
       displayName: "Aisha Adewale",
       email: "aisha@example.com",
       country: "Nigeria",

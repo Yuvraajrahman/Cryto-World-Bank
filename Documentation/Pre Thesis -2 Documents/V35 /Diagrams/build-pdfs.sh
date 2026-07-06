@@ -58,7 +58,7 @@ figure_canvas() {
       echo "2000 1400" ;;
     fig-blockchain-stack)
       echo "1700 1250" ;;
-    fig-data-partitioning)
+    fig-data-partitioning|fig-financial-data-lifecycle)
       echo "2000 1300" ;;
     fig-activity-aux)
       echo "1900 1400" ;;

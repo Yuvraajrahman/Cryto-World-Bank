@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { parseEther } from "viem";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import {
   AlertTriangle,
@@ -14,11 +16,38 @@ import {
 import { api, BankDTO, TransactionDTO } from "@/lib/api";
 import { useSession } from "@/lib/store";
 import { formatDateTime } from "@/lib/utils";
+import { contractAddresses, nationalBankAbi, worldBankAbi } from "@/lib/contracts";
+import { contractsConfigured } from "@/lib/onChain";
 
 export function Admin() {
   const role = useSession((s) => s.role);
   const user = useSession((s) => s.user);
-  const [paused, setPaused] = useState(false);
+  const isOwner = role === "OWNER";
+  const isNbAdmin = role === "NATIONAL_BANK_ADMIN";
+  const { isConnected } = useAccount();
+  const onChain = contractsConfigured();
+  const govContract = (isOwner ? contractAddresses.worldBank : contractAddresses.nationalBank) as
+    | `0x${string}`
+    | "";
+  const govAbi = isOwner ? worldBankAbi : nationalBankAbi;
+
+  const { data: chainPaused } = useReadContract({
+    address: govContract || undefined,
+    abi: govAbi,
+    functionName: "paused",
+    query: { enabled: Boolean(onChain && govContract) },
+  });
+
+  const { data: chainApr } = useReadContract({
+    address: govContract || undefined,
+    abi: govAbi,
+    functionName: "lendingAprBps",
+    query: { enabled: Boolean(onChain && govContract) },
+  });
+
+  const { writeContract, data: txHash, isPending, reset } = useWriteContract();
+  const { isSuccess: txOk } = useWaitForTransactionReceipt({ hash: txHash });
+
   const [apr, setApr] = useState(300);
 
   const [banks, setBanks] = useState<{
@@ -62,8 +91,66 @@ export function Admin() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const isOwner = role === "OWNER";
-  const isNbAdmin = role === "NATIONAL_BANK_ADMIN";
+  const paused = onChain ? Boolean(chainPaused) : false;
+
+  useEffect(() => {
+    if (chainApr != null) setApr(Number(chainApr));
+  }, [chainApr]);
+
+  useEffect(() => {
+    if (txOk) {
+      toast.success("On-chain transaction confirmed");
+      reset();
+      load();
+    }
+  }, [txOk, reset]);
+
+  function setAprOnChain() {
+    if (!govContract || !isConnected) {
+      toast.error("Connect wallet");
+      return;
+    }
+    writeContract({
+      address: govContract,
+      abi: govAbi,
+      functionName: "setLendingApr",
+      args: [BigInt(apr)],
+    });
+  }
+
+  function togglePauseOnChain() {
+    if (!govContract || !isConnected) return;
+    writeContract({
+      address: govContract,
+      abi: govAbi,
+      functionName: paused ? "unpause" : "pause",
+    });
+  }
+
+  function allocateOnChain() {
+    if (!isConnected) {
+      toast.error("Connect wallet");
+      return;
+    }
+    const amt = parseEther(amount);
+    if (isOwner && contractAddresses.worldBank && contractAddresses.nationalBank) {
+      writeContract({
+        address: contractAddresses.worldBank,
+        abi: worldBankAbi,
+        functionName: "allocate",
+        args: [contractAddresses.nationalBank, amt],
+      });
+      return;
+    }
+    if (isNbAdmin && contractAddresses.nationalBank && contractAddresses.localBank) {
+      writeContract({
+        address: contractAddresses.nationalBank,
+        abi: nationalBankAbi,
+        functionName: "allocate",
+        args: [contractAddresses.localBank, amt],
+      });
+    }
+  }
 
   const allocationTargets = isOwner
     ? (banks?.nationalBanks ?? [])
@@ -137,11 +224,8 @@ export function Admin() {
               />
               <p className="mt-1 text-xs text-ink-200">Safety cap: 50.00% (5000 bps)</p>
             </div>
-            <button
-              className="btn-primary mt-4"
-              onClick={() => toast.success(`APR set to ${(apr / 100).toFixed(2)}%`)}
-            >
-              Update rate
+            <button className="btn-primary mt-4" onClick={onChain ? setAprOnChain : () => toast.success(`APR set to ${(apr / 100).toFixed(2)}%`)} disabled={isPending}>
+              Update rate {onChain ? "on-chain" : ""}
             </button>
           </div>
         ) : null}
@@ -207,9 +291,9 @@ export function Admin() {
               />
             </div>
           </div>
-          <button className="btn-primary mt-4" onClick={allocate} disabled={allocating}>
+          <button className="btn-primary mt-4" onClick={onChain ? allocateOnChain : allocate} disabled={allocating || isPending}>
             <Shuffle className="h-4 w-4" />
-            {allocating ? "Allocating…" : "Allocate funds"}
+            {allocating || isPending ? "Allocating…" : onChain ? "Allocate on-chain" : "Allocate funds"}
           </button>
         </div>
 
@@ -235,10 +319,8 @@ export function Admin() {
             <div className="mt-4 flex gap-2">
               <button
                 className={paused ? "btn-primary" : "btn-danger"}
-                onClick={() => {
-                  setPaused((p) => !p);
-                  toast(paused ? "System resumed" : "System paused");
-                }}
+                onClick={onChain ? togglePauseOnChain : () => toast(paused ? "System resumed" : "System paused")}
+                disabled={isPending}
               >
                 {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
                 {paused ? "Unpause" : "Pause"}

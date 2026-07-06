@@ -35,6 +35,15 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
     mapping(address => NationalBankAccount) public nationalBanks;
     address[] private _nationalBankList;
 
+    struct CapitalRequest {
+        address bank;
+        uint256 amount;
+        bool open;
+    }
+
+    uint256 public nextCapitalRequestId = 1;
+    mapping(uint256 => CapitalRequest) public capitalRequests;
+
     uint256 public totalDeposits;
     uint256 public totalAllocated;
     uint256 public totalRepaid;
@@ -43,6 +52,7 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
     event NationalBankRegistered(address indexed bank, string name, string jurisdiction);
     event NationalBankRevoked(address indexed bank);
     event CapitalAllocated(address indexed bank, uint256 amount);
+    event CapitalRequested(address indexed bank, uint256 amount, uint256 indexed requestId);
     event RepaymentRecorded(address indexed bank, uint256 principal, uint256 interest);
     event LendingAprUpdated(uint256 oldBps, uint256 newBps);
     event EmergencyWithdrawal(address indexed to, uint256 amount);
@@ -107,7 +117,7 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
     // -------- Allocation & repayment --------
 
     function allocate(address bank, uint256 amount)
-        external
+        public
         onlyRole(GOVERNOR_ROLE)
         whenNotPaused
         nonReentrant
@@ -125,6 +135,25 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
         require(ok, "transfer failed");
 
         emit CapitalAllocated(bank, amount);
+    }
+
+    function allocateCapital(address bank, uint256 amount) external {
+        allocate(bank, amount);
+    }
+
+    function requestCapital(uint256 amount) external onlyRole(NATIONAL_BANK_ROLE) returns (uint256 requestId) {
+        require(amount > 0, "zero amount");
+        require(nationalBanks[msg.sender].registered, "not registered");
+        requestId = nextCapitalRequestId++;
+        capitalRequests[requestId] = CapitalRequest({ bank: msg.sender, amount: amount, open: true });
+        emit CapitalRequested(msg.sender, amount, requestId);
+    }
+
+    function fulfillCapitalRequest(uint256 requestId) external onlyRole(GOVERNOR_ROLE) {
+        CapitalRequest storage r = capitalRequests[requestId];
+        require(r.open, "closed");
+        r.open = false;
+        allocate(r.bank, r.amount);
     }
 
     function recordRepayment(uint256 principal)

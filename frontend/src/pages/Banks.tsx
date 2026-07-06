@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { useAccount } from "wagmi";
+import { parseEther } from "viem";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import {
   Building2,
@@ -14,6 +16,16 @@ import {
 } from "lucide-react";
 import { api, BankDTO } from "@/lib/api";
 import { useSession } from "@/lib/store";
+import {
+  contractAddresses,
+  nationalBankAbi,
+  upwardDepositAbi,
+  worldBankAbi,
+  capitalRequestAbi,
+  localBankAdminAbi,
+} from "@/lib/contracts";
+import { contractsConfigured } from "@/lib/onChain";
+import { useOnChainTx } from "@/hooks/useOnChainTx";
 
 interface BanksResponse {
   worldBank: BankDTO | null;
@@ -37,17 +49,38 @@ export function Banks() {
 
   const [data, setData] = useState<BanksResponse | null>(null);
   const [stats, setStats] = useState<BankStats | null>(null);
+  const [chainHierarchy, setChainHierarchy] = useState<{
+    world?: { reserveEth: number; allocatedEth: number };
+    national?: { balanceEth: number };
+    local?: { balanceEth: number; pending: number; active: number };
+  } | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function load() {
     setLoading(true);
     try {
-      const [b, s] = await Promise.all([
+      const [b, s, chain] = await Promise.all([
         api.get<BanksResponse>("/api/banks"),
         api.get<BankStats>("/api/banks/stats"),
+        contractsConfigured()
+          ? api.get<{
+              world: { reserveEth: number; allocatedEth: number };
+              national: { balanceEth: number } | null;
+              local: { balanceEth: number; pending: number; active: number } | null;
+            }>("/api/chain/hierarchy").catch(() => null)
+          : Promise.resolve(null),
       ]);
       setData(b);
       setStats(s);
+      setChainHierarchy(
+        chain
+          ? {
+              world: chain.world,
+              national: chain.national ?? undefined,
+              local: chain.local ?? undefined,
+            }
+          : null,
+      );
     } finally {
       setLoading(false);
     }
@@ -95,7 +128,7 @@ export function Banks() {
             label: "World Bank",
             value: String(stats?.tiers.world ?? 0),
             icon: Landmark,
-            hint: `${(data?.worldBank?.reserve ?? 0).toFixed(0)} ETH reserve`,
+            hint: `${(chainHierarchy?.world?.reserveEth ?? data?.worldBank?.reserve ?? 0).toFixed(2)} ETH reserve`,
           },
           {
             label: "National Banks",
@@ -138,6 +171,18 @@ export function Banks() {
           currentBankId={user?.bankId}
           role={role}
         />
+      ) : null}
+
+      {(canAllocate || role === "LOCAL_BANK_ADMIN") && contractsConfigured() ? (
+        <UpwardDepositPanel role={role} onAfter={load} />
+      ) : null}
+
+      {(role === "OWNER" || role === "NATIONAL_BANK_ADMIN" || role === "LOCAL_BANK_ADMIN") ? (
+        <CapitalRequestsPanel role={role} onAfter={load} />
+      ) : null}
+
+      {role === "LOCAL_BANK_ADMIN" && contractsConfigured() ? (
+        <AccountCompliancePanel />
       ) : null}
 
       <div className="card p-6">
@@ -284,6 +329,166 @@ export function Banks() {
   );
 }
 
+function UpwardDepositPanel({ role, onAfter }: { role: string; onAfter: () => void }) {
+  const isNational = role === "NATIONAL_BANK_ADMIN" || role === "OWNER";
+  const isLocal = role === "LOCAL_BANK_ADMIN";
+  const [amount, setAmount] = useState("0.1");
+  const { isConnected } = useAccount();
+  const { write, busy } = useOnChainTx(onAfter);
+
+  function submit() {
+    if (!isConnected) {
+      toast.error("Connect MetaMask");
+      return;
+    }
+    if (!contractAddresses.upwardDeposit) {
+      toast.error("Run phase2:local");
+      return;
+    }
+    const parent = isLocal
+      ? contractAddresses.nationalBank
+      : isNational
+        ? contractAddresses.worldBank
+        : null;
+    if (!parent) {
+      toast.error("Parent bank address missing");
+      return;
+    }
+    write({
+      address: contractAddresses.upwardDeposit,
+      abi: upwardDepositAbi,
+      functionName: "depositUpward",
+      args: [parent],
+      value: parseEther(amount),
+    } as unknown as Parameters<typeof write>[0]);
+  }
+
+  const label = isLocal ? "Local → National" : "National → World";
+
+  return (
+    <div className="card p-6">
+      <div className="mb-4">
+        <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Phase II</div>
+        <div className="font-display text-xl font-semibold text-ink-100">Upward funding</div>
+        <p className="mt-1 text-sm text-ink-200">
+          Voluntary surplus repatriation via UpwardDepositFacility ({label}).
+        </p>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div>
+          <label className="label">Amount (ETH)</label>
+          <input className="input" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        </div>
+        <div className="flex items-end md:col-span-2">
+          <button className="btn-primary w-full" onClick={submit} disabled={busy}>
+            {busy ? "Confirm in wallet…" : "Deposit upward on-chain"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CapitalRequestsPanel({ role, onAfter }: { role: string; onAfter: () => void }) {
+  const tier =
+    role === "OWNER" ? "world" : role === "NATIONAL_BANK_ADMIN" ? "national" : "national";
+  const canFulfill = role === "OWNER" || role === "NATIONAL_BANK_ADMIN";
+  const [requests, setRequests] = useState<
+    Array<{ requestId: string; bank: string; amountEth: string; open: boolean }>
+  >([]);
+  const [requestAmount, setRequestAmount] = useState("0.1");
+  const { isConnected } = useAccount();
+  const { write, busy } = useOnChainTx(onAfter);
+
+  async function loadRequests() {
+    try {
+      const path =
+        role === "LOCAL_BANK_ADMIN"
+          ? "/api/phase2/capital-requests?tier=national"
+          : `/api/phase1/capital-requests?tier=${tier}`;
+      const r = await api.get<{ requests: typeof requests }>(path);
+      setRequests(r.requests ?? []);
+    } catch {
+      setRequests([]);
+    }
+  }
+
+  useEffect(() => {
+    void loadRequests();
+  }, [role, tier]);
+
+  function submitRequest() {
+    if (!isConnected) {
+      toast.error("Connect MetaMask");
+      return;
+    }
+    if (role === "NATIONAL_BANK_ADMIN" && contractAddresses.nationalBank) {
+      write({
+        address: contractAddresses.nationalBank,
+        abi: nationalBankAbi,
+        functionName: "requestUpstreamCapital",
+        args: [parseEther(requestAmount)],
+      });
+      return;
+    }
+    if (role === "LOCAL_BANK_ADMIN" && contractAddresses.localBank) {
+      write({
+        address: contractAddresses.localBank,
+        abi: localBankAdminAbi,
+        functionName: "requestCapital",
+        args: [parseEther(requestAmount)],
+      });
+    }
+  }
+
+  function fulfill(requestId: string) {
+    if (!isConnected) return;
+    const contract = role === "OWNER" ? contractAddresses.worldBank : contractAddresses.nationalBank;
+    if (!contract) return;
+    write({
+      address: contract,
+      abi: capitalRequestAbi,
+      functionName: "fulfillCapitalRequest",
+      args: [BigInt(requestId)],
+    });
+  }
+
+  return (
+    <div className="card p-6 space-y-4">
+      <div>
+        <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Capital requests</div>
+        <div className="font-display text-xl font-semibold text-ink-100">Request / fulfill liquidity</div>
+      </div>
+      {role !== "OWNER" && role !== "APPROVER" ? (
+        <div className="flex flex-wrap gap-2">
+          <input className="input w-32" value={requestAmount} onChange={(e) => setRequestAmount(e.target.value)} />
+          <button className="btn-primary" onClick={submitRequest} disabled={busy}>
+            Request capital upward
+          </button>
+        </div>
+      ) : null}
+      <ul className="space-y-2 text-sm">
+        {requests.length === 0 ? (
+          <li className="text-ink-200">No open capital requests.</li>
+        ) : (
+          requests.map((r) => (
+            <li key={r.requestId} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-ink-600/60 p-3">
+              <span className="font-mono text-xs">
+                #{r.requestId} · {r.amountEth} ETH from {r.bank.slice(0, 10)}…
+              </span>
+              {canFulfill ? (
+                <button className="btn-ghost text-xs" onClick={() => fulfill(r.requestId)} disabled={busy}>
+                  Fulfill
+                </button>
+              ) : null}
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+}
+
 function AllocationPanel({
   world,
   national,
@@ -303,8 +508,11 @@ function AllocationPanel({
   const defaultFrom = isOwner ? world?.id ?? "" : currentBankId ?? "";
   const [fromBankId, setFromBankId] = useState(defaultFrom);
   const [toBankId, setToBankId] = useState("");
-  const [amount, setAmount] = useState("10");
+  const [amount, setAmount] = useState("0.05");
   const [submitting, setSubmitting] = useState(false);
+  const { isConnected } = useAccount();
+  const onChain = contractsConfigured();
+  const { write, busy: chainBusy } = useOnChainTx(onAfter);
 
   useEffect(() => {
     if (!fromBankId) setFromBankId(defaultFrom);
@@ -320,13 +528,45 @@ function AllocationPanel({
     : local.filter((l) => l.parentBankId === currentBankId);
 
   async function submit() {
-    if (!fromBankId || !toBankId) {
-      toast.error("Select source and destination");
-      return;
-    }
     const amt = Number(amount);
     if (!(amt > 0)) {
       toast.error("Enter a positive amount");
+      return;
+    }
+
+    if (onChain) {
+      if (!isConnected) {
+        toast.error("Connect MetaMask with the matching persona wallet");
+        return;
+      }
+      if (isOwner) {
+        if (!contractAddresses.worldBank || !contractAddresses.nationalBank) {
+          toast.error("Run deploy + sync:env");
+          return;
+        }
+        write({
+          address: contractAddresses.worldBank,
+          abi: worldBankAbi,
+          functionName: "allocate",
+          args: [contractAddresses.nationalBank, parseEther(amount)],
+        });
+        return;
+      }
+      if (!contractAddresses.nationalBank || !contractAddresses.localBank) {
+        toast.error("Run deploy + sync:env");
+        return;
+      }
+      write({
+        address: contractAddresses.nationalBank,
+        abi: nationalBankAbi,
+        functionName: "allocate",
+        args: [contractAddresses.localBank, parseEther(amount)],
+      });
+      return;
+    }
+
+    if (!fromBankId || !toBankId) {
+      toast.error("Select source and destination");
       return;
     }
     try {
@@ -345,6 +585,8 @@ function AllocationPanel({
     }
   }
 
+  const busy = submitting || chainBusy;
+
   return (
     <div className="card p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -354,64 +596,96 @@ function AllocationPanel({
             Allocate reserve down the hierarchy
           </div>
           <p className="mt-1 text-sm text-ink-200">
-            {isOwner
-              ? "Move funds from the World Reserve to a National Bank."
-              : "Move funds from your National Bank to one of your Local Banks."}
+            {onChain
+              ? isOwner
+                ? "On-chain: WorldBankReserve.allocate → National Bank contract."
+                : "On-chain: NationalBank.allocate → Local Bank contract."
+              : isOwner
+                ? "Move funds from the World Reserve to a National Bank."
+                : "Move funds from your National Bank to one of your Local Banks."}
           </p>
         </div>
         <span className="badge-gold">
           <Shuffle className="h-3.5 w-3.5" />
-          {isOwner ? "Governor" : "NB Admin"}
+          {onChain ? "On-chain" : isOwner ? "Governor" : "NB Admin"}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <div>
-          <label className="label">From</label>
-          <select
-            className="input"
-            value={fromBankId}
-            onChange={(e) => setFromBankId(e.target.value)}
-          >
-            <option value="">Select…</option>
-            {sourceOptions.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name} · {b.reserve.toFixed(0)} ETH
-              </option>
-            ))}
-          </select>
+      {onChain ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div>
+            <label className="label">From → To</label>
+            <div className="input text-xs text-ink-200">
+              {isOwner
+                ? `World Bank → ${contractAddresses.nationalBank?.slice(0, 10)}…`
+                : `National → ${contractAddresses.localBank?.slice(0, 10)}…`}
+            </div>
+          </div>
+          <div>
+            <label className="label">Amount (ETH)</label>
+            <input
+              className="input"
+              inputMode="decimal"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+          <div className="flex items-end">
+            <button className="btn-primary w-full" onClick={submit} disabled={busy}>
+              <Shuffle className="h-4 w-4" />
+              {busy ? "Confirm in wallet…" : "Allocate on-chain"}
+            </button>
+          </div>
         </div>
-        <div>
-          <label className="label">To</label>
-          <select
-            className="input"
-            value={toBankId}
-            onChange={(e) => setToBankId(e.target.value)}
-          >
-            <option value="">Select…</option>
-            {targetOptions.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.name}
-              </option>
-            ))}
-          </select>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div>
+            <label className="label">From</label>
+            <select
+              className="input"
+              value={fromBankId}
+              onChange={(e) => setFromBankId(e.target.value)}
+            >
+              <option value="">Select…</option>
+              {sourceOptions.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name} · {b.reserve.toFixed(0)} ETH
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">To</label>
+            <select
+              className="input"
+              value={toBankId}
+              onChange={(e) => setToBankId(e.target.value)}
+            >
+              <option value="">Select…</option>
+              {targetOptions.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">Amount (ETH)</label>
+            <input
+              className="input"
+              inputMode="decimal"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+          <div className="flex items-end">
+            <button className="btn-primary w-full" onClick={submit} disabled={busy}>
+              <Shuffle className="h-4 w-4" />
+              {busy ? "Allocating…" : "Allocate"}
+            </button>
+          </div>
         </div>
-        <div>
-          <label className="label">Amount (ETH)</label>
-          <input
-            className="input"
-            inputMode="decimal"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-        </div>
-        <div className="flex items-end">
-          <button className="btn-primary w-full" onClick={submit} disabled={submitting}>
-            <Shuffle className="h-4 w-4" />
-            {submitting ? "Allocating…" : "Allocate"}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -454,10 +728,36 @@ function RegisterNationalForm({ onAfter }: { onAfter: () => void }) {
   const [jurisdiction, setJurisdiction] = useState("");
   const [reserve, setReserve] = useState("0");
   const [submitting, setSubmitting] = useState(false);
+  const onChain = contractsConfigured();
+  const { isConnected } = useAccount();
+  const { write, busy: chainBusy } = useOnChainTx(onAfter);
 
   async function submit() {
     if (!name || !wallet || !jurisdiction) {
       toast.error("Fill all fields");
+      return;
+    }
+    if (onChain && contractAddresses.worldBank) {
+      if (!isConnected) {
+        toast.error("Connect MetaMask (World Governor)");
+        return;
+      }
+      write({
+        address: contractAddresses.worldBank,
+        abi: worldBankAbi,
+        functionName: "registerNationalBank",
+        args: [wallet as `0x${string}`, name, jurisdiction],
+      });
+      try {
+        await api.post("/api/banks/register-national", {
+          name,
+          walletAddress: wallet,
+          jurisdiction,
+          reserve: Number(reserve) || 0,
+        });
+      } catch {
+        /* off-chain mirror optional */
+      }
       return;
     }
     try {
@@ -528,9 +828,9 @@ function RegisterNationalForm({ onAfter }: { onAfter: () => void }) {
           />
         </div>
       </div>
-      <button className="btn-primary mt-5" onClick={submit} disabled={submitting}>
+      <button className="btn-primary mt-5" onClick={submit} disabled={submitting || chainBusy}>
         <Plus className="h-4 w-4" />
-        {submitting ? "Registering…" : "Register"}
+        {submitting || chainBusy ? "Registering…" : onChain ? "Register on-chain" : "Register"}
       </button>
     </div>
   );
@@ -554,6 +854,9 @@ function RegisterLocalForm({
   const [parentBankId, setParentBankId] = useState(defaultParentId ?? "");
   const [reserve, setReserve] = useState("0");
   const [submitting, setSubmitting] = useState(false);
+  const onChain = contractsConfigured();
+  const { isConnected } = useAccount();
+  const { write, busy: chainBusy } = useOnChainTx(onAfter);
 
   useEffect(() => {
     if (defaultParentId && !parentBankId) setParentBankId(defaultParentId);
@@ -562,6 +865,31 @@ function RegisterLocalForm({
   async function submit() {
     if (!name || !wallet || !jurisdiction || !city || !parentBankId) {
       toast.error("Fill all fields");
+      return;
+    }
+    if (onChain && contractAddresses.nationalBank) {
+      if (!isConnected) {
+        toast.error("Connect MetaMask (National Governor)");
+        return;
+      }
+      write({
+        address: contractAddresses.nationalBank,
+        abi: nationalBankAbi,
+        functionName: "registerLocalBank",
+        args: [wallet as `0x${string}`, name, city],
+      });
+      try {
+        await api.post("/api/banks/register-local", {
+          name,
+          walletAddress: wallet,
+          jurisdiction,
+          city,
+          parentBankId,
+          reserve: Number(reserve) || 0,
+        });
+      } catch {
+        /* optional mirror */
+      }
       return;
     }
     try {
@@ -663,10 +991,65 @@ function RegisterLocalForm({
           />
         </div>
       </div>
-      <button className="btn-primary mt-5" onClick={submit} disabled={submitting}>
+      <button className="btn-primary mt-5" onClick={submit} disabled={submitting || chainBusy}>
         <Plus className="h-4 w-4" />
-        {submitting ? "Registering…" : "Register"}
+        {submitting || chainBusy ? "Registering…" : onChain ? "Register on-chain" : "Register"}
       </button>
+    </div>
+  );
+}
+
+function AccountCompliancePanel() {
+  const [clientWallet, setClientWallet] = useState("");
+  const { isConnected } = useAccount();
+  const { write, busy } = useOnChainTx();
+
+  function freeze() {
+    if (!isConnected || !contractAddresses.localBank || !clientWallet) {
+      toast.error("Connect wallet and enter client address");
+      return;
+    }
+    write({
+      address: contractAddresses.localBank,
+      abi: localBankAdminAbi,
+      functionName: "freezeAccount",
+      args: [clientWallet as `0x${string}`],
+    });
+  }
+
+  function unfreeze() {
+    if (!isConnected || !contractAddresses.localBank || !clientWallet) return;
+    write({
+      address: contractAddresses.localBank,
+      abi: localBankAdminAbi,
+      functionName: "unfreezeAccount",
+      args: [clientWallet as `0x${string}`],
+    });
+  }
+
+  return (
+    <div className="card p-6 space-y-4">
+      <div>
+        <div className="text-xs uppercase tracking-[0.22em] text-ink-200">Compliance</div>
+        <div className="font-display text-xl font-semibold text-ink-100">Freeze / unfreeze client</div>
+        <p className="mt-1 text-sm text-ink-200">
+          Block or restore a retail borrower wallet from requesting new loans.
+        </p>
+      </div>
+      <input
+        className="input font-mono"
+        placeholder="Borrower wallet 0x…"
+        value={clientWallet}
+        onChange={(e) => setClientWallet(e.target.value)}
+      />
+      <div className="flex gap-2">
+        <button className="btn-danger" onClick={freeze} disabled={busy}>
+          Freeze account
+        </button>
+        <button className="btn-ghost" onClick={unfreeze} disabled={busy}>
+          Unfreeze
+        </button>
+      </div>
     </div>
   );
 }

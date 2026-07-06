@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAccount } from "wagmi";
+import { parseEther, type Hex } from "viem";
 import toast from "react-hot-toast";
 import {
   CheckCircle2,
@@ -12,9 +14,16 @@ import {
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { api, BankDTO, BorrowingLimits } from "@/lib/api";
+import { fetchCreditPassport, validateLoanAmount, type CreditPassportInfo } from "@/lib/phase2";
+import { contractAddresses, localBankAbi } from "@/lib/contracts";
+import { contractsConfigured } from "@/lib/onChain";
+import { useOnChainTx } from "@/hooks/useOnChainTx";
 
 export function RequestLoan() {
   const nav = useNavigate();
+  const { isConnected } = useAccount();
+  const onChain = contractsConfigured();
+  const { write, busy: chainBusy } = useOnChainTx(() => nav("/app/approvals"));
   const [principal, setPrincipal] = useState("2.5");
   const [termMonths, setTermMonths] = useState(12);
   const [purpose, setPurpose] = useState("Working capital for a small business");
@@ -25,6 +34,10 @@ export function RequestLoan() {
   const [limits, setLimits] = useState<BorrowingLimits | null>(null);
   const [gasEth, setGasEth] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [nidFile, setNidFile] = useState<File | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [passport, setPassport] = useState<CreditPassportInfo | null>(null);
+  const { address } = useAccount();
 
   async function load() {
     setLoading(true);
@@ -47,12 +60,15 @@ export function RequestLoan() {
 
   useEffect(() => {
     load();
+    if (address && onChain) {
+      void fetchCreditPassport(address).then(setPassport);
+    }
     // Simulate gas estimation — small ETH cost that refreshes every few seconds.
     setGasEth(Number((0.002 + Math.random() * 0.003).toFixed(5)));
     const t = setInterval(() => setGasEth(Number((0.002 + Math.random() * 0.003).toFixed(5))), 6000);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [address, onChain]);
 
   const apr = 0.08;
   const principalNum = Number(principal) || 0;
@@ -64,6 +80,15 @@ export function RequestLoan() {
   }, [principalNum, termMonths, gasEth]);
 
   const limitsWarning = useMemo(() => {
+    if (onChain && passport && principalNum > 0) {
+      const max = Number(passport.maxLoanEth);
+      if (principalNum > max) {
+        return {
+          kind: "error" as const,
+          text: `Exceeds Credit Passport ${passport.riskTierName} cap (${max.toFixed(4)} ETH).`,
+        };
+      }
+    }
     if (!limits) return null;
     if (principalNum <= 0) return null;
     if (principalNum > limits.sixMonth.remaining) {
@@ -92,15 +117,62 @@ export function RequestLoan() {
       };
     }
     return { kind: "ok", text: "Within limits." };
-  }, [principalNum, limits, localBanks, selectedBankId]);
+  }, [principalNum, limits, localBanks, selectedBankId, onChain, passport]);
+
+  async function fileToBase64(file: File): Promise<string> {
+    const buf = await file.arrayBuffer();
+    let binary = "";
+    const bytes = new Uint8Array(buf);
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  }
 
   async function submit() {
-    if (!selectedBankId) {
+    if (!selectedBankId && !onChain) {
       toast.error("Select a local bank");
       return;
     }
-    if (limitsWarning?.kind === "error") {
+    if (limitsWarning?.kind === "error" && !onChain) {
       toast.error(limitsWarning.text);
+      return;
+    }
+    if (onChain) {
+      if (!isConnected) {
+        toast.error("Connect MetaMask as borrower (account #4 or #5)");
+        return;
+      }
+      if (!contractAddresses.localBank) {
+        toast.error("Run deploy + sync:env");
+        return;
+      }
+      if (principalNum <= 0) {
+        toast.error("Enter a positive amount");
+        return;
+      }
+      const validation = await validateLoanAmount(address!, principalNum);
+      if (!validation.valid) {
+        toast.error(`Credit Passport limit: max ${validation.maxLoanEth} ETH`);
+        return;
+      }
+      let docHash: Hex = `0x${"0".repeat(64)}` as Hex;
+      if (nidFile && photoFile && address) {
+        const upload = await api.post<{ docHash: string }>("/api/phase2/documents/upload", {
+          wallet: address,
+          nidBase64: await fileToBase64(nidFile),
+          photoBase64: await fileToBase64(photoFile),
+          purpose,
+        });
+        docHash = upload.docHash as Hex;
+      }
+      write({
+        address: contractAddresses.localBank,
+        abi: localBankAbi,
+        functionName: docHash === (`0x${"0".repeat(64)}` as Hex) ? "requestLoan" : "requestLoanWithDoc",
+        args:
+          docHash === (`0x${"0".repeat(64)}` as Hex)
+            ? [parseEther(principal), termMonths, purpose]
+            : [parseEther(principal), termMonths, purpose, docHash],
+      });
       return;
     }
     try {
@@ -134,6 +206,24 @@ export function RequestLoan() {
           </button>
         }
       />
+
+      {passport ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+          <div className="stat">
+            <div className="stat-label">Credit Passport</div>
+            <div className="stat-value">{passport.riskTierName}</div>
+            <div className="text-xs text-ink-200">Score {passport.creditScore}</div>
+          </div>
+          <div className="stat">
+            <div className="stat-label">Max borrow</div>
+            <div className="stat-value">{Number(passport.maxLoanEth).toFixed(4)} ETH</div>
+          </div>
+          <div className="stat">
+            <div className="stat-label">Open loans</div>
+            <div className="stat-value">{passport.openLoans}</div>
+          </div>
+        </div>
+      ) : null}
 
       {limits ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
@@ -224,6 +314,42 @@ export function RequestLoan() {
               </select>
             </div>
             <div className="sm:col-span-2">
+              <label className="label">NID document (hashed on-chain only)</label>
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                className="input"
+                onChange={(e) => setNidFile(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label">Photo verification</label>
+              <input
+                type="file"
+                accept="image/*"
+                className="input"
+                onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label">NID document (SHA-256 hash stored on-chain)</label>
+              <input
+                type="file"
+                accept="image/*,.pdf"
+                className="input"
+                onChange={(e) => setNidFile(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="label">Photo verification</label>
+              <input
+                type="file"
+                accept="image/*"
+                className="input"
+                onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
+              />
+            </div>
+            <div className="sm:col-span-2">
               <label className="label">Purpose</label>
               <textarea
                 rows={3}
@@ -268,10 +394,14 @@ export function RequestLoan() {
             <button
               className="btn-primary"
               onClick={submit}
-              disabled={submitting || limitsWarning?.kind === "error"}
+              disabled={submitting || chainBusy || (!onChain && limitsWarning?.kind === "error")}
             >
               <FilePlus2 className="h-4 w-4" />
-              {submitting ? "Submitting…" : "Submit Request"}
+              {submitting || chainBusy
+                ? "Confirm in wallet…"
+                : onChain
+                  ? "Submit on-chain"
+                  : "Submit Request"}
             </button>
             <button className="btn-ghost" onClick={() => nav(-1)}>
               Cancel

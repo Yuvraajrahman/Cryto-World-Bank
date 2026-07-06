@@ -1,13 +1,15 @@
-// Contract addresses pulled from env vars. Leave blank for the "unconfigured"
-// state the UI renders with a polite warning so the rest of the app still
-// loads during design / offline work.
 export const contractAddresses = {
     worldBank: (import.meta.env.VITE_WORLD_BANK_ADDRESS ?? ""),
     nationalBank: (import.meta.env.VITE_NATIONAL_BANK_ADDRESS ?? ""),
     localBank: (import.meta.env.VITE_LOCAL_BANK_ADDRESS ?? ""),
+    mockUsdc: (import.meta.env.VITE_MOCK_USDC_ADDRESS ?? ""),
+    creditPassport: (import.meta.env.VITE_CREDIT_PASSPORT_ADDRESS ?? ""),
+    upwardDeposit: (import.meta.env.VITE_UPWARD_DEPOSIT_ADDRESS ?? ""),
+    savingsVault: (import.meta.env.VITE_SAVINGS_VAULT_ADDRESS ?? ""),
+    groupLendingPool: (import.meta.env.VITE_GROUP_LENDING_POOL_ADDRESS ?? ""),
+    interBankLendingPool: (import.meta.env.VITE_INTERBANK_LENDING_POOL_ADDRESS ?? ""),
+    governorMultisig: (import.meta.env.VITE_GOVERNOR_MULTISIG_ADDRESS ?? ""),
 };
-// Thin ABI stubs covering only the functions the current UI needs. Full ABIs
-// will be generated from Hardhat artifacts once contracts are deployed.
 export const worldBankAbi = [
     {
         type: "function",
@@ -38,10 +40,139 @@ export const worldBankAbi = [
     },
     {
         type: "function",
+        name: "allocate",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "address", name: "bank" },
+            { type: "uint256", name: "amount" },
+        ],
+        outputs: [],
+    },
+    {
+        type: "function",
         name: "lendingAprBps",
         stateMutability: "view",
         inputs: [],
         outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "registerNationalBank",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "address", name: "bank" },
+            { type: "string", name: "name" },
+            { type: "string", name: "jurisdiction" },
+        ],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "pause",
+        stateMutability: "nonpayable",
+        inputs: [],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "unpause",
+        stateMutability: "nonpayable",
+        inputs: [],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "paused",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "bool" }],
+    },
+    {
+        type: "function",
+        name: "setLendingApr",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "newBps" }],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "emergencyWithdraw",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "address", name: "to" },
+            { type: "uint256", name: "amount" },
+        ],
+        outputs: [],
+    },
+];
+export const nationalBankAbi = [
+    {
+        type: "function",
+        name: "allocate",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "address", name: "bank" },
+            { type: "uint256", name: "amount" },
+        ],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "bankStats",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [
+            { type: "uint256", name: "balance" },
+            { type: "uint256", name: "allocated" },
+            { type: "uint256", name: "repaid" },
+            { type: "uint256", name: "localBankCount" },
+        ],
+    },
+    {
+        type: "function",
+        name: "registerLocalBank",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "address", name: "bank" },
+            { type: "string", name: "bankName" },
+            { type: "string", name: "region" },
+        ],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "requestUpstreamCapital",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "amount" }],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "pause",
+        stateMutability: "nonpayable",
+        inputs: [],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "unpause",
+        stateMutability: "nonpayable",
+        inputs: [],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "paused",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "bool" }],
+    },
+    {
+        type: "function",
+        name: "setLendingApr",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "newBps" }],
+        outputs: [],
     },
 ];
 export const localBankAbi = [
@@ -53,6 +184,18 @@ export const localBankAbi = [
             { type: "uint256", name: "principal" },
             { type: "uint32", name: "termMonths" },
             { type: "string", name: "purpose" },
+        ],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "requestLoanWithDoc",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "uint256", name: "principal" },
+            { type: "uint32", name: "termMonths" },
+            { type: "string", name: "purpose" },
+            { type: "bytes32", name: "docHash" },
         ],
         outputs: [{ type: "uint256" }],
     },
@@ -86,6 +229,44 @@ export const localBankAbi = [
     },
     {
         type: "function",
+        name: "approveLoan",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "id" }],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "rejectLoan",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "uint256", name: "id" },
+            { type: "string", name: "reason" },
+        ],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "allLoanIds",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "uint256[]" }],
+    },
+    {
+        type: "function",
+        name: "installmentAmount",
+        stateMutability: "view",
+        inputs: [{ type: "uint256", name: "id" }],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "nextLoanId",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
         name: "payInstallment",
         stateMutability: "payable",
         inputs: [{ type: "uint256" }],
@@ -110,5 +291,229 @@ export const localBankAbi = [
             { type: "uint256", name: "active" },
             { type: "uint256", name: "repaid" },
         ],
+    },
+];
+export const upwardDepositAbi = [
+    {
+        type: "function",
+        name: "depositUpward",
+        stateMutability: "payable",
+        inputs: [{ type: "address", name: "parentInstitution" }],
+        outputs: [],
+    },
+];
+export const savingsVaultAbi = [
+    {
+        type: "function",
+        name: "deposit",
+        stateMutability: "payable",
+        inputs: [{ type: "uint256", name: "assets" }],
+        outputs: [{ type: "uint256", name: "shares" }],
+    },
+    {
+        type: "function",
+        name: "withdraw",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "shares" }],
+        outputs: [{ type: "uint256", name: "assets" }],
+    },
+    {
+        type: "function",
+        name: "balanceOf",
+        stateMutability: "view",
+        inputs: [{ type: "address" }],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "sharesOf",
+        stateMutability: "view",
+        inputs: [{ type: "address" }],
+        outputs: [{ type: "uint256" }],
+    },
+];
+export const groupLendingAbi = [
+    {
+        type: "function",
+        name: "createGroup",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "address", name: "localBank" }],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "addMember",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "uint256", name: "groupId" },
+            { type: "address", name: "member" },
+        ],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "recordConsent",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "groupId" }],
+        outputs: [],
+    },
+];
+export const interBankAbi = [
+    {
+        type: "function",
+        name: "borrow",
+        stateMutability: "payable",
+        inputs: [
+            { type: "address", name: "borrower" },
+            { type: "uint256", name: "principal" },
+            { type: "uint32", name: "tenorDays" },
+        ],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "repay",
+        stateMutability: "payable",
+        inputs: [{ type: "uint256", name: "id" }],
+        outputs: [],
+    },
+];
+export const capitalRequestAbi = [
+    {
+        type: "function",
+        name: "requestCapital",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "amount" }],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "fulfillCapitalRequest",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "requestId" }],
+        outputs: [],
+    },
+];
+export const localBankAdminAbi = [
+    {
+        type: "function",
+        name: "requestCapital",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "uint256", name: "amount" }],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "freezeAccount",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "address", name: "client" }],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "unfreezeAccount",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "address", name: "client" }],
+        outputs: [],
+    },
+];
+export const mockUsdcAbi = [
+    {
+        type: "function",
+        name: "mint",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "address", name: "to" },
+            { type: "uint256", name: "amount" },
+        ],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "balanceOf",
+        stateMutability: "view",
+        inputs: [{ type: "address" }],
+        outputs: [{ type: "uint256" }],
+    },
+    {
+        type: "function",
+        name: "decimals",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "uint8" }],
+    },
+    {
+        type: "function",
+        name: "symbol",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "string" }],
+    },
+];
+export const governorMultisigAbi = [
+    {
+        type: "function",
+        name: "owners",
+        stateMutability: "view",
+        inputs: [{ type: "uint256", name: "index" }],
+        outputs: [{ type: "address" }],
+    },
+    {
+        type: "function",
+        name: "isOwner",
+        stateMutability: "view",
+        inputs: [{ type: "address" }],
+        outputs: [{ type: "bool" }],
+    },
+    {
+        type: "function",
+        name: "confirmationCount",
+        stateMutability: "view",
+        inputs: [{ type: "bytes32", name: "opId" }],
+        outputs: [{ type: "uint8" }],
+    },
+    {
+        type: "function",
+        name: "confirm",
+        stateMutability: "nonpayable",
+        inputs: [{ type: "bytes32", name: "opId" }],
+        outputs: [],
+    },
+    {
+        type: "function",
+        name: "execute",
+        stateMutability: "nonpayable",
+        inputs: [
+            { type: "address", name: "target" },
+            { type: "bytes", name: "data" },
+            { type: "bytes32", name: "opId" },
+        ],
+        outputs: [],
+    },
+];
+export const interBankLoanAbi = [
+    {
+        type: "function",
+        name: "loans",
+        stateMutability: "view",
+        inputs: [{ type: "uint256" }],
+        outputs: [
+            { type: "uint256", name: "id" },
+            { type: "address", name: "lender" },
+            { type: "address", name: "borrower" },
+            { type: "uint256", name: "principal" },
+            { type: "uint256", name: "interestBps" },
+            { type: "uint32", name: "tenorDays" },
+            { type: "uint256", name: "createdAt" },
+            { type: "uint256", name: "dueAt" },
+            { type: "uint8", name: "status" },
+        ],
+    },
+    {
+        type: "function",
+        name: "borrowRateBps",
+        stateMutability: "view",
+        inputs: [],
+        outputs: [{ type: "uint256" }],
     },
 ];

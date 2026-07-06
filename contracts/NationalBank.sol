@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IWorldBankReserve} from "./interfaces/IWorldBankReserve.sol";
 
 /**
  * @title NationalBank (Tier 2)
@@ -35,12 +36,22 @@ contract NationalBank is AccessControl, ReentrancyGuard, Pausable {
     mapping(address => LocalBankAccount) public localBanks;
     address[] private _localBankList;
 
+    struct CapitalRequest {
+        address bank;
+        uint256 amount;
+        bool open;
+    }
+
+    uint256 public nextCapitalRequestId = 1;
+    mapping(uint256 => CapitalRequest) public capitalRequests;
+
     uint256 public totalAllocated;
     uint256 public totalRepaid;
 
     event LocalBankRegistered(address indexed bank, string name, string region);
     event LocalBankRevoked(address indexed bank);
     event CapitalAllocated(address indexed bank, uint256 amount);
+    event CapitalRequested(address indexed bank, uint256 amount, uint256 indexed requestId);
     event RepaymentRecorded(address indexed bank, uint256 principal, uint256 interest);
     event LendingAprUpdated(uint256 oldBps, uint256 newBps);
 
@@ -100,7 +111,7 @@ contract NationalBank is AccessControl, ReentrancyGuard, Pausable {
     // -------- Allocation & repayment --------
 
     function allocate(address bank, uint256 amount)
-        external
+        public
         onlyRole(GOVERNOR_ROLE)
         whenNotPaused
         nonReentrant
@@ -118,6 +129,32 @@ contract NationalBank is AccessControl, ReentrancyGuard, Pausable {
         require(ok, "transfer failed");
 
         emit CapitalAllocated(bank, amount);
+    }
+
+    function allocateCapital(address bank, uint256 amount) external {
+        allocate(bank, amount);
+    }
+
+    function requestCapital(uint256 amount) external onlyRole(LOCAL_BANK_ROLE) returns (uint256 requestId) {
+        require(amount > 0, "zero amount");
+        require(localBanks[msg.sender].registered, "not registered");
+        requestId = nextCapitalRequestId++;
+        capitalRequests[requestId] = CapitalRequest({ bank: msg.sender, amount: amount, open: true });
+        emit CapitalRequested(msg.sender, amount, requestId);
+    }
+
+    /// @notice National governor requests liquidity from the World Bank reserve.
+    function requestUpstreamCapital(uint256 amount) external onlyRole(GOVERNOR_ROLE) returns (uint256 requestId) {
+        require(amount > 0, "zero amount");
+        requestId = IWorldBankReserve(worldBank).requestCapital(amount);
+        emit CapitalRequested(worldBank, amount, requestId);
+    }
+
+    function fulfillCapitalRequest(uint256 requestId) external onlyRole(GOVERNOR_ROLE) {
+        CapitalRequest storage r = capitalRequests[requestId];
+        require(r.open, "closed");
+        r.open = false;
+        allocate(r.bank, r.amount);
     }
 
     function recordRepayment(uint256 principal)

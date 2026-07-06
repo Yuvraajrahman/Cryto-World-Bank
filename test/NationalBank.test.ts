@@ -134,4 +134,17 @@ describe("NationalBank — Tier 2 unit tests", () => {
     expect(list).to.include(localBank.address);
     expect(list).to.include(other.address);
   });
+
+  it("requestUpstreamCapital forwards to World Bank as registered national bank", async () => {
+    const { wb, nb, governor } = await deploy();
+    await wb.connect(governor).registerNationalBank(await nb.getAddress(), "NB", "BD");
+
+    await expect(nb.connect(governor).requestUpstreamCapital(ethers.parseEther("2")))
+      .to.emit(wb, "CapitalRequested")
+      .withArgs(await nb.getAddress(), ethers.parseEther("2"), 1n);
+
+    const req = await wb.capitalRequests(1);
+    expect(req.open).to.equal(true);
+    expect(req.amount).to.equal(ethers.parseEther("2"));
+  });
 });

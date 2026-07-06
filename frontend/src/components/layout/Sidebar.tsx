@@ -14,6 +14,8 @@ import {
   Inbox,
   Bot,
   Globe2,
+  PiggyBank,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession, Role } from "@/lib/store";
@@ -39,6 +41,7 @@ const nav: NavItem[] = [
   { to: "/app/reserve", label: "World Reserve", icon: Landmark, roles: ALL },
   { to: "/app/banks", label: "Bank Network", icon: Network, roles: ALL },
   { to: "/app/simulation", label: "Global simulation", icon: Globe2, roles: ALL },
+  { to: "/app/facilities", label: "Facilities", icon: PiggyBank, roles: ALL },
   {
     to: "/app/loans",
     label: "My Loans",
@@ -72,6 +75,12 @@ const nav: NavItem[] = [
     to: "/app/admin",
     label: "Admin",
     icon: Settings2,
+    roles: ["OWNER", "NATIONAL_BANK_ADMIN"],
+  },
+  {
+    to: "/app/multisig",
+    label: "Multisig",
+    icon: Shield,
     roles: ["OWNER", "NATIONAL_BANK_ADMIN"],
   },
 ];

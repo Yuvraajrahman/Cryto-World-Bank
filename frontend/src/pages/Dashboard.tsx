@@ -22,13 +22,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  api,
-  BankDTO,
-  LoanDTO,
-  ProfileResponse,
-  TransactionDTO,
-} from "@/lib/api";
+import { api, BankDTO, LoanDTO, ProfileResponse, TransactionDTO } from "@/lib/api";
+import { contractsConfigured } from "@/lib/onChain";
 import { useSession } from "@/lib/store";
 import { MarketDataChart } from "@/components/market/MarketDataChart";
 
@@ -48,7 +43,13 @@ interface BanksResponse {
   localBanks: BankDTO[];
 }
 
-const reserveSeries = [
+interface ChainHierarchy {
+  world?: { reserveEth: number; depositsEth: number; allocatedEth: number };
+  national?: { balanceEth: number; allocatedEth: number };
+  local?: { balanceEth: number; active: number; pending: number; repaid: number };
+}
+
+const reserveSeriesFallback = [
   { m: "Oct", reserve: 1200, allocated: 800 },
   { m: "Nov", reserve: 1420, allocated: 910 },
   { m: "Dec", reserve: 1510, allocated: 1020 },
@@ -63,11 +64,16 @@ export function Dashboard() {
 
   const [stats, setStats] = useState<BankStats | null>(null);
   const [banks, setBanks] = useState<BanksResponse | null>(null);
+  const [chain, setChain] = useState<ChainHierarchy | null>(null);
+  const [phase1Ready, setPhase1Ready] = useState(false);
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [myLoans, setMyLoans] = useState<LoanDTO[]>([]);
 
   async function load() {
-    const [s, b, p, loans] = await Promise.all([
+    const onChain = contractsConfigured();
+    const [hierarchy, phase1, s, b, p, loans] = await Promise.all([
+      onChain ? api.get<ChainHierarchy>("/api/chain/hierarchy").catch(() => null) : Promise.resolve(null),
+      api.get<{ chainConnected?: boolean }>("/api/phase1/status").catch(() => null),
       api.get<BankStats>("/api/banks/stats").catch(() => null),
       api.get<BanksResponse>("/api/banks").catch(() => null),
       api.get<ProfileResponse>("/api/profile").catch(() => null),
@@ -78,6 +84,8 @@ export function Dashboard() {
             .catch(() => [])
         : Promise.resolve([] as LoanDTO[]),
     ]);
+    setChain(hierarchy);
+    setPhase1Ready(Boolean(phase1?.chainConnected));
     setStats(s);
     setBanks(b);
     setProfile(p);
@@ -90,13 +98,23 @@ export function Dashboard() {
   }, [user?.id]);
 
   const world = banks?.worldBank;
-  const reserve = world?.reserve ?? 0;
-  const allocated = world?.totalAllocated ?? 0;
+  const reserve = chain?.world?.reserveEth ?? world?.reserve ?? 0;
+  const allocated = chain?.world?.allocatedEth ?? world?.totalAllocated ?? 0;
+  const activeLoans = chain?.local?.active ?? stats?.activeLoans ?? 0;
+  const repaidLoans = chain?.local?.repaid ?? stats?.totalRepaid ?? 0;
+  const reserveSeries = useMemo(() => {
+    if (!chain?.world) return reserveSeriesFallback;
+    const r = chain.world.reserveEth;
+    const a = chain.world.allocatedEth;
+    return [{ m: "Live", reserve: r, allocated: a }];
+  }, [chain]);
   const utilizationPct = stats
     ? Math.round(
         (stats.totalLent / Math.max(1, stats.totalLent + reserve)) * 100,
       )
-    : 0;
+    : chain?.world
+      ? Math.round((allocated / Math.max(1, reserve + allocated)) * 100)
+      : 0;
 
   const recentTx = profile?.transactions ?? [];
 
@@ -129,27 +147,27 @@ export function Dashboard() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
           label="Reserve Balance"
-          value={`${reserve.toFixed(2)} ETH`}
+          value={`${reserve.toFixed(4)} ETH`}
           icon={Landmark}
-          hint={world ? world.name : "World reserve"}
+          hint={phase1Ready ? "on-chain" : world ? world.name : "World reserve"}
         />
         <Stat
           label="Allocated Capital"
-          value={`${allocated.toFixed(2)} ETH`}
+          value={`${allocated.toFixed(4)} ETH`}
           icon={Network}
-          hint={`${stats?.tiers.national ?? 0} national · ${stats?.tiers.local ?? 0} local`}
+          hint={phase1Ready ? "on-chain" : `${stats?.tiers.national ?? 0} national · ${stats?.tiers.local ?? 0} local`}
         />
         <Stat
           label="Active Loans"
-          value={String(stats?.activeLoans ?? 0)}
+          value={String(activeLoans)}
           icon={Coins}
-          hint={`${stats?.borrowerCount ?? 0} borrowers onboarded`}
+          hint={`${chain?.local?.pending ?? 0} pending`}
         />
         <Stat
-          label="Lifetime Repaid"
-          value={`${(stats?.totalRepaid ?? 0).toFixed(2)} ETH`}
+          label="Loans Repaid"
+          value={String(repaidLoans)}
           icon={Receipt}
-          hint={`${utilizationPct}% utilization`}
+          hint={phase1Ready ? "on-chain" : `${utilizationPct}% utilization`}
         />
       </div>
 
@@ -166,7 +184,7 @@ export function Dashboard() {
             </div>
             <span className="badge-gold">
               <TrendingUp className="h-3.5 w-3.5" />
-              +18.4% QoQ
+              {phase1Ready ? "Live chain" : "Demo seed"}
             </span>
           </div>
           <div className="h-64">

@@ -28,6 +28,10 @@ describe("Crypto World Bank — four-tier hierarchy", () => {
     return { worldBank, national, local, governor, nationalGov, localGov, approver, borrower, depositor };
   }
 
+  async function wireApprover(local: Awaited<ReturnType<typeof deployFixture>>["local"], localGov: Awaited<ReturnType<typeof deployFixture>>["localGov"], approver: Awaited<ReturnType<typeof deployFixture>>["approver"]) {
+    await local.connect(localGov).addApprover(approver.address);
+  }
+
   it("accepts deposits into the reserve", async () => {
     const { worldBank, depositor } = await deployFixture();
     await depositor.sendTransaction({ to: await worldBank.getAddress(), value: ethers.parseEther("10") });
@@ -46,11 +50,13 @@ describe("Crypto World Bank — four-tier hierarchy", () => {
     await national.connect(nationalGov).registerLocalBank(await local.getAddress(), "LB", "Dhaka");
     await national.connect(nationalGov).allocate(await local.getAddress(), ethers.parseEther("25"));
 
-    expect(await ethers.provider.getBalance(await local.getAddress())).to.equal(ethers.parseEther("25"));
+    // ETH lands on LocalBank then forwards to LoanController via receive().
+    const loanController = await local.loanController();
+    expect(await ethers.provider.getBalance(loanController)).to.equal(ethers.parseEther("25"));
   });
 
   it("full loan lifecycle: request → approve → repay", async () => {
-    const { worldBank, national, local, governor, nationalGov, localGov, borrower, depositor } =
+    const { worldBank, national, local, governor, nationalGov, localGov, approver, borrower, depositor } =
       await deployFixture();
 
     await depositor.sendTransaction({ to: await worldBank.getAddress(), value: ethers.parseEther("100") });
@@ -59,8 +65,9 @@ describe("Crypto World Bank — four-tier hierarchy", () => {
     await national.connect(nationalGov).registerLocalBank(await local.getAddress(), "LB", "Dhaka");
     await national.connect(nationalGov).allocate(await local.getAddress(), ethers.parseEther("25"));
 
+    await wireApprover(local, localGov, approver);
     await local.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "working capital");
-    await local.connect(localGov).approveLoan(1);
+    await local.connect(approver).approveLoan(1);
 
     const loan = await local.loans(1);
     expect(loan.status).to.equal(3); // Active

@@ -19,11 +19,18 @@ describe("LocalBank — Tier 3 unit tests", () => {
       "Dhaka"
     );
 
-    // Prefund the local bank so it can disburse loans.
+    // Prefund the local bank loan pool (auto-forwards to LoanController).
     await funder.sendTransaction({ to: await lb.getAddress(), value: ethers.parseEther("200") });
 
     return { nb, lb, governor, approver, borrower, other, funder };
   }
+
+  it("deploys an owned LoanController", async () => {
+    const { lb } = await deploy();
+    const controller = await lb.loanController();
+    expect(controller).to.properAddress;
+    expect(await ethers.provider.getBalance(controller)).to.equal(ethers.parseEther("200"));
+  });
 
   it("stores the national-bank parent + metadata on deploy", async () => {
     const { nb, lb } = await deploy();
@@ -63,7 +70,7 @@ describe("LocalBank — Tier 3 unit tests", () => {
       lb.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "working capital")
     )
       .to.emit(lb, "LoanRequested")
-      .withArgs(1, borrower.address, ethers.parseEther("5"), "working capital");
+      .withArgs(1, borrower.address, ethers.parseEther("5"), ethers.ZeroHash, "working capital");
   });
 
   it("only an approver can approve or reject loans", async () => {

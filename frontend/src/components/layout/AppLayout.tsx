@@ -7,6 +7,7 @@ import { useSession } from "@/lib/store";
 import { useEffect } from "react";
 import { api, UserDTO } from "@/lib/api";
 import { ChatbotWidget } from "@/components/chatbot/ChatbotWidget";
+import { OnChainWalletBanner } from "@/components/layout/OnChainWalletBanner";
 
 export function AppLayout() {
   const { isConnected, address } = useAccount();
@@ -52,6 +53,7 @@ export function AppLayout() {
                 </div>
               </div>
             ) : null}
+            {authed ? <OnChainWalletBanner /> : null}
             <Outlet />
           </div>
         </main>

@@ -7,10 +7,11 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Stat } from "@/components/ui/Stat";
 import { shortAddress } from "@/lib/utils";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, } from "recharts";
-import { api, } from "@/lib/api";
+import { api } from "@/lib/api";
+import { contractsConfigured } from "@/lib/onChain";
 import { useSession } from "@/lib/store";
 import { MarketDataChart } from "@/components/market/MarketDataChart";
-const reserveSeries = [
+const reserveSeriesFallback = [
     { m: "Oct", reserve: 1200, allocated: 800 },
     { m: "Nov", reserve: 1420, allocated: 910 },
     { m: "Dec", reserve: 1510, allocated: 1020 },
@@ -23,10 +24,15 @@ export function Dashboard() {
     const user = useSession((s) => s.user);
     const [stats, setStats] = useState(null);
     const [banks, setBanks] = useState(null);
+    const [chain, setChain] = useState(null);
+    const [phase1Ready, setPhase1Ready] = useState(false);
     const [profile, setProfile] = useState(null);
     const [myLoans, setMyLoans] = useState([]);
     async function load() {
-        const [s, b, p, loans] = await Promise.all([
+        const onChain = contractsConfigured();
+        const [hierarchy, phase1, s, b, p, loans] = await Promise.all([
+            onChain ? api.get("/api/chain/hierarchy").catch(() => null) : Promise.resolve(null),
+            api.get("/api/phase1/status").catch(() => null),
             api.get("/api/banks/stats").catch(() => null),
             api.get("/api/banks").catch(() => null),
             api.get("/api/profile").catch(() => null),
@@ -37,6 +43,8 @@ export function Dashboard() {
                     .catch(() => [])
                 : Promise.resolve([]),
         ]);
+        setChain(hierarchy);
+        setPhase1Ready(Boolean(phase1?.chainConnected));
         setStats(s);
         setBanks(b);
         setProfile(p);
@@ -47,13 +55,24 @@ export function Dashboard() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.id]);
     const world = banks?.worldBank;
-    const reserve = world?.reserve ?? 0;
-    const allocated = world?.totalAllocated ?? 0;
+    const reserve = chain?.world?.reserveEth ?? world?.reserve ?? 0;
+    const allocated = chain?.world?.allocatedEth ?? world?.totalAllocated ?? 0;
+    const activeLoans = chain?.local?.active ?? stats?.activeLoans ?? 0;
+    const repaidLoans = chain?.local?.repaid ?? stats?.totalRepaid ?? 0;
+    const reserveSeries = useMemo(() => {
+        if (!chain?.world)
+            return reserveSeriesFallback;
+        const r = chain.world.reserveEth;
+        const a = chain.world.allocatedEth;
+        return [{ m: "Live", reserve: r, allocated: a }];
+    }, [chain]);
     const utilizationPct = stats
         ? Math.round((stats.totalLent / Math.max(1, stats.totalLent + reserve)) * 100)
-        : 0;
+        : chain?.world
+            ? Math.round((allocated / Math.max(1, reserve + allocated)) * 100)
+            : 0;
     const recentTx = profile?.transactions ?? [];
-    return (_jsxs("div", { className: "space-y-8", children: [_jsx(SectionHeader, { eyebrow: "Overview", title: _jsxs(_Fragment, { children: ["Welcome back,", " ", _jsx("span", { className: "gold-text", children: user?.displayName ?? shortAddress(address) })] }), description: "Your portfolio, reserve position, and loan lifecycle \u2014 all surfaced in one glance.", right: user?.role === "BORROWER" ? (_jsxs(Link, { to: "/app/loans/new", className: "btn-primary", children: ["Request Loan ", _jsx(ArrowUpRight, { className: "h-4 w-4" })] })) : (_jsxs(Link, { to: "/app/approvals", className: "btn-primary", children: ["Open queue ", _jsx(ArrowUpRight, { className: "h-4 w-4" })] })) }), _jsxs("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4", children: [_jsx(Stat, { label: "Reserve Balance", value: `${reserve.toFixed(2)} ETH`, icon: Landmark, hint: world ? world.name : "World reserve" }), _jsx(Stat, { label: "Allocated Capital", value: `${allocated.toFixed(2)} ETH`, icon: Network, hint: `${stats?.tiers.national ?? 0} national · ${stats?.tiers.local ?? 0} local` }), _jsx(Stat, { label: "Active Loans", value: String(stats?.activeLoans ?? 0), icon: Coins, hint: `${stats?.borrowerCount ?? 0} borrowers onboarded` }), _jsx(Stat, { label: "Lifetime Repaid", value: `${(stats?.totalRepaid ?? 0).toFixed(2)} ETH`, icon: Receipt, hint: `${utilizationPct}% utilization` })] }), _jsxs("div", { className: "grid grid-cols-1 gap-6 lg:grid-cols-3", children: [_jsxs("div", { className: "card p-6 lg:col-span-2", children: [_jsxs("div", { className: "mb-4 flex items-end justify-between", children: [_jsxs("div", { children: [_jsx("div", { className: "text-xs uppercase tracking-[0.22em] text-ink-200", children: "Reserve Flow" }), _jsx("div", { className: "font-display text-xl font-semibold text-ink-100", children: "Capital Movement \u2014 6-month window" })] }), _jsxs("span", { className: "badge-gold", children: [_jsx(TrendingUp, { className: "h-3.5 w-3.5" }), "+18.4% QoQ"] })] }), _jsx("div", { className: "h-64", children: _jsx(ResponsiveContainer, { width: "100%", height: "100%", children: _jsxs(AreaChart, { data: reserveSeries, children: [_jsxs("defs", { children: [_jsxs("linearGradient", { id: "gReserve", x1: "0", y1: "0", x2: "0", y2: "1", children: [_jsx("stop", { offset: "0%", stopColor: "#d4af37", stopOpacity: 0.55 }), _jsx("stop", { offset: "100%", stopColor: "#d4af37", stopOpacity: 0 })] }), _jsxs("linearGradient", { id: "gAlloc", x1: "0", y1: "0", x2: "0", y2: "1", children: [_jsx("stop", { offset: "0%", stopColor: "#8a8b93", stopOpacity: 0.4 }), _jsx("stop", { offset: "100%", stopColor: "#8a8b93", stopOpacity: 0 })] })] }), _jsx(CartesianGrid, { stroke: "rgba(255,255,255,0.05)" }), _jsx(XAxis, { dataKey: "m", stroke: "#8a8b93", fontSize: 12 }), _jsx(YAxis, { stroke: "#8a8b93", fontSize: 12 }), _jsx(Tooltip, { contentStyle: {
+    return (_jsxs("div", { className: "space-y-8", children: [_jsx(SectionHeader, { eyebrow: "Overview", title: _jsxs(_Fragment, { children: ["Welcome back,", " ", _jsx("span", { className: "gold-text", children: user?.displayName ?? shortAddress(address) })] }), description: "Your portfolio, reserve position, and loan lifecycle \u2014 all surfaced in one glance.", right: user?.role === "BORROWER" ? (_jsxs(Link, { to: "/app/loans/new", className: "btn-primary", children: ["Request Loan ", _jsx(ArrowUpRight, { className: "h-4 w-4" })] })) : (_jsxs(Link, { to: "/app/approvals", className: "btn-primary", children: ["Open queue ", _jsx(ArrowUpRight, { className: "h-4 w-4" })] })) }), _jsxs("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4", children: [_jsx(Stat, { label: "Reserve Balance", value: `${reserve.toFixed(4)} ETH`, icon: Landmark, hint: phase1Ready ? "on-chain" : world ? world.name : "World reserve" }), _jsx(Stat, { label: "Allocated Capital", value: `${allocated.toFixed(4)} ETH`, icon: Network, hint: phase1Ready ? "on-chain" : `${stats?.tiers.national ?? 0} national · ${stats?.tiers.local ?? 0} local` }), _jsx(Stat, { label: "Active Loans", value: String(activeLoans), icon: Coins, hint: `${chain?.local?.pending ?? 0} pending` }), _jsx(Stat, { label: "Loans Repaid", value: String(repaidLoans), icon: Receipt, hint: phase1Ready ? "on-chain" : `${utilizationPct}% utilization` })] }), _jsxs("div", { className: "grid grid-cols-1 gap-6 lg:grid-cols-3", children: [_jsxs("div", { className: "card p-6 lg:col-span-2", children: [_jsxs("div", { className: "mb-4 flex items-end justify-between", children: [_jsxs("div", { children: [_jsx("div", { className: "text-xs uppercase tracking-[0.22em] text-ink-200", children: "Reserve Flow" }), _jsx("div", { className: "font-display text-xl font-semibold text-ink-100", children: "Capital Movement \u2014 6-month window" })] }), _jsxs("span", { className: "badge-gold", children: [_jsx(TrendingUp, { className: "h-3.5 w-3.5" }), phase1Ready ? "Live chain" : "Demo seed"] })] }), _jsx("div", { className: "h-64", children: _jsx(ResponsiveContainer, { width: "100%", height: "100%", children: _jsxs(AreaChart, { data: reserveSeries, children: [_jsxs("defs", { children: [_jsxs("linearGradient", { id: "gReserve", x1: "0", y1: "0", x2: "0", y2: "1", children: [_jsx("stop", { offset: "0%", stopColor: "#d4af37", stopOpacity: 0.55 }), _jsx("stop", { offset: "100%", stopColor: "#d4af37", stopOpacity: 0 })] }), _jsxs("linearGradient", { id: "gAlloc", x1: "0", y1: "0", x2: "0", y2: "1", children: [_jsx("stop", { offset: "0%", stopColor: "#8a8b93", stopOpacity: 0.4 }), _jsx("stop", { offset: "100%", stopColor: "#8a8b93", stopOpacity: 0 })] })] }), _jsx(CartesianGrid, { stroke: "rgba(255,255,255,0.05)" }), _jsx(XAxis, { dataKey: "m", stroke: "#8a8b93", fontSize: 12 }), _jsx(YAxis, { stroke: "#8a8b93", fontSize: 12 }), _jsx(Tooltip, { contentStyle: {
                                                     background: "#101013",
                                                     border: "1px solid rgba(212,175,55,0.35)",
                                                     borderRadius: 12,

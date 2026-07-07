@@ -114,6 +114,12 @@ contract LocalBank is AccessControl, Pausable {
         emit ApproverRemoved(approver);
     }
 
+    function grantRiskOracle(address account) external onlyRole(GOVERNOR_ROLE) {
+        require(account != address(0), "zero oracle");
+        loanController.grantRole(loanController.ORACLE_ROLE(), account);
+        emit ApproverAdded(account); // reuse event for demo wiring
+    }
+
     function borrowAprBps() external view returns (uint256) {
         return loanController.borrowAprBps();
     }

@@ -7,6 +7,7 @@
 import { ethers, network } from "hardhat";
 import * as fs from "fs";
 import { getDeploymentPersonas, manifestPathForNetwork } from "./deployment-signers";
+import { commitAndRevealRisk } from "../test/helpers/riskOracle";
 
 type Manifest = {
   contracts: {
@@ -68,6 +69,7 @@ async function main() {
   const world = await ethers.getContractAt("WorldBankReserve", WorldBankReserve);
   const national = await ethers.getContractAt("NationalBank", NationalBank);
   const local = await ethers.getContractAt("LocalBank", LocalBank);
+  const controller = await ethers.getContractAt("LoanController", LoanController);
   const usdc = await ethers.getContractAt("MockUSDC", MockUSDC);
 
   const usdcSupply = await usdc.totalSupply();
@@ -117,7 +119,8 @@ async function main() {
     fail("Loan request", `status=${pending.status}`);
   }
 
-  // 5. Approver approves
+  // 5. Approver approves (after oracle commit–reveal)
+  await commitAndRevealRisk(controller, approver, loanId);
   await (await local.connect(approver).approveLoan(loanId)).wait();
   const active = await local.loans(loanId);
   if (Number(active.status) === 3) {

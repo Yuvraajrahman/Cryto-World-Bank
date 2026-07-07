@@ -115,6 +115,13 @@ function main() {
     INTERBANK_LENDING_POOL_ADDRESS: shared.INTERBANK_LENDING_POOL_ADDRESS,
     GOVERNOR_MULTISIG_ADDRESS: shared.GOVERNOR_MULTISIG_ADDRESS,
     CHAIN_RPC_URL: shared.CHAIN_RPC_URL,
+    ...(dep.chainId === 31337
+      ? {
+          ORACLE_PRIVATE_KEY:
+            process.env.ORACLE_PRIVATE_KEY ??
+            "0x5de4111afa1a4b94908f83103eb1f1709b719baa8af4d696e4ebf879d12f2e5",
+        }
+      : {}),
   });
 
   console.log(`Synced ${network} deployment → frontend/.env and backend/.env`);

@@ -1,0 +1,37 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '19.2px', 'primaryColor': '#ffffff', 'primaryBorderColor': '#000000', 'primaryTextColor': '#000000', 'lineColor': '#000000', 'fontFamily': 'Helvetica'}, 'flowchart': {'htmlLabels': true, 'nodeSpacing': 58, 'rankSpacing': 70, 'padding': 10}}}%%
+flowchart TB
+    %% ==================================================================
+    %% LEVEL 0 DATA FLOW DIAGRAM (CONTEXT DIAGRAM) — Gane-Sarson Notation
+    %% Subsystem: Crypto World Bank — Core Lending Subsystem
+    %% ==================================================================
+
+    classDef entity fill:#f2f2f2,stroke:#000000,stroke-width:1.2px,color:#000000;
+    classDef process fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold;
+
+    %% ---- External entities (Gane-Sarson: square-cornered rectangles) ----
+    CLIENT["Client / Borrower<br/>(Tier 4)"]:::entity
+    APPROVER["Local Bank Approver<br/>(Tier 3)"]:::entity
+    NATBANK["National Bank<br/>(Tier 2)"]:::entity
+    MLSVC["ML Risk Scoring Service<br/>(FastAPI + Commit-Reveal Oracle)"]:::entity
+    CHAIN["Blockchain Ledger<br/>(EVM Smart Contracts)"]:::entity
+
+    %% ---- Process (Gane-Sarson: rounded rectangle) ----
+    SYS("0<br/>Core Lending Subsystem"):::process
+
+    %% ---- Data flows ----
+    CLIENT -- "Loan application<br/>(amount, term, purpose)" --> SYS
+    SYS -- "Application status /<br/>disbursement notice" --> CLIENT
+    CLIENT -- "Installment payment" --> SYS
+    SYS -- "Repayment confirmation<br/>&amp; schedule" --> CLIENT
+
+    SYS -- "Authority Brief<br/>(risk score, SHAP breakdown)" --> APPROVER
+    APPROVER -- "Approve / reject decision" --> SYS
+
+    SYS -- "Capital draw-down request" --> NATBANK
+    NATBANK -- "Capital allocation confirmation" --> SYS
+
+    SYS -- "Applicant feature vector" --> MLSVC
+    MLSVC -- "Committed score hash /<br/>revealed score + SHAP" --> SYS
+
+    SYS -- "Loan state transaction<br/>(request / approve / disburse / repay)" --> CHAIN
+    CHAIN -- "Confirmed tx receipt /<br/>emitted events" --> SYS

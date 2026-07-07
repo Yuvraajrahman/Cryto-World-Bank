@@ -68,12 +68,18 @@
     "fontSize": 14
   },
   "sequence": {
-    "useMaxWidth": true,
+    "useMaxWidth": false,
     "mirrorActors": false,
-    "actorMargin": 42,
-    "boxMargin": 8,
-    "noteFontSize": 13,
-    "messageFontSize": 13
+    "actorMargin": 72,
+    "boxMargin": 12,
+    "boxTextMargin": 8,
+    "noteMargin": 14,
+    "messageMargin": 56,
+    "diagramMarginX": 24,
+    "diagramMarginY": 24,
+    "noteFontSize": 14,
+    "messageFontSize": 14,
+    "showSequenceNumbers": false
   },
   "xyChart": {
     "useMaxWidth": true

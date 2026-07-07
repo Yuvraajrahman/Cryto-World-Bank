@@ -4,6 +4,7 @@
 import { ethers, network } from "hardhat";
 import * as fs from "fs";
 import { getDeploymentPersonas, manifestPathForNetwork } from "./deployment-signers";
+import { commitAndRevealRisk } from "../test/helpers/riskOracle";
 
 type Manifest = {
   contracts: Record<string, string>;
@@ -93,6 +94,7 @@ async function main() {
 
   const loanId = await controller.nextLoanId();
   await (await local.connect(borrower).requestLoan(ethers.parseEther("0.04"), 6, "phase2")).wait();
+  await commitAndRevealRisk(controller, approver, loanId);
   await (await local.connect(approver).approveLoan(loanId)).wait();
   const loan = await local.loans(loanId);
   if (Number(loan.status) === 3) pass("Loan approved", "status Active");

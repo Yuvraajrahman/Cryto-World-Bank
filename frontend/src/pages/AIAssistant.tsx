@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { streamChat, type StreamChatMessage } from "@/lib/aiStream";
+import { confirmAgentAction, sendAgentMessage } from "@/lib/phase3";
 import { getFeatureKeyFromPath, getRecommendedPrompts } from "@/lib/assistantPrompts";
 import { useSession } from "@/lib/store";
 import { MarkdownMessage } from "@/components/chatbot/MarkdownMessage";
@@ -34,6 +35,11 @@ export function AIAssistant() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
+  const [agentConfirm, setAgentConfirm] = useState<{
+    confirmationId: string;
+    message: string;
+    tool: string;
+  } | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const featureKey = useMemo(() => getFeatureKeyFromPath(pathname), [pathname]);
@@ -73,6 +79,55 @@ export function AIAssistant() {
     const body = (text ?? draft).trim();
     if (!body || pending) return;
     setDraft("");
+
+    if (/apply.*loan|loan.*apply|borrow\s+\d/i.test(body)) {
+      const userMsgId = uid();
+      const botId = uid();
+      setMessages((m) => [
+        ...m,
+        { id: userMsgId, role: "user", body },
+        { id: botId, role: "bot", body: "", meta: { model: "agent" } },
+      ]);
+      setPending(true);
+      try {
+        const res = await sendAgentMessage(body);
+        if (res.type === "confirmation_required" && res.confirmationId) {
+          setAgentConfirm({
+            confirmationId: res.confirmationId,
+            message: res.message ?? "Confirm loan application?",
+            tool: res.tool ?? "submit_loan_application",
+          });
+          setMessages((prev) =>
+            prev.map((x) =>
+              x.id === botId ? { ...x, body: res.message ?? "Please confirm to submit." } : x,
+            ),
+          );
+        } else {
+          setMessages((prev) =>
+            prev.map((x) =>
+              x.id === botId
+                ? { ...x, body: res.message ?? JSON.stringify(res.result ?? res, null, 2) }
+                : x,
+            ),
+          );
+        }
+      } catch (err: unknown) {
+        setMessages((prev) =>
+          prev.map((x) =>
+            x.id === botId
+              ? {
+                  ...x,
+                  body: err instanceof Error ? err.message : "Agent request failed",
+                }
+              : x,
+          ),
+        );
+      } finally {
+        setPending(false);
+      }
+      return;
+    }
+
     const botId = uid();
     setMessages((m) => [
       ...m,
@@ -130,6 +185,35 @@ export function AIAssistant() {
             : x,
         ),
       );
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function confirmAgent() {
+    if (!agentConfirm) return;
+    setPending(true);
+    try {
+      const res = await confirmAgentAction(agentConfirm.confirmationId);
+      setMessages((m) => [
+        ...m,
+        {
+          id: uid(),
+          role: "bot",
+          body: `Confirmed. ${JSON.stringify(res.result, null, 2)}`,
+          meta: { model: "agent" },
+        },
+      ]);
+      setAgentConfirm(null);
+    } catch (err: unknown) {
+      setMessages((m) => [
+        ...m,
+        {
+          id: uid(),
+          role: "bot",
+          body: err instanceof Error ? err.message : "Confirmation failed",
+        },
+      ]);
     } finally {
       setPending(false);
     }
@@ -216,6 +300,20 @@ export function AIAssistant() {
             </div>
           ) : null}
 
+          {agentConfirm ? (
+            <div className="border-t border-gold-700/40 bg-gold-900/20 px-5 py-3">
+              <p className="text-sm text-gold-100">{agentConfirm.message}</p>
+              <div className="mt-2 flex gap-2">
+                <button className="btn-primary text-xs" onClick={confirmAgent} disabled={pending}>
+                  Confirm {agentConfirm.tool}
+                </button>
+                <button className="btn-ghost text-xs" onClick={() => setAgentConfirm(null)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           <div className="border-t border-ink-700/60 p-4">
             <div className="flex gap-2">
               <input
@@ -259,7 +357,7 @@ export function AIAssistant() {
               </li>
               <li className="flex items-start gap-2">
                 <Zap className="mt-0.5 h-4 w-4 text-gold-400" />
-                Route approvers to the pending queue
+                Submit a loan with human confirmation (Phase III agent)
               </li>
             </ul>
           </div>
@@ -270,10 +368,8 @@ export function AIAssistant() {
               How it works
             </div>
             <p className="text-sm text-ink-200">
-              The current backend classifies your message with a keyword-based
-              intent router (<span className="font-mono text-gold-300">cwb-intent-rules-v0</span>).
-              Sprint 3 replaces this with a transformer classifier + retrieval-augmented
-              responses over your on-chain history — the UI and API shape stay identical.
+              Loan applications use the Phase III agent with a mandatory confirmation gate.
+              General questions stream from your local LLM (Ollama) when configured.
             </p>
           </div>
         </div>

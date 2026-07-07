@@ -25,6 +25,7 @@ import { formatDateTime } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { contractAddresses, localBankAbi } from "@/lib/contracts";
 import { contractsConfigured } from "@/lib/onChain";
+import { commitRevealOracle, fetchOracleStatus } from "@/lib/phase3";
 import { useOnChainTx } from "@/hooks/useOnChainTx";
 
 interface ChainPendingLoan {
@@ -82,6 +83,7 @@ export function Approvals() {
   const [chainLoans, setChainLoans] = useState<ChainPendingLoan[]>([]);
   const [phase2Pending, setPhase2Pending] = useState<PendingLoanRow[]>([]);
   const [briefs, setBriefs] = useState<Record<string, Record<string, unknown>>>({});
+  const [oracleState, setOracleState] = useState<Record<string, { revealed: boolean; scoreBps: number }>>({});
 
   async function load() {
     setLoading(true);
@@ -96,6 +98,16 @@ export function Approvals() {
       if (onChain) {
         const p2 = await fetchPendingLoansPhase2();
         setPhase2Pending(p2);
+        const oracleEntries: Record<string, { revealed: boolean; scoreBps: number }> = {};
+        for (const l of chainPending.loans) {
+          try {
+            const st = await fetchOracleStatus(l.id);
+            oracleEntries[l.id] = { revealed: st.revealed, scoreBps: st.scoreBps };
+          } catch {
+            oracleEntries[l.id] = { revealed: false, scoreBps: 0 };
+          }
+        }
+        setOracleState(oracleEntries);
         if (p2.length > 0 && chainPending.loans.length === 0) {
           setChainLoans(
             p2.map((p) => ({
@@ -139,6 +151,27 @@ export function Approvals() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function scoreAndCommitOracle(loan: ChainPendingLoan) {
+    setActing(`oracle_${loan.id}`);
+    try {
+      const result = await commitRevealOracle({
+        loanId: loan.id,
+        wallet: loan.borrower,
+        principalEth: loan.principalEth,
+        termMonths: loan.termMonths,
+      });
+      setOracleState((prev) => ({
+        ...prev,
+        [loan.id]: { revealed: true, scoreBps: result.scoreBps },
+      }));
+      toast.success(`Oracle revealed — risk ${result.riskScore.toFixed(2)} (${result.decision})`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Oracle commit failed");
+    } finally {
+      setActing(null);
+    }
+  }
 
   async function approveChain(loan: ChainPendingLoan) {
     if (!isConnected) {
@@ -324,6 +357,8 @@ export function Approvals() {
                 const p2 = phase2Pending.find((p) => p.id === l.id);
                 const docId = p2?.documentRequestId;
                 const brief = briefs[l.id];
+                const oracle = oracleState[l.id];
+                const canApproveOnChain = oracle?.revealed === true;
                 return (
                 <div key={l.id} className="card p-5 border-gold-700/30">
                   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -364,6 +399,26 @@ export function Approvals() {
                       Generate Authority Brief
                     </button>
                   )}
+                  <div className="mt-3 rounded-lg border border-ink-600/60 bg-ink-950/60 p-3 text-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="uppercase tracking-[0.2em] text-ink-200">Oracle state</span>
+                      {oracle?.revealed ? (
+                        <span className="badge-green">SCORE_REVEALED · {oracle.scoreBps} bps</span>
+                      ) : (
+                        <span className="badge-gold">PENDING</span>
+                      )}
+                    </div>
+                    {!oracle?.revealed ? (
+                      <button
+                        className="btn-ghost mt-2 text-xs"
+                        disabled={acting === `oracle_${l.id}`}
+                        onClick={() => scoreAndCommitOracle(l)}
+                      >
+                        <Sparkles className="mr-1 inline h-3 w-3" />
+                        {acting === `oracle_${l.id}` ? "Scoring…" : "Score & commit oracle"}
+                      </button>
+                    ) : null}
+                  </div>
                   <div className="mt-4">
                     <input
                       className="input mb-3"
@@ -379,8 +434,9 @@ export function Approvals() {
                     <div className="flex gap-2">
                       <button
                         className="btn-primary"
-                        disabled={chainBusy}
+                        disabled={chainBusy || !canApproveOnChain}
                         onClick={() => approveChain(l)}
+                        title={canApproveOnChain ? undefined : "Run Score & commit oracle first"}
                       >
                         <CheckCircle2 className="h-4 w-4" />
                         Approve on-chain

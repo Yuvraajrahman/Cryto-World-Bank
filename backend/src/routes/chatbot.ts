@@ -15,6 +15,7 @@ type Intent =
   | "bank_information"
   | "how_it_works"
   | "register_bank"
+  | "loan_apply"
   | "greeting"
   | "general_question";
 
@@ -26,6 +27,11 @@ const INTENTS: Array<{ intent: Intent; keywords: string[]; confidence: number }>
   { intent: "bank_information", keywords: ["bank", "national", "local", "hierarchy"], confidence: 0.7 },
   { intent: "how_it_works", keywords: ["how does", "what is", "explain", "how it works"], confidence: 0.7 },
   { intent: "register_bank", keywords: ["register", "onboard", "become a bank"], confidence: 0.8 },
+  {
+    intent: "loan_apply",
+    keywords: ["apply for a loan", "loan_apply", "borrow eth", "apply loan"],
+    confidence: 0.85,
+  },
 ];
 
 function classify(q: string): { intent: Intent; confidence: number } {
@@ -233,6 +239,20 @@ function handleIntent(
     return {
       ...base,
       text: "Bank registration requires a Governor (World) or National Bank Admin account. Institutions can contact the Crypto World Bank team to begin onboarding.",
+    };
+  }
+
+  if (intent === "loan_apply" && user.role === "BORROWER") {
+    return {
+      ...base,
+      text:
+        "I can help you apply for a loan. Open the AI Assistant and say e.g. “apply for a 0.05 ETH loan”, " +
+        "then confirm when prompted. Or use Request Loan in the app.",
+      actions: [
+        { label: "AI Assistant", href: "/app/assistant" },
+        { label: "Request loan", href: "/app/loans/new" },
+      ],
+      suggestions: ["What is my current borrowing limit?"],
     };
   }
 

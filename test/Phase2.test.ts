@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { commitAndRevealRisk } from "./helpers/riskOracle";
 
 describe("Phase II — core banking extensions", () => {
   async function deployStack() {
@@ -36,6 +37,7 @@ describe("Phase II — core banking extensions", () => {
     await worldBank.connect(worldGov).registerNationalBank(await national.getAddress(), "NB", "BD");
     await national.connect(nationalGov).registerLocalBank(await local.getAddress(), "LB", "Dhaka");
     await local.connect(localGov).addApprover(approver.address);
+    await local.connect(localGov).grantRiskOracle(approver.address);
     await local.connect(localGov).registerClient(borrower.address);
     await local.connect(localGov).registerClient(borrower2.address);
 
@@ -48,6 +50,7 @@ describe("Phase II — core banking extensions", () => {
       national,
       local,
       passport,
+      controller: await ethers.getContractAt("LoanController", loanController),
       worldGov,
       nationalGov,
       localGov,
@@ -65,8 +68,9 @@ describe("Phase II — core banking extensions", () => {
   });
 
   it("approves loan within passport limit and upgrades score on repay", async () => {
-    const { local, approver, borrower, passport } = await deployStack();
+    const { local, approver, borrower, passport, controller } = await deployStack();
     await local.connect(borrower).requestLoan(ethers.parseEther("0.04"), 6, "ok");
+    await commitAndRevealRisk(controller, approver, 1);
     await local.connect(approver).approveLoan(1);
     const loan = await local.loans(1);
     const per = await local.installmentAmount(1);

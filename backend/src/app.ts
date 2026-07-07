@@ -17,6 +17,8 @@ import { phase1Router } from "./routes/phase1";
 import { phase2Router } from "./routes/phase2";
 import { chainRouter } from "./routes/chain";
 import { briefRouter } from "./routes/brief";
+import { oracleRouter } from "./routes/oracle";
+import { agentRouter } from "./routes/agent";
 import { errorHandler } from "./middleware/error";
 
 // Builds the Express app without binding a port. index.ts wraps it in
@@ -98,6 +100,8 @@ export function createApp(): Express {
   app.use("/api/phase2", phase2Router);
   app.use("/api/chain", chainRouter);
   app.use("/api/brief", briefRouter);
+  app.use("/api/oracle", oracleRouter);
+  app.use("/api/agent", agentRouter);
 
   app.use(errorHandler);
 

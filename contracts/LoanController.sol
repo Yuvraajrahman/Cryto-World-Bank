@@ -13,6 +13,7 @@ import {ICreditPassport} from "./interfaces/ICreditPassport.sol";
 contract LoanController is AccessControl, ReentrancyGuard, Pausable {
     bytes32 public constant APPROVER_ROLE = keccak256("APPROVER_ROLE");
     bytes32 public constant LOCAL_BANK_ROLE = keccak256("LOCAL_BANK_ROLE");
+    bytes32 public constant ORACLE_ROLE = keccak256("ORACLE_ROLE");
 
     address public immutable localBank;
     address public creditPassport;
@@ -47,6 +48,11 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
     mapping(address => uint256[]) public loansByBorrower;
     uint256[] private _allLoanIds;
 
+    // Phase III commit–reveal risk oracle (MVT path; Chainlink is Future Work).
+    mapping(uint256 => bytes32) public riskCommitments;
+    mapping(uint256 => uint16) public revealedRiskBps;
+    mapping(uint256 => bool) public riskScoreRevealed;
+
     event LoanRequested(uint256 indexed id, address indexed borrower, uint256 principal, bytes32 docHash, string purpose);
     event LoanApproved(uint256 indexed id, address indexed approver, uint256 totalOwed, uint8 installments);
     event LoanRejected(uint256 indexed id, address indexed approver, string reason);
@@ -58,6 +64,8 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
     event ApproverRemoved(address indexed approver);
     event BorrowAprUpdated(uint256 oldBps, uint256 newBps);
     event CreditPassportSet(address indexed passport);
+    event RiskScoreCommitted(uint256 indexed loanId, bytes32 commitHash, address indexed oracle);
+    event RiskScoreRevealed(uint256 indexed loanId, uint16 scoreBps, address indexed oracle);
 
     constructor(address localBankAddress, address governor) {
         require(localBankAddress != address(0), "zero local bank");
@@ -66,6 +74,36 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         _grantRole(DEFAULT_ADMIN_ROLE, localBankAddress);
         _grantRole(LOCAL_BANK_ROLE, localBankAddress);
         _grantRole(APPROVER_ROLE, governor);
+        _grantRole(ORACLE_ROLE, governor);
+    }
+
+    function commitRiskScore(uint256 id, bytes32 commitHash) external onlyRole(ORACLE_ROLE) {
+        Loan storage l = loans[id];
+        require(l.id != 0, "unknown loan");
+        require(l.status == LoanStatus.Pending, "not pending");
+        require(commitHash != bytes32(0), "zero commit");
+        riskCommitments[id] = commitHash;
+        riskScoreRevealed[id] = false;
+        revealedRiskBps[id] = 0;
+        emit RiskScoreCommitted(id, commitHash, msg.sender);
+    }
+
+    function revealRiskScore(uint256 id, uint16 scoreBps, bytes32 salt) external onlyRole(ORACLE_ROLE) {
+        Loan storage l = loans[id];
+        require(l.id != 0, "unknown loan");
+        require(l.status == LoanStatus.Pending, "not pending");
+        bytes32 commit = riskCommitments[id];
+        require(commit != bytes32(0), "no commit");
+        require(!riskScoreRevealed[id], "already revealed");
+        require(keccak256(abi.encodePacked(scoreBps, salt)) == commit, "commit mismatch");
+        require(scoreBps <= 10000, "bps overflow");
+        riskScoreRevealed[id] = true;
+        revealedRiskBps[id] = scoreBps;
+        emit RiskScoreRevealed(id, scoreBps, msg.sender);
+    }
+
+    function isRiskScoreRevealed(uint256 id) external view returns (bool) {
+        return riskScoreRevealed[id];
     }
 
     receive() external payable {}
@@ -138,6 +176,7 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         require(hasRole(APPROVER_ROLE, approver), "not approver");
         Loan storage l = loans[id];
         require(l.status == LoanStatus.Pending, "not pending");
+        require(riskScoreRevealed[id], "risk not revealed");
         require(address(this).balance >= l.principal, "insufficient funds");
 
         if (creditPassport != address(0)) {
@@ -220,6 +259,7 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
     {
         Loan storage l = loans[id];
         require(l.status == LoanStatus.Pending, "not pending");
+        require(riskScoreRevealed[id], "risk not revealed");
         require(address(this).balance >= l.principal, "insufficient funds");
 
         if (creditPassport != address(0)) {

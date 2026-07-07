@@ -1,0 +1,33 @@
+flowchart TB
+  subgraph ACTORS["External actors"]
+    direction LR
+    CL["Client"]
+    AP["Bank approver"]
+    DON["Chainlink DON"]
+  end
+
+  UI["Presentation layer<br/>React SPA · wallet signing"]
+  APP["Application services<br/>Express REST · FastAPI ML · event listener"]
+  PERS[("Persistence layer<br/>PostgreSQL · Redis")]
+  CHAIN["On-chain layer<br/>World / National / Local Bank · LoanController"]
+
+  CL -->|"loan apply · repay · deposit"| UI
+  AP -->|"approve · reject · compliance review"| APP
+  UI -->|"HTTPS REST · WebSocket"| APP
+  UI -->|"wallet-signed transaction"| CHAIN
+  APP -->|"SQL read/write · audit logs"| PERS
+  APP -->|"ethers.js contract calls"| CHAIN
+  APP -->|"ML / oracle request"| DON
+  DON -->|"price feed · reserve attestation"| CHAIN
+  CHAIN -->|"chain events"| APP
+  APP -->|"projection upsert"| PERS
+  APP -->|"API response · loan status"| UI
+  PERS -.->|"read models"| UI
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef store fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class CHAIN apex;
+  class UI,APP mid;
+  class PERS store;
+  class CL,AP,DON apex;

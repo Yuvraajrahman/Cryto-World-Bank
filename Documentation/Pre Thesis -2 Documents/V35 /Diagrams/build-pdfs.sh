@@ -14,6 +14,8 @@ figure_canvas() {
   case "$base" in
     fig-erd-core|fig-erd-extended|fig-eer-model|fig-db-full-schema)
       echo "2000 1500" ;;
+    ERD_diagram_relational)
+      echo "16800 9600" ;;
     Ch3_use-case-nine-actor-taxonomy|fig-activity-onboarding-id)
       echo "1900 1400" ;;
     fig-activity-lending)
@@ -21,11 +23,15 @@ figure_canvas() {
     Ch3_data-flow-diagrams)
       echo "2280 1680" ;;
     Ch3_multi-entity-cross-tier-operations)
-      echo "7200 5400" ;;
+      echo "3800 2200" ;;
+    fig-seq-loan-flow)
+      echo "2000 2800" ;;
+    fig-seq-installment-income)
+      echo "2000 2400" ;;
+    fig-seq-banking-data)
+      echo "2000 2000" ;;
     fig-seq-chat-chatbot)
-      echo "2160 1560" ;;
-    fig-seq-*)
-      echo "1800 1300" ;;
+      echo "2200 2600" ;;
     fig-db-1nf|fig-db-2nf|fig-db-3nf|fig-db-bcnf)
       echo "1800 2800" ;;
     fig-kinked-rate-curve|fig-liquidation-engine)
@@ -52,14 +58,24 @@ figure_canvas() {
       echo "1800 1200" ;;
     fig-three-layer-arch)
       echo "1800 1300" ;;
+    fig-architecture-data-flow)
+      echo "1900 1400" ;;
+    fig-dfd-level0-lending)
+      echo "1800 1440" ;;
+    fig-dfd-level1-lending)
+      echo "3840 2160" ;;
+    d1_system_component_architecture)
+      echo "2800 4200" ;;
     fig-component-architecture)
       echo "2200 1500" ;;
     fig-uml-class)
-      echo "2000 1400" ;;
+      echo "2400 1700" ;;
     fig-blockchain-stack)
-      echo "1700 1250" ;;
-    fig-data-partitioning|fig-financial-data-lifecycle)
-      echo "2000 1300" ;;
+      echo "2400 1100" ;;
+    fig-data-partitioning)
+      echo "1200 420" ;;
+    fig-financial-data-lifecycle)
+      echo "1300 520" ;;
     fig-activity-aux)
       echo "1900 1400" ;;
     fig-hierarchical-banking)
@@ -79,7 +95,7 @@ figure_canvas() {
     Ch4_four-phase-roadmap-sdlc)
       echo "1900 1500" ;;
     Ch4_dev-verification-toolchain)
-      echo "1900 1400" ;;
+      echo "1600 520" ;;
     fig-savings-vault)
       echo "1800 1050" ;;
     fig-local-llm)
@@ -99,36 +115,12 @@ mmdc_common_opts() {
   [[ -f "$MERMAID_PUPPET" ]] && MMC_OPTS+=(-p "$MERMAID_PUPPET")
 }
 
-# Sequence diagrams embed inline 16px labels; scale by factor for thesis readability.
-scale_svg_inline_fonts() {
-  local svg="$1" factor="$2"
-  python3 - "$svg" "$factor" <<'PY'
-import re, sys
-from pathlib import Path
-path, factor = Path(sys.argv[1]), float(sys.argv[2])
-text = path.read_text()
-
-def repl(m):
-    size = float(m.group(1))
-    return f"font-size: {size * factor:.1f}px"
-
-text = re.sub(r"font-size:\s*([0-9.]+)px", repl, text)
-path.write_text(text)
-PY
-}
-
-# Sequence diagrams are participant-wide; at \linewidth their native 13px labels
-# shrink to ~3pt. Enlarge the inline fonts (geometry stays fixed) then re-render the
-# SVG to PDF so the thesis copy is legible.
+# Sequence diagrams: keep mmdc PDF geometry (message spacing matches labels).
+# Do not scale inline SVG fonts — that enlarges text without moving arrows.
 finalize_figure_pdf() {
   local name="$1" width="$2"
-  local svg="$DIR/${name}.svg" pdf="$DIR/${name}.pdf"
   if [[ "$name" == fig-seq-* ]]; then
-    scale_svg_inline_fonts "$svg" 1.5
-    if command -v rsvg-convert >/dev/null 2>&1; then
-      echo "rsvg  $name (scaled labels x1.5)"
-      rsvg-convert -w "$width" -f pdf -o "$pdf" "$svg"
-    fi
+    echo "keep  $name (mmdc PDF, native spacing)"
   fi
 }
 

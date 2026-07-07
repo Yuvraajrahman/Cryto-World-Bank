@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { commitAndRevealRisk } from "./helpers/riskOracle";
 
 describe("LocalBank — Tier 3 unit tests", () => {
   async function deploy() {
@@ -23,6 +24,15 @@ describe("LocalBank — Tier 3 unit tests", () => {
     await funder.sendTransaction({ to: await lb.getAddress(), value: ethers.parseEther("200") });
 
     return { nb, lb, governor, approver, borrower, other, funder };
+  }
+
+  async function revealOracle(
+    lb: Awaited<ReturnType<typeof deploy>>["lb"],
+    oracle: { address: string },
+    loanId: number,
+  ) {
+    const ctrl = await ethers.getContractAt("LoanController", await lb.loanController());
+    await commitAndRevealRisk(ctrl, oracle, loanId);
   }
 
   it("deploys an owned LoanController", async () => {
@@ -85,6 +95,7 @@ describe("LocalBank — Tier 3 unit tests", () => {
     await lb.connect(borrower).requestLoan(ethers.parseEther("5"), 12, "x");
 
     const before = await ethers.provider.getBalance(borrower.address);
+    await revealOracle(lb, governor, 1);
     await lb.connect(governor).approveLoan(1);
     const after = await ethers.provider.getBalance(borrower.address);
 
@@ -102,6 +113,7 @@ describe("LocalBank — Tier 3 unit tests", () => {
     await funder.sendTransaction({ to: await lb.getAddress(), value: ethers.parseEther("200") });
 
     await lb.connect(borrower).requestLoan(ethers.parseEther("150"), 12, "expansion");
+    await revealOracle(lb, governor, 1);
     await lb.connect(governor).approveLoan(1);
 
     const loan = await lb.loans(1);
@@ -116,6 +128,7 @@ describe("LocalBank — Tier 3 unit tests", () => {
     await funder.sendTransaction({ to: await lb.getAddress(), value: ethers.parseEther("200") });
 
     await lb.connect(borrower).requestLoan(ethers.parseEther("120"), 12, "x");
+    await revealOracle(lb, governor, 1);
     await lb.connect(governor).approveLoan(1);
 
     const per = await lb.installmentAmount(1);
@@ -133,6 +146,7 @@ describe("LocalBank — Tier 3 unit tests", () => {
   it("only the borrower can pay their own installments", async () => {
     const { lb, governor, borrower, other } = await deploy();
     await lb.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "x");
+    await revealOracle(lb, governor, 1);
     await lb.connect(governor).approveLoan(1);
 
     const per = await lb.installmentAmount(1);
@@ -165,6 +179,7 @@ describe("LocalBank — Tier 3 unit tests", () => {
     const { lb, governor, borrower } = await deploy();
     await lb.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "a"); // id 1 pending
     await lb.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "b"); // id 2 pending
+    await revealOracle(lb, governor, 1);
     await lb.connect(governor).approveLoan(1); // id 1 active
     await lb.connect(governor).rejectLoan(2, "no"); // id 2 rejected
     await lb.connect(borrower).requestLoan(ethers.parseEther("3"), 6, "c"); // id 3 pending
@@ -192,6 +207,7 @@ describe("LocalBank — Tier 3 unit tests", () => {
   it("cannot pay an installment below the expected amount", async () => {
     const { lb, governor, borrower } = await deploy();
     await lb.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "x");
+    await revealOracle(lb, governor, 1);
     await lb.connect(governor).approveLoan(1);
     const per = await lb.installmentAmount(1);
     await expect(

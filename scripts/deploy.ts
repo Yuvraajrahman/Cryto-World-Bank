@@ -202,6 +202,10 @@ async function main() {
   await (await local.connect(localGov).addApprover(approver.address)).wait();
   await (await local.connect(localGov).registerClient(borrower1.address)).wait();
   await (await local.connect(localGov).registerClient(borrower2.address)).wait();
+
+  const controller = await ethers.getContractAt("LoanController", loanControllerAddr);
+  await (await local.connect(localGov).grantRiskOracle(approver.address)).wait();
+  console.log(`  ✓ Oracle role granted to approver`);
   console.log(`  ✓ Approver + borrowers registered`);
 
   await (await mockUsdc.connect(worldGov).mint(worldGov.address, 100_000n * 1_000_000n)).wait();

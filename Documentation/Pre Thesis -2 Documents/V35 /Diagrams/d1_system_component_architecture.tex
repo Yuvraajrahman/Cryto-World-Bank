@@ -1,0 +1,170 @@
+% UML 2.x component diagram — standard stereotypes and interface notation.
+\definecolor{umlcomponentfill}{HTML}{ECECFF}
+\definecolor{umlplannedfill}{HTML}{F5F5F5}
+
+\newcommand{\umlprovidedif}[3]{%
+  \coordinate (#1-ball) at #3;
+  \draw[line width=0.65pt] ($(#1-ball)+(-0.38,0)$) -- (#1-ball);
+  \draw[line width=0.65pt, fill=white] (#1-ball) circle (0.11);
+  \node[font=\footnotesize\itshape, align=center, anchor=west] at ($(#1-ball)+(0.14,0)$) {#2};
+}
+
+\begin{tikzpicture}[
+  font=\small,
+  >=Latex,
+  component/.style={
+    draw, line width=0.8pt, fill=umlcomponentfill, align=left,
+    inner xsep=6pt, inner ysep=5pt, text width=3.8cm},
+  planned/.style={component, fill=umlplannedfill, dashed},
+  layer/.style={
+    draw, dashed, rounded corners=3pt, line width=0.6pt,
+    inner sep=10pt, fill=white},
+  dep/.style={->, dashed, line width=0.55pt, draw=black!65},
+  use/.style={->, line width=0.65pt, draw=black!80},
+  del/.style={->, line width=0.75pt, draw=black!85},
+  assembly/.style={-, line width=0.65pt, draw=black!80},
+]
+
+  % ======================== LAYER 1: PRESENTATION ========================
+  \node[component] (react) at (0,5.8) {
+    \textbf{React SPA}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize TypeScript, Tailwind, MUI}
+  };
+  \node[component] (wallet) at (0,3.4) {
+    \textbf{Wallet Connector}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize Wagmi, RainbowKit, Viem}
+  };
+  \node[component] (approver) at (0,1.0) {
+    \textbf{Approver Dashboard}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize Authority Brief UI}
+  };
+  \node[layer, fit=(react)(wallet)(approver), label={[font=\normalsize\bfseries]above:Presentation Layer}] (play) {};
+
+  % ======================== INTERFACES (P -> A) ========================
+  \umlprovidedif{rest}{IRestAPI}{(2.05,5.4)};
+  \umlprovidedif{agent}{IAgentChat}{(2.05,3.8)};
+  \umlprovidedif{wrpc}{IWalletRPC}{(2.05,2.2)};
+
+  % ======================== LAYER 2: APPLICATION ========================
+  \node[component] (express) at (5.2,6.6) {
+    \textbf{Express.js API Gateway}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize REST orchestration, context injection}
+  };
+  \node[component] (fastapi) at (5.2,4.2) {
+    \textbf{FastAPI Scoring Service}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize RF + IF + stacking, SHAP}
+  };
+  \node[component] (mcp) at (5.2,1.8) {
+    \textbf{MCP Agent Server}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize Qwen3-8B, MVT 3--5 tools}
+  };
+  \node[component] (listener) at (5.2,-0.6) {
+    \textbf{Event Listener}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize Node.js, Socket.IO}
+  };
+  \node[layer, fit=(express)(fastapi)(mcp)(listener), label={[font=\normalsize\bfseries]above:Application Services Layer}] (alayer) {};
+
+  % Interfaces (A -> D / C)
+  \umlprovidedif{score}{IScoringAPI}{(7.35,4.8)};
+  \umlprovidedif{oracle}{IOracleCommitReveal}{(7.35,3.4)};
+  \umlprovidedif{contract}{IContractCall}{(7.35,2.0)};
+  \umlprovidedif{event}{IEventStream}{(7.35,0.4)};
+  \umlprovidedif{persist}{IPersistenceRepo}{(7.35,-1.0)};
+  \umlprovidedif{cache}{ICacheRepo}{(7.35,-2.2)};
+  \umlprovidedif{vector}{IVectorStore}{(7.35,-3.4)};
+
+  % ======================== LAYER 3: PERSISTENCE ========================
+  \node[component] (pg) at (10.4,5.0) {
+    \textbf{PostgreSQL}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize 51-entity 3NF schema}
+  };
+  \node[component] (redis) at (10.4,2.6) {
+    \textbf{Redis Cache}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}
+  };
+  \node[component] (chroma) at (10.4,0.2) {
+    \textbf{ChromaDB}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize RAG vector store}
+  };
+  \node[layer, fit=(pg)(redis)(chroma), label={[font=\normalsize\bfseries]above:Persistence Layer}] (dlayer) {};
+
+  % ======================== LAYER 4: ON-CHAIN ========================
+  \node[component] (core) at (15.6,6.8) {
+    \textbf{Core Tier Contracts}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize WorldBankReserve, NationalBank, LocalBank, LoanController}
+  };
+  \node[component] (prod) at (15.6,4.4) {
+    \textbf{Banking Product Contracts}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize SavingsVault, FixedDeposit, GroupLendingPool, CurrentAccount, InsuranceFund}
+  };
+  \node[component, text width=3.65cm] (multi) at (15.6,1.6) {
+    \textbf{Multi-Entity Contracts}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize InterBankLendingPool, UpwardDepositFacility, SyndicatedLoan, TranchedPool, TreasurySwap, FXModule, LiquidationEngine, NettingEngine}
+  };
+  \node[component] (evm) at (15.6,-0.8) {
+    \textbf{EVM Testnet}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright}\\
+    {\footnotesize Sepolia, Polygon Amoy}
+  };
+  \node[planned] (cl) at (15.6,-3.0) {
+    \textbf{Chainlink DON}\\[-1pt]
+    {\footnotesize\guillemotleft component\guillemotright\ (planned)}\\
+    {\footnotesize Functions, Automation, Price Feeds, PoR}
+  };
+  \node[layer, fit=(core)(prod)(multi)(evm)(cl), label={[font=\normalsize\bfseries]above:On-Chain \& Ledger Layer}] (clayer) {};
+
+  % ======================== DEPENDENCIES ========================
+  \draw[dep] (react.east) -- (rest-ball);
+  \draw[dep] (react.east) to[out=0,in=180] (agent-ball);
+  \draw[dep] (wallet.east) -- (wrpc-ball);
+  \draw[assembly] (rest-ball) -- (express.west);
+  \draw[assembly] (agent-ball) -- (express.west);
+
+  \draw[del] (express) -- node[above, font=\scriptsize] {delegates} (mcp);
+  \draw[dep] (express.east) to[out=0,in=180] (score-ball);
+  \draw[dep] (express.east) to[out=0,in=180] (contract-ball);
+  \draw[dep] (express.east) to[out=0,in=180] (persist-ball);
+  \draw[dep] (express.east) to[out=0,in=180] (cache-ball);
+  \draw[assembly] (score-ball) -- (fastapi.west);
+  \draw[dep] (fastapi.east) -- (oracle-ball);
+  \draw[dep] (fastapi.east) to[out=0,in=180] (persist-ball);
+  \draw[dep] (mcp.west) to[out=180,in=0] (agent-ball);
+  \draw[dep] (mcp.east) to[out=0,in=180] (vector-ball);
+  \draw[dep] (listener.east) -- (event-ball);
+  \draw[dep] (listener.east) to[out=0,in=180] (persist-ball);
+
+  \draw[assembly] (persist-ball) -- (pg.west);
+  \draw[assembly] (cache-ball) -- (redis.west);
+  \draw[assembly] (vector-ball) -- (chroma.west);
+
+  \draw[assembly] (contract-ball) to[out=0,in=180] (core.west);
+  \draw[assembly] (contract-ball) to[out=0,in=180] (prod.west);
+  \draw[assembly] (contract-ball) to[out=0,in=180] (multi.west);
+  \draw[assembly] (oracle-ball) to[out=0,in=180] (core.west);
+  \draw[assembly] (event-ball) to[out=0,in=180] (evm.west);
+  \draw[assembly] (wrpc-ball) to[out=0,in=180] (evm.west);
+  \draw[use] (core) -- (evm);
+
+  % ======================== NOTATION KEY ========================
+  \node[draw, rounded corners=2pt, fill=white, align=left, font=\scriptsize, inner sep=5pt]
+    at (7.8,-5.0) {
+    \textbf{UML component notation}\\[2pt]
+    \raisebox{-0.15ex}{\tikz{\draw[line width=0.55pt,fill=umlcomponentfill] (0,0) rectangle (0.45,0.22);}}\ component \quad
+    \raisebox{-0.15ex}{\tikz{\draw[line width=0.55pt,fill=white] (0.1,0.11) circle (0.09);}}\ provided interface\\[2pt]
+    \raisebox{-0.15ex}{\tikz{\draw[->, dashed, line width=0.5pt] (0,0.11) -- (0.55,0.11);}}\ requires \quad
+    \raisebox{-0.15ex}{\tikz{\draw[->, line width=0.55pt] (0,0.11) -- (0.55,0.11);}}\ delegates / assembly
+  };
+
+\end{tikzpicture}

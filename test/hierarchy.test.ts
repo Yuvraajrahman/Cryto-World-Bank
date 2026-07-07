@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { commitAndRevealRisk } from "./helpers/riskOracle";
 
 describe("Crypto World Bank — four-tier hierarchy", () => {
   async function deployFixture() {
@@ -30,6 +31,7 @@ describe("Crypto World Bank — four-tier hierarchy", () => {
 
   async function wireApprover(local: Awaited<ReturnType<typeof deployFixture>>["local"], localGov: Awaited<ReturnType<typeof deployFixture>>["localGov"], approver: Awaited<ReturnType<typeof deployFixture>>["approver"]) {
     await local.connect(localGov).addApprover(approver.address);
+    await local.connect(localGov).grantRiskOracle(approver.address);
   }
 
   it("accepts deposits into the reserve", async () => {
@@ -67,6 +69,8 @@ describe("Crypto World Bank — four-tier hierarchy", () => {
 
     await wireApprover(local, localGov, approver);
     await local.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "working capital");
+    const ctrl = await ethers.getContractAt("LoanController", await local.loanController());
+    await commitAndRevealRisk(ctrl, approver, 1);
     await local.connect(approver).approveLoan(1);
 
     const loan = await local.loans(1);

@@ -3,6 +3,9 @@ import { z } from "zod";
 import { config } from "../config";
 import { AuthedRequest, optionalAuth } from "../middleware/auth";
 
+import { buildThreeTierPrompt } from "../prompt/threeTier";
+import { scanForInjection } from "../middleware/injectionScan";
+
 export const aiRouter = Router();
 
 type ChatRole = "system" | "user" | "assistant";
@@ -32,29 +35,13 @@ function buildSystemPrompt(opts: {
   route?: string;
   user?: NonNullable<AuthedRequest["user"]>;
 }) {
-  const { featureKey, route, user } = opts;
-
-  const context: string[] = [
-    "You are the Crypto World Bank (CWB) in-product assistant.",
-    "The platform models a 4-tier hierarchy: World Bank Reserve → National Bank → Local Bank → Borrower.",
-    "Be concise, action-oriented, and use the product's terminology and routes when relevant.",
-    "If a request requires privileged access, explain what role is needed and where to navigate in the app.",
-    "Never claim to have executed blockchain transactions; you can only guide the user.",
-  ];
-
-  if (featureKey || route) {
-    context.push(
-      `Current feature context: ${featureKey ?? "unknown"}${route ? ` (route: ${route})` : ""}.`,
-    );
-  }
-
-  if (user) {
-    context.push(
-      `User context: displayName=${user.displayName}, role=${user.role}${user.bankId ? `, bankId=${user.bankId}` : ""}.`,
-    );
-  }
-
-  return context.join("\n");
+  return buildThreeTierPrompt({
+    featureKey: opts.featureKey,
+    route: opts.route,
+    role: opts.user?.role,
+    displayName: opts.user?.displayName,
+    bankId: opts.user?.bankId,
+  });
 }
 
 function normalizeMessages(input: Array<{ role: ChatRole; content: string }>): Array<{ role: ChatRole; content: string }> {
@@ -79,6 +66,18 @@ aiRouter.post("/chat/stream", optionalAuth, async (req, res) => {
   try {
     const parsed = streamSchema.parse(req.body ?? {});
     const user = (req as AuthedRequest).user;
+
+    const lastUser = [...parsed.messages].reverse().find((m) => m.role === "user");
+    if (lastUser) {
+      const scan = scanForInjection(lastUser.content);
+      if (scan.blocked) {
+        sseWrite(res, "error", { message: scan.reason ?? "Prompt blocked" });
+        sseWrite(res, "done", { model: config.llmModel });
+        res.end();
+        return;
+      }
+    }
+
     const sys = buildSystemPrompt({
       featureKey: parsed.featureKey,
       route: parsed.route,

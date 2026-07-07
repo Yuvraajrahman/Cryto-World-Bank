@@ -1,14 +1,20 @@
+%%{init: {'flowchart': {'rankSpacing': 56, 'nodeSpacing': 52, 'padding': 16, 'curve': 'linear'}, 'themeVariables': {'fontSize': '22px'}}}%%
 flowchart TB
-  A["Frontend &mdash; React SPA + wallet signing"]
-  B["Off-Chain Services &mdash; Express API &middot; PostgreSQL &middot; FastAPI ML &middot; Redis &middot; event listener"]
-  C["Oracle Layer &mdash; Chainlink Functions &middot; Automation &middot; Price Feeds &middot; Proof of Reserve"]
-  D["Smart-Contract Layer &mdash; Solidity &middot; OpenZeppelin &middot; UUPS upgradeable &middot; 15 modular contracts"]
-  E["Execution Layer &mdash; EVM (Polygon Amoy PoS / Ethereum Sepolia testnet)"]
-  F["Settlement Layer &mdash; Ethereum L1 (security anchor)"]
+  A["Frontend<br/>React + wallet"]
+  B["Off-chain<br/>Express &middot; PostgreSQL &middot; ML"]
+  C["Oracle<br/>commit&ndash;reveal (MVT)"]
+  D["Smart contracts<br/>Solidity 0.8.20 &middot; 17 modules"]
+  E["Execution<br/>Sepolia / Amoy EVM"]
+  F["Settlement<br/>Ethereum L1 anchor"]
+
+  A ~~~ B ~~~ C
+  D ~~~ E ~~~ F
+  A ~~~ D
+  B ~~~ E
+  C ~~~ F
 
   A --> B
   B --> C
-  C --> D
   D --> E
   E --> F
 

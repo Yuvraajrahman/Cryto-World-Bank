@@ -68,16 +68,36 @@ riskRouter.post("/score", requireAuth, async (req, res, next) => {
     try {
       const ctl = new AbortController();
       const t = setTimeout(() => ctl.abort(), 2500);
-      const r = await fetch(`${config.mlServiceUrl}/score`, {
+      const r = await fetch(`${config.mlServiceUrl}/v1/score`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          wallet: "0x0000000000000000000000000000000000000000",
+          principal_eth: body.features?.principalEth ?? 0.1,
+          term_months: body.features?.termMonths ?? 12,
+          prior_default_count: body.features?.priorDefaults ?? 0,
+          consecutive_paid_loans: body.features?.consecutivePaidLoans ?? 0,
+          monthly_income_usd: body.features?.monthlyIncomeUsd ?? 800,
+          tx_count_6m: body.features?.txCount6m ?? 0,
+          loan_id: body.loanId,
+        }),
         signal: ctl.signal,
       });
       clearTimeout(t);
       if (r.ok) {
         const data = (await r.json()) as Record<string, unknown>;
-        res.json({ ...data, upstream: true });
+        res.json({
+          riskScore: data.risk_score,
+          anomalyScore: data.anomaly_score ?? 0,
+          recommendation: data.decision,
+          shap: (data.features as Array<{ name: string; contribution: number }>)?.map((f) => ({
+            feature: f.name,
+            contribution: f.contribution,
+          })),
+          scoreBps: data.score_bps,
+          model: data.model,
+          upstream: true,
+        });
         return;
       }
     } catch {

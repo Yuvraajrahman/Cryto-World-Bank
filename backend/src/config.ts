@@ -19,6 +19,7 @@ export const config = {
     interBankLendingPool: process.env.INTERBANK_LENDING_POOL_ADDRESS ?? "",
   },
   mlServiceUrl: process.env.ML_SERVICE_URL ?? "http://localhost:8000",
-  llmBaseUrl: process.env.LLM_BASE_URL ?? "http://127.0.0.1:1234",
-  llmModel: process.env.LLM_MODEL ?? "local-model",
+  llmBaseUrl: process.env.LLM_BASE_URL ?? "http://127.0.0.1:11434",
+  llmModel: process.env.LLM_MODEL ?? "qwen3:8b",
+  oraclePrivateKey: process.env.ORACLE_PRIVATE_KEY ?? "",
 };

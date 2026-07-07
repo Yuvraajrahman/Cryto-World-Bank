@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ethers } from "ethers";
 import { config } from "../config";
+import { fetchOracleStatus } from "../agent/tools";
 import { getPrisma } from "../db/prisma";
 import { requireAuth } from "../middleware/auth";
 
@@ -65,17 +66,39 @@ briefRouter.get("/:loanId", requireAuth, async (req, res) => {
     chainLoan?.principalEth ?? (prismaLoan ? ethers.formatEther(BigInt(prismaLoan.principalWei)) : 0),
   );
 
-  const riskScore =
-    principalEth < 0.1 ? 0.22 : principalEth < 0.5 ? 0.38 : principalEth < 2 ? 0.52 : 0.68;
-  const recommendation = riskScore < 0.35 ? "APPROVE" : riskScore < 0.65 ? "REVIEW" : "REJECT";
+  let authorityBrief: Record<string, unknown> | null = null;
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 4000);
+    const r = await fetch(`${config.mlServiceUrl}/v1/brief`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        wallet: chainLoan?.borrower ?? "0x0000000000000000000000000000000000000000",
+        principal_eth: principalEth,
+        term_months: chainLoan?.termMonths ?? prismaLoan?.termMonths ?? 12,
+        prior_default_count: 0,
+        consecutive_paid_loans: prismaLoan?.borrower?.creditPassport?.completedCycles ?? 0,
+        monthly_income_usd: 800,
+        purpose: chainLoan?.purpose ?? prismaLoan?.request?.purpose ?? "",
+        loan_id: loanId,
+      }),
+      signal: ctl.signal,
+    });
+    clearTimeout(t);
+    if (r.ok) {
+      const data = (await r.json()) as { authority_brief: Record<string, unknown> };
+      authorityBrief = data.authority_brief;
+    }
+  } catch {
+    /* fall through to heuristic */
+  }
 
-  res.json({
-    loanId,
-    generatedAt: new Date().toISOString(),
-    chain: chainLoan,
-    prisma: prismaLoan,
-    documents,
-    authorityBrief: {
+  if (!authorityBrief) {
+    const riskScore =
+      principalEth < 0.1 ? 0.22 : principalEth < 0.5 ? 0.38 : principalEth < 2 ? 0.52 : 0.68;
+    const recommendation = riskScore < 0.35 ? "APPROVE" : riskScore < 0.65 ? "REVIEW" : "REJECT";
+    authorityBrief = {
       headline: `Loan #${loanId} — ${recommendation}`,
       recommendation,
       riskScore: Number(riskScore.toFixed(3)),
@@ -95,8 +118,24 @@ briefRouter.get("/:loanId", requireAuth, async (req, res) => {
         docHashPresent: Boolean(chainLoan?.docHash && chainLoan.docHash !== `0x${"0".repeat(64)}`),
         kycLevel: prismaLoan?.borrower?.kycLevel ?? "LEVEL_0",
       },
-      disclaimer:
-        "Authority Brief v0 — replace with FastAPI /v1/brief when ML pipeline is connected.",
-    },
+      disclaimer: "Heuristic brief — start ML service for RF+IF+SHAP output.",
+    };
+  }
+
+  let oracleState = { revealed: false, scoreBps: 0 };
+  try {
+    oracleState = await fetchOracleStatus(loanId);
+  } catch {
+    /* optional */
+  }
+
+  res.json({
+    loanId,
+    generatedAt: new Date().toISOString(),
+    chain: chainLoan,
+    prisma: prismaLoan,
+    documents,
+    authorityBrief,
+    oracle: oracleState,
   });
 });

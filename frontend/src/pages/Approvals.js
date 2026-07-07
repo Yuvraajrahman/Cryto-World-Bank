@@ -11,6 +11,7 @@ import { formatDateTime } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { contractAddresses, localBankAbi } from "@/lib/contracts";
 import { contractsConfigured } from "@/lib/onChain";
+import { commitRevealOracle, fetchOracleStatus } from "@/lib/phase3";
 import { useOnChainTx } from "@/hooks/useOnChainTx";
 export function Approvals() {
     const role = useSession((s) => s.role);
@@ -33,6 +34,7 @@ export function Approvals() {
     const [chainLoans, setChainLoans] = useState([]);
     const [phase2Pending, setPhase2Pending] = useState([]);
     const [briefs, setBriefs] = useState({});
+    const [oracleState, setOracleState] = useState({});
     async function load() {
         setLoading(true);
         try {
@@ -45,6 +47,17 @@ export function Approvals() {
             if (onChain) {
                 const p2 = await fetchPendingLoansPhase2();
                 setPhase2Pending(p2);
+                const oracleEntries = {};
+                for (const l of chainPending.loans) {
+                    try {
+                        const st = await fetchOracleStatus(l.id);
+                        oracleEntries[l.id] = { revealed: st.revealed, scoreBps: st.scoreBps };
+                    }
+                    catch {
+                        oracleEntries[l.id] = { revealed: false, scoreBps: 0 };
+                    }
+                }
+                setOracleState(oracleEntries);
                 if (p2.length > 0 && chainPending.loans.length === 0) {
                     setChainLoans(p2.map((p) => ({
                         id: p.id,
@@ -81,6 +94,28 @@ export function Approvals() {
         load();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    async function scoreAndCommitOracle(loan) {
+        setActing(`oracle_${loan.id}`);
+        try {
+            const result = await commitRevealOracle({
+                loanId: loan.id,
+                wallet: loan.borrower,
+                principalEth: loan.principalEth,
+                termMonths: loan.termMonths,
+            });
+            setOracleState((prev) => ({
+                ...prev,
+                [loan.id]: { revealed: true, scoreBps: result.scoreBps },
+            }));
+            toast.success(`Oracle revealed — risk ${result.riskScore.toFixed(2)} (${result.decision})`);
+        }
+        catch (err) {
+            toast.error(err instanceof Error ? err.message : "Oracle commit failed");
+        }
+        finally {
+            setActing(null);
+        }
+    }
     async function approveChain(loan) {
         if (!isConnected) {
             toast.error("Connect MetaMask as approver (account #3) or LB governor (#2)");
@@ -209,10 +244,12 @@ export function Approvals() {
                                 const p2 = phase2Pending.find((p) => p.id === l.id);
                                 const docId = p2?.documentRequestId;
                                 const brief = briefs[l.id];
-                                return (_jsxs("div", { className: "card p-5 border-gold-700/30", children: [_jsx("div", { className: "flex flex-wrap items-center justify-between gap-3", children: _jsxs("div", { children: [_jsxs("div", { className: "font-medium text-ink-100", children: ["Loan #", l.id, " \u00B7 ", l.principalEth.toFixed(4), " ETH"] }), _jsxs("div", { className: "font-mono text-xs text-ink-200", children: [l.borrower.slice(0, 10), "\u2026 \u00B7 ", l.termMonths, " mo \u00B7", " ", (l.aprBps / 100).toFixed(2), "% APR"] }), _jsx("div", { className: "mt-2 text-sm text-ink-100", children: l.purpose }), docId ? (_jsxs("div", { className: "mt-2 flex gap-2 text-xs", children: [_jsx("a", { className: "text-gold-300 underline", href: documentNidUrl(docId), target: "_blank", rel: "noreferrer", children: "View NID" }), _jsx("a", { className: "text-gold-300 underline", href: documentPhotoUrl(docId), target: "_blank", rel: "noreferrer", children: "View photo" })] })) : null] }) }), brief ? (_jsxs("div", { className: "mt-3 rounded-lg border border-gold-700/30 bg-gold-900/10 p-3 text-sm", children: [_jsxs("div", { className: "flex items-center gap-2 text-gold-200", children: [_jsx(Sparkles, { className: "h-4 w-4" }), "Authority Brief: ", String(brief.headline ?? brief.recommendation)] }), _jsxs("div", { className: "mt-1 text-xs text-ink-200", children: ["Risk ", String(brief.riskScore), " \u00B7 ", String(brief.recommendation)] })] })) : (_jsxs("button", { className: "btn-ghost mt-3 text-xs", onClick: () => loadBrief(l.id), children: [_jsx(FileSearch, { className: "mr-1 inline h-3 w-3" }), "Generate Authority Brief"] })), _jsxs("div", { className: "mt-4", children: [_jsx("input", { className: "input mb-3", placeholder: "Rejection reason (if rejecting)", value: rejectReason[`chain_${l.id}`] ?? "", onChange: (e) => setRejectReason((r) => ({
+                                const oracle = oracleState[l.id];
+                                const canApproveOnChain = oracle?.revealed === true;
+                                return (_jsxs("div", { className: "card p-5 border-gold-700/30", children: [_jsx("div", { className: "flex flex-wrap items-center justify-between gap-3", children: _jsxs("div", { children: [_jsxs("div", { className: "font-medium text-ink-100", children: ["Loan #", l.id, " \u00B7 ", l.principalEth.toFixed(4), " ETH"] }), _jsxs("div", { className: "font-mono text-xs text-ink-200", children: [l.borrower.slice(0, 10), "\u2026 \u00B7 ", l.termMonths, " mo \u00B7", " ", (l.aprBps / 100).toFixed(2), "% APR"] }), _jsx("div", { className: "mt-2 text-sm text-ink-100", children: l.purpose }), docId ? (_jsxs("div", { className: "mt-2 flex gap-2 text-xs", children: [_jsx("a", { className: "text-gold-300 underline", href: documentNidUrl(docId), target: "_blank", rel: "noreferrer", children: "View NID" }), _jsx("a", { className: "text-gold-300 underline", href: documentPhotoUrl(docId), target: "_blank", rel: "noreferrer", children: "View photo" })] })) : null] }) }), brief ? (_jsxs("div", { className: "mt-3 rounded-lg border border-gold-700/30 bg-gold-900/10 p-3 text-sm", children: [_jsxs("div", { className: "flex items-center gap-2 text-gold-200", children: [_jsx(Sparkles, { className: "h-4 w-4" }), "Authority Brief: ", String(brief.headline ?? brief.recommendation)] }), _jsxs("div", { className: "mt-1 text-xs text-ink-200", children: ["Risk ", String(brief.riskScore), " \u00B7 ", String(brief.recommendation)] })] })) : (_jsxs("button", { className: "btn-ghost mt-3 text-xs", onClick: () => loadBrief(l.id), children: [_jsx(FileSearch, { className: "mr-1 inline h-3 w-3" }), "Generate Authority Brief"] })), _jsxs("div", { className: "mt-3 rounded-lg border border-ink-600/60 bg-ink-950/60 p-3 text-xs", children: [_jsxs("div", { className: "flex flex-wrap items-center justify-between gap-2", children: [_jsx("span", { className: "uppercase tracking-[0.2em] text-ink-200", children: "Oracle state" }), oracle?.revealed ? (_jsxs("span", { className: "badge-green", children: ["SCORE_REVEALED \u00B7 ", oracle.scoreBps, " bps"] })) : (_jsx("span", { className: "badge-gold", children: "PENDING" }))] }), !oracle?.revealed ? (_jsxs("button", { className: "btn-ghost mt-2 text-xs", disabled: acting === `oracle_${l.id}`, onClick: () => scoreAndCommitOracle(l), children: [_jsx(Sparkles, { className: "mr-1 inline h-3 w-3" }), acting === `oracle_${l.id}` ? "Scoring…" : "Score & commit oracle"] })) : null] }), _jsxs("div", { className: "mt-4", children: [_jsx("input", { className: "input mb-3", placeholder: "Rejection reason (if rejecting)", value: rejectReason[`chain_${l.id}`] ?? "", onChange: (e) => setRejectReason((r) => ({
                                                         ...r,
                                                         [`chain_${l.id}`]: e.target.value,
-                                                    })) }), _jsxs("div", { className: "flex gap-2", children: [_jsxs("button", { className: "btn-primary", disabled: chainBusy, onClick: () => approveChain(l), children: [_jsx(CheckCircle2, { className: "h-4 w-4" }), "Approve on-chain"] }), _jsxs("button", { className: "btn-danger", disabled: chainBusy, onClick: () => rejectChain(l), children: [_jsx(XCircle, { className: "h-4 w-4" }), "Reject"] })] })] })] }, l.id));
+                                                    })) }), _jsxs("div", { className: "flex gap-2", children: [_jsxs("button", { className: "btn-primary", disabled: chainBusy || !canApproveOnChain, onClick: () => approveChain(l), title: canApproveOnChain ? undefined : "Run Score & commit oracle first", children: [_jsx(CheckCircle2, { className: "h-4 w-4" }), "Approve on-chain"] }), _jsxs("button", { className: "btn-danger", disabled: chainBusy, onClick: () => rejectChain(l), children: [_jsx(XCircle, { className: "h-4 w-4" }), "Reject"] })] })] })] }, l.id));
                             })] })) : null, filtered.length === 0 && chainLoans.length === 0 && !loading ? (_jsx(EmptyState, { icon: Inbox, title: "No pending loan requests", description: "When a borrower submits a request funded by your bank, it will appear here." })) : (_jsx("div", { className: "space-y-3", children: filtered.map((l) => {
                             const borrower = l.borrowerId ? borrowers[l.borrowerId] : undefined;
                             const isOpen = expanded === l.id;

@@ -1,0 +1,67 @@
+<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, 'Times New Roman', 'Latin Modern Roman', serif">
+  <!-- Background -->
+  <rect x="0" y="0" width="800" height="800" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="400" y="34" text-anchor="middle" font-size="25" font-weight="bold" fill="#1a1a1a">System Architecture Overview</text>
+
+  <!-- Arrow marker defs -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 9 3, 0 6" fill="#333333"/>
+    </marker>
+  </defs>
+
+  <!-- Box 1: Smart Contracts (top-left) -->
+  <rect x="20" y="65" width="350" height="330" rx="6" fill="#eaf1fb" stroke="#4472c4" stroke-width="2"/>
+  <text x="195" y="98" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a1a">Smart Contracts</text>
+  <line x1="35" y1="112" x2="355" y2="112" stroke="#4472c4" stroke-width="1.5"/>
+  <text x="195" y="168" text-anchor="middle" font-size="17" fill="#1a1a1a">Solidity 0.8.20, OpenZeppelin</text>
+  <text x="195" y="205" text-anchor="middle" font-size="17" fill="#1a1a1a">Foundry (build, fuzz, invariants)</text>
+  <text x="195" y="242" text-anchor="middle" font-size="17" fill="#1a1a1a">Hardhat</text>
+
+  <!-- Box 2: Security & Verification (top-right) -->
+  <rect x="430" y="65" width="350" height="330" rx="6" fill="#eaf1fb" stroke="#4472c4" stroke-width="2"/>
+  <text x="605" y="98" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a1a">Security &amp; Verification</text>
+  <line x1="445" y1="112" x2="765" y2="112" stroke="#4472c4" stroke-width="1.5"/>
+  <text x="605" y="168" text-anchor="middle" font-size="17" fill="#1a1a1a">Slither (static), Mythril (symbolic)</text>
+  <text x="605" y="205" text-anchor="middle" font-size="17" fill="#1a1a1a">Echidna (property fuzz)</text>
+  <text x="605" y="242" text-anchor="middle" font-size="17" fill="#1a1a1a">Halmos / Certora (formal)</text>
+
+  <!-- Box 3: Off-chain Backend (bottom-right) -->
+  <rect x="430" y="450" width="350" height="330" rx="6" fill="#eaf1fb" stroke="#4472c4" stroke-width="2"/>
+  <text x="605" y="483" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a1a">Off-chain Backend</text>
+  <line x1="445" y1="497" x2="765" y2="497" stroke="#4472c4" stroke-width="1.5"/>
+  <text x="605" y="555" text-anchor="middle" font-size="17" fill="#1a1a1a">Express.js API, PostgreSQL,</text>
+  <text x="605" y="588" text-anchor="middle" font-size="17" fill="#1a1a1a">event listener</text>
+  <text x="605" y="625" text-anchor="middle" font-size="17" fill="#1a1a1a">FastAPI ML service (RF + IF +</text>
+  <text x="605" y="658" text-anchor="middle" font-size="17" fill="#1a1a1a">stacking, SHAP)</text>
+
+  <!-- Box 4: Frontend & Oracle (bottom-left) -->
+  <rect x="20" y="450" width="350" height="330" rx="6" fill="#eaf1fb" stroke="#4472c4" stroke-width="2"/>
+  <text x="195" y="483" text-anchor="middle" font-size="20" font-weight="bold" fill="#1a1a1a">Frontend &amp; Oracle</text>
+  <line x1="35" y1="497" x2="355" y2="497" stroke="#4472c4" stroke-width="1.5"/>
+  <text x="195" y="555" text-anchor="middle" font-size="17" fill="#1a1a1a">React + TypeScript dashboard,</text>
+  <text x="195" y="588" text-anchor="middle" font-size="17" fill="#1a1a1a">MCP agent</text>
+  <text x="195" y="625" text-anchor="middle" font-size="17" fill="#1a1a1a">Chainlink Functions / Automation</text>
+  <text x="195" y="658" text-anchor="middle" font-size="17" fill="#1a1a1a">Price Feed / PoR</text>
+
+  <!-- Arrow 1: Box1 -> Box2 (horizontal, top row) -->
+  <line x1="370" y1="230" x2="423" y2="230" stroke="#333333" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+
+  <!-- Arrow 2: Box2 -> Box3 (vertical, right column) -->
+  <line x1="605" y1="395" x2="605" y2="443" stroke="#333333" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+
+  <!-- Arrow 3: Box3 -> Box4 (horizontal, bottom row, right to left) -->
+  <line x1="430" y1="615" x2="377" y2="615" stroke="#333333" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+
+  <!-- Step numbers on arrows -->
+  <circle cx="396" cy="215" r="13" fill="#4472c4"/>
+  <text x="396" y="220" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">1</text>
+
+  <circle cx="622" cy="419" r="13" fill="#4472c4"/>
+  <text x="622" y="424" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">2</text>
+
+  <circle cx="403" cy="600" r="13" fill="#4472c4"/>
+  <text x="403" y="605" text-anchor="middle" font-size="14" font-weight="bold" fill="#ffffff">3</text>
+</svg>

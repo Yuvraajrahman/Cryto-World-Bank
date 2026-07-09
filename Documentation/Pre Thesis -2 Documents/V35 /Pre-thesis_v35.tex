@@ -2983,66 +2983,34 @@ For stability, lightweight data indexing strategies are used to reduce complexit
 \section{Performance Evaluation}
 \label{sec:performance-evaluation}
 \label{sec:eval-method}
-
-\subsection{Verification and Validation}
 \label{sec:verification-validation}
-
-\begin{itemize}[noitemsep]
-\item \textbf{Verification} --- Hardhat tests in \texttt{test/}; Vitest suites in \texttt{backend/tests/}; Foundry fuzz (Section~\ref{sec:foundry}).
-\item \textbf{Validation} --- supervisor gates G1--G4; BCCC benchmarks (Table~\ref{tab:ml-bccc-results}, Figure~\ref{fig:ml-eval}).
-\end{itemize}
-
-\begin{figure}[H]
-\centering
-\BalancedDiagram{Ch4_rq2-latency-plan}
-\caption[RQ2 latency and gas measurement plan]{RQ2 latency and gas measurement plan}
-\label{fig:rq2-latency-plan}
-\end{figure}
-
-\subsection{Explainability Methodology}
-\label{sec:ml-explainability}
-\label{sec:ml-evaluation}
-
-Figure~\ref{fig:ml-explainability} summarises the explainability and anomaly-detection flow.
-
-\begin{figure}[H]
-\centering
-\BalancedDiagram{fig-ml-explainability}
-\caption[Explainability and anomaly-detection flow]{Explainability and anomaly-detection flow}
-\label{fig:ml-explainability}
-\end{figure}
-
-\subsection{Foundry Invariant and Fuzz Test Suite}
 \label{sec:foundry}
 
 \begin{itemize}[noitemsep]
-\item Solvency: \(\mathrm{totalOutstandingLoans} \le \mathrm{getTotalReserve}\).
-\item Role segregation: no address holds both BORROWER\_ROLE and BANK\_APPROVER\_ROLE.
-\item Capital-flow direction: cross-tier allocations cannot decrease totalReserve below the minimum ratio at any single transaction boundary.
+\item \textbf{Verification:} Hardhat contract tests (\texttt{test/}, 42 cases); Vitest API tests (\texttt{backend/tests/}); Foundry invariants (solvency, role segregation, capital-flow direction) in Phase~IV.
+\item \textbf{Validation:} Phase gates G1--G4; BCCC fraud benchmarks (Table~\ref{tab:ml-bccc-results}, Figure~\ref{fig:ml-eval}).
 \end{itemize}
 
-\subsection{Implementation Evidence and Traceability}
 \label{sec:implementation-evidence}
 
 \begin{table}[H]
 \centering
-\caption[Pre-thesis implementation evidence]{Pre-thesis implementation evidence (repository root).}
+\caption[Implementation evidence]{Implementation evidence (repository root).}
 \label{tab:implementation-evidence}
 \small
 \begin{tabular}{@{}p{3.2cm}p{4.4cm}p{6.6cm}@{}}
 \toprule
 \tableheadcolor
-\textbf{Component} & \textbf{Path} & \textbf{Status at pre-thesis} \\
+\textbf{Component} & \textbf{Path} & \textbf{Status} \\
 \midrule
-Smart contracts & \texttt{contracts/*.sol} & WorldBankReserve, NationalBank, LocalBank specified and compilable \\
-Contract tests & \texttt{test/*.test.ts} & 42 Hardhat unit/integration cases across four suites \\
-Backend API & \texttt{backend/src/} & Express routes for loans, banks, auth, income \\
-API tests & \texttt{backend/tests/} & Vitest suites for auth, banks, loans, chat, income \\
-Frontend DApp & \texttt{frontend/src/} & React shell with Wagmi wallet connect \\
-ML training pipeline & \texttt{Documentation/.../ML pipeline - Mac M4/} & BCCC subsample trained; \texttt{artifacts/metrics.json} \\
-ML evidence pack & \texttt{Documentation/.../evidence/mac-m4/} & Figures + \texttt{metrics.json} copied for thesis \\
-ML service stub & \texttt{ml-service/app/} & FastAPI \texttt{/health}, \texttt{/score} scaffold \\
-Deploy scripts & \texttt{scripts/deploy.ts} & Sepolia/Amoy/local deploy ready \\
+Smart contracts & \texttt{contracts/*.sol} & World/National/Local Bank compilable \\
+Contract tests & \texttt{test/*.test.ts} & 42 Hardhat cases (four suites) \\
+Backend API & \texttt{backend/src/} & Loans, banks, auth, income routes \\
+API tests & \texttt{backend/tests/} & Vitest auth, banks, loans, chat \\
+Frontend & \texttt{frontend/src/} & React + Wagmi wallet shell \\
+ML pipeline & \texttt{Documentation/.../ML pipeline - Mac M4/} & BCCC subsample; \texttt{metrics.json} \\
+ML service & \texttt{ml-service/app/} & FastAPI \texttt{/health}, \texttt{/score} scaffold \\
+Deploy & \texttt{scripts/deploy.ts} & Sepolia/Amoy/local ready \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3050,25 +3018,46 @@ Deploy scripts & \texttt{scripts/deploy.ts} & Sepolia/Amoy/local deploy ready \\
 \section{Analysis of Design Solutions}
 \label{sec:analysis-design-solutions}
 
+\begin{table}[H]
+\centering
+\caption[Design selection vs.\ CO6 factors]{Selected design vs.\ CO6 evaluation factors.}
+\label{tab:co6-selection-summary}
+\small
+\begin{tabular}{@{}p{2.2cm}p{3.6cm}p{4.0cm}p{4.4cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Factor} & \textbf{Selected} & \textbf{Evidence} & \textbf{Status} \\
+\midrule
+Cost & \$0 prototype; L2 gas ${\approx}$\$0.011/loan & Tables~\ref{tab:economic-feasibility},~\ref{tab:gas-cost} & Met \\
+Efficiency & Off-chain ML; single-chain & NFR-01; Phase~IV gas table & ML trained; live p95 pending \\
+Usability & React + wallet; MCP agent & NFR-05; FR-08 & UI shell; agent Phase~III \\
+Impact & Tier-transparent flow; group lending & Section~\ref{sec:societal-impact} & Specified \\
+Sustainability & PoS testnets; off-chain ML & Section~\ref{sec:environmental-impact} & Qualitative \\
+Maintainability & Monorepo; OpenZeppelin; G1--G4 & Table~\ref{tab:implementation-evidence} & 42 tests passing \\
+Performance & RF+IF+stacking; F1\,=\,0.891 & Table~\ref{tab:ml-bccc-results} & Benchmark met; E2E Phase~II--IV \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Requirements Traceability Matrix}
 \label{sec:traceability}
 
 \begin{table}[H]
 \centering
-\caption[Requirements traceability matrix (excerpt)]{Requirements traceability matrix (excerpt).}
+\caption[Requirements traceability (excerpt)]{Requirements traceability matrix (excerpt).}
 \label{tab:traceability}
 \footnotesize
 \begin{tabular}{@{}p{1.1cm}p{2.6cm}p{2.8cm}p{2.6cm}p{3.2cm}@{}}
 \toprule
 \tableheadcolor
-\textbf{Req.} & \textbf{Use case / diagram} & \textbf{Module} & \textbf{Test / evidence} & \textbf{MVT item} \\
+\textbf{Req.} & \textbf{Use case / diagram} & \textbf{Module} & \textbf{Test / evidence} & \textbf{MVT} \\
 \midrule
 FR-01 & Figure~\ref{fig:four-tier} & \texttt{WorldBankReserve.sol} & \texttt{hierarchy.test.ts} & \#1 \\
-FR-02 & Figures~\ref{fig:act-lending},~\ref{fig:seq-loan-flow} & \texttt{LocalBank.sol}, backend loans route & \texttt{LocalBank.test.ts}, \texttt{loans.test.ts} & \#2--3 \\
-FR-04 & Table~\ref{tab:integrity-constraints} & \texttt{BORROWING\_LIMIT} + SBT & Planned Foundry invariant & \#5 \\
-FR-05 & Figure~\ref{fig:ml-oracle-commit-reveal} & \texttt{ml-service/}, Mac M4 pipeline & Table~\ref{tab:ml-bccc-results} & \#4, \#8 \\
-FR-07 & Figures~\ref{fig:dfd-level0-lending}--\ref{fig:dfd-level1-lending} & Event listener (planned) & PostgreSQL projection tests & DT-I.12--13 \\
-FR-08 & Figure~\ref{fig:seq-chat-bot} & MCP agent (Phase III) & Section~\ref{sec:optional-agent} & \#11--12 \\
+FR-02 & Figures~\ref{fig:act-lending},~\ref{fig:seq-loan-flow} & \texttt{LocalBank.sol}, loans API & \texttt{LocalBank.test.ts} & \#2--3 \\
+FR-04 & Table~\ref{tab:integrity-constraints} & \texttt{BORROWING\_LIMIT} + SBT & Foundry invariant (planned) & \#5 \\
+FR-05 & Figure~\ref{fig:ml-oracle-commit-reveal} & \texttt{ml-service/} & Table~\ref{tab:ml-bccc-results} & \#4, \#8 \\
+FR-07 & Figures~\ref{fig:dfd-level0-lending}--\ref{fig:dfd-level1-lending} & Event listener & PostgreSQL tests & DT-I.12--13 \\
+FR-08 & Figure~\ref{fig:seq-chat-bot} & MCP agent & Section~\ref{sec:optional-agent} & \#11--12 \\
 NFR-02 & Table~\ref{tab:defense-layers} & OpenZeppelin RBAC & \texttt{WorldBankReserve.test.ts} & \#13--14 \\
 \bottomrule
 \end{tabular}
@@ -3078,47 +3067,31 @@ NFR-02 & Table~\ref{tab:defense-layers} & OpenZeppelin RBAC & \texttt{WorldBankR
 \label{sec:final-design-adjustments}
 \label{sec:bridge}
 
-An initial design considered multi-chain deployment bridging Polygon zkEVM and Ethereum Sepolia to distribute retail and institutional traffic across separate networks. This approach was revised after security analysis identified cross-chain bridges as the highest-risk attack surface in DeFi---accounting for over \$1.1~billion in documented losses through Ronin (\$625M), Wormhole (\$320M), and Nomad (\$190M) exploits in 2022 alone. The revised architecture consolidates \textbf{all live contract deployment on a single EVM chain}. Polygon zkEVM remains the design-preference target (ZK validity proofs verified on Ethereum~L1), while the prototype implementation may deploy to stable public EVM testnets such as Ethereum Sepolia (primary) and/or Polygon Amoy PoS (secondary) for operational stability, without changing the contract logic or the single-chain assumption.
-
-Ethereum Sepolia is retained in the testing plan as a stable public EVM testnet option for prototype deployment when required, with no live asset bridge between networks. This simplification reduces attack surface and keeps Phases~I--II deliverable within the project timeline. Chen et al.~[31] validate multi-chain lending feasibility in the literature; the CWB adopts their throughput lessons without deploying a live CCIP or LayerZero bridge. Credit Passport SBT state, borrowing-limit enforcement, and loan lifecycle data remain single-chain on the chosen prototype testnet.
+Multi-chain bridging (Sepolia $\leftrightarrow$ zkEVM) was rejected due to bridge attack surface. \textbf{Final design:} single-chain deployment on Sepolia/Amoy; Polygon zkEVM Cardona remains the design-preference target without a live cross-chain bridge. Details in Tables~\ref{tab:design-decisions},~\ref{tab:design-alternatives-criteria} (Chapter~\ref{ch:design-alternatives}).
 
 \section{Statistical Analysis}
 \label{sec:statistical-analysis}
 
 \subsection{Datasets and Benchmark Results}
 \label{sec:ml-workload}
+\label{sec:ml-explainability}
+\label{sec:ml-evaluation}
 
 \begin{table}[H]
 \centering
-\caption[Datasets used for ML risk scoring]{Datasets used for ML risk scoring (RQ3).}
-\label{tab:ml-datasets}
-\begin{tabular}{p{3.4cm}p{2.2cm}p{7.6cm}}
-\toprule
-\tableheadcolor
-\textbf{Dataset} & \textbf{Role} & \textbf{Usage in this project} \\
-\midrule
-BCCC-DeFiFraudTrans-2025~[99] & Primary (supervised) & 50k-address subsample; held-out metrics in Table~\ref{tab:ml-bccc-results}; full corpus deferred to Phase~III \\
-Elliptic Bitcoin Dataset~[68] & Baseline comparison & Secondary benchmark only; domain mismatch acknowledged \\
-On-chain CWB transaction log (future) & Production retrain & Local Bank history once MVT deployment has live traffic \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption[BCCC subsample benchmark (held-out test)]{BCCC-DeFiFraudTrans-2025 subsample benchmark on held-out test set (\texttt{evidence/mac-m4/metrics.json}).}
+\caption[BCCC fraud-detection benchmark]{BCCC-DeFiFraudTrans-2025 subsample benchmark (address-grouped hold-out; \texttt{evidence/mac-m4/metrics.json}). Primary dataset; Elliptic~[68] secondary only; on-chain CWB log for future retrain.}
 \label{tab:ml-bccc-results}
 \begin{tabular}{lrrrrr}
 \toprule
 \tableheadcolor
 \textbf{Split} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{ROC-AUC} & \textbf{$n_{\text{test}}$} \\
 \midrule
-Address-grouped hold-out & 0.874 & 0.908 & 0.891 & 0.991 & 5{,}140 \\
+Held-out test & 0.874 & 0.908 & 0.891 & 0.991 & 5{,}140 \\
 \bottomrule
 \end{tabular}
 
 \vspace{4pt}
-\footnotesize Confusion matrix (TN\,=\,4{,}621, FP\,=\,60, FN\,=\,42, TP\,=\,417); fraud rate ${\approx}8.7\%$; 21 behavioral features; leakage column \texttt{flag} removed.
+\footnotesize TN\,=\,4{,}621, FP\,=\,60, FN\,=\,42, TP\,=\,417; fraud rate ${\approx}8.7\%$; 21 features; leakage column \texttt{flag} removed.
 \end{table}
 
 \begin{figure}[H]
@@ -3136,34 +3109,56 @@ Address-grouped hold-out & 0.874 & 0.908 & 0.891 & 0.991 & 5{,}140 \\
 \vspace{6pt}
 \Diagram[width=0.92\linewidth]{fig-ml-shap-importance}
 
-\caption[ML evaluation and explainability benchmarks]{ML evaluation on BCCC subsample (held-out test: F1\,=\,0.891, ROC-AUC\,=\,0.991) and global SHAP feature importance.}
+\caption[ML evaluation and SHAP]{ML evaluation (F1\,=\,0.891, ROC-AUC\,=\,0.991) and SHAP feature importance.}
 \label{fig:ml-eval}
 \end{figure}
 
 \section{Comparisons and Relationships}
 \label{sec:comparisons-relationships}
 
+\begin{table}[H]
+\centering
+\caption[Selected vs.\ rejected design choices]{Selected vs.\ rejected design choices and linked metrics.}
+\label{tab:comparison-relationships}
+\footnotesize
+\begin{tabular}{@{}p{2.4cm}p{2.8cm}p{2.8cm}p{5.2cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Dimension} & \textbf{CWB (selected)} & \textbf{Rejected / baseline} & \textbf{Metric / requirement} \\
+\midrule
+Architecture & Four-tier hierarchy & Flat Aave/Compound & FR-01/FR-03; Table~\ref{tab:protocol-comparison} \\
+Settlement & Single-chain Sepolia/Amoy & Multi-chain bridge & Table~\ref{tab:gas-cost}; Section~\ref{sec:final-design-adjustments} \\
+ML delivery & Off-chain RF+IF+SHAP & On-chain-only scoring & F1\,=\,0.891; NFR-01 \\
+Oracle & Commit--reveal relay & Chainlink Functions DON & Human approver gate (FR-02) \\
+Gas & L2 Cardona (design) & Ethereum mainnet & ${\approx}$\$0.011 vs \$2.40--\$4.80 \\
+Human vs ML & Decision support & Auto-disburse & NFR-02; Section~\ref{sec:ethical-issues} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Discussion}
 \label{sec:discussion}
 \label{sec:research-limitations}
 
-\paragraph{G1 --- Compound novelty vs.\ partial counterexamples.}
-Maple Finance, Goldfinch, Morpho~V2, and Aave Arc provide partial institutional-credit precedents on individual axes~[51, 67, 71]. The defensible claim is the \textit{compound} architecture (four-tier reserve enforcement + explainable oracle ML + programmable mutual liability), not ``no prior four-tier DeFi.''
-
-\paragraph{G2 --- BCCC domain transfer.}
-Models trained on BCCC flat-pool transactions may not generalize to hierarchical CWB flows (Section~\ref{sec:ml-workload}). At pre-thesis stage, a \textit{50{,}000-address BCCC subsample} provides baseline fraud-detection metrics (F1\,=\,0.891); full-corpus training and 22-dimensional CWB feature mapping remain for final thesis. Mitigation: acknowledge the gap, benchmark on BCCC as baseline only, collect CWB testnet labels for retraining, and run feature-distribution comparison as Future Work.
-
-\paragraph{G3 --- Testnet scope as academic evidence.}
-Working testnet deployment + benchmark tables + documented specifications suffice for workshop venues (AFT, FMBC, IEEE Blockchain workshops). Full research papers additionally require controlled experiments, baselines, threat models, and reproducible public repos. This pre-thesis delivers specification and workload planning; MVT deployment provides the empirical layer.
-
-\paragraph{G4 --- Group lending external validity.}
-On-chain mutual liability is cryptographic cosigning, not social solidarity~[72, 73]. Repayment-rate claims must not cite BRAC/Grameen historical data as direct validation of smart-contract behaviour.
-
-\paragraph{G5 --- Oracle trust and economic viability.}
-Score-at-origination-only mitigates latency/cost; oracle collusion and model staleness remain open (Section~\ref{sec:ml-workload}). Certora reserve-invariant proofs are Future Work (Section~\ref{sec:future-work}); Foundry fuzz tests should list what is asserted, assumed, and out of scope~[77].
-
-\paragraph{G6 --- Preferred-creditor status and sovereign willingness to repay.}
-The default cascade in \texttt{InterBankLendingPool} and related reserve buffers resolves \textit{technical default}---insufficient escrowed collateral, missed installment flows, or reserve shortfall within the protocol. It does \textbf{not} create sovereign or institutional willingness to repay. Real multilateral development lending relies partly on preferred-creditor treatment, a diplomatic and reputational mechanism outside any smart contract's reach. CWB therefore does not claim to replicate treaty-backed enforcement or compel repayment from an unwilling institutional participant; that remains a legal and governance-layer question rather than a protocol property.
+\begin{table}[H]
+\centering
+\caption[Research limitations (summary)]{Research limitations and mitigations (summary).}
+\label{tab:research-limitations}
+\small
+\begin{tabular}{@{}p{1.0cm}p{3.2cm}p{8.0cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{ID} & \textbf{Limitation} & \textbf{Mitigation / scope} \\
+\midrule
+G1 & Partial DeFi precedents (Maple, Goldfinch) & Claim: combined four-tier + ML + group lending \\
+G2 & BCCC flat-pool training $\neq$ hierarchical CWB flows & Baseline F1 only; CWB retrain after testnet traffic \\
+G3 & Pre-thesis evidence = spec + benchmarks & MVT testnet E2E and Foundry suite (Phase~IV) \\
+G4 & On-chain group lending $\neq$ social solidarity & No BRAC/Grameen repayment claims \\
+G5 & Oracle collusion; model staleness & Commit--reveal MVP; Certora proofs in Future Work \\
+G6 & Technical default only & No sovereign preferred-creditor enforcement \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 
@@ -3173,27 +3168,22 @@ The default cascade in \texttt{InterBankLendingPool} and related reserve buffers
 
 \section{Conclusion}
 \label{sec:conclusion-summary}
-The Crypto World Bank addresses hierarchical development-finance coordination by combining a four-tier institutional reserve hierarchy, explainable oracle-mediated ML, and programmable mutual liability---capabilities absent from flat DeFi lending protocols managing over \$55~billion in TVL~[8]. At pre-thesis stage, the deliverable is formal specification plus measured ML benchmarks and contract tests; full testnet deployment is scoped to the MVT checklist (Section~\ref{sec:mvt-checklist}).
-
 \label{sec:research-contribution}
-This thesis makes four contributions: (1)~a \textit{compound} four-tier hierarchical DeFi architecture (reserve enforcement + explainable ML + mutual liability); (2)~on-chain programmable joint-liability group lending with over-indebtedness controls (Section~\ref{sec:over-indebted}); (3)~oracle-mediated AI/ML integration with SHAP and anomaly reports (Section~\ref{sec:ml-explainability}), subject to the BCCC domain-transfer gap (Section~\ref{sec:ml-workload}); and (4)~a specified compliance-aware identity pathway (zkKYC, W3C DID/VC) deferred to Future Work. Examiner limitations G1--G6 are consolidated in Section~\ref{sec:research-limitations}.
 
-With specified architecture (Chapter~\ref{ch:design-alternatives}), empirical evaluation (Chapter~\ref{ch:evaluation}), and economic analysis (Section~\ref{sec:economic-analysis}), and a phased implementation roadmap, CWB is a structurally distinct contribution to blockchain-based development finance at the \textit{specification and prototype} stage.
+This paper is a complete specification of all the core sections that will be used in development of the project. It introduces a problem--solution view of how decentralized financing can be made adaptable to the institutional layers of our traditional financing system that is not flat, rather layered. Flat DeFi is hard to be made adaptable among the general mass, so our system provides a tier-based architecture for financial flow, with the added benefit of transparency with programmable smart contracts for the betterment of the client, and less control for the capitalistic organizations. The paper shows credible studies from the past that have contributed to the field before, and uses that evidence and those architectures as proof that a tier-based DeFi system can be built with better security layers that can contribute to the development finance sector globally. The core architecture stack follows mostly a traditional DeFi financial platform build, but the AI/ML layer integration and the tier-based layers are completely novel; no other paper or project shows all four-layer integration before. This project idea is enhanced by the existing systems that have two-tier-based banking systems.
+
+A detailed plan has been introduced for how new clients can be onboarded and attracted to the platform, how clients will interact with the system, how banking authorities can approve loans, and how ML and AI layers can communicate in the middle with both clients and authorities to make this whole process of lending decentralized cryptocurrencies easier and more secure. The potential of such a decentralized system to be popular and adaptable is huge if implemented correctly and if the higher authorities show interest and invest heavily in this idea for the good of humanity. The purpose of this project is to push the idea of decentralized currencies forward for future generations to show more interest, and to support the building blocks for better financing systems in the future.
 
 \section{Future Work}
 \label{sec:future-work}
-\paragraph{MVT completion (final thesis Must).}
-\begin{enumerate}[noitemsep]
-\item End-to-end hierarchical lending on the chosen prototype testnet (World Bank $\to$ National $\to$ Local $\to$ client).
-\item Stablecoin-first deployment with USDC default at retail tiers (Section~\ref{sec:stablecoin-first}).
-\item Phase~II modules: \texttt{SavingsVault}, \texttt{FixedDeposit}, \texttt{GroupLendingPool}, \texttt{InterBankLendingPool}, \texttt{UpwardDepositFacility}.
-\item ML pipeline integration: commit--reveal oracle, Authority Brief, full BCCC retrain (Sections~\ref{sec:ml-explainability},~\ref{sec:ml-workload}).
-\item MCP conversational agent with human confirmation gate (Section~\ref{sec:optional-agent}).
-\item Foundry fuzz / invariant suite (Section~\ref{sec:foundry}).
-\item Runtime monitoring: event-listener index and reserve dashboard (Section~\ref{sec:realtime}).
-\end{enumerate}
 
-Post-MVT extensions (GNN ablation, federated learning, zkKYC circuits, Certora proofs, retail payments) are documented in the architecture chapters but are outside the graded MVT minimum.
+This section has been specified in the above chapters; it focuses on the potential of the project and the technical abilities and functional capabilities that can be improved and enhanced in the future. First priority is completing the MVT checklist of the development cycle for the defense of the project, and the rest are mostly added stretch to show how many features can be incorporated in the given time. A small summary of the future work:
+
+Deployment on Polygon zkEVM Cardona, which remains experimental for production grade currently; as zkEVM may prove to be more stable, the platform will be deployed on Polygon zkEVM as it is more cost efficient for transactional activities.
+
+Cross-tier features such as \texttt{InterBankLendingPool} and group lending, upward deposit facilities will be improved and made functional. For security and monitoring, multisig admin for World Bank operations and a live reserve transparency dashboard will be integrated. zkKYC (currently unstable globally), Certora proofs, federated learning, and GraphSAGE (quite complex to implement now) have been specified in the paper and will be more attainable with more time and effort; these have been moved to future work.
+
+This field requires much research, as financial flow is heavily manipulated and misused globally by capitalists; transparency in capital flow is vital for equal access to resources and opportunity to live in harmony. The long-term goal of this project is to evolve this developed system to a more robust level, with more proper and efficient architecture and system design, a regulation-aware system while keeping transparency, equal access, and beneficial to humanity as core design principles.
 
 
 \appendix
@@ -3600,15 +3590,6 @@ contract WorldBankReserve is ReentrancyGuard, AccessControl {
     );
 }
 \end{lstlisting}
-
-\textbf{Design annotation 1 --- \texttt{nonReentrant} on state-changing functions.}
-\texttt{allocateCapital} and \texttt{recordRepayment} both transfer ETH. OpenZeppelin's \texttt{nonReentrant} guard stops the contract from being called again before the first call finishes, which reduces reentrancy risk during those transfers. See Section~\ref{sec:kinked-rate} for the full safety review.
-
-\textbf{Design annotation 2 --- \texttt{AccessControl} mapping to RBAC design.}
-Each bank role (e.g., \texttt{NATIONAL\_BANK\_ROLE}) is assigned to specific wallet addresses by the World Bank admin. This implements the four-tier access rules in Section~\ref{sec:prototype-scope}: national banks call \texttt{recordRepayment}; only the World Bank admin calls \texttt{allocateCapital}.
-
-\textbf{Design annotation 3 --- Events enable off-chain indexing for the analytics layer.}
-The contract logs major actions such as \texttt{CapitalAllocated}, \texttt{RepaymentReceived}, and \texttt{ReserveRatioUpdated}. The backend listener copies these logs into PostgreSQL so dashboards and the fraud-detection model can use them without reading the blockchain on every query.
 
 \chapter*{Appendix E: Internal Industry Research Notes}
 \phantomsection

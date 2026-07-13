@@ -92,6 +92,10 @@ figure_canvas() {
       echo "1800 1300" ;;
     Ch4_ml-oracle-commit-reveal)
       echo "2000 1300" ;;
+    fig-ml-preprocessing-split)
+      echo "1400 1500" ;;
+    fig-ml-inference-service)
+      echo "1400 900" ;;
     Ch4_four-phase-roadmap-sdlc)
       echo "1900 1500" ;;
     Ch4_dev-verification-toolchain)
@@ -134,6 +138,18 @@ if command -v mmdc >/dev/null 2>&1; then
   else
     for mmd in "${mmd_files[@]}"; do
       name="$(basename "$mmd" .mmd)"
+      if [[ "$name" == "ERD_diagram_relational" && -f "$DIR/ERD_diagram_relational.svg" ]]; then
+        echo "skip mmdc $name (hand-authored SVG)"
+        continue
+      fi
+      if [[ "$name" == "fig-erd-core" && -f "$DIR/fig-erd-core.svg" ]]; then
+        echo "skip mmdc $name (hand-authored SVG)"
+        continue
+      fi
+      if [[ "$name" == "fig-erd-extended" && -f "$DIR/fig-erd-extended.svg" ]]; then
+        echo "skip mmdc $name (hand-authored SVG)"
+        continue
+      fi
       read -r W H <<<"$(figure_canvas "$name")"
       echo "mmdc  $name (${W}x${H})"
       mmdc -i "$mmd" -o "$DIR/${name}.pdf" "${MMC_OPTS[@]}" -w "$W" -H "$H" -e pdf -f
@@ -145,17 +161,21 @@ else
   echo "WARN: mmdc missing; skipping Mermaid PDFs" >&2
 fi
 
-if command -v rsvg-convert >/dev/null 2>&1; then
+    if command -v rsvg-convert >/dev/null 2>&1; then
   for svg in "$DIR"/*.svg; do
     [[ -f "$svg" ]] || continue
     name="$(basename "$svg" .svg)"
-    # Mermaid PDFs from mmdc keep node labels; rsvg-convert drops foreignObject text.
-    if [[ -f "$DIR/${name}.mmd" ]]; then
+    # Hand-authored SVG replaces mmdc output for the full relational ERD.
+    if [[ -f "$DIR/${name}.mmd" && "$name" != "ERD_diagram_relational" && "$name" != "fig-erd-core" && "$name" != "fig-erd-extended" ]]; then
       echo "skip rsvg $name (mmdc PDF kept)"
       continue
     fi
     echo "rsvg  $name"
-    rsvg-convert -w 1200 -f pdf -o "$DIR/${name}.pdf" "$svg"
+    if [[ "$name" == "ERD_diagram_relational" ]]; then
+      rsvg-convert -f pdf -o "$DIR/${name}.pdf" "$svg"
+    else
+      rsvg-convert -w 1200 -f pdf -o "$DIR/${name}.pdf" "$svg"
+    fi
   done
 else
   echo "WARN: rsvg-convert missing; skipping SVG PDFs" >&2

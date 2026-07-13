@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="720" viewBox="0 0 860 720" role="img" aria-label="ML inference service flow">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B1B1B"/>
+    </marker>
+    <style>
+      text { font-family: Georgia, 'Latin Modern Roman', 'Times New Roman', serif; fill: #111111; }
+      .step { font-size: 15.369px; font-weight: 600; }
+      .body { font-size: 13.972px; }
+      .box { stroke-width: 1.1; }
+      .apex { fill: #D6E4F7; stroke: #1B1B1B; stroke-width: 1.2; }
+      .mid { fill: #EAF1FB; stroke: #1B1B1B; }
+      .note { fill: #F2F4F7; stroke: #8A8A8A; stroke-width: 1; }
+      .line { stroke: #1B1B1B; stroke-width: 1.1; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="860" height="720" fill="#FFFFFF"/>
+
+  <rect class="box apex" x="130" y="20" width="600" height="88" rx="2"/>
+  <text class="step" x="430" y="52" text-anchor="middle">1. Loan request input</text>
+  <text class="body" x="430" y="84" text-anchor="middle">amount, term, defaults, income, transaction activity</text>
+
+  <rect class="box mid" x="100" y="132" width="660" height="100" rx="2"/>
+  <text class="step" x="430" y="164" text-anchor="middle">2. Backend and ML service</text>
+  <text class="body" x="430" y="194" text-anchor="middle">Express.js /api/risk/score to FastAPI /v1/score and /v1/brief</text>
+  <text class="body" x="430" y="224" text-anchor="middle">trained model files loaded, or fallback for local testing</text>
+
+  <rect class="box mid" x="80" y="256" width="700" height="112" rx="2"/>
+  <text class="step" x="430" y="288" text-anchor="middle">3. Scoring pipeline</text>
+  <text class="body" x="430" y="318" text-anchor="middle">22-dim CWB feature vector</text>
+  <text class="body" x="430" y="348" text-anchor="middle">Random Forest + Isolation Forest + logistic regression stack</text>
+
+  <rect class="box apex" x="60" y="392" width="740" height="112" rx="2"/>
+  <text class="step" x="430" y="424" text-anchor="middle">4. Risk outputs and explainability</text>
+  <text class="body" x="430" y="454" text-anchor="middle">risk score, anomaly score, APPROVE / REVIEW / REJECT</text>
+  <text class="body" x="430" y="484" text-anchor="middle">SHAP top-six reasons for approver review</text>
+
+  <rect class="box note" x="100" y="528" width="660" height="100" rx="2"/>
+  <text class="step" x="430" y="560" text-anchor="middle">5. Approver brief and on-chain commit</text>
+  <text class="body" x="430" y="590" text-anchor="middle">Authority Brief for bank approvers</text>
+  <text class="body" x="430" y="620" text-anchor="middle">commit-reveal oracle stores hash on-chain</text>
+
+  <line class="line" x1="430" y1="108" x2="430" y2="128"/>
+  <line class="line" x1="430" y1="232" x2="430" y2="252"/>
+  <line class="line" x1="430" y1="368" x2="430" y2="388"/>
+  <line class="line" x1="430" y1="504" x2="430" y2="524"/>
+</svg>

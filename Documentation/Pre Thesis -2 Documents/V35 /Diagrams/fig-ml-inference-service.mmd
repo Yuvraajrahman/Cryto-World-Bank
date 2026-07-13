@@ -1,0 +1,17 @@
+%%{init: {"theme": "base", "flowchart": {"htmlLabels": true, "curve": "linear", "nodeSpacing": 20, "rankSpacing": 28, "padding": 6, "useMaxWidth": false}, "themeVariables": {"fontSize": "15px"}} }%%
+flowchart TB
+
+  I1["1. Loan request input<br/>amount, term, defaults, income, activity"]
+  I2["2. Backend and ML service<br/>Express /api/risk/score to FastAPI /v1/score and /v1/brief<br/>trained models or fallback"]
+  I3["3. Scoring pipeline<br/>22-dim CWB features<br/>RF + IF + logistic stack"]
+  I4["4. Risk outputs and explainability<br/>risk score, anomaly score, APPROVE / REVIEW / REJECT<br/>SHAP top-six reasons"]
+  I5["5. Approver brief and on-chain commit<br/>Authority Brief + commit-reveal hash"]
+
+  I1 --> I2 --> I3 --> I4 --> I5
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef note fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class I1,I4 apex;
+  class I2,I3 mid;
+  class I5 note;

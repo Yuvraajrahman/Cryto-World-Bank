@@ -94,12 +94,8 @@
   \fi
 }
 \makeatother
-\newcommand{\TableScreenshotEnd}[2][]{%
-  \refstepcounter{table}%
-  \if\relax\detokenize{#1}\relax\else\label{#1}\fi%
-  \phantomsection%
-  \addcontentsline{lot}{table}{\protect\numberline{\thetable}#2}%
-}
+% Legacy hook for optional appendix table screenshots (no List of Tables entry).
+\newcommand{\TableScreenshotEnd}[2][]{}
 \usepackage[table]{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric,calc}
@@ -598,6 +594,8 @@ We would like to express our sincere gratitude to our panel members for their gu
     \item[Isolation Forest score:] \(s(x, n) = 2^{-E(h(x))/c(n)}\)
     \item[Random Forest fraud probability:] \(P(\text{fraud}\mid x) = \frac{1}{T}\sum_{t=1}^{T} f_t(x)\)
     \item[Net interest split:] \(\text{NetInterest} = \text{InterestCollected} - \text{DepositorYield} - \text{InsuranceAllocation}\)
+    \item[Net present value (NPV):] \(\mathrm{NPV}=\sum_{t=0}^{3}\frac{B_t-C_t}{(1+r)^t}\)
+    \item[Return on investment (ROI):] \(\mathrm{ROI}=\frac{\sum_{t=0}^{3}B_t-\sum_{t=0}^{3}C_t}{\sum_{t=0}^{3}C_t}\times 100\%\)
     \item[SHAP (Shapley value):] \(\phi_i = \sum_{S \subseteq F \setminus \{i\}} \frac{|S|!(|F|-|S|-1)!}{|F|!}\left[f(S \cup \{i\}) - f(S)\right]\)
 \end{description}
 \newpage
@@ -685,8 +683,8 @@ The system is designed for three categories of participant: a programmable World
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch1_system-overview-four-tier-stack}
-\caption[Crypto World Bank system overview]{Crypto World Bank system overview}
+\BalancedDiagram{architecture_diagram_fixed}
+\caption[System overview]{System overview.}
 \label{fig:intro-system-overview}
 \end{figure}
 
@@ -702,19 +700,6 @@ Smart-contracts can develop lending rules as immutable, atomic, with auditable o
 
 \paragraph{Optional conversational interface.}
 Every user interacts with this system primarily through the React UI and wallet credential signing. For development purposes and demonstration, a locally hosted agent (Qwen3-8B + MCP, 17 banking tools) provides an alternate path to get the essential tasks done, including all the customer services that require system interaction information guidance and assistance in acquiring a loan or exchange finances with the system. In the final build it is planned to be replaced with secured API-based services.
-
-\paragraph{Technical foundations.}
-\label{sec:blockchain-fundamentals}
-
-\textbf{Consensus.} The chain is an append-only ledger: nodes agree on history, and no one can rewrite past blocks without controlling most of the network~[50].
-
-\textbf{EVM execution~[104].} Loan logic runs as deterministic bytecode on Ethereum-compatible chains. Storage writes are the main cost driver (Section~\ref{sec:gas-cost}).
-
-\textbf{State machines.} Each loan moves through clear stages---\texttt{PENDING} $\to$ \texttt{APPROVED} $\to$ \texttt{ACTIVE} $\to$ \texttt{REPAYING} $\to$ \texttt{COMPLETED/DEFAULTED}---with only authorised roles allowed to advance it.
-
-\textbf{Oracles~[45, 96].} Contracts cannot read off-chain data on their own. ML risk scores reach the chain via a commit-reveal oracle (Section~\ref{sec:oracle-architecture}); Chainlink Feeds, Automation, and Proof of Reserve handle prices, due-date checks, and reserve attestation. Live ML wiring starts after pre-thesis~2.
-
-\textbf{Polygon zkEVM.} We deploy on Cardona testnet (Section~\ref{sec:high-level-arch}) for low fees and L1-backed validity proofs.
 
 \section{Rationale and Motivation}
 \label{sec:rationale}
@@ -766,24 +751,9 @@ Banks also borrow from peers, park surplus with parent tiers, and syndicate larg
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{Ch1_cross-tier-lending-flows}
-\caption[Cross-tier lending flow directions]{Cross-tier lending flow directions}
+\BalancedDiagram{fund_flow_diagram_v2}
+\caption[Cross-tier lending flows]{Cross-tier lending flows.}
 \label{fig:cross-tier-lending}
-\end{figure}
-
-
-
-\paragraph{Can a group of entities lend or fund together?}\label{par:group-entities}
-Syndicated loans, solidarity groups, tranched pools, and upward surplus deposits (Figure~\ref{fig:multi-entity-cofunding}; Section~\ref{sec:multi-entity}) coexist with same-tier peer liquidity pools (Section~\ref{sec:interbank-pool}); retail clients enter through Local Banks via KYC, Credit Passport, and borrowing limits, with syndication reserved for large loans.
-
-
-
-
-\begin{figure}[H]
-\centering
-\BalancedDiagram{Ch3_multi-entity-cross-tier-operations}
-\caption[Multi-entity co-funding mechanisms]{Multi-entity co-funding mechanisms: syndicated loan, solidarity group, tranched pool, and upward deposit}
-\label{fig:multi-entity-cofunding}
 \end{figure}
 
 \section{Methodology in Brief}
@@ -806,18 +776,6 @@ There are four Agile phases to this methodology for this project. This report is
 \paragraph{Stablecoin-first lending.}
 \label{sec:stablecoin-first}
 Retail clients are not to be carrying high-priced positions like ETH, since the prices of Ethereum might fluctuate. MiCA and the U.S. GENIUS Act support the idea that stablecoins should be more generalized for authorized cryptocurrency. There are many settlement projects like \textit{mBridge} and \textit{Agora}~[61, 62], moving the value of cryptocurrencies across borders, but it is not a replacement for our lending system. The architectural system for stablecoin pools and L2 deployment (Section~\ref{sec:bridge}) gives the liquidity move fluidly from the top tier to the bottom, and the surplus to go up from the bottom.
-
-\section{Thesis Organization}
-\label{sec:thesis-organization}
-
-\begin{itemize}[noitemsep]
-\item \textbf{Ch.~1 --- Introduction:} problem, objectives, approach (\textbf{CO1}).
-\item \textbf{Ch.~2 --- Literature:} PRISMA review and protocol comparison (\textbf{CO9}).
-\item \textbf{Ch.~3 --- Specifications and impact:} requirements, societal/environmental impact, ethics, project management, economics (\textbf{CO2--4}, \textbf{CO10--12}).
-\item \textbf{Ch.~4 --- Design alternatives:} design process, preliminary architecture, technology choices (\textbf{CO5}).
-\item \textbf{Ch.~5 --- Evaluation and analysis:} performance evaluation, design analysis, discussion (\textbf{CO6--7}).
-\item \textbf{Ch.~6 --- Conclusion:} summary, contributions, and future work; appendices hold contracts and deployment notes.
-\end{itemize}
 
 %% CHAPTER 2: LITERATURE REVIEW
 \chapter{Literature Review}
@@ -875,7 +833,7 @@ Lastly, for an optional feature to our project, future studies can be made and f
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.08}
-\caption[Literature review summary (Part 1 of 2)]{Literature review summary (Part 1 of 2)}
+\caption[Literature review summary (1/2)]{Literature review summary (1/2).}
 \label{tab:lit-summary}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{6.8cm}@{}}
@@ -904,7 +862,7 @@ Liao et al.\ (2019) [106] · Audit automation & Classification + fuzzing & Workf
 \footnotesize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{1.08}
-\caption[Literature review summary (Part 2 of 2)]{Literature review summary (Part 2 of 2)}
+\caption[Literature review summary (2/2)]{Literature review summary (2/2).}
 \label{tab:lit-summary-b}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{6.8cm}@{}}
@@ -962,7 +920,7 @@ TVL / Status (2026) & \$26B & \$1.4B & \$10B & \$2.6B & \$680M & Planning \\
 \bottomrule
 \end{tabular}%
 }
-\caption[Protocol comparison on eleven architectural dimensions]{Protocol comparison on eleven architectural dimensions}
+\caption[Protocol comparison]{Protocol comparison.}
 \label{tab:protocol-comparison}
 \label{sec:comparative-protocol}
 \end{table}
@@ -989,7 +947,7 @@ The functional and non-functional requirements are shown in Table~\ref{tab:funct
 
 \begin{table}[H]
 \centering
-\caption[Functional requirements (representative)]{Functional requirements (representative subset). Full feature inventory in Table~\ref{tab:feature-list}.}
+\caption[Functional requirements]{Functional requirements.}
 \label{tab:functional-requirements}
 \small
 \begin{tabular}{@{}p{1.2cm}p{4.2cm}p{8.8cm}@{}}
@@ -1077,7 +1035,7 @@ Table~\ref{tab:feature-list} lists the complete list of features of the full pro
 \setlength{\tabcolsep}{3.5pt}
 \renewcommand{\arraystretch}{0.88}
 \begin{longtable}{@{}>{\centering\arraybackslash}p{0.5cm}>{\raggedright\arraybackslash}p{9.0cm}>{\raggedright\arraybackslash}p{2.2cm}>{\centering\arraybackslash}p{1.6cm}@{}}
-\caption[Complete feature inventory]{Complete feature inventory by category, priority, and implementation phase.}
+\caption[Feature inventory]{Feature inventory.}
 \label{tab:feature-list} \\
 \toprule
 \tableheadcolor
@@ -1313,7 +1271,7 @@ Phase~I focuses on the foundation layers, such as the smart contracts of World B
 \enlargethispage{1.1cm}
 \begin{table}[H]
 \centering
-\caption[Phase I task register]{Phase I task register: smart contract and database foundation.}
+\caption[Phase I task register]{Phase I task register.}
 \label{tab:phaseI-contracts}
 \scriptsize
 \setlength{\tabcolsep}{2.5pt}
@@ -1335,7 +1293,7 @@ DT-I.08 & Should & Chainlink Price Feeds (fiat/USD, ETH/USD via \texttt{Aggregat
 DT-I.09 & Should & Chainlink Proof of Reserve --- WorldBankReserve attestation & 2 \\
 DT-I.10 & Should & Append-only \texttt{audit\_logs} PostgreSQL role + RLS policies & 2 \\
 DT-I.11 & Could & Polygon zkEVM Cardona migration --- RPC, chain IDs, factory addresses & 1 \\
-DT-I.12 & Must & Phase~I schema migration --- 13 M1 tables (Section~\ref{sec:db-impl-tiers}); M2/M3/stub tables deferred & 4 \\
+DT-I.12 & Must & Phase~I schema migration --- 13 M1 tables; M2/M3/stub tables deferred & 4 \\
 DT-I.13 & Must & Core indexes and referential integrity constraints & 2 \\
 DT-I.14 & Must & React frontend shell --- Vite build, routing, layout components & 3 \\
 DT-I.15 & Must & WalletConnect --- connection, address display, network switching & 2 \\
@@ -1463,16 +1421,6 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--10 & Foundry, s
 \end{tabular}
 \end{table}
 
-\vspace{0.35\baselineskip}
-\noindent\begin{minipage}{\textwidth}
-\centering
-\ThesisIncludeGraphics[width=\linewidth,height=0.26\textheight,keepaspectratio]{Ch4_dev-verification-toolchain}
-\captionof{figure}[Planned development and verification toolchain]{Planned development and verification toolchain}
-\label{fig:dev-toolchain}
-\end{minipage}
-
-
-
 \subsection{SDLC Stage Mapping}
 
 \begin{table}[H]
@@ -1493,7 +1441,6 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--10 & Foundry, s
 7 & Maintenance & Monitoring; model retraining; bug fixes; iteration & Updated docs; retrained models \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{Technology Stack: Additional Alternative Evaluations}
 \end{table}
 
 
@@ -1506,7 +1453,7 @@ IV & Verification, evaluation, finalization & 14--16 & DT-IV.01--10 & Foundry, s
 \begin{table}[H]
 \centering
 \small
-\caption[Design reference versus demonstration path]{Design reference versus demonstration path and key mitigations.}
+\caption[Design vs.\ demonstration path]{Design vs.\ demonstration path.}
 \label{tab:design-vs-demo}
 \label{tab:zero-cost-risks}
 \begin{tabular}{@{}p{2.8cm}p{4.2cm}p{4.2cm}p{3.2cm}@{}}
@@ -1532,7 +1479,7 @@ Hosting & Cloud API + ML & Local stack + Vercel frontend & Cold-start / cost \\
 
 \begin{table}[H]
 \centering
-\caption[Economic feasibility --- zero-cost prototype]{Economic feasibility --- zero-cost prototype.}
+\caption[Economic feasibility]{Economic feasibility.}
 \label{tab:economic-feasibility}
 \begin{tabular}{p{4cm}p{2.5cm}p{7cm}}
 \toprule
@@ -1554,7 +1501,7 @@ Development tools & \$0 & Hardhat, VS Code, Git --- all open-source \\
 
 \begin{table}[H]
 \centering
-\caption[Gas cost and break-even assumptions]{Gas cost and break-even assumptions (Polygon zkEVM Cardona design preference).}
+\caption[Gas cost assumptions]{Gas cost assumptions.}
 \label{tab:gas-cost}
 \begin{tabular}{p{4.2cm}p{2.8cm}p{6.8cm}}
 \toprule
@@ -1579,7 +1526,7 @@ Break-even active loans & ${\approx}$200 & Covers default losses at base case \\
 
 \begin{table}[H]
 \centering
-\caption[Illustrative three-year NPV and ROI (pilot scale)]{Illustrative three-year NPV and ROI at pilot scale (300 active loans, \$25{,}000 average).}
+\caption[NPV and ROI summary]{NPV and ROI summary.}
 \label{tab:npv-roi}
 \small
 \begin{tabular}{@{}lrrrr@{}}
@@ -1593,7 +1540,7 @@ Break-even active loans & ${\approx}$200 & Covers default losses at base case \\
 3 & 96.0 & 10.0 & 86.0 & 0.751 \\
 \midrule
 \multicolumn{2}{l}{\textbf{NPV (sum of discounted net)}} & & \multicolumn{2}{r}{\textbf{\$149.6k}} \\
-\multicolumn{2}{l}{\textbf{ROI (3-yr benefits $-$ costs) / costs}} & & \multicolumn{2}{r}{\textbf{1{,}247\%}} \\
+\multicolumn{2}{l}{\textbf{ROI (3-yr benefits $-$ costs) / costs}} & & \multicolumn{2}{r}{\textbf{620\%}} \\
 \multicolumn{2}{l}{\textbf{Break-even loans (base case)}} & & \multicolumn{2}{r}{\textbf{$\approx$300}} \\
 \bottomrule
 \end{tabular}
@@ -1650,7 +1597,7 @@ Based on the Software engineering process for a blockchain project, a developmen
 
 \begin{table}[H]
 \centering
-\caption[Process model comparison]{Process model comparison and selection rationale.}
+\caption[Process model comparison]{Process model comparison.}
 \label{tab:process-model-comparison}
 \small
 \begin{tabular}{@{}p{2.4cm}p{3.2cm}p{3.2cm}p{5.4cm}@{}}
@@ -1672,21 +1619,13 @@ The project is built in the main branch from the root section. It follows a conv
 \subsection{Implementation Feasibility and Demonstration Scope}
 \label{sec:impl-feasibility}
 
-The full project scope---phase task registers (DT-I.01--IV.10), the MVT checklist (Table~\ref{tab:mvt-checklist}), and the module inventory in Chapter~\ref{ch:design-alternatives}---remains the project record. This section states what we will actually build and demo in the 16-week window using free testnets and local tools.
+Full project scope is documented with what will be completed and demonstrated before the defense, through completion of the project in the phase task registers (DT-I.01--IV.10), the MVT checklist (Table~\ref{tab:mvt-checklist}), and the module inventory in Chapter~\ref{ch:design-alternatives}. The phases have been designed with balance in mind, across the time window and complexity of tasks. All tasks are distributed across four phases; estimated completion time is 16~weeks, including all features and bug fixes. However, the demonstration prototype may be completed well before the 16-week window.
 
-Phase~I targets roughly 31 person-days of Must work for a two-person team over four weeks. That is enough for core contracts, database setup, and a basic frontend, but only if Should tasks are not treated as gate blockers. Phase~I originally listed about 30 Must person-days; the revised plan keeps the same scope but adds explicit room for testnet debugging.
+All details about phase task distribution can be found in Section~\ref{sec:impl-phase-plan}, the Chapter~3 MVT checklist (Table~\ref{tab:mvt-checklist}), and the full feature list (Table~\ref{tab:feature-list}). It covers demonstration criteria for each phase, involving frontend, backend, and conceptual theory through practical implementation of each aspect. Those details are not repeated in this section.
 
-The Phase~I (G1) demo must show:
-\begin{itemize}[noitemsep]
-\item Three tier contracts and \texttt{MockUSDC} deployed on Sepolia
-\item A working capital-flow demo (\texttt{allocateCapital} across tiers)
-\item Passing RBAC tests in Hardhat or Foundry
-\item A React dashboard connected via WalletConnect that reads live reserve balances
-\item PostgreSQL M1 tables migrated with seed data (Section~\ref{sec:db-impl-tiers})
-\item A short screen recording ($\leq$5 minutes) as the MVT~\#1 artifact
-\end{itemize}
+Features flagged as \textbf{Future Work} are designed for later delivery, given more time and manpower for stable development. Some features are over-engineered relative to the graded prototype and are retained as design depth for high-end complexity rather than MVT deliverables. Examples include: the \textbf{full 17-tool MCP suite}, which is complex and time-consuming and may require a team of 6--8 developers over several months; \textbf{GNN (GraphSAGE) ablation} and \textbf{federated learning across banks}, which belong to the research literature and could form an MSc-level research section in future; \textbf{Groth16 zkKYC / zkAML circuits}, still unstable in practice but heavily impactful for efficiency and privacy; and \textbf{NettingEngine} multilateral settlement plus \textbf{trade finance / escrow letters of credit}, which require further manual research and study.
 
-Production upgrades---Chainlink DON oracles, live USDC, full 51-table schema, and mainnet deployment---stay documented in Chapter~\ref{ch:design-alternatives} and Future Work. They are not required for the graded prototype.
+The MVT list may be enhanced while developing the project, as it is difficult to determine which experimental features will be functional. The design and concept of the project are quite novel---similar projects are not widely available online---so the experimental phases may require considerable tweaking and change based on challenges encountered during development.
 
 \section{Preliminary Design or Design (Model) Specification}
 \label{sec:preliminary-design-specification}
@@ -1702,7 +1641,7 @@ The system uses a 4-layer architecture: React for frontend, application services
 
 \begin{table}[H]
 \centering
-\caption[Four-layer architecture technical detail]{Four-layer architecture: technical components and responsibilities.}
+\caption[Four-layer architecture detail]{Four-layer architecture detail.}
 \label{tab:four-layer-arch}
 \small
 \begin{tabular}{@{}p{2.4cm}p{3.2cm}p{4.2cm}p{4.6cm}@{}}
@@ -1734,49 +1673,23 @@ On-chain &
 
 \begin{figure}[H]
 \centering
-\BalancedDiagram{fig-three-layer-arch}
-\caption[Four-layer application architecture]{Four-layer application architecture}
+\BalancedDiagram[width=0.7\linewidth,height=0.504\textheight]{fig-three-layer-arch}
+\caption[Four-layer architecture]{Four-layer architecture.}
 \label{fig:three-layer-arch}
 \end{figure}
 
-Figure~\ref{fig:component-diagram} shows component-level interactions. Core lending contracts are specified in Phase~I; extended modules are documented in Appendix~\ref{app:smart-contract-capabilities}.
+Figure~\ref{fig:component-diagram} shows a generalized interaction of the different components. This diagram will be improved during project development as more features are integrated; it is the current baseline. The component diagram and extended modules are documented in Appendix~\ref{app:smart-contract-capabilities}.
 
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-component-architecture}
-\caption[Component diagram with architecture-pattern labels]{Component diagram (planning phase): layered client--server topology with PostgreSQL repository and external oracle feeds.}
+\caption[Component diagram]{Component diagram.}
 \label{fig:component-diagram}
-\end{figure}
-
-Figures~\ref{fig:dfd-level0-lending} and~\ref{fig:dfd-level1-lending} model the core lending subsystem in Gane-Sarson notation: Level-0 (Figure~\ref{fig:dfd-level0-lending}) shows boundary flows to five external entities; Level-1 (Figure~\ref{fig:dfd-level1-lending}) decomposes Process~0 into Processes~1.0--5.0 with data stores D1--D6.
-
-\begin{figure}[H]
-\centering
-\BalancedDiagram{fig-dfd-level0-lending}
-\caption[Level-0 data-flow diagram (core lending)]{Level-0 data-flow diagram (Gane-Sarson notation): context view of the core lending subsystem and its external entities.}
-\label{fig:dfd-level0-lending}
-\label{fig:dfd-context}
-\end{figure}
-
-\LandscapeDiagram{fig-dfd-level1-lending}
-\caption[Level-1 data-flow diagram (core lending)]{Level-1 data-flow diagram (Gane-Sarson notation): decomposition of Process~0 into Processes~1.0--5.0 with data stores D1--D6.}
-\label{fig:dfd-level1-lending}
-\label{fig:dfd-suite}
-\label{fig:dfd-level1a}
-\LandscapeDiagramEnd
-
-Figure~\ref{fig:system-component-architecture} is the detailed UML-style component diagram: four layers, required interfaces (lollipop notation), and delegation between Express.js, FastAPI, MCP agent, persistence stores, and on-chain contract modules.
-
-\begin{figure}[H]
-\centering
-\TallDiagram{d1_system_component_architecture}
-\caption[System component architecture]{System component architecture: presentation, application services, persistence, and on-chain layers with interface dependencies and contract groupings.}
-\label{fig:system-component-architecture}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption[Smart contract inventory]{Smart contract inventory: seventeen modular contracts across core, product, and multi-entity modules.}
+\caption[Smart contract inventory]{Smart contract inventory.}
 \label{tab:contract-inventory}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -1812,14 +1725,14 @@ NettingEngine & Multi-entity & Future Work & ERD stubs only; Section~\ref{sec:fu
 \begin{figure}[H]
 \centering
 \ThesisIncludeGraphics[width=\linewidth,height=0.40\textheight,keepaspectratio]{fig-blockchain-stack}
-\caption[Layered blockchain and application stack]{Layered blockchain and application stack}
+\caption[Blockchain stack]{Blockchain stack.}
 \label{fig:blockchain-stack}
 \end{figure}
 
 
 \begin{table}[H]
 \centering
-\caption[Blockchain platform selection criteria and justification]{Blockchain platform selection criteria and justification.}
+\caption[Blockchain platform selection]{Blockchain platform selection.}
 \label{tab:blockchain-selection}
 \begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
 \toprule
@@ -1832,12 +1745,11 @@ Consensus & Public-testnet consensus (PoS/L1 testnet) & Stable testnet consensus
 Smart contract language & Solidity 0.8.20 & Industry standard; overflow-safe compiler; rich libraries. \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{Blockchain Platform Selection: Comparison of EVM-Compatible Networks}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption[Blockchain platform selection (continued)]{Blockchain platform selection (continued): operational and deployment factors.}
+\caption[Blockchain platform selection (cont.)]{Blockchain platform selection (cont.).}
 \label{tab:blockchain-selection-cont}
 \begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
 \toprule
@@ -1852,23 +1764,22 @@ Security model & Public-testnet security model & Testnet PoS; ZK settlement eval
 Migration path & EVM-compatible & Portable Solidity across EVM chains. \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{Blockchain Platform Selection (Continued): Operational and Deployment Factors}
 \end{table}
 
 \subsubsection{Transaction Verification and Consensus}
 
-The prototype deploys on \textbf{Ethereum Sepolia} (primary) with \textbf{Polygon Amoy} as a secondary fallback (Tables~\ref{tab:blockchain-selection}). Both are public PoS testnets with free faucets and no real-asset exposure. Polygon zkEVM Cardona remains a \textbf{design-preference} target for future ZK-anchored settlement but is not the default MVP chain. The retail loan lifecycle involves multiple on-chain state transitions per client; projected gas cost stays well below 0.01\% of interest on a representative micro-loan and is validated in Phase~IV (Section~\ref{sec:gas-cost}).
+The prototype is designed to be deployed on \textbf{Ethereum Sepolia} for the primary development route and \textbf{Polygon Amoy} as the secondary fallback (Tables~\ref{tab:blockchain-selection} and~\ref{tab:blockchain-selection-cont}). Both chains are free, development-friendly, and stable. The future target is deploying on \textbf{zkEVM}, as it is preferred for better privacy management and future-proofing. The loan lifecycle involves multiple on-chain state transitions for each client, with a complex verification process. For our chosen deployment plan with efficiency in mind, gas cost stays well below 0.01\% of interest, and the whole validation process will be implemented in Phase~IV (Section~\ref{sec:gas-cost}).
 
 \subsubsection{Oracle Architecture: Off-Chain AI to On-Chain Decision}
 \label{sec:oracle-architecture}
 
-Off-chain ML risk scores must reach the on-chain loan approval workflow without trusting a single party at decision time (the oracle problem~[40, 41]). The graded MVT path is a \textbf{commit--reveal relay}: the FastAPI scoring service commits $h = \text{keccak256}(s \,\|\, \text{nonce})$ to \texttt{LoanController}, then reveals the score~$s$ and nonce within the decision window. The contract verifies the hash and stores $s$ immutably, giving an audit trail and preventing post-commit score changes. A trusted backend relay may assist integration in Phases~I--II only.
+The goal is to run server verification with all the necessary documents, authentication, and ML-layer processing workload on servers for off-chain tasks, and send only the necessary information on-chain without trusting a single party for decision-making. This task has been added to the MVT as a \textbf{commit--reveal relay}. Backend servers process information and commit $h = \text{keccak256}(s \,\|\, \text{nonce})$ to \texttt{LoanController}, which then reveals score~$s$ and the nonce used in the decision-making process---one of the fundamental features of the project. The Solidity smart contract runs the verification--validation process on the hash and stores score~$s$ as an immutable object. This immutable record provides an auditable trail and prevents post-commit score changes for security. This oracle architecture is designed to integrate these scoring features into the smart contract and exchange information on-chain for improved security and loan/lending approval decisions.
 
-Figure~\ref{fig:oracle-architecture} summarises the authoritative MVT path and the documented Chainlink upgrade routes. Table~\ref{tab:chainlink-upgrade-paths} maps each Chainlink service to its production role and the zero-cost demonstration substitute (Section~\ref{sec:design-limitations}; Table~\ref{tab:design-vs-demo}).
+Figure~\ref{fig:oracle-architecture} shows a summary version of the authentication flow, and Chainlink upgrades have been documented. Chainlink services have been organized and their relative production-role connections are shown in Table~\ref{tab:chainlink-upgrade-paths}. The zero-cost demonstration substitutes are shown in Section~\ref{sec:design-limitations} and Table~\ref{tab:design-vs-demo}.
 
 \begin{table}[H]
 \centering
-\caption[Chainlink upgrade paths versus MVT substitutes]{Chainlink upgrade paths versus MVT demonstration substitutes.}
+\caption[Chainlink upgrade paths]{Chainlink upgrade paths.}
 \label{tab:chainlink-upgrade-paths}
 \small
 \begin{tabular}{@{}p{2.6cm}p{4.8cm}p{5.8cm}@{}}
@@ -1894,12 +1805,10 @@ Proof of Reserve &
 \end{tabular}
 \end{table}
 
-Chainlink Functions adds roughly 30--60\,s latency and a per-call fee, acceptable at loan origination but unnecessary for the graded prototype. Production contract interfaces for reserve reporting and FX conversion are specified in Appendix~D; integration code remains in the repository rather than in this chapter.
-
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-oracle-architecture}
-\caption[Oracle architecture]{Oracle architecture}
+\caption[Oracle architecture]{Oracle architecture.}
 \label{fig:oracle-architecture}
 \end{figure}
 
@@ -1907,31 +1816,20 @@ Chainlink Functions adds roughly 30--60\,s latency and a per-call fee, acceptabl
 \subsection{Data Model and Database Design}
 \label{sec:data-model}
 
-This section describes the PostgreSQL data model for Crypto World Bank. The complete logical schema defines \textbf{51 entities} in Third Normal Form (3NF); Table~\ref{tab:db-entities} summarises the \textbf{16 core entities} that drive the prototype, and Table~\ref{tab:db-entities-ext2} groups the remaining extension and stub relations by phase.
-
-The graded prototype \textbf{migrates about 32 tables} across Phases~I--III (Section~\ref{sec:db-impl-tiers}); Gate~G1 requires 13 tables only. The full 51-entity relational ERD is in Appendix~\ref{app:db-schema-reference} (Figure~\ref{fig:erd-relational}) because of its size; Figures~\ref{fig:core-system-graph} and~\ref{fig:erd-extended} below provide readable focused views of the core lending graph and banking-product extensions.
+This section describes and shows the full database schema. To incorporate all features of the project, the estimated entity count is \textbf{51} in Third Normal Form (3NF). For the prototype initial build, \textbf{16 core entities} flagged as Must have been specified clearly as essential, shown in Table~\ref{tab:db-entities}. Remaining extension and stub relation groups are shown in Table~\ref{tab:db-entities-ext2}. The full 51-entity relational ERD is moved to Appendix~\ref{app:db-schema-reference} (Figure~\ref{fig:erd-relational}) due to its size, and this figure may be heavily modified during the development phases as some entities might need more relevant subsections and extensions. Figure~\ref{fig:core-system-graph} demonstrates the core entity relationships for the prototype; banking-product extensions and their FK anchors into core lending entities are summarised in Table~\ref{tab:ext-entity-fks} (Section~\ref{sec:multi-entity-consistency}).
 
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-erd-core}
-\caption[Core system entity graph]{Core system entity graph}
+\caption[Core entity graph]{Core entity graph.}
 \label{fig:core-system-graph}
 \end{figure}
-
-\begin{figure}[H]
-\centering
-\BalancedDiagram{fig-erd-extended}
-\caption[Extended ERD: banking products]{Extended ERD: banking-product entities (crow's-foot; PK shown; entity roles in Table~\ref{tab:db-entities-ext2}).}
-\label{fig:erd-extended}
-\end{figure}
-
-Figure~\ref{fig:erd-extended} documents banking-product extensions; FK anchors into core lending entities are in Table~\ref{tab:ext-entity-fks} (Section~\ref{sec:multi-entity-consistency}).
 
 \subsubsection{Entity Summary}
 
 \begin{table}[H]
 \centering
-\caption[Core database entities]{Core database entities: primary keys and roles (Phase~I--III prototype scope).}
+\caption[Core database entities]{Core database entities.}
 \label{tab:db-entities}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -1978,7 +1876,7 @@ SESSIONS & \texttt{session\_id} & Retail agent wallet session (Phase~III); FK \t
 
 \begin{table}[H]
 \centering
-\caption[Deferred and extension entities]{Deferred and extension entities (35 relations): grouped by implementation phase. Full attribute lists are omitted; see ERD figures and Section~\ref{sec:db-impl-tiers}.}
+\caption[Deferred entities]{Deferred entities.}
 \label{tab:db-entities-ext2}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -2006,20 +1904,12 @@ Future & \texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION} & Phase~IV 
 }
 \end{table}
 
-\subsubsection{Logical Schema versus Physical Migration Tiers}
-\label{sec:db-impl-tiers}
-
-The 51-entity count describes the \textbf{complete logical data model} for architectural consistency with the seventeen-contract inventory. The graded prototype does \textit{not} require 51 physical PostgreSQL tables at Gate~G1. \textbf{Phase~I (M1, 13 tables)} covers the institution hierarchy, actors, lending lifecycle, and event sync---the Gate~G1 minimum. \textbf{Phase~II ($\sim$12 tables)} adds ledger, credit passport, and rate-tier tables plus one optional product path. \textbf{Phase~III ($\sim$7 tables)} adds ML, agent session, and security-log tables. Remaining entities stay as ERD stubs or Future Work (Table~\ref{tab:db-entities-ext2}).
-
-\paragraph{Platform-configuration relations (outside the 51-entity count).}
-\texttt{CHAIN\_REGISTRY} (deployment chain IDs, RPC endpoints, EIP-7702 delegation contract addresses) and \texttt{SESSION\_KEY\_PERMISSION} (normalised MCP tool allowlists per session) are Phase~IV platform-configuration tables. They are referenced in Sections~\ref{sec:onboarding} and~\ref{sec:optional-agent} but are \textit{not} included in the 51-entity lending schema because they hold deployment metadata rather than banking-domain state.
-
 \begin{table}[H]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.12}
-\caption[Audit and logging table taxonomy]{Audit and logging table taxonomy: separate relations for on-chain events, governance actions, ML inference, and system security.}
+\caption[Audit and logging taxonomy]{Audit and logging taxonomy.}
 \label{tab:db-audit-taxonomy}
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{4.7cm}@{}}
 \toprule
@@ -2059,7 +1949,7 @@ The 51-entity count describes the \textbf{complete logical data model} for archi
 
 \begin{table}[H]
 \centering
-\caption[EER constructs applied]{EER constructs applied: specialisation, hierarchy, and constraints.}
+\caption[EER constructs]{EER constructs.}
 \label{tab:eer-constructs}
 \begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
 \toprule
@@ -2076,22 +1966,7 @@ Participation constraint & BORROWER.\texttt{registered\_local\_bank\_id} NOT NUL
 Append-only table (policy) & AGENT\_ACTION\_LOG, AUDIT\_LOGS, SECURITY\_EVENT\_LOG & DB-level INSERT-only role + Row-Level Security policy enforces that no UPDATE or DELETE is permitted on audit records. \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{EER Constructs Applied: Specialization, Hierarchy, and Constraints}
 \end{table}
-
-\subsubsection{Normalization}
-\label{sec:normalization}
-
-The schema has been normalized to Third Normal Form (3NF) and checked against Boyce-Codd Normal Form (BCNF):
-
-\begin{itemize}[noitemsep]
-\item \textbf{1NF:} There are no repeating groups in any of the attributes. Separate entities store multi-valued attributes, such as proof of income.
-\item \textbf{2NF:} There are no partial dependencies. The full composite key (\texttt{loan\_id}, \texttt{installment\_number}) determines the non-key attributes of INSTALLMENT.
-\item \textbf{3NF:} No dependencies that go through other dependencies. Instead of storing redundant values like \texttt{total\_borrowed} in bank entities, they are calculated at query time.
-\item \textbf{BCNF:} All non-trivial functional dependencies have a superkey as their determinant. For example, in \texttt{INTEREST\_RATE\_TIER}, \texttt{tier\_id} $\to$ \{\texttt{base\_rate}, \texttt{kink\_utilisation}, \texttt{rate\_above\_kink}, \texttt{max\_rate}\}: the determinant \texttt{tier\_id} is the primary key, satisfying BCNF. Prior to the normalisation fix in this section, interest-rate parameters were columns on the three bank entities, determined by \texttt{bank\_tier\_id} (a non-key attribute), violating BCNF.
-\end{itemize}
-
-A transitive dependency was identified during schema review: \texttt{interest\_rate\_parameters} $\to$ \texttt{bank\_tier\_id} (interest rate values were stored as columns in the World Bank, National Bank, and Local Bank entities, making them dependent on a non-key attribute via the tier relationship). This violates 3NF. The fix is to extract these parameters into a dedicated \texttt{INTEREST\_RATE\_TIER} table keyed by \texttt{tier\_id}, which each bank entity references via FK. This normalisation change ensures that updating a base rate does not require touching multiple bank-tier rows.
 
 \subsubsection{Relational Integrity Constraints}
 \label{sec:integrity-constraints}
@@ -2120,19 +1995,14 @@ FOREIGN KEY & \texttt{LOAN} $\to$ \texttt{ASSETS} (collateral, loan asset); \tex
 \bottomrule
 \end{tabular}%
 }
-\TableScreenshotEnd{Relational Integrity Constraints: Referential and Domain Rules}
 \end{table}
-
-\vspace{2pt}
-\noindent\textit{\small This integrity constraints table summarizes referential and domain constraints that keep loan, repayment, and identity records consistent. These constraints reduce operational risk by preventing orphaned records and invalid lifecycle states, which is critical for auditability in financial systems.}
-
 
 \subsection{On-Chain and Off-Chain Data Partitioning}
 \label{sec:data-partitioning}
 
 \begin{table}[H]
 \centering
-\caption[Data partitioning between on-chain and off-chain storage]{Data partitioning between on-chain and off-chain storage.}
+\caption[Data partitioning]{Data partitioning.}
 \label{tab:data-partitioning}
 \begin{tabular}{p{4.5cm}p{2.5cm}p{6.5cm}}
 \toprule
@@ -2149,57 +2019,30 @@ Session key material & Off-chain (\texttt{sessions} table) & EIP-7702 session ke
 Session lineage chains (SESSIONS, message history, compression summaries) & Off-chain (PostgreSQL) & Full transcript history is too large for on-chain storage. The lineage chain enables searchable long-term memory without gas cost. \texttt{AGENT\_ACTION\_LOG} provides the on-chain audit link via confirmed transaction hashes. \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{On-Chain vs.~Off-Chain Data Partitioning: State, Analytics, and Privacy Boundaries}
 \end{table}
-
-\paragraph{Borrowing limit sync protocol.}
-Borrowing limits are enforced on-chain, but the rolling exposure that feeds those limits is derived from off-chain transaction history. When a \texttt{LoanDisbursed} or \texttt{LoanRepaid} event arrives, the event listener first records it in \texttt{TRANSACTION} and recalculates the borrower's six-month and one-year windows. If the new figure no longer matches \texttt{on\_chain\_enforced\_limit} stored in \texttt{BORROWING\_LIMIT}, the Express API submits an on-chain update through \texttt{LocalBank.updateBorrowingLimit}. Once the chain emits \texttt{BorrowingLimitUpdated}, the listener refreshes the projection row and clears any \texttt{sync\_discrepancy\_flag}, keeping the database aligned with the authoritative contract state.
-
-\paragraph{Projection vs.\ application tables.}
-The database splits cleanly between tables the application writes and tables the event listener maintains as read models. Projection tables---\texttt{CREDIT\_PASSPORT}, \texttt{CREDIT\_PASSPORT\_HISTORY}, \texttt{BORROWING\_LIMIT}, and \texttt{COLLATERAL\_POSITION}---are populated only from chain events; Express.js may read them for dashboards and API responses but cannot insert or update them directly, a rule enforced by PostgreSQL row-level security (Table~\ref{tab:integrity-constraints}). Workflow tables such as \texttt{LOAN\_REQUEST}, \texttt{CHAT\_MESSAGE}, and \texttt{PROFILE\_SETTING} remain Express-owned. \texttt{LOAN\_REQUEST} is the one hybrid case: most columns are application-writable, but \texttt{oracle\_state} is reserved for the listener, with column-level privileges preventing the API role from modifying it while still allowing the listener to track commit--reveal oracle progress independently of user-facing application state.
 
 \begin{figure}[H]
 \centering
 \ThesisIncludeGraphics[width=\linewidth,height=0.34\textheight,keepaspectratio]{fig-data-partitioning}
-\caption[On-chain versus off-chain data partitioning]{On-chain versus off-chain data partitioning}
+\caption[Data partitioning diagram]{Data partitioning diagram.}
 \label{fig:data-partitioning}
 \end{figure}
-
-\subsubsection{Financial Data Authority and Lifecycle}
-\label{sec:financial-data-lifecycle}
-
-On-chain contract state is the \textbf{authoritative source of truth} for settlement: reserve balances, loan lifecycle transitions, role bindings, and enforced borrowing limits. PostgreSQL holds workflow metadata, PII, ML inference records, and \textbf{read-only projections} synchronised from chain events by the event listener (FR-07; Section~\ref{sec:realtime}). Where the two layers disagree after a confirmed transaction, the on-chain record prevails; projection tables exist for fast queries and dashboards, not for independent financial ledgering.
-
-\paragraph{Retail loan write path.}
-The end-to-end flow for a standard retail loan is: (1)~the client submits an application (wallet-signed \texttt{requestLoan} on \texttt{LocalBank}, with optional off-chain document hash in \texttt{LOAN\_REQUEST}); (2)~the ML service scores features off-chain and the commit--reveal oracle records the risk score on-chain (Section~\ref{sec:oracle-architecture}); (3)~the Local Bank approver signs \texttt{approveLoan}, which atomically updates loan state and disburses funds; (4)~the event listener ingests \texttt{LoanRequested}, \texttt{LoanApproved}, and \texttt{LoanDisbursed} events into \texttt{BLOCKCHAIN\_EVENT\_LOG} and updates \texttt{LOAN}, \texttt{INSTALLMENT}, and projection tables (Figure~\ref{fig:seq-loan-flow}). Repayments follow the same pattern: \texttt{payInstallment} on-chain, then listener projection.
-
-\vspace{2pt}
-\noindent\textit{\small At MVT scope, loan denomination may use \texttt{MockUSDC} or native ETH on the demonstration testnet (Table~\ref{tab:design-vs-demo}); the authority rules above are unchanged---only the settlement asset differs.}
 
 \begin{figure}[H]
 \centering
 \ThesisIncludeGraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{fig-financial-data-lifecycle}
-\caption[Financial data authority and lifecycle]{Financial data authority and lifecycle: on-chain settlement state, off-chain workflow and projections, and the event-listener bridge.}
+\caption[Financial data lifecycle]{Financial data lifecycle.}
 \label{fig:financial-data-lifecycle}
 \end{figure}
-
-\subsection{Operating Context}
-\label{sec:operating-context}
-
-The Crypto World Bank is specified as a \textbf{blockchain-based institutional finance platform} on EVM-compatible infrastructure, not as a geographic pilot for a single rural market. The primary contribution is programmable hierarchical banking---reserve enforcement, tiered capital flow, on-chain auditability, and modular lending products---deployable on a stability-first prototype testnet (Ethereum Sepolia as primary, Polygon Amoy PoS as secondary). Polygon zkEVM remains an evaluated option in the platform comparison tables rather than the default prototype deployment chain narrative.
-
-Three design choices anchor the operating context. First, \textbf{stablecoin-denominated retail lending} (Section~\ref{sec:stablecoin-first}) limits liability-side volatility when collateral and loans use different asset types. Second, \textbf{low per-transaction gas cost} on zkEVM L2 makes high-frequency installment and reserve operations economically viable relative to Ethereum mainnet. Third, wallet-based onboarding (Section~\ref{sec:onboarding}) keeps retail access simple without changing contract role logic. Solidarity group lending (Section~\ref{sec:banking-products}) is a programmable product module informed by microfinance literature (BRAC, Grameen); it is not scoped to a specific country deployment. Institutional onboarding is planned through academic pilots, open-source replication, and regulatory sandbox partnerships (Section~\ref{sec:regulatory-compliance}).
 
 \subsection{User Taxonomy and Onboarding Flows}
 \label{sec:onboarding}
 \label{sec:tiered-kyc}
 \label{sec:identity}
 
-\noindent On-chain roles are bound to wallet addresses; KYC document hashes stay off-chain. Tables~\ref{tab:user-taxonomy}--\ref{tab:permission-matrix} and Figure~\ref{fig:permission-matrix} define actors and permissions. Groth16 zkKYC is Future Work (Section~\ref{sec:future-work}).
-
 \begin{table}[H]
 \centering
-\caption[Operational user taxonomy]{Operational user taxonomy: KYC level, wallet type, and data residence by user type.}
+\caption[User taxonomy]{User taxonomy.}
 \label{tab:user-taxonomy}
 \begin{tabular}{p{3.1cm}p{1.4cm}p{2.6cm}p{2.4cm}p{3.4cm}}
 \toprule
@@ -2219,7 +2062,7 @@ World Bank Admin (Governance) & Tier 1 & Founding team + supervisor attestation 
 
 \begin{table}[H]
 \centering
-\caption[Formal actor taxonomy]{Formal actor taxonomy (nine actors).}
+\caption[Actor taxonomy]{Actor taxonomy.}
 \label{tab:actor-taxonomy}
 \begin{tabular}{p{1.2cm}p{4.2cm}p{7.9cm}}
 A1a & Retail Client (pre-KYC) & Browsing only; no banking transactions. \\
@@ -2240,7 +2083,7 @@ A9 & External Auditor & Chainlink PoR verification. \\
 
 \begin{table}[H]
 \centering
-\caption[Actor permission matrix (tabular summary)]{Actor permission matrix (tabular summary of primary actions).}
+\caption[Actor permission matrix]{Actor permission matrix.}
 \label{tab:permission-matrix}
 \begin{tabular}{p{4.4cm}p{1.3cm}p{1.5cm}p{1.5cm}p{1.5cm}p{1.6cm}}
 \toprule
@@ -2267,7 +2110,7 @@ View reserve summary (public) & YES & YES & YES & YES & READ \\
 \begin{figure}[H]
 \centering
 \ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{Ch3_actor-permission-matrix}
-\caption[Actor permission matrix (primary actions)]{Actor permission matrix (primary actions)}
+\caption[Permission matrix diagram]{Permission matrix diagram.}
 \label{fig:permission-matrix}
 \end{figure}
 
@@ -2279,54 +2122,54 @@ View reserve summary (public) & YES & YES & YES & YES & READ \\
 \subsubsection{Kinked Interest Rates}
 \label{sec:kinked-rate}
 
-Borrowing cost follows a kinked utilization model (Compound/Aave pattern~[42]) with optimal utilization $U^* = 80\%$. Below the kink the rate rises gently; above it the rate jumps to incentivise repayment (Formulas~18--19, List of Formulas). Figure~\ref{fig:kinked-rate-curve} shows the curve.
+This feature is integrated into the financial flow of the banking system (Compound/Aave pattern~[42]) with optimal utilization $U^* = 80\%$. As shown in Figure~\ref{fig:kinked-rate-curve} below, the interest rate jumps when loan pool utilization reaches the 80\% margin. This method has been utilized to avoid providing excessive loans when the loan pool is at a critical level for maintaining banking functions. The model encourages repayment to keep a low rate for borrowing cryptocurrencies.
 
 \begin{figure}[H]
 \centering
 \HalfWidthDiagram{fig-kinked-rate-curve}
-\caption[Kinked utilization-based borrowing rate]{Kinked utilization-based borrowing rate}
+\caption[Kinked borrowing rate]{Kinked borrowing rate.}
 \label{fig:kinked-rate-curve}
 \end{figure}
 
 \subsubsection{Liquidation Engine}
 \label{sec:liquidation}
 
-\texttt{LiquidationEngine} monitors health factor (HF) and pays third-party liquidators a 5--8\% bonus when $HF < 1.0$. Retail over-collateralised loans use $HF = (C \times LT)/D$; group pools use pool-level HF; credit-based loans trigger SBT downgrade instead of collateral seizure. Figure~\ref{fig:liquidation-engine} summarises tier models.
+The \texttt{LiquidationEngine} is designed to monitor health factor based on collateral given by individual clients for loans and to provide bonuses of 5--8\% to liquidators when the HF score is below 1.0 ($HF < 1.0$). Pool-level shared credit is utilized for groups. When a retail client's collateral is proven to score $HF < 1.0$, their SBT is downgraded and lending score is reduced instead of collateral seizure. A summary is given in the following figure (Figure~\ref{fig:liquidation-engine}).
 
 \begin{figure}[H]
 \centering
 \HalfWidthDiagram{fig-liquidation-engine}
-\caption[LiquidationEngine tier models and lifecycle]{LiquidationEngine tier models and lifecycle}
+\caption[Liquidation engine]{Liquidation engine.}
 \label{fig:liquidation-engine}
 \end{figure}
 
 \subsubsection{Savings and Fixed Deposits}
 \label{sec:savings-vault}
 
-\texttt{SavingsVault} accepts USDC deposits with utilization-linked yield (ERC-4626). \texttt{FixedDeposit} locks principal for a fixed term (ERC-7540). Interest splits among depositor yield, \texttt{InsuranceFund}, and protocol revenue (Formula NetInterest).
+\texttt{FixedDeposit} (ERC-7540) is designed to lock currency for a set period of time. \texttt{SavingsVault} (ERC-4626) is designed to deposit stablecoins like normal savings accounts. $\text{NetInterest} = \text{InterestCollected} - \text{DepositorYield} - \text{InsuranceAllocation}$ is utilized to split interest among depositor yield, \texttt{InsuranceFund}, and protocol revenue; details are demonstrated in Figure~\ref{fig:savings-vault} below.
 
 \begin{figure}[H]
 \centering
 \ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{fig-savings-vault}
-\caption[SavingsVault and FixedDeposit closed loop]{SavingsVault and FixedDeposit closed loop}
+\caption[Savings vault]{Savings vault.}
 \label{fig:savings-vault}
 \end{figure}
 
 \subsubsection{Credit Passport (SBT)}
 \label{sec:credit-passport}
 
-Each KYC-verified client receives a non-transferable SBT~[94] encoding repayment history (\texttt{creditScore}, \texttt{riskTier}). Table~\ref{tab:credit-tiers} governs loan limits by tier; the token upgrades on full repayment and downgrades on default.
+SBT involves credit score (1--1000), risk tier (Bronze, Silver, Gold, Platinum, Diamond), and repayment history. A client is rewarded by upgrading SBT tier when their financial exchanges are remarkable or noticeably good, and punished when they cannot repay loans or do not follow the required rules to maintain a healthy account in the system. Full tier details are shown in Figure~\ref{fig:credit-passport} and Table~\ref{tab:credit-tiers}.
 
 \begin{figure}[H]
 \centering
-\HalfWidthDiagram{fig-credit-passport}
-\caption[On-chain Credit Passport SBT lifecycle]{On-chain Credit Passport SBT lifecycle}
+\ThesisIncludeGraphics[width=0.7\linewidth,keepaspectratio]{fig-credit-passport}
+\caption[Credit Passport lifecycle]{Credit Passport lifecycle.}
 \label{fig:credit-passport}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption[Credit Passport tier schedule]{Credit Passport tier schedule governing maximum loan limits and interest modifiers.}
+\caption[Credit Passport tiers]{Credit Passport tiers.}
 \label{tab:credit-tiers}
 \begin{tabular}{p{0.8cm}p{2.2cm}p{2.6cm}p{3.2cm}p{3.8cm}}
 \toprule
@@ -2349,69 +2192,68 @@ Each KYC-verified client receives a non-transferable SBT~[94] encoding repayment
 \begin{figure}[H]
 \centering
 \ThesisIncludeGraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{Ch3_multi-entity-cross-tier-operations}
-\caption[Multi-entity and cross-tier capital operations]{Multi-entity and cross-tier capital operations}
+\caption[Multi-entity operations]{Multi-entity operations.}
 \label{fig:multi-entity-ops}
 \end{figure}
 
+Besides lending down to clients, banks in the hierarchy also need to move capital sideways (between peers at the same tier), upwards (returning surplus to a parent bank), and together (sharing large loans). Figure~\ref{fig:multi-entity-ops} gives an overview. The subsections below describe five on-chain mechanisms for these flows; batch settlement netting (\texttt{NettingEngine}) is left for future work (Section~\ref{sec:future-work}).
 
-The architecture framing of multi-directional flows promises downward, same-tier, and upward lending plus bank-level syndication for large exposures. Earlier specifications left same-tier and upward flows at design-level only. A paper that claims a \emph{complete} banking system must specify these flows---and the genuinely multi-entity operations they enable---at the same depth as the downward flow. This section closes that gap with five concrete contract-and-flow specifications: a fully-specified InterBankLendingPool (Section~\ref{sec:interbank-pool}), upward surplus repatriation (Section~\ref{sec:upward-flow}), syndicated / club lending (Section~\ref{sec:syndicated-lending}), senior--junior tranched lending pools (Section~\ref{sec:tranched-pools}), and cross-tier treasury FX swap (Section~\ref{sec:treasury-fx}). Multilateral settlement netting (\texttt{NettingEngine}) is scoped to Future Work (Section~\ref{sec:future-work}). The corresponding ERD entities, contract list, implementation phase plan, and Future Work are updated downstream so the database design, software-engineering stages, and architecture remain a single consistent system.
-
-\subsubsection{InterBankLendingPool: Fully Specified Same-Tier Lending}
+\subsubsection{InterBankLendingPool: Same-Tier Lending}
 \label{sec:interbank-pool}
 
-One \texttt{InterBankLendingPool} (IBLP) per tier (\texttt{IBLP\_NB}, \texttt{IBLP\_LB}) supplies same-tier short-tenor (1/7/30-day) USDC liquidity among peer banks, gated by active tier role (Section~\ref{sec:defense-in-depth}).
+When two banks at the same tier need short-term liquidity from each other, they use an \texttt{InterBankLendingPool} (IBLP)---one pool per tier for National Banks (\texttt{IBLP\_NB}) and Local Banks (\texttt{IBLP\_LB}). Loans run for 1, 7, or 30~days in USDC, and only banks with an active role in that tier may participate (Section~\ref{sec:defense-in-depth}).
 
-\paragraph{Rate model.}
-$r_{\text{IB}}(U)$ follows the kinked curve of Section~\ref{sec:kinked-rate} (Formulas~18--19) with kink $U^{*}_{\text{IB}} = 0.90$. The interbank rate is capped by the parent-tier downward rate:
+\paragraph{Interest rate.}
+The pool borrow rate $r_{\text{IB}}(U)$ uses the same kinked curve as retail lending (Section~\ref{sec:kinked-rate}, Formulas~18--19), with utilisation kink $U^{*}_{\text{IB}} = 0.90$. It may never exceed the rate at which the parent tier lends downward, minus a small spread $\delta$ that prevents arbitrage:
 \begin{equation}
 r_{\text{IB}}(U) \le r_{\text{downward}}(U) - \delta
 \end{equation}
-\noindent $\delta$ is the governance-set spread that blocks arbitrage against the tier above; checked live via \texttt{getCurrentBorrowRate()} at each rate update.
+\noindent $\delta$ is set by governance and checked on every rate update via \texttt{getCurrentBorrowRate()}.
 
-\paragraph{Default cascade.}
-On maturity default: (1) reserve buffer debited, (2) \texttt{InsuranceFund} drawn, (3) parent tier absorbs residual and queues role suspension via TimeLock.
+\paragraph{When a borrower defaults.}
+If an interbank loan is not repaid at maturity, losses are covered in order: first from the borrower's reserve buffer, then from the \texttt{InsuranceFund}, and finally by the parent tier. Serious cases can trigger a role suspension through the TimeLock.
 
 \subsubsection{Upward Surplus Repatriation}
 \label{sec:upward-flow}
 
-Banks with reserves above the minimum by 20\% may deposit excess into the parent tier via \texttt{UpwardDepositFacility}, earning parent deposit yield. The upward rate is capped below the downward rate:
+A bank that holds more reserves than required (at least 20\% above the minimum) may place the extra funds with its parent bank through \texttt{UpwardDepositFacility} and earn deposit interest. The upward deposit rate must stay below the downward lending rate minus the same spread $\delta$:
 \begin{equation}
 r_{\text{up}} < r_{\text{down}} - \delta
 \end{equation}
-\noindent Withdrawals revert if they breach the depositor's minimum reserve ratio; daily withdrawals are capped at 20\% of outstanding upward liabilities; net upward exposure is capped at 30\% of on-chain assets.
+\noindent Withdrawals are blocked if they would push the bank below its minimum reserve ratio. Other limits: no more than 20\% of upward deposits may be withdrawn per day, and total upward exposure may not exceed 30\% of on-chain assets.
 
 \subsubsection{Syndicated and Club Lending}
 \label{sec:syndicated-lending}
 
-When single-name exposure exceeds a bank's lending ceiling, multiple banks co-fund one loan through \texttt{SyndicatedLoan}: Lead Arranger, Co-Lenders, and Borrower (client via Local Bank only). Funding requires aggregate commitments $\ge 90\%$ of \texttt{totalAmount} and Co-Lender confirmation $\ge 75\%$ by capital share. Each lender's share is recorded as \texttt{shareBps[lender][syndicateId]}; principal and interest (and default recovery) distribute pro-rata by that share.
+A single bank may not fund a very large loan alone. In a \texttt{SyndicatedLoan}, several banks share the exposure: one Lead Arranger, one or more Co-Lenders, and the Borrower (always a retail client via a Local Bank). The deal closes only when total commitments reach at least 90\% of the loan amount and Co-Lenders representing at least 75\% of committed capital agree. Each bank's share is stored on-chain; principal, interest, and any recovery after default are split in proportion to those shares.
 
 \subsubsection{Senior--Junior Tranched Lending Pools}
 \label{sec:tranched-pools}
 
-\texttt{TranchedPool} splits capital into senior (lower yield, protected) and junior (higher yield, first-loss) tranches. Repayment waterfall: senior interest $\to$ junior interest $\to$ senior principal $\to$ junior principal; losses reverse (junior written down first). Subordination ratio (junior/senior) is fixed at deposit between 10/90 and 30/70.
+A \texttt{TranchedPool} divides pooled capital into two parts. Senior tranche holders take lower risk and receive lower returns; junior tranche holders take higher risk and receive higher returns but absorb losses first. On repayment, senior interest is paid before junior interest, then senior principal before junior principal. Losses follow the reverse order. The junior-to-senior ratio must fall between 10/90 and 30/70 when the pool is created.
 
 \subsubsection{Cross-Tier Treasury FX Swap}
 \label{sec:treasury-fx}
 
-\texttt{TreasurySwap} executes oracle-priced atomic cross-asset swaps for banking-role wallets:
+Banks holding different assets can exchange them atomically through \texttt{TreasurySwap}, using oracle prices:
 \begin{equation}
 \text{Amount}_{\text{to}} = \text{Amount}_{\text{from}} \times \frac{P_{\text{from}}}{P_{\text{to}}} \times (1 - \text{spread})
 \end{equation}
-\noindent $P$ is the Chainlink feed price; treasury spread is 5--10~bps. Post-swap reserve ratio must remain above the tier minimum; swaps above \$1M require Safe two-signature confirmation.
+\noindent $P_{\text{from}}$ and $P_{\text{to}}$ come from Chainlink feeds; the treasury charges a spread of 5--10~bps. After the swap, the bank must still meet its minimum reserve ratio. Swaps above \$1M require two signatures on a Safe multisig.
 
 \subsubsection{Multilateral Settlement Netting Engine (Future Work)}
 \label{sec:netting-settlement}
 
-\noindent\textit{Future Work.} A \texttt{NettingEngine} contract to compress bilateral IBLP and \texttt{TreasurySwap} obligations into batch settlement---including partial settlement (\texttt{settlePartial}) and challenge-period dispute resolution---is listed in Section~\ref{sec:future-work}. ERD stubs (\texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}) remain in the schema for forward compatibility but are not specified at implementation depth in this report.
+\noindent\textit{Future Work.} A \texttt{NettingEngine} would combine many bilateral obligations from IBLP and \texttt{TreasurySwap} into fewer net payments, with support for partial settlement and a dispute window. This is described in Section~\ref{sec:future-work}; only placeholder database tables (\texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}) exist in the schema for now.
 
 \subsubsection{Database, Phase, and Contract Consistency for Multi-Entity Operations}
 \label{sec:multi-entity-consistency}
 
-Eight ERD entities (\texttt{INTERBANK\_LOAN}, \texttt{UPWARD\_DEPOSIT}, \texttt{SYNDICATE}, \texttt{SYNDICATE\_MEMBER}, \texttt{TRANCHED\_POOL}, \texttt{TREASURY\_SWAP}, \texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}) extend Figure~\ref{fig:erd-extended}, together with \texttt{GROUP\_CONSENT} (Phase~II, required before \texttt{GroupLendingPool}) and \texttt{TRANCHED\_POOL\_SUBSCRIPTION} (Phase~II). All institution-participant FKs anchor to \texttt{INSTITUTION.institution\_id} (Table~\ref{tab:db-entities-ext2}). Five contracts are specified at implementation depth in this report: \texttt{InterBankLendingPool}, \texttt{UpwardDepositFacility}, \texttt{SyndicatedLoan}, \texttt{TranchedPool}, and \texttt{TreasurySwap}; \texttt{NettingEngine} is Future Work (Section~\ref{sec:future-work}). Extended entities include planned \texttt{on\_chain\_address} and \texttt{last\_synced\_block} columns for event-listener mapping.
+Table~\ref{tab:ext-entity-fks} lists how the multi-entity tables link back to the core lending schema through foreign keys.
 
 \begin{table}[H]
 \centering
-\caption[FK anchors for extended and multi-entity entities]{FK anchors connecting extended entities to core schema.}
+\caption[FK anchors]{FK anchors.}
 \label{tab:ext-entity-fks}
 \small
 \begin{tabular}{@{}p{3.5cm}p{8.5cm}@{}}
@@ -2439,34 +2281,33 @@ COLLATERAL\_POSITION & \texttt{borrower\_id} $\to$ \texttt{BORROWER}; \texttt{lo
 BLOCKCHAIN\_EVENT\_LOG & Referenced by: \texttt{LOAN\_REQUEST.submission\_event\_log\_id}, \texttt{approval\_event\_log\_id}; \texttt{LOAN.disbursement\_event\_log\_id}; \texttt{INSTALLMENT.payment\_event\_log\_id} \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{FK Anchors for Extended and Multi-Entity Entities}
 \end{table}
 
 \subsection{System Modeling}
 \label{sec:system-modeling}
 
-This section presents the system analysis diagrams that model the platform's structure, behavior, and data flow. Loan state transitions are formalised in Section~\ref{sec:oracle-architecture}; the diagrams below show actor interactions and operational flows at the use-case and sequence level.
+This section uses standard system-analysis diagrams to show who uses the platform, what they do, how data moves, and how the main parts connect. The figures below complement the technical design in earlier sections; they are not repeated at contract or table level here.
 
 \subsubsection{Use Case Diagram}
 \label{sec:usecase}
 
-The system involves nine actors across eleven representative use cases (Figure~\ref{fig:usecase}). Four \textbf{core primary} actors initiate banking operations: Retail Client (A1, three KYC sub-types), Local Bank Admin (A2), National Bank Admin (A3), and World Bank Admin (A4). A5 (AI Agent) is a \textbf{planned Phase~III primary} actor with restricted write permissions gated by the human confirmation protocol (Table~\ref{tab:mvt-checklist}, item~11). Four secondary actors are external systems or authorities: Regulatory Authority (A6), Chainlink DON (A7), Blockchain Validator (A8), and External Auditor (A9). Note that the primary actor classes in the use-case diagram are a condensation of the formal nine-actor taxonomy defined in Table~\ref{tab:actor-taxonomy}: Visitor and Registered Retail User are pre-conditions for the CLIENT (BORROWER) role rather than independent diagram actors, and Local Bank Operator / Approver are merged into the Bank Approver role at the diagram level.
+Figure~\ref{fig:usecase} maps the main actors---borrowers, bank staff, regulators, and system services---to the actions each can perform on the platform.
 
 \begin{figure}[H]
 \centering
 \BalancedDiagram[width=0.98\linewidth]{Ch3_use-case-nine-actor-taxonomy}
-\caption[Use-case diagram (nine-actor taxonomy)]{Use-case diagram (nine-actor taxonomy)}
+\caption[Use-case diagram]{Use-case diagram.}
 \label{fig:usecase}
 \end{figure}
 
 \subsubsection{Activity Diagrams}
 
-Figures~\ref{fig:act-lending}--\ref{fig:act-aux} present three end-to-end activity flows. Each diagram has a single start and a single end node; decision diamonds route exceptional paths (limit exceeded, rejection, verification retry) back to the terminal state without spawning parallel lifelines.
+Figures~\ref{fig:act-lending}--\ref{fig:act-aux} walk through three everyday flows step by step: applying for and repaying a loan, signing up and verifying identity, and routine banking tasks such as checking balances or using the chat assistant.
 
 \begin{figure}[H]
 \centering
 \ActivityDiagram{fig-activity-lending}
-\caption[USDC loan lifecycle activity flow]{USDC loan lifecycle activity flow}
+\caption[Loan lifecycle activity]{Loan lifecycle activity.}
 \label{fig:act-lending}
 \label{fig:act-loan}\label{fig:act-hierarchy}
 \end{figure}
@@ -2474,7 +2315,7 @@ Figures~\ref{fig:act-lending}--\ref{fig:act-aux} present three end-to-end activi
 \begin{figure}[H]
 \centering
 \ActivityDiagram{fig-activity-onboarding-id}
-\caption[Retail onboarding and identity activity flow]{Retail onboarding and identity activity flow}
+\caption[Onboarding activity]{Onboarding activity.}
 \label{fig:act-onboarding}
 \label{fig:act-income}\label{fig:act-profile}
 \end{figure}
@@ -2482,54 +2323,54 @@ Figures~\ref{fig:act-lending}--\ref{fig:act-aux} present three end-to-end activi
 \begin{figure}[H]
 \centering
 \ActivityDiagram{fig-activity-aux}
-\caption[Client banking session activity flow]{Client banking session activity flow}
+\caption[Banking session activity]{Banking session activity.}
 \label{fig:act-aux}
 \label{fig:act-chat}\label{fig:act-aichatbot}\label{fig:act-market}
 \end{figure}
 
-\paragraph{SAR activity flow.}
-The Suspicious Activity Report (SAR) workflow is triggered when the Isolation Forest anomaly detector (Section~\ref{sec:threat-model}) flags a wallet with an anomaly score above the 0.75 threshold. The five-step flow is:
-
-\begin{enumerate}[noitemsep]
-\item Isolation Forest flags the wallet: \texttt{anomaly\_score > 0.75}.
-\item \texttt{LOAN\_RISK\_ASSESSMENT} records the per-loan detection (FK \texttt{model\_id} $\to$ \texttt{MODEL\_REGISTRY}); \texttt{SECURITY\_EVENT\_LOG} records the system-wide AML alert event.
-\item Express.js backend emits a planned event-bus message (\texttt{aml-alert} topic); the compliance dashboard consumes it.
-\item Bank officer reviews the alert in the admin compliance queue:
-    \begin{itemize}[noitemsep]
-    \item \textbf{False positive:} Dismiss and document reason (audit trail in \texttt{audit\_logs}).
-    \item \textbf{Confirmed:} Generate SAR record in \texttt{audit\_logs}; insert \texttt{INSTITUTION\_MESSAGE} (\texttt{message\_type='SAR\_ESCALATION'}) to notify the tier above (National Bank); freeze wallet via \texttt{LocalBank.freezeAccount(clientId)}.
-    \end{itemize}
-\item The \texttt{freezeAccount} function is gated by the \texttt{onlyApprover} modifier and is Foundry-tested (Phase~III invariant suite). A frozen wallet cannot initiate new loan disbursements or installment payments until the freeze is lifted by the tier above.
-\end{enumerate}
-
 \subsubsection{Data Flow Diagrams}
 
-The core lending data flows are specified in Figures~\ref{fig:dfd-level0-lending} and~\ref{fig:dfd-level1-lending} (Section~\ref{sec:high-level-arch}). Level-0 defines subsystem boundary flows to the Client, Local Bank Approver, National Bank, ML Risk Scoring Service, and Blockchain Ledger. Level-1 expands Process~0 into submit/validate (1.0), risk scoring with commit--reveal oracle (2.0), approver review (3.0), disbursement (4.0), and installment processing (5.0), reading and writing stores D1--D6 (\texttt{LOAN\_REQUEST}, \texttt{LOAN}, \texttt{INSTALLMENT}, \texttt{LOAN\_RISK\_ASSESSMENT}, \texttt{BLOCKCHAIN\_EVENT\_LOG}, \texttt{BORROWING\_LIMIT}).
+Figures~\ref{fig:dfd-level0-lending} and~\ref{fig:dfd-level1-lending} show how information enters the lending system, which processes handle it, and where it is stored. Level~0 gives the overall view; Level~1 breaks the lending process into smaller steps.
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{fig-dfd-level0-lending}
+\caption[DFD Level~0]{DFD Level~0.}
+\label{fig:dfd-level0-lending}
+\label{fig:dfd-context}
+\end{figure}
+
+\LandscapeDiagram{fig-dfd-level1-lending}
+\caption[DFD Level~1]{DFD Level~1.}
+\label{fig:dfd-level1-lending}
+\label{fig:dfd-suite}
+\label{fig:dfd-level1a}
+\LandscapeDiagramEnd
 
 \subsubsection{Sequence Diagrams}
 
-Figures~\ref{fig:seq-loan-flow}--\ref{fig:seq-chat-bot} consolidate the platform's nine interaction flows into four panels: loan approval with reject alternative, installment and income, hierarchical banking with market data and borrowing-limit, and chat with AI-chatbot.
+Figures~\ref{fig:seq-loan-flow}--\ref{fig:seq-chat-bot} show the order in which different parts of the system exchange messages---for example during loan approval, installment payment, bank hierarchy operations, and chat with the AI assistant.
 
 \SequenceDiagram{fig-seq-loan-flow}
-\caption[Loan approval sequence]{Loan approval sequence: application submission, ML scoring, commit--reveal oracle, approver review, and on-chain disbursement or rejection.}
+\caption[Loan approval sequence]{Loan approval sequence.}
 \label{fig:seq-loan-flow}
 \label{fig:seq-loan}\label{fig:seq-reject}
 \SequenceDiagramEnd
 
 \SequenceDiagram{fig-seq-installment-income}
-\caption[Installment and income verification]{Installment payment via wallet-signed \texttt{payInstallment} with listener projection, and income-proof upload for KYC Level~2/3 officer review.}
+\caption[Installment and income verification]{Installment and income verification.}
 \label{fig:seq-installment-income}
 \label{fig:seq-installment}\label{fig:seq-income}
 \SequenceDiagramEnd
 
 \SequenceDiagram{fig-seq-banking-data}
-\caption[Hierarchical banking and data sync]{Downward capital allocation across tiers, Chainlink price read with Redis cache, and event-driven borrowing-limit synchronisation to PostgreSQL.}
+\caption[Hierarchical banking and data sync]{Hierarchical banking and data sync.}
 \label{fig:seq-banking-data}
 \label{fig:seq-hierarchy}\label{fig:seq-marketdata}\label{fig:seq-borrowlimit}
 \SequenceDiagramEnd
 
 \SequenceDiagram{fig-seq-chat-chatbot}
-\caption[Chat and AI agent sequences]{Human client--officer messaging through the Express API, and Phase~III confirmation-gated conversational agent with MCP read/write tools.}
+\caption[Chat and AI agent sequences]{Chat and AI agent sequences.}
 \label{fig:seq-chat-bot}
 \label{fig:seq-chat}\label{fig:seq-aichatbot}
 \SequenceDiagramEnd
@@ -2537,44 +2378,28 @@ Figures~\ref{fig:seq-loan-flow}--\ref{fig:seq-chat-bot} consolidate the platform
 \subsubsection{UML Class Diagram}
 \label{sec:uml-class-diagram}
 
-Figure~\ref{fig:uml-class} is a \textbf{Software Engineering} UML class diagram for the \textit{core lending domain}. It is not another system-architecture drawing (those are Figures~\ref{fig:three-layer-arch} and~\ref{fig:component-diagram}). Instead it answers: \emph{which software classes exist, what data they hold, and how they relate}---the same question CSE470 asks when moving from requirements to implementation.
-
-The diagram has three layers of classes:
-\begin{itemize}[noitemsep]
-\item \textbf{Institution hierarchy} --- \texttt{Institution} is an abstract supertype; \texttt{WorldBankReserve}, \texttt{NationalBank}, and \texttt{LocalBank} are its subtypes (generalisation), matching Figure~\ref{fig:erd-relational} and the Solidity contracts in \texttt{contracts/}.
-\item \textbf{Retail lending} --- \texttt{Borrower} and \texttt{LoanRequest} mirror PostgreSQL tables; \texttt{LoanController} is the on-chain state machine that enforces the oracle gate and disbursement rules.
-\item \textbf{Off-chain services} --- \texttt{LoanService} (Express.js) and \texttt{ScoringService} (FastAPI) are controller/service classes that the React UI calls; they delegate to contracts and the ML pipeline without duplicating business logic in the frontend.
-\end{itemize}
-
-\noindent\textit{Why include it?} Use-case and sequence diagrams (above) show \textit{who talks to whom over time}; the class diagram shows \textit{the static object model} that developers implement. Examiners assessing System Analysis and Design and Software Engineering coursework can trace each class back to a requirement in Table~\ref{tab:functional-requirements}.
+Figure~\ref{fig:uml-class} shows the main software classes in the lending domain---institutions, borrowers, loans, and backend services---and how they relate to one another.
 
 \begin{figure}[H]
 \centering
 \ThesisIncludeGraphics[width=\linewidth,height=0.90\textheight,keepaspectratio]{fig-uml-class}
-\caption[UML class diagram (core lending domain)]{UML class diagram (core lending domain): institution hierarchy, loan entities, on-chain controller, and off-chain services.}
+\caption[UML class diagram]{UML class diagram.}
 \label{fig:uml-class}
 \end{figure}
 
 \subsubsection{User Interface Design}
 \label{sec:ui-design}
 
-The retail and approver interfaces follow a mobile-first Material Design~3 layout implemented in \texttt{frontend/} (React~18, TypeScript, Tailwind, MUI). Two primary surfaces are specified:
-
-\begin{itemize}[noitemsep]
-\item \textbf{Retail loan flow} --- wallet connect, KYC status banner, loan application form with plain-language APR and installment preview, and post-submission status tracking.
-\item \textbf{Authority Brief dashboard} --- approver view with composite risk score $s$, SHAP waterfall chart, anomaly deviation table, and approve/decline actions gated on oracle \texttt{SCORE\_REVEALED} state.
-\end{itemize}
-
-\noindent High-fidelity Figma prototype exports (screen flows, component layout, and approver dashboard) are collected in \textbf{Appendix~F} (Section~\ref{app:ui-prototypes}) so the main chapters stay specification-focused; Figure~\ref{fig:ui-wireframe-retail} and Figure~\ref{fig:ui-wireframe-approver} will be inserted there before final submission.
+Screen layouts for the retail borrower flow and the bank approver dashboard are kept in \textbf{Appendix~F} (Section~\ref{app:ui-prototypes}) as Figma exports; Figures~\ref{fig:ui-wireframe-retail} and~\ref{fig:ui-wireframe-approver} will be inserted there before final submission.
 
 \subsubsection{Four-Tier Capital Flow}
 
-Figure~\ref{fig:four-tier} illustrates the hierarchical capital flow and cascading repayment structure.
+Figure~\ref{fig:four-tier} shows how capital moves down the World $\to$ National $\to$ Local $\to$ Client hierarchy and how repayments flow back upward through the same tiers.
 
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-hierarchical-banking}
-\caption[Four-tier hierarchical capital flow]{Four-tier hierarchical capital flow}
+\caption[Four-tier capital flow]{Four-tier capital flow.}
 \label{fig:four-tier}
 \end{figure}
 
@@ -2591,7 +2416,7 @@ Max two simultaneous group loans, 30-day cooling-off, and cross-bank check via \
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-group-lending-lifecycle}
-\caption[Solidarity group lending lifecycle]{Solidarity group lending lifecycle}
+\caption[Group lending lifecycle]{Group lending lifecycle.}
 \label{fig:group-lending-lifecycle}
 \end{figure}
 
@@ -2606,7 +2431,7 @@ Parameter changes route through a 48-hour \texttt{TimelockController} with snaps
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-governance-dual-path}
-\caption[Governance dual-path]{Governance dual-path}
+\caption[Governance dual-path]{Governance dual-path.}
 \label{fig:governance-dual-path}
 \end{figure}
 
@@ -2632,7 +2457,7 @@ Regulatory & Audit logs via contract events; sandbox pilots for production; zkKY
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-sar-aml-workflow}
-\caption[SAR and AML compliance workflow]{SAR and AML compliance workflow}
+\caption[SAR and AML workflow]{SAR and AML workflow.}
 \label{fig:sar-aml-workflow}
 \end{figure}
 
@@ -2645,7 +2470,7 @@ Regulatory & Audit logs via contract events; sandbox pilots for production; zkKY
 \begin{figure}[H]
 \centering
 \BalancedDiagram{fig-defense-in-depth}
-\caption[Five-layer defense-in-depth security architecture]{Five-layer defense-in-depth security architecture}
+\caption[Defense-in-depth architecture]{Defense-in-depth architecture.}
 \label{fig:defense-in-depth}
 \end{figure}
 
@@ -2653,7 +2478,7 @@ Security spans five layers (Table~\ref{tab:defense-layers}): L5 operational keys
 
 \begin{table}[H]
 \centering
-\caption[Five-layer defense-in-depth model]{Five-layer defense-in-depth model.}
+\caption[Defense-in-depth model]{Defense-in-depth model.}
 \label{tab:defense-layers}
 \small
 \begin{tabular}{@{}p{1.2cm}p{3.2cm}p{10.0cm}@{}}
@@ -2677,7 +2502,7 @@ Table~\ref{tab:threat-model} maps primary threats to mitigations across the five
 
 \begin{table}[H]
 \centering
-\caption[Threat model (summary)]{Threat model and mitigations (summary).}
+\caption[Threat model]{Threat model.}
 \label{tab:threat-model}
 \footnotesize
 \begin{tabular}{@{}p{2.4cm}p{1.0cm}p{3.2cm}p{6.8cm}@{}}
@@ -2704,7 +2529,7 @@ Table~\ref{tab:design-decisions} demonstrates the chosen stack for frontend, bac
 
 \begin{table}[H]
 \centering
-\caption[Design decisions and alternatives considered]{Design decisions and alternatives considered.}
+\caption[Design decisions]{Design decisions.}
 \label{tab:design-decisions}
 \begin{tabular}{p{3cm}p{3cm}p{3cm}p{4.5cm}}
 \toprule
@@ -2730,12 +2555,11 @@ Tool exposure per turn & Named toolsets & Full 17-tool list & Phase~III Should; 
 Write-tool enforcement & Confirmation audit hook & In-pipeline check & Phase~III Must; agent write-path \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{Design Decisions: Evaluated Alternatives and Selection Rationale}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption[Design alternative evaluation criteria]{Design alternative evaluation criteria (selected vs.\ rejected).}
+\caption[Design alternative criteria]{Design alternative criteria.}
 \label{tab:design-alternatives-criteria}
 \footnotesize
 \begin{tabular}{@{}p{2.6cm}p{2.2cm}p{2.2cm}p{2.8cm}p{3.4cm}@{}}
@@ -2756,7 +2580,7 @@ Database & PostgreSQL 3NF & SQLite & Concurrency (40\%), window queries (35\%), 
 
 \begin{table}[H]
 \centering
-\caption[Selected technology justifications]{Selected technology justifications (1st choice).}
+\caption[Selected technology justifications]{Selected technology justifications.}
 \label{tab:tech-justification-selected}
 \small
 \begin{tabular}{@{}p{3.2cm}p{9.8cm}@{}}
@@ -2784,7 +2608,7 @@ EIP-7702 session keys & Future Work: scoped session keys for agent on-chain acti
 
 \begin{table}[H]
 \centering
-\caption[Alternative technology justifications]{Retained alternatives (2nd choice) and why they were not selected.}
+\caption[Alternative technology justifications]{Alternative technology justifications.}
 \label{tab:tech-justification-alternatives}
 \small
 \begin{tabular}{@{}p{3.2cm}p{9.8cm}@{}}
@@ -2824,7 +2648,7 @@ The purpose of the AI/ML layer is to provide a risk score per loan approval that
 \begin{figure}[H]
 \centering
 \BalancedDiagram{Ch4_ml-oracle-commit-reveal}
-\caption[ML oracle commit--reveal gate]{ML oracle commit--reveal gate}
+\caption[ML oracle commit--reveal]{ML oracle commit--reveal.}
 \label{fig:ml-oracle-commit-reveal}
 \end{figure}
 
@@ -2850,7 +2674,7 @@ The conversational agent that has been designed to assist the clients to better 
 
 \begin{table}[H]
 \centering
-\caption[MCP tool server (MVT subset)]{MCP tool server (MVT subset). The full 17-tool suite is Future Work.}
+\caption[MCP tool server]{MCP tool server.}
 \label{tab:mcp-tools}
 \begin{tabular}{p{4.8cm}p{1.4cm}p{6.3cm}}
 \toprule
@@ -2908,25 +2732,18 @@ The Express.js backend injects the client's full on-chain state as a structured 
   "conversation_history": [ "...last 10 turns..." ]
 }
 \end{verbatim}
-The \texttt{compression\_summary} field is injected only when this is a child session (i.e., when \texttt{parent\_session\_id} is non-null). It provides the prior-session context without exceeding the Volatile tier token budget. This context block is injected only when the user is authenticated and the \texttt{eth\_call} round-trip completes within a 200~ms timeout (falling back to a static-context response otherwise). The model uses the injected context to ground its answers in the user's actual account data rather than generic policy text, materially reducing hallucination risk for account-specific queries.
-
-
-\paragraph{Security and limitations (prototype stance).}
-The agent's safety posture is enforced at four levels. (1)~\textbf{Tool-schema boundary:} the agent interacts with CWB exclusively through the MVT MCP tool schema (\textbf{3--5 tools}) and cannot execute arbitrary code, make unapproved API calls, or read data outside that schema. The full 17-tool suite remains a specified but undeployed Future Work expansion. (2)~\textbf{Human confirmation gate:} every write tool requires explicit affirmative consent in the conversation history; the confirmation turn ID is logged as the audit reference. (3)~\textbf{Session key scope:} the EIP-7702 session key is scoped to specific tools, value-capped, time-bound to 24~hours, and revocable at any time. A session that attempts to call an out-of-scope tool is rejected at the key level, not just at the application level. (4)~\textbf{Prompt injection scanning and lifecycle hook middleware:} user-sourced content is scanned for injection patterns before entering the prompt (Layer~2 control, Section~\ref{sec:aiml-support}), and every write-tool HTTP POST is intercepted by a middleware stack that enforces the confirmation invariant at the application layer independently of the model's output. Together, these four levels form a defence-in-depth posture in which no single point of failure can circumvent a critical safety constraint. Hallucination risk is bounded by: (a) the injected on-chain state grounding account-specific answers, and (b) the refusal layer for regulatory and legal queries (100\% target on the red-team set, Section~\ref{sec:optional-agent}).
-\paragraph{Architecture diagram.}
-Figure~\ref{fig:local-llm-mermaid} shows the compact end-to-end request path; Figure~\ref{fig:local-llm-tikz} expands the same flow with component boundaries and authentication context.
 
 \begin{figure}[H]
 \centering
 \OnePageDiagram{fig-local-llm-compact}
-\caption[AI banking agent request path]{AI banking agent request path}
+\caption[AI agent request path]{AI agent request path.}
 \label{fig:local-llm-mermaid}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \OnePageDiagram{fig-local-llm}
-\caption[AI agent data flow]{AI agent data flow}
+\caption[AI agent data flow]{AI agent data flow.}
 \label{fig:local-llm-tikz}
 \end{figure}
 
@@ -2956,7 +2773,6 @@ Proof of Reserve & Chainlink PoR & Cryptographically verifiable WorldBankReserve
 Event Indexing & PostgreSQL event listener & Stability-first indexing baseline (GraphQL over The Graph optional later) \\
 \bottomrule
 \end{tabular}
-\TableScreenshotEnd{Local LLM Assistant Integration: Components, Configuration, and Prototype Stance}
 \end{table}
 
 
@@ -2970,7 +2786,28 @@ For stability, lightweight data indexing strategies are used to reduce complexit
 
 \subsubsection{Functional Verification of Design Alternatives}
 \label{sec:design-alternative-verification}
-% Reserved for Phase~IV Foundry simulation and gate-demo results; see Section~\ref{sec:impl-phase-plan}.
+
+This section provides a functional verification for design alternatives from Table~\ref{tab:design-decisions} and Table~\ref{tab:design-alternatives-criteria}.
+
+\begin{table}[H]
+\centering
+\caption[Design alternative verification]{Design alternative verification.}
+\label{tab:design-alternative-verification}
+\small
+\begin{tabular}{@{}p{3.4cm}p{4.2cm}p{6.0cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Design alternative} & \textbf{Verification method} & \textbf{Status (Pre-Thesis~2)} \\
+\midrule
+EVM (Sepolia/Amoy) vs.\ Solana & Hardhat contract tests; testnet deploy script & 42 Hardhat cases (Table~\ref{tab:implementation-evidence}); Phase~I--II \\
+Commit--reveal oracle vs.\ Chainlink DON & Oracle flow walkthrough; commit--reveal gate diagram & Designed; MVT path specified (Figure~\ref{fig:ml-oracle-commit-reveal}) \\
+Random Forest + IF vs.\ XGBoost & BCCC fraud benchmark; SHAP explainability check & Benchmark met (Table~\ref{tab:ml-bccc-results}) \\
+PostgreSQL vs.\ SQLite & ERD, 3NF schema, integrity constraints & Specified (Table~\ref{tab:integrity-constraints}; Appendix ERD) \\
+300-client capital flow & Foundry/Anvil deterministic simulation & Planned Phase~IV (DT-IV.01) \\
+Solvency and RBAC invariants & Foundry fuzz + invariant suite & Planned Phase~IV (DT-IV.04) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 
@@ -2986,16 +2823,15 @@ For stability, lightweight data indexing strategies are used to reduce complexit
 \label{sec:verification-validation}
 \label{sec:foundry}
 
-\begin{itemize}[noitemsep]
-\item \textbf{Verification:} Hardhat contract tests (\texttt{test/}, 42 cases); Vitest API tests (\texttt{backend/tests/}); Foundry invariants (solvency, role segregation, capital-flow direction) in Phase~IV.
-\item \textbf{Validation:} Phase gates G1--G4; BCCC fraud benchmarks (Table~\ref{tab:ml-bccc-results}, Figure~\ref{fig:ml-eval}).
-\end{itemize}
+Verification criteria: Hardhat contract tests; Backend Vitest API tests; Foundry invariants (solvency, role segregation, capital-flow direction) in Phase~IV.
+
+Validation criteria: Phase task/feature implementations (specified in Chapter~\ref{ch:design-alternatives}); BCCC fraud benchmarks (Table~\ref{tab:ml-bccc-results}, Figure~\ref{fig:ml-eval}). Table~\ref{tab:implementation-evidence} contains project implementation files and paths:
 
 \label{sec:implementation-evidence}
 
 \begin{table}[H]
 \centering
-\caption[Implementation evidence]{Implementation evidence (repository root).}
+\caption[Implementation evidence]{Implementation evidence.}
 \label{tab:implementation-evidence}
 \small
 \begin{tabular}{@{}p{3.2cm}p{4.4cm}p{6.6cm}@{}}
@@ -3020,7 +2856,7 @@ Deploy & \texttt{scripts/deploy.ts} & Sepolia/Amoy/local ready \\
 
 \begin{table}[H]
 \centering
-\caption[Design selection vs.\ CO6 factors]{Selected design vs.\ CO6 evaluation factors.}
+\caption[CO6 design selection]{CO6 design selection.}
 \label{tab:co6-selection-summary}
 \small
 \begin{tabular}{@{}p{2.2cm}p{3.6cm}p{4.0cm}p{4.4cm}@{}}
@@ -3044,7 +2880,7 @@ Performance & RF+IF+stacking; F1\,=\,0.891 & Table~\ref{tab:ml-bccc-results} & B
 
 \begin{table}[H]
 \centering
-\caption[Requirements traceability (excerpt)]{Requirements traceability matrix (excerpt).}
+\caption[Requirements traceability]{Requirements traceability.}
 \label{tab:traceability}
 \footnotesize
 \begin{tabular}{@{}p{1.1cm}p{2.6cm}p{2.8cm}p{2.6cm}p{3.2cm}@{}}
@@ -3067,19 +2903,100 @@ NFR-02 & Table~\ref{tab:defense-layers} & OpenZeppelin RBAC & \texttt{WorldBankR
 \label{sec:final-design-adjustments}
 \label{sec:bridge}
 
-Multi-chain bridging (Sepolia $\leftrightarrow$ zkEVM) was rejected due to bridge attack surface. \textbf{Final design:} single-chain deployment on Sepolia/Amoy; Polygon zkEVM Cardona remains the design-preference target without a live cross-chain bridge. Details in Tables~\ref{tab:design-decisions},~\ref{tab:design-alternatives-criteria} (Chapter~\ref{ch:design-alternatives}).
+This section provides the final edits in the overall project. The project is in development phase; more changes may be required as the phases progress.
+
+Major changes involve: Multi-chain feature was rejected due to potential security risks in bridge attacks. Single-chain design is chosen for deployment on Sepolia/Amoy. Complete details about design decisions can be found in Tables~\ref{tab:design-decisions},~\ref{tab:design-alternatives-criteria} (Chapter~\ref{ch:design-alternatives}).
 
 \section{Statistical Analysis}
 \label{sec:statistical-analysis}
+
+This section documents how the ML layer is implemented, what models have been utilized, what datasets were chosen, and preprocessing and evaluations of training and testing. These data are supposed to be complete and fully functional so the backend should be able to feed data from off-chain to on-chain via Chainlink Functions by the end of Phase~III.
 
 \subsection{Datasets and Benchmark Results}
 \label{sec:ml-workload}
 \label{sec:ml-explainability}
 \label{sec:ml-evaluation}
 
+\textbf{Primary dataset:} A credible and trusted dataset is crucial for the project; the most suitable dataset available is the BCCC-DeFiFraudTrans-2025 dataset from York University. It contains a combination of DeFi transaction information with 1.03 million rows. For the current run we used a smaller sample of 50{,}000 transactions where about 8.7\% are labeled as fraud transactions. Potential leak columns were removed before the testing. Table~\ref{tab:bccc-dataset-summary} and Table~\ref{tab:bccc-dataset-features} list the full dataset properties and model input features.
+
 \begin{table}[H]
 \centering
-\caption[BCCC fraud-detection benchmark]{BCCC-DeFiFraudTrans-2025 subsample benchmark (address-grouped hold-out; \texttt{evidence/mac-m4/metrics.json}). Primary dataset; Elliptic~[68] secondary only; on-chain CWB log for future retrain.}
+\caption[BCCC dataset summary]{BCCC dataset summary.}
+\label{tab:bccc-dataset-summary}
+\small
+\begin{tabular}{@{}p{3.6cm}p{10.2cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Property} & \textbf{Value} \\
+\midrule
+Dataset name & BCCC-DeFiFraudTrans-2025 \\
+Provider & York University BCCC \\
+Source files & \texttt{DeFiTransLyzer\_fraud.csv} + \texttt{DeFiTransLyzer\_legitimate.csv} (merged) \\
+Full corpus size & 1{,}026{,}867 rows; 172 columns (164 numeric) \\
+File size & ${\approx}$1{,}181~MB \\
+Label column & \texttt{fraud} (0\,=\,legitimate, 1\,=\,fraud) \\
+Training subsample & 50{,}000 transactions (\texttt{seed=42}) \\
+Fraud rate (sample) & 8.65\% \\
+Split method & Grouped hold-out by wallet \texttt{address} \\
+Train / validation / test & 37{,}715 / 7{,}145 / 5{,}140 rows \\
+Model input features & 21 behavioral transaction features (Table~\ref{tab:bccc-dataset-features}) \\
+Removed leakage columns & \texttt{flag}, \texttt{fraud}, and other label or split columns \\
+Scaling & StandardScaler fit on training fold only \\
+Secondary dataset & Elliptic [68] (reference only); CWB on-chain logs planned for retrain \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption[BCCC input features]{BCCC input features.}
+\label{tab:bccc-dataset-features}
+\footnotesize
+\begin{tabular}{@{}p{2.4cm}p{3.6cm}p{2.0cm}p{4.8cm}p{1.0cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{CWB alias} & \textbf{BCCC column} & \textbf{Category} & \textbf{Description} & \textbf{Used} \\
+\midrule
+tx\_count\_30d & num\_transaction & Volume & Number of transactions in the sample window & Yes \\
+duration\_seconds & duration\_seconds & Volume & Total transaction duration (seconds) & Yes \\
+error\_rate & error\_rate & Errors & Share of failed or error events & Yes \\
+gas\_used\_avg & gas\_used.gas\_used\_average & Gas & Average gas used per transaction & Yes \\
+gas\_used\_std & gas\_used.gas\_used\_standard\_deviation & Gas & Variability of gas used & Yes \\
+gas\_price\_avg & gas\_prices.gas\_prices\_average & Gas & Average gas price paid & Yes \\
+value\_avg & values.values\_average & Value & Average transferred value & Yes \\
+value\_std & values.values\_standard\_deviation & Value & Variability of transferred value & Yes \\
+unique\_from\_addrs & number\_of\_unique\_from\_address & Addresses & Count of unique sender addresses & Yes \\
+unique\_to\_addrs & number\_of\_unique\_to\_address & Addresses & Count of unique receiver addresses & Yes \\
+from\_addr\_count & number\_of\_from\_address & Addresses & Total sender address count & Yes \\
+to\_addr\_count & number\_of\_to\_address & Addresses & Total receiver address count & Yes \\
+token\_transfer\_amt & token\_transfer\_amount & Transfer & Raw token transfer amount (text column; excluded) & No \\
+normalized\_transfer & normalized\_token\_transfer & Transfer & Normalised token transfer amount & Yes \\
+gas\_efficiency & gas\_efficiency & Gas & Gas efficiency ratio & Yes \\
+event\_activity & event\_activity\_flag & Activity & Event activity indicator & Yes \\
+log\_count & log\_count & Activity & Number of on-chain event logs & Yes \\
+num\_errors & number\_of\_errors & Errors & Count of error events & Yes \\
+nonce\_avg & nonce.nonce\_average & Addresses & Average wallet nonce (activity signal) & Yes \\
+chain\_id & chain\_id & Network & Blockchain network identifier & Yes \\
+erc20\_log\_qty & erc\_20\_Log\_Normalized\_Quantity & Transfer & Normalised ERC-20 log quantity & Yes \\
+erc20\_qty\_int & erc\_20\_Quantity\_Is\_Int & Transfer & ERC-20 quantity integer flag & Yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Preprocessing and split.} For each wallet, 22 features are provided; 21 features are selected that include gas usage, transfer counts, and wallet addresses. These large-number values are scaled and data is split by unique wallet addresses for training and testing sets. Data split counts: train / validation / test = 37{,}715 / 7{,}145 / 5{,}140. Figure~\ref{fig:ml-preprocessing-split} shows the preprocessing steps:
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{fig-ml-preprocessing-split}
+\caption[BCCC preprocessing split]{BCCC preprocessing split.}
+\label{fig:ml-preprocessing-split}
+\end{figure}
+
+\textbf{Models:} A random forest model (80 trees) was chosen for the calculation of fraud probability and an Isolation Forest model (80 trees) for anomaly detection. The combination of these two models provides better fraud detection and decision-making scores for loan approvers, and helps detect misuse of the platform. A simplified logistic regression method combines these two model results to provide a score that is used as a measurement metric to show the probability of any client being fraudulent and trying to interact with the system. Results and evaluations are shown in Figure~\ref{fig:ml-eval}, Figure~\ref{fig:ml-confusion-matrix}, and Table~\ref{tab:ml-bccc-results}.
+
+\begin{table}[H]
+\centering
+\caption[BCCC benchmark results]{BCCC benchmark results.}
 \label{tab:ml-bccc-results}
 \begin{tabular}{lrrrrr}
 \toprule
@@ -3096,29 +3013,55 @@ Held-out test & 0.874 & 0.908 & 0.891 & 0.991 & 5{,}140 \\
 
 \begin{figure}[H]
 \centering
-\small
-\begin{minipage}[t]{0.48\linewidth}
-\centering
-\Diagram[width=\linewidth]{fig-ml-metrics-bars}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.48\linewidth}
-\centering
-\Diagram[width=\linewidth]{fig-ml-confusion-matrix}
-\end{minipage}
-
-\vspace{6pt}
-\Diagram[width=0.92\linewidth]{fig-ml-shap-importance}
-
-\caption[ML evaluation and SHAP]{ML evaluation (F1\,=\,0.891, ROC-AUC\,=\,0.991) and SHAP feature importance.}
+\Diagram[width=0.78\linewidth]{fig-ml-metrics-bars}
+\caption[ML evaluation metrics]{ML evaluation metrics.}
 \label{fig:ml-eval}
 \end{figure}
+
+\begin{figure}[H]
+\centering
+\Diagram[width=0.62\linewidth]{fig-ml-confusion-matrix}
+\caption[Confusion matrix]{Confusion matrix.}
+\label{fig:ml-confusion-matrix}
+\end{figure}
+
+\textbf{Inference service.} After completion of model training and code implementations, the platform should be able to monitor and evaluate new applications in real time. Figure~\ref{fig:ml-inference-service} shows the inference flow from loan request to on-chain commit.
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{fig-ml-inference-service}
+\caption[ML inference flow]{ML inference flow.}
+\label{fig:ml-inference-service}
+\end{figure}
+
+\textbf{Decision bands and explainability.} The inference service provides risk score, anomaly score, and decision suggestion. Based on the combined score, the following decisions are suggested, shown in Table~\ref{tab:ml-decision-bands}:
+
+\begin{table}[H]
+\centering
+\caption[ML decision bands]{ML decision bands.}
+\label{tab:ml-decision-bands}
+\small
+\begin{tabular}{@{}p{3.6cm}p{3.2cm}p{6.8cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Combined risk score ($s$)} & \textbf{Suggested decision} & \textbf{Meaning} \\
+\midrule
+$s < 0.4$ & Approve & Low risk; loan may be considered for approval \\
+$0.4 \le s < 0.7$ & Manual review & Medium risk; approver must review before decision \\
+$s \ge 0.7$ & Reject & High risk; application should be rejected \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 \section{Comparisons and Relationships}
 \label{sec:comparisons-relationships}
 
+Table~\ref{tab:comparison-relationships} demonstrates the choices that were available after researching existing platforms and papers. After extensive planning and analysis, the following options were selected; the rejected options have potential, but the preferably better options were chosen for stability and to make sure all features are well implemented.
+
 \begin{table}[H]
 \centering
-\caption[Selected vs.\ rejected design choices]{Selected vs.\ rejected design choices and linked metrics.}
+\caption[Design comparisons]{Design comparisons.}
 \label{tab:comparison-relationships}
 \footnotesize
 \begin{tabular}{@{}p{2.4cm}p{2.8cm}p{2.8cm}p{5.2cm}@{}}
@@ -3136,13 +3079,46 @@ Human vs ML & Decision support & Auto-disburse & NFR-02; Section~\ref{sec:ethica
 \end{tabular}
 \end{table}
 
+\section{Return on Investment Analysis}
+\label{sec:ch5-roi}
+
+ROI for the project is being calculated with the estimated cost of production and maintenance. The full project is planned with zero-cost production in mind, as it is an academic project. The calculation below is shown as probable data, and it may be improved as development phases progress; the complete version of the project can produce results of some sort. For the estimation results, NPV and ROI are calculated for a three-year time scope at a discount rate of $r=10\%$. The details are shown in Table~\ref{tab:ch5-roi-calculation}.
+\[
+\mathrm{NPV}=\sum_{t=0}^{3}\frac{B_t-C_t}{(1+r)^t}.
+\]
+\[
+\mathrm{ROI}=\frac{\sum_{t=0}^{3}B_t-\sum_{t=0}^{3}C_t}{\sum_{t=0}^{3}C_t}\times 100\%.
+\]
+
+\begin{table}[H]
+\centering
+\caption[ROI and NPV calculation]{ROI and NPV calculation.}
+\label{tab:ch5-roi-calculation}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\tableheadcolor
+\textbf{Year} & \textbf{Benefits (\$k)} & \textbf{Costs (\$k)} & \textbf{Net (\$k)} & \textbf{PV factor} & \textbf{PV net (\$k)} \\
+\midrule
+0 (setup) & 0.0 & 6.0 & $-$6.0 & 1.000 & $-$6.0 \\
+1 & 48.0 & 6.0 & 42.0 & 0.909 & 38.2 \\
+2 & 72.0 & 8.0 & 64.0 & 0.826 & 52.9 \\
+3 & 96.0 & 10.0 & 86.0 & 0.751 & 64.6 \\
+\midrule
+\textbf{Totals} & \textbf{216.0} & \textbf{30.0} & \textbf{186.0} & --- & \textbf{149.7} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Discussion}
 \label{sec:discussion}
 \label{sec:research-limitations}
 
+The purpose of this chapter is to evaluate the selected design and the contextual logic behind choosing the selected options for development of the project, and to show the results of the benchmarks of the trained and tested models, gas cost optimization, combined scoring, and decision-making process by the ML layer. However, current results are estimations based on the design of the project. More practical information can be included during the development phases of the project, and ROI calculation can be improved further with more data and influential factors taken into account. A few limitations can be observed: the model has to be made adaptive with the tier-based system of the project; live testnet results are to be added; commit--reveal oracle results and the total latency per transaction are to be calculated with the complete implementation of all features.
+
 \begin{table}[H]
 \centering
-\caption[Research limitations (summary)]{Research limitations and mitigations (summary).}
+\caption[Research limitations]{Research limitations.}
 \label{tab:research-limitations}
 \small
 \begin{tabular}{@{}p{1.0cm}p{3.2cm}p{8.0cm}@{}}
@@ -3196,12 +3172,21 @@ This appendix records the physical-schema details moved from Chapter~\ref{ch:des
 \section{Full Relational ERD}
 \label{sec:appendix-erd-full}
 
-Figure~\ref{fig:erd-relational} is the complete logical data model: 51 documented entities plus two Phase-IV configuration tables (\texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION}), with crow's-foot cardinalities, migration-tier colour coding, and a notation key. It is placed here rather than in Chapter~\ref{ch:design-alternatives} because the diagram requires a full landscape page at high magnification to remain legible.
+Figure~\ref{fig:erd-relational} is the complete logical data model: 51 documented entities plus two Phase-IV configuration tables (\texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION}), with Chen notation (entity rectangles, relationship diamonds, cardinality labels), migration-tier colour coding, and a notation key. It spans two portrait sheets (Figures~\ref{fig:erd-relational} and~\ref{fig:erd-relational-p2}) so entity text and connectors remain legible. Deferred stub and future-work relations are listed in Table~\ref{tab:db-entities-ext2}.
 
-\LandscapeDiagram{ERD_diagram_relational}
-\caption[Full relational ERD (51 entities)]{Full relational ERD: 51 documented entities plus two Phase-IV configuration tables (\texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION}), grouped by migration tier (M1 core, M2, M3, stub, future work).}
+\begin{figure}[p]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,height=0.92\textheight,keepaspectratio]{ERD_diagram_relational_p1}
+\caption[Full relational ERD (sheet 1)]{Full relational ERD (sheet 1 of 2).}
 \label{fig:erd-relational}
-\LandscapeDiagramEnd
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,height=0.92\textheight,keepaspectratio]{ERD_diagram_relational_p2}
+\caption[Full relational ERD (sheet 2)]{Full relational ERD (sheet 2 of 2).}
+\label{fig:erd-relational-p2}
+\end{figure}
 
 \section{Indexing Strategy}
 \label{sec:indexing-strategy}
@@ -3210,7 +3195,7 @@ B-tree indexes (the PostgreSQL default) support efficient retrieval on frequentl
 
 \begin{table}[H]
 \centering
-\caption[Indexing strategy]{Indexing strategy: B-tree indexes for time-window and high-frequency queries.}
+\caption[Indexing strategy]{Indexing strategy.}
 \label{tab:indexing-strategy}
 \begingroup
 \footnotesize
@@ -3293,14 +3278,13 @@ B-tree indexes (the PostgreSQL default) support efficient retrieval on frequentl
 \bottomrule
 \end{tabular}
 \endgroup
-\TableScreenshotEnd{Indexing Strategy: B-tree Indexes for Time-Window and High-Frequency Queries}
 \end{table}
 
 \section{Functional Dependencies}
 
 \begin{table}[H]
 \centering
-\caption[Representative functional dependencies]{Representative functional dependencies.}
+\caption[Functional dependencies]{Functional dependencies.}
 \label{tab:functional-deps}
 \begingroup
 \footnotesize
@@ -3333,7 +3317,6 @@ INTEREST\_RATE\_TIER & \texttt{tier\_id} $\to$ \texttt{base\_rate}, \texttt{kink
 \bottomrule
 \end{tabular}
 \endgroup
-\TableScreenshotEnd{Functional Dependencies in the Core Lending and Identity Schema}
 \end{table}
 
 \section{Materialized Views and Agent Query Optimisation}
@@ -3503,7 +3486,7 @@ Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook 
 
 \begin{table}[H]
 \centering
-\caption[Smart contract capabilities summary]{Smart contract capabilities summary (17 modular contracts).}
+\caption[Smart contract capabilities]{Smart contract capabilities.}
 \label{tab:appendix-contract-capabilities}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -3600,7 +3583,7 @@ contract WorldBankReserve is ReentrancyGuard, AccessControl {
 
 \begin{table}[H]
 \centering
-\caption[Internal industry research corpus]{Internal industry research corpus.}
+\caption[Industry research corpus]{Industry research corpus.}
 \label{tab:internal-research}
 \begingroup
 \footnotesize
@@ -3632,64 +3615,64 @@ IR-5 & \texttt{binance\_architecture\_research.md} & Off-chain PostgreSQL/Redis 
 \paragraph{Retail loan application flow.}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: retail loan application wireframe / prototype]}\vspace{3.2cm}}}
-\caption[Retail loan application prototype (Figma)]{Retail loan application prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-retail}
+\caption[Retail loan wireframe]{Retail loan wireframe.}
 \label{fig:ui-wireframe-retail}
 \end{figure}
 
 \paragraph{Authority Brief approver dashboard.}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: Authority Brief approver dashboard]}\vspace{3.2cm}}}
-\caption[Authority Brief approver dashboard prototype (Figma)]{Authority Brief approver dashboard prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-approver}
+\caption[Approver dashboard wireframe]{Approver dashboard wireframe.}
 \label{fig:ui-wireframe-approver}
 \end{figure}
 
 \paragraph{Client onboarding funnel (KYC levels).}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: five-stage onboarding funnel / KYC status screens]}\vspace{3.2cm}}}
-\caption[Client onboarding funnel prototype (Figma)]{Client onboarding funnel prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-onboarding}
+\caption[Onboarding wireframe]{Onboarding wireframe.}
 \label{fig:ui-wireframe-onboarding}
 \end{figure}
 
 \paragraph{Reserve transparency dashboard (Tier~1).}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: World Bank reserve balances and allocation overview]}\vspace{3.2cm}}}
-\caption[Reserve transparency dashboard prototype (Figma)]{Reserve transparency dashboard prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-reserve}
+\caption[Reserve dashboard wireframe]{Reserve dashboard wireframe.}
 \label{fig:ui-wireframe-reserve}
 \end{figure}
 
 \paragraph{Conversational banking agent (chat).}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: MCP chat assistant with confirmation-gated actions]}\vspace{3.2cm}}}
-\caption[Conversational banking agent prototype (Figma)]{Conversational banking agent prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-agent}
+\caption[Banking agent wireframe]{Banking agent wireframe.}
 \label{fig:ui-wireframe-agent}
 \end{figure}
 
 \paragraph{Group solidarity lending application.}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: group loan request and member share breakdown]}\vspace{3.2cm}}}
-\caption[Group solidarity lending prototype (Figma)]{Group solidarity lending prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-group-lending}
+\caption[Group lending wireframe]{Group lending wireframe.}
 \label{fig:ui-wireframe-group-lending}
 \end{figure}
 
 \paragraph{Compliance and AML alert review.}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: SAR/AML alert queue and officer review screen]}\vspace{3.2cm}}}
-\caption[Compliance and AML alert review prototype (Figma)]{Compliance and AML alert review prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-compliance}
+\caption[Compliance wireframe]{Compliance wireframe.}
 \label{fig:ui-wireframe-compliance}
 \end{figure}
 
 \paragraph{Mobile navigation and responsive layout.}
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.88\linewidth}{\centering\vspace{3.2cm}\textit{[Insert Figma export: mobile nav, breakpoints, and component library sheet]}\vspace{3.2cm}}}
-\caption[Mobile navigation and responsive layout prototype (Figma)]{Mobile navigation and responsive layout prototype (Figma).}
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-mobile}
+\caption[Mobile layout wireframe]{Mobile layout wireframe.}
 \label{fig:ui-wireframe-mobile}
 \end{figure}
 

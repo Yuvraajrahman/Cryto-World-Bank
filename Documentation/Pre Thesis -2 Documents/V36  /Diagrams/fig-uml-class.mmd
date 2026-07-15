@@ -1,0 +1,68 @@
+%%{init: {"themeVariables": {"fontSize": "19px"}} }%%
+classDiagram
+  direction TB
+
+  class Borrower {
+    +borrowerId: UUID
+    +walletAddress: address
+    +kycLevel: int
+    +registeredLocalBankId: FK
+  }
+
+  class LoanRequest {
+    +requestId: UUID
+    +status: enum
+    +oracleState: enum
+    +amount: decimal
+    +submitApplication()
+  }
+
+  class LoanController {
+    +commitRiskScore(hash)
+    +revealRiskScore(score, nonce)
+    +approveLoan(requestId)
+    +disburseLoan(loanId)
+    +processInstallment(loanId, n)
+  }
+
+  class WorldBankReserve {
+    +allocateCapital(bank, amount)
+    +registerNationalBank(addr)
+  }
+
+  class NationalBank {
+    +registerLocalBank(addr)
+    +allocateToLocal(bank, amount)
+  }
+
+  class LocalBank {
+    +onboardClient(wallet)
+    +freezeAccount(clientId)
+  }
+
+  class LoanService {
+    +submitApplication(dto)
+    +getAuthorityBrief(loanId)
+  }
+
+  class ScoringService {
+    +score(features) float
+    +explain(loanId) SHAPVector
+  }
+
+  class Institution {
+    <<abstract>>
+    +institutionId: PK
+    +institutionType: enum
+  }
+
+  Institution <|-- WorldBankReserve
+  Institution <|-- NationalBank
+  Institution <|-- LocalBank
+  Borrower "1" --> "0..*" LoanRequest : submits
+  LoanRequest "1" --> "0..1" LoanController : mirrored on-chain
+  LoanService ..> LoanController : calls via API
+  LoanService ..> ScoringService : POST /v1/score
+  WorldBankReserve --> NationalBank : downward capital
+  NationalBank --> LocalBank : downward capital
+  LocalBank --> Borrower : retail service

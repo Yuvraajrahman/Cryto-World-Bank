@@ -1,0 +1,23 @@
+%%{init: {"theme": "base", "flowchart": {"htmlLabels": true, "curve": "linear", "nodeSpacing": 20, "rankSpacing": 28, "padding": 6, "useMaxWidth": false}, "themeVariables": {"fontSize": "13px"}} }%%
+flowchart LR
+
+  subgraph SC["Smart contracts"]
+    SCN["Solidity 0.8.20, OpenZeppelin<br/>Foundry (build, fuzz, invariants), Hardhat"]
+  end
+
+  subgraph SEC["Security &amp; verification"]
+    SECN["Slither (static), Mythril (symbolic)<br/>Echidna (property fuzz), Halmos / Certora (formal)"]
+  end
+
+  subgraph BE["Off-chain backend"]
+    BEN["Express.js API, PostgreSQL, event listener<br/>FastAPI ML service (RF + IF + stacking, SHAP)"]
+  end
+
+  subgraph FE["Frontend &amp; oracle"]
+    FEN["React + TypeScript dashboard, MCP agent<br/>Chainlink Functions / Automation / Price Feed / PoR"]
+  end
+
+  SC --> SEC --> BE --> FE
+
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class SCN,SECN,BEN,FEN mid;

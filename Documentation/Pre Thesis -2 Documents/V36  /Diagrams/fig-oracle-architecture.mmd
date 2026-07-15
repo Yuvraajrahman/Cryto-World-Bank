@@ -1,0 +1,30 @@
+flowchart TB
+  ML["Off-Chain ML Risk Service<br/>FastAPI: RF + Isolation Forest + SHAP"]
+  subgraph PATHS["Risk-score delivery paths"]
+    direction LR
+    CR["Commit-Reveal Oracle<br/>authoritative (MVT)"]
+    FN["Chainlink Functions<br/>stretch, DON-signed"]
+  end
+  LB["LocalBank loan contract<br/>consumes risk score"]
+  WBR["WorldBankReserve<br/>publishes reserve balance"]
+  subgraph SVC["Supporting Chainlink services"]
+    direction LR
+    AU["Automation<br/>installment upkeep"]
+    PF["Price Feeds<br/>ETH/USD, EUR/USD"]
+    POR["Proof of Reserve<br/>solvency attestation"]
+  end
+
+  ML --> CR
+  ML --> FN
+  CR --> LB
+  FN --> LB
+  AU --> LB
+  PF --> LB
+  POR --> WBR
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef neutral fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class LB,WBR apex;
+  class CR,FN,AU,PF,POR mid;
+  class ML neutral;

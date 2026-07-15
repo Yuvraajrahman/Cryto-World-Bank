@@ -1,0 +1,26 @@
+%%{init: {"theme": "base", "flowchart": {"htmlLabels": true, "curve": "linear", "nodeSpacing": 20, "rankSpacing": 28, "padding": 6, "useMaxWidth": false}, "themeVariables": {"fontSize": "15px"}} }%%
+flowchart TB
+
+  S0["BCCC-DeFiFraudTrans-2025<br/>fraud + legitimate CSV merge"]
+  S1["Full corpus: 1.03M rows, 172 columns"]
+  S2["Subsample 50,000 transactions<br/>seed = 42; fraud rate &asymp; 8.7%"]
+  S3["Remove leakage columns<br/>flag, fraud, and label fields"]
+  S4["Select 21 behavioral features<br/>transfers, gas, addresses, nonce"]
+  S5["Clean values and scale<br/>StandardScaler fit on train only"]
+  S6["Grouped hold-out split<br/>by wallet address"]
+
+  T["Train set<br/>37,715 rows"]
+  V["Validation set<br/>7,145 rows"]
+  Te["Test set<br/>5,140 rows"]
+
+  S0 --> S1 --> S2 --> S3 --> S4 --> S5 --> S6
+  S6 --> T
+  S6 --> V
+  S6 --> Te
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef note fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class S0,S6 apex;
+  class S1,S2,S3,S4,S5 mid;
+  class T,V,Te note;

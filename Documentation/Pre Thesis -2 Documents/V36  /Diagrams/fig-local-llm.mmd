@@ -1,0 +1,41 @@
+flowchart TB
+  subgraph CLIENT["Client tier"]
+    direction TB
+    U["Authenticated client (wallet)"]
+    UI["React UI — thin client,<br/>streaming chat-completions"]
+  end
+
+  subgraph OFFCHAIN["Off-chain services"]
+    direction TB
+    SCAN["Prompt-injection scanner<br/>(Layer 2; sanitises user-sourced fields)"]
+    API["Express API — context injection layer"]
+    CTX["On-chain context block:<br/>wallet, savings_balance, pool_utilisation,<br/>kyc_tier, session_id, parent_session_id,<br/>compression_summary, last 10 turns"]
+    MODEL["Qwen3-8B (llama.cpp, Q4_K_M)"]
+    MCP["MCP tool server (3-5 MVT tools,<br/>typed parameter schemas)"]
+    DB["PostgreSQL"]
+    GATE["Human confirmation gate<br/>+ confirmation audit-hook middleware"]
+  end
+
+  subgraph ONCHAIN["On-chain"]
+    direction TB
+    CALL["eth_call read (200 ms timeout;<br/>else static-context fallback)"]
+    SK["EIP-7702 session key<br/>(scoped, value-capped, 24h, revocable)"]
+    SC["Smart contracts"]
+    LOG["AGENT_ACTION_LOG (append-only)"]
+  end
+
+  U --> UI
+  UI -->|"user content"| SCAN --> API
+  API -->|"read state"| CALL --> CTX
+  CTX --> API
+  API -->|"grounded prompt"| MODEL --> MCP
+  MCP -->|"read tool"| DB --> API
+  MCP -->|"write tool"| GATE --> SK --> SC --> LOG
+  API -->|"streamed answer"| UI
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef note fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class U,GATE apex;
+  class UI,API,MODEL,MCP,DB,SK,SC mid;
+  class SCAN,CTX,CALL,LOG note;

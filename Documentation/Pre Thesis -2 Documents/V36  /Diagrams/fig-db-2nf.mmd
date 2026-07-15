@@ -1,0 +1,16 @@
+flowchart TB
+  BAD["<b>INSTALLMENT</b> &mdash; violates 2NF<br/>PK (loan_id, installment_number)<br/>amount_due, due_date<br/>loan_principal (depends on loan_id only &rarr; partial dependency)"]
+  R["Apply 2NF: move attributes that depend on only<br/>part of the composite key up to LOAN"]
+  G1["<b>LOAN</b><br/>loan_id (PK)<br/>loan_principal"]
+  G2["<b>INSTALLMENT</b> (weak entity)<br/>PK (loan_id, installment_number)<br/>amount_due, due_date"]
+
+  BAD --> R
+  R --> G1
+  G1 -->|"1 : N (identifies)"| G2
+
+  classDef bad fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  classDef note fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1px,color:#111111;
+  classDef good fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class BAD bad;
+  class R note;
+  class G1,G2 good;

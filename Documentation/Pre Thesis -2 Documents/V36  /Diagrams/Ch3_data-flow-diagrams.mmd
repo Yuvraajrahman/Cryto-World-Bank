@@ -1,0 +1,46 @@
+flowchart TB
+  subgraph L0["Level-0 Context Diagram"]
+    direction LR
+    EC0["Client"]
+    EA0["Bank Admin"]
+    ED0["Chainlink DON"]
+    EX0["External Auditor"]
+    P0(("0<br/>Crypto World<br/>Bank"))
+    EC0 -->|"application, repayment"| P0
+    P0 -->|"status, funds"| EC0
+    EA0 -->|"approve / freeze"| P0
+    ED0 -->|"price / score feed"| P0
+    P0 -->|"reserve proof"| EX0
+  end
+
+  subgraph L1["Level-1 Decomposition"]
+    direction TB
+    EC1["Client"]
+    EA1["Bank Admin"]
+    ED1["Chainlink DON"]
+    P1(("1.0<br/>Lending"))
+    P2(("2.0<br/>Deposits /<br/>Interbank / FX"))
+    P3(("3.0<br/>Risk &amp;<br/>Compliance"))
+    DS1[("D1 LOAN_REQUEST / LOAN")]
+    DS2[("D2 TRANSACTION")]
+    DS3[("D3 CREDIT_PASSPORT")]
+    DS4[("D4 SECURITY_EVENT_LOG")]
+
+    EC1 -->|"apply / repay"| P1
+    P1 -->|"risk features"| P3
+    ED1 -->|"score / price"| P3
+    EA1 -->|"approve / reject"| P1
+    P1 --> DS1
+    P1 --> DS2
+    P3 --> DS3
+    P3 --> DS4
+    P2 --> DS2
+    EC1 -->|"deposit / swap"| P2
+  end
+
+  classDef ext fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef proc fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef store fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class EC0,EA0,ED0,EX0,EC1,EA1,ED1 ext;
+  class P0,P1,P2,P3 proc;
+  class DS1,DS2,DS3,DS4 store;

@@ -1,0 +1,19 @@
+flowchart TB
+  P1["Phase I — Foundation &amp; infrastructure (Weeks 1-4)<br/>SDLC: Requirements + Design<br/>Contract hierarchy, full DB schema, React shell"]
+  G1{"Gate G1<br/>supervisor sign-off"}
+  P2["Phase II — Core banking &amp; on-chain lifecycle (Weeks 5-9)<br/>SDLC: Implementation<br/>Lending workflow, SBT limits, Chainlink Automation"]
+  G2{"Gate G2"}
+  P3["Phase III — AI/ML oracle + conversational agent (Weeks 10-13)<br/>SDLC: Implementation + Integration<br/>Commit-reveal oracle, ML pipeline, MCP agent, dashboard"]
+  G3{"Gate G3"}
+  P4["Phase IV — Verification, evaluation, finalization (Weeks 14-16)<br/>SDLC: Testing + Deployment<br/>Foundry, simulation, evaluation pack, testnet deploy"]
+  G4{"Gate G4"}
+  E(("final thesis"))
+
+  P1 --> G1 --> P2 --> G2 --> P3 --> G3 --> P4 --> G4 --> E
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class E apex;
+  class P1,P2,P3,P4 mid;
+  class G1,G2,G3,G4 dec;

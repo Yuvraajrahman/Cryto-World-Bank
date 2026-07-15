@@ -1,0 +1,29 @@
+flowchart TB
+  subgraph NORMAL["Normal path (parameter change / upgrade)"]
+    direction TB
+    N1["Proposal created<br/>(voting power snapshot at creation block)"]
+    N2{"Quorum &ge; 60% ?"}
+    N3["48h TimelockController<br/>(5 min in lab demo)"]
+    N4["Execute change"]
+    N5["Rejected"]
+    N1 --> N2
+    N2 -- yes --> N3 --> N4
+    N2 -- no --> N5
+  end
+
+  subgraph EMERGENCY["Emergency path"]
+    direction TB
+    E1["2-of-3 emergency pause multisig<br/>(WB admin, NB rep, security reviewer)"]
+    E2["Pause operations within minutes"]
+    E3["4-of-7 Security Council Safe<br/>pause / upgrade / revoke roles within 2h"]
+    E4["Mandatory 48h disclosure;<br/>cannot change params outside timelock"]
+    E1 --> E2
+    E3 --> E4
+  end
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class N4,E2 apex;
+  class N1,N3,N5,E1,E3,E4 mid;
+  class N2 dec;

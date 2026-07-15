@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 596 1015" width="595pt" height="1013.30pt">
+
+<rect width="596" height="1015" fill="#FFFFFF"/>
+
+<g id="entities">
+<g id="ent-INCOME_PROOF">
+<rect x="16" y="16" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="16" y="16" width="172" height="24" rx="4" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="16" y="37" width="172" height="3" fill="#7DD3FC"/>
+<text x="102.0" y="32" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">INCOME_PROOF</text>
+<rect x="19.0" y="42" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="31.0" y="51" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="52" y="51" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">proof_id</text>
+<rect x="19.0" y="57" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="31.0" y="66" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="52" y="66" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_id</text>
+<text x="52" y="81" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">document_hash</text>
+</g>
+<g id="ent-MODEL_REGISTRY">
+<rect x="16" y="143" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="16" y="143" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="16" y="164" width="172" height="3" fill="#E0F7FF"/>
+<text x="102.0" y="159" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">MODEL_REGISTRY</text>
+<rect x="19.0" y="169" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="31.0" y="178" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="52" y="178" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">model_id</text>
+<text x="52" y="193" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">model_name</text>
+<text x="52" y="208" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">version</text>
+</g>
+<g id="ent-LOAN_RISK_ASSESSMENT">
+<rect x="16" y="270" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="16" y="270" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="16" y="291" width="172" height="3" fill="#E0F7FF"/>
+<text x="102.0" y="286" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">LOAN_RISK_ASSESSMENT</text>
+<rect x="19.0" y="296" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="31.0" y="305" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="52" y="305" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">assessment_id</text>
+<rect x="19.0" y="311" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="31.0" y="320" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="52" y="320" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">loan_request_id</text>
+<rect x="19.0" y="326" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="31.0" y="335" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="52" y="335" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">model_id</text>
+</g>
+<g id="ent-SECURITY_EVENT_LOG">
+<rect x="16" y="397" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="16" y="397" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="16" y="418" width="172" height="3" fill="#E0F7FF"/>
+<text x="102.0" y="413" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">SECURITY_EVENT_LOG</text>
+<rect x="19.0" y="423" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="31.0" y="432" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="52" y="432" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">security_event_id</text>
+<text x="52" y="447" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">event_type</text>
+<text x="52" y="462" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">append_only</text>
+</g>
+<g id="ent-LOAN_GROUP">
+<rect x="212" y="16" width="172" height="58" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="16" width="172" height="24" rx="4" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="212" y="37" width="172" height="3" fill="#7DD3FC"/>
+<text x="298.0" y="32" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">LOAN_GROUP</text>
+<rect x="215.0" y="42" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="51" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="51" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">group_id</text>
+<rect x="215.0" y="57" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="66" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="66" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">local_bank_id</text>
+</g>
+<g id="ent-GROUP_MEMBER">
+<rect x="212" y="128" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="128" width="172" height="24" rx="4" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="212" y="149" width="172" height="3" fill="#7DD3FC"/>
+<text x="298.0" y="144" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">GROUP_MEMBER</text>
+<rect x="215.0" y="154" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="163" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="163" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">member_id</text>
+<rect x="215.0" y="169" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="178" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="178" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">group_id</text>
+<rect x="215.0" y="184" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="193" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="193" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_id</text>
+</g>
+<g id="ent-GROUP_CONSENT">
+<rect x="212" y="255" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="255" width="172" height="24" rx="4" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="212" y="276" width="172" height="3" fill="#7DD3FC"/>
+<text x="298.0" y="271" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">GROUP_CONSENT</text>
+<rect x="215.0" y="281" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="290" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="290" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">consent_id</text>
+<rect x="215.0" y="296" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="305" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="305" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">loan_request_id</text>
+<rect x="215.0" y="311" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="320" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="320" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">member_id</text>
+</g>
+<g id="ent-SESSIONS">
+<rect x="212" y="382" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="382" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="212" y="403" width="172" height="3" fill="#E0F7FF"/>
+<text x="298.0" y="398" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">SESSIONS</text>
+<rect x="215.0" y="408" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="417" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="417" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">session_id</text>
+<rect x="215.0" y="423" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="432" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="432" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_id</text>
+<text x="248" y="447" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">expires_at</text>
+</g>
+<g id="ent-AGENT_CONVERSATION_TURN">
+<rect x="212" y="509" width="172" height="58" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="509" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="212" y="530" width="172" height="3" fill="#E0F7FF"/>
+<text x="298.0" y="525" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">AGENT_CONVERSATION_TURN</text>
+<rect x="215.0" y="535" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="544" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="544" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">turn_id</text>
+<rect x="215.0" y="550" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="559" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="559" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">session_id</text>
+</g>
+<g id="ent-AGENT_ACTION_LOG">
+<rect x="212" y="621" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="621" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="212" y="642" width="172" height="3" fill="#E0F7FF"/>
+<text x="298.0" y="637" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">AGENT_ACTION_LOG</text>
+<rect x="215.0" y="647" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="656" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="656" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">action_id</text>
+<rect x="215.0" y="662" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="671" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="671" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">session_id</text>
+<rect x="215.0" y="677" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="686" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="686" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">confirmation_turn_id</text>
+</g>
+<g id="ent-SESSION_ANCESTOR">
+<rect x="212" y="748" width="172" height="58" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="748" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="212" y="769" width="172" height="3" fill="#E0F7FF"/>
+<text x="298.0" y="764" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">SESSION_ANCESTOR</text>
+<rect x="215.0" y="774" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="783" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="783" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">session_id</text>
+<rect x="215.0" y="789" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="798" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="798" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">ancestor_session_id</text>
+</g>
+<g id="ent-SESSION_KEY_PERMISSION">
+<rect x="212" y="860" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="212" y="860" width="172" height="24" rx="4" fill="#E0F7FF" stroke="#0284C7" stroke-width="1.2" stroke-dasharray="4 3"/>
+<rect x="212" y="881" width="172" height="3" fill="#E0F7FF"/>
+<text x="298.0" y="876" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">SESSION_KEY_PERMISSION</text>
+<rect x="215.0" y="886" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="895" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="248" y="895" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">permission_id</text>
+<rect x="215.0" y="901" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="227.0" y="910" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="248" y="910" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">session_id</text>
+<text x="248" y="925" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">tool_allowlist</text>
+</g>
+<g id="ent-SAVINGS_ACCOUNT">
+<rect x="408" y="16" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="408" y="16" width="172" height="24" rx="4" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="408" y="37" width="172" height="3" fill="#7DD3FC"/>
+<text x="494.0" y="32" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">SAVINGS_ACCOUNT</text>
+<rect x="411.0" y="42" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="51" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="444" y="51" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">account_id</text>
+<rect x="411.0" y="57" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="66" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="66" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_id</text>
+<rect x="411.0" y="72" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="81" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="81" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">local_bank_id</text>
+</g>
+<g id="ent-INTERBANK_LOAN">
+<rect x="408" y="143" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="408" y="143" width="172" height="24" rx="4" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="408" y="164" width="172" height="3" fill="#7DD3FC"/>
+<text x="494.0" y="159" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">INTERBANK_LOAN</text>
+<rect x="411.0" y="169" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="178" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="444" y="178" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">interbank_loan_id</text>
+<rect x="411.0" y="184" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="193" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="193" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">lender_institution_id</text>
+<rect x="411.0" y="199" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="208" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="208" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_institution_id</text>
+</g>
+<g id="ent-UPWARD_DEPOSIT">
+<rect x="408" y="270" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="408" y="270" width="172" height="24" rx="4" fill="#7DD3FC" stroke="#0284C7" stroke-width="1.2"/>
+<rect x="408" y="291" width="172" height="3" fill="#7DD3FC"/>
+<text x="494.0" y="286" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">UPWARD_DEPOSIT</text>
+<rect x="411.0" y="296" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="305" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="444" y="305" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">deposit_id</text>
+<rect x="411.0" y="311" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="320" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="320" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">depositor_institution_id</text>
+<rect x="411.0" y="326" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="335" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="335" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">parent_institution_id</text>
+</g>
+<g id="ent-FIXED_DEPOSIT">
+<rect x="408" y="397" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="408" y="397" width="172" height="24" rx="4" fill="#FFFFFF" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="5 3"/>
+<rect x="408" y="418" width="172" height="3" fill="#FFFFFF"/>
+<text x="494.0" y="413" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">FIXED_DEPOSIT</text>
+<rect x="411.0" y="423" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="432" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="444" y="432" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">deposit_id</text>
+<rect x="411.0" y="438" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="447" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="447" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_id</text>
+<rect x="411.0" y="453" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="462" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="462" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">local_bank_id</text>
+</g>
+<g id="ent-CURRENT_ACCOUNT">
+<rect x="408" y="524" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="408" y="524" width="172" height="24" rx="4" fill="#FFFFFF" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="5 3"/>
+<rect x="408" y="545" width="172" height="3" fill="#FFFFFF"/>
+<text x="494.0" y="540" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">CURRENT_ACCOUNT</text>
+<rect x="411.0" y="550" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="559" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="444" y="559" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">account_id</text>
+<rect x="411.0" y="565" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="574" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="574" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_id</text>
+<rect x="411.0" y="580" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="589" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="589" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">local_bank_id</text>
+</g>
+<g id="ent-INSURANCE_FUND">
+<rect x="408" y="651" width="172" height="58" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="408" y="651" width="172" height="24" rx="4" fill="#FFFFFF" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="5 3"/>
+<rect x="408" y="672" width="172" height="3" fill="#FFFFFF"/>
+<text x="494.0" y="667" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">INSURANCE_FUND</text>
+<rect x="411.0" y="677" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="686" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="444" y="686" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">fund_id</text>
+<rect x="411.0" y="692" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="701" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="701" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">local_bank_id</text>
+</g>
+<g id="ent-SYNDICATE">
+<rect x="408" y="763" width="172" height="73" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="1.4"/>
+<rect x="408" y="763" width="172" height="24" rx="4" fill="#FFFFFF" stroke="#4B5563" stroke-width="1.2" stroke-dasharray="5 3"/>
+<rect x="408" y="784" width="172" height="3" fill="#FFFFFF"/>
+<text x="494.0" y="779" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#111111">SYNDICATE</text>
+<rect x="411.0" y="789" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="798" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="444" y="798" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">syndicate_id</text>
+<rect x="411.0" y="804" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="813" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="813" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">lead_institution_id</text>
+<rect x="411.0" y="819" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="423.0" y="828" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="444" y="828" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">borrower_id</text>
+</g>
+</g>
+<g id="connectors">
+<line x1="102.0" y1="89" x2="102.0" y2="105.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="102.0" y1="127.0" x2="102.0" y2="143" stroke="#111111" stroke-width="1.0"/>
+<polygon points="102.0,105.0 134.4,116.0 102.0,127.0 69.6,116.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="102.0" y="119.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">submits</text>
+<text x="148.4" y="119.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="102.0" y1="216" x2="102.0" y2="232.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="102.0" y1="254.0" x2="102.0" y2="270" stroke="#111111" stroke-width="1.0"/>
+<polygon points="102.0,232.0 137.6,243.0 102.0,254.0 66.4,243.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="102.0" y="246.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">versions</text>
+<text x="151.6" y="246.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="102.0" y1="343" x2="102.0" y2="359.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="102.0" y1="381.0" x2="102.0" y2="397" stroke="#111111" stroke-width="1.0"/>
+<polygon points="102.0,359.0 131.2,370.0 102.0,381.0 72.8,370.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="102.0" y="373.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">scores</text>
+<text x="145.2" y="373.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="298.0" y1="74" x2="298.0" y2="90.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="298.0" y1="112.0" x2="298.0" y2="128" stroke="#111111" stroke-width="1.0"/>
+<polygon points="298.0,90.0 333.6,101.0 298.0,112.0 262.4,101.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="298.0" y="104.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">contains</text>
+<text x="347.6" y="104.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="298.0" y1="201" x2="298.0" y2="217.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="298.0" y1="239.0" x2="298.0" y2="255" stroke="#111111" stroke-width="1.0"/>
+<polygon points="298.0,217.0 324.0,228.0 298.0,239.0 272.0,228.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="298.0" y="231.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">joins</text>
+<text x="338.0" y="231.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="298.0" y1="328" x2="298.0" y2="344.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="298.0" y1="366.0" x2="298.0" y2="382" stroke="#111111" stroke-width="1.0"/>
+<polygon points="298.0,344.0 333.6,355.0 298.0,366.0 262.4,355.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="298.0" y="358.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">consents</text>
+<text x="347.6" y="358.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="298.0" y1="455" x2="298.0" y2="471.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="298.0" y1="493.0" x2="298.0" y2="509" stroke="#111111" stroke-width="1.0"/>
+<polygon points="298.0,471.0 324.0,482.0 298.0,493.0 272.0,482.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="298.0" y="485.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">opens</text>
+<text x="338.0" y="485.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="298.0" y1="567" x2="298.0" y2="583.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="298.0" y1="605.0" x2="298.0" y2="621" stroke="#111111" stroke-width="1.0"/>
+<polygon points="298.0,583.0 324.0,594.0 298.0,605.0 272.0,594.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="298.0" y="597.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">turns</text>
+<text x="338.0" y="597.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="298.0" y1="694" x2="298.0" y2="710.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="298.0" y1="732.0" x2="298.0" y2="748" stroke="#111111" stroke-width="1.0"/>
+<polygon points="298.0,710.0 327.2,721.0 298.0,732.0 268.8,721.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="298.0" y="724.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">audits</text>
+<text x="341.2" y="724.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="298.0" y1="806" x2="298.0" y2="822.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="298.0" y1="844.0" x2="298.0" y2="860" stroke="#111111" stroke-width="1.0"/>
+<polygon points="298.0,822.0 330.4,833.0 298.0,844.0 265.6,833.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="298.0" y="836.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">lineage</text>
+<text x="344.4" y="836.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="494.0" y1="89" x2="494.0" y2="105.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="494.0" y1="127.0" x2="494.0" y2="143" stroke="#111111" stroke-width="1.0"/>
+<polygon points="494.0,105.0 520.0,116.0 494.0,127.0 468.0,116.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="494.0" y="119.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">holds</text>
+<text x="534.0" y="119.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="494.0" y1="216" x2="494.0" y2="232.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="494.0" y1="254.0" x2="494.0" y2="270" stroke="#111111" stroke-width="1.0"/>
+<polygon points="494.0,232.0 520.0,243.0 494.0,254.0 468.0,243.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="494.0" y="246.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">lends</text>
+<text x="534.0" y="246.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="494.0" y1="343" x2="494.0" y2="358.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="494.0" y1="382.0" x2="494.0" y2="397" stroke="#111111" stroke-width="1.0"/>
+<polygon points="494.0,358.0 539.2,370.0 494.0,382.0 448.8,370.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="494.0" y="373.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="6.5" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">repatriates</text>
+<text x="553.2" y="373.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="494.0" y1="470" x2="494.0" y2="486.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="494.0" y1="508.0" x2="494.0" y2="524" stroke="#111111" stroke-width="1.0"/>
+<polygon points="494.0,486.0 523.2,497.0 494.0,508.0 464.8,497.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="494.0" y="500.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">offers</text>
+<text x="537.2" y="500.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="494.0" y1="597" x2="494.0" y2="613.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="494.0" y1="635.0" x2="494.0" y2="651" stroke="#111111" stroke-width="1.0"/>
+<polygon points="494.0,613.0 520.0,624.0 494.0,635.0 468.0,624.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="494.0" y="627.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">backs</text>
+<text x="534.0" y="627.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+<line x1="494.0" y1="709" x2="494.0" y2="725.0" stroke="#111111" stroke-width="1.0"/>
+<line x1="494.0" y1="747.0" x2="494.0" y2="763" stroke="#111111" stroke-width="1.0"/>
+<polygon points="494.0,725.0 520.0,736.0 494.0,747.0 468.0,736.0" fill="#FFFFFF" stroke="#111111" stroke-width="1.0"/>
+<text x="494.0" y="739.0" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="500" fill="#111111" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">leads</text>
+<text x="534.0" y="739.0" text-anchor="start" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="600" fill="#0284C7">1:N</text>
+</g>
+<rect x="14" y="967" width="568" height="46" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+<rect x="28" y="983" width="24" height="13" rx="2" fill="#7DD3FC" stroke="#0284C7" stroke-width="1"/>
+<text x="40.0" y="993" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#FFFFFF">PK</text>
+<text x="60" y="993" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">Primary Key</text>
+<rect x="124" y="983" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="136.0" y="993" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">FK</text>
+<text x="156" y="993" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">Foreign Key</text>
+<rect x="220" y="983" width="24" height="13" rx="2" fill="#E0F7FF" stroke="#0284C7" stroke-width="1"/>
+<text x="232.0" y="993" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">UK</text>
+<text x="252" y="993" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">Unique Key</text>
+<rect x="316" y="983" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="328.0" y="993" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#111111">◇</text>
+<text x="348" y="993" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">Relationship</text>
+<rect x="412" y="983" width="24" height="13" rx="2" fill="#FFFFFF" stroke="#0284C7" stroke-width="1"/>
+<text x="424.0" y="993" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="700" fill="#0284C7">1:N</text>
+<text x="444" y="993" font-family="Arial, Helvetica, sans-serif" font-size="8.5" fill="#111111">Cardinality</text>
+</svg>

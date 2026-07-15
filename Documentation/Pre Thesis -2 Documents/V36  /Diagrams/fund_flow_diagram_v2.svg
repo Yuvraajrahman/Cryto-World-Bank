@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 0 980 1040" font-family="Georgia, 'Times New Roman', serif">
+<defs>
+  <marker id="arrow" markerWidth="13.5" markerHeight="13.5" refX="10.5" refY="5.25" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L12,5.25 L0,10.5 Z" fill="#333"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="1028" height="1040" fill="#ffffff"/>
+
+<!-- Title -->
+<text x="490" y="42" text-anchor="middle" font-size="20" font-weight="700" fill="#1a1a1a">Multi-Tier Capital Flow &amp; Settlement Hierarchy</text>
+
+<!-- ===== Edges (behind boxes) ===== -->
+<!-- Tier1 <-> Tier2 -->
+<path d="M340,200 L340,340" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M400,340 L400,200" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="7,5" marker-end="url(#arrow)"/>
+<text x="325" y="274" text-anchor="end" font-size="15" fill="#1a1a1a">capital (downward)</text>
+<text x="415" y="274" text-anchor="start" font-size="15" fill="#1a1a1a">surplus deposit (upward)</text>
+
+<!-- Tier2 peer -> Tier2 -->
+<path d="M640,395 L500,395" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="570" y="380" text-anchor="middle" font-size="14" fill="#1a1a1a">interbank (same-tier)</text>
+
+<!-- Tier2 <-> Tier3 -->
+<path d="M340,450 L340,590" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M400,590 L400,450" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="7,5" marker-end="url(#arrow)"/>
+<text x="325" y="524" text-anchor="end" font-size="15" fill="#1a1a1a">capital (downward)</text>
+<text x="415" y="524" text-anchor="start" font-size="15" fill="#1a1a1a">surplus deposit (upward)</text>
+
+<!-- Tier3 peer -> Tier3 -->
+<path d="M640,645 L500,645" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<text x="570" y="630" text-anchor="middle" font-size="14" fill="#1a1a1a">interbank (same-tier)</text>
+
+<!-- Tier3 <-> Tier4 -->
+<path d="M340,700 L340,840" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M400,840 L400,700" fill="none" stroke="#333" stroke-width="1.8" stroke-dasharray="7,5" marker-end="url(#arrow)"/>
+<text x="325" y="774" text-anchor="end" font-size="15" fill="#1a1a1a">loan disbursement</text>
+<text x="415" y="774" text-anchor="start" font-size="15" fill="#1a1a1a">repayment</text>
+
+<!-- ===== Nodes ===== -->
+
+<!-- Tier 1: World Bank Reserve (root, highlighted) -->
+<rect x="240" y="90" width="260" height="110" rx="12" ry="12" fill="#a9d6f5" stroke="#2b2b2b" stroke-width="2"/>
+<g transform="translate(357,104) scale(1.3)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="370" y="164" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">World Bank Reserve</text>
+<text x="370" y="186" text-anchor="middle" font-size="14" fill="#2c3f4a">Tier 1</text>
+
+<!-- Tier 2: National Bank -->
+<rect x="240" y="340" width="260" height="110" rx="12" ry="12" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(357,354) scale(1.3)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="370" y="414" text-anchor="middle" font-size="17" fill="#1a1a1a">National Bank</text>
+<text x="370" y="436" text-anchor="middle" font-size="14" fill="#44525c">Tier 2</text>
+
+<!-- Tier 2 peer: National Bank (peer) -->
+<rect x="640" y="340" width="260" height="110" rx="12" ry="12" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(757,354) scale(1.3)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="770" y="414" text-anchor="middle" font-size="17" fill="#1a1a1a">National Bank (peer)</text>
+<text x="770" y="436" text-anchor="middle" font-size="14" fill="#44525c">Tier 2</text>
+
+<!-- Tier 3: Local Bank -->
+<rect x="240" y="590" width="260" height="110" rx="12" ry="12" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(357,604) scale(1.3)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="370" y="664" text-anchor="middle" font-size="17" fill="#1a1a1a">Local Bank</text>
+<text x="370" y="686" text-anchor="middle" font-size="14" fill="#44525c">Tier 3</text>
+
+<!-- Tier 3 peer: Local Bank (peer) -->
+<rect x="640" y="590" width="260" height="110" rx="12" ry="12" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(757,604) scale(1.3)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="770" y="664" text-anchor="middle" font-size="17" fill="#1a1a1a">Local Bank (peer)</text>
+<text x="770" y="686" text-anchor="middle" font-size="14" fill="#44525c">Tier 3</text>
+
+<!-- Tier 4: Client -->
+<rect x="260" y="840" width="220" height="100" rx="12" ry="12" fill="#ffffff" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(357,852) scale(1.3)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10" cy="6" r="4"/><path d="M2 18 c0 -5 4 -7.5 8 -7.5 s8 2.5 8 7.5"/>
+    </g>
+<text x="370" y="904" text-anchor="middle" font-size="17" fill="#1a1a1a">Client</text>
+<text x="370" y="928" text-anchor="middle" font-size="14" fill="#44525c">Tier 4</text>
+
+<!-- ===== Legend ===== -->
+<line x1="300" y1="985" x2="350" y2="985" stroke="#333" stroke-width="1.8"/>
+<text x="360" y="990" font-size="13.5" fill="#3a3a3a">Capital / loan disbursement (downward flow)</text>
+<line x1="300" y1="1010" x2="350" y2="1010" stroke="#333" stroke-width="1.8" stroke-dasharray="7,5"/>
+<text x="360" y="1015" font-size="13.5" fill="#3a3a3a">Surplus deposit / repayment (upward flow)</text>
+
+</svg>

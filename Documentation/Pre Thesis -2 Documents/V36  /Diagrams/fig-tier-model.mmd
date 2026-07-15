@@ -1,0 +1,24 @@
+flowchart TB
+  CL["Client (KYC level)"]
+  L1["L1 Basic &rarr; up to 0.1 ETH-eq"]
+  L2["L2 Standard &rarr; up to 2 ETH-eq"]
+  L3["L3 Enhanced &rarr; up to 10 ETH-eq"]
+  D{"Requested &gt;<br/>bank lending ceiling?"}
+  SOLO["Single Local Bank funds loan"]
+  SYN["Escalate to SyndicatedLoan<br/>(Lead + Co-Lenders, pro-rata shares)"]
+
+  CL --> L1
+  CL --> L2
+  CL --> L3
+  L1 --> D
+  L2 --> D
+  L3 --> D
+  D -- no --> SOLO
+  D -- yes --> SYN
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class CL apex;
+  class L1,L2,L3,SOLO,SYN mid;
+  class D dec;

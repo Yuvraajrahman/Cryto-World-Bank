@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="1280" viewBox="0 0 860 1280" role="img" aria-label="BCCC preprocessing and data split">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1B1B1B"/>
+    </marker>
+    <style>
+      text { font-family: Georgia, 'Latin Modern Roman', 'Times New Roman', serif; fill: #111111; }
+      .title { font-size: 22px; font-weight: 600; }
+      .body { font-size: 20px; }
+      .box { stroke-width: 1.1; }
+      .apex { fill: #D6E4F7; stroke: #1B1B1B; stroke-width: 1.2; }
+      .mid { fill: #EAF1FB; stroke: #1B1B1B; }
+      .note { fill: #F2F4F7; stroke: #8A8A8A; stroke-width: 1; }
+      .line { stroke: #1B1B1B; stroke-width: 1.1; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="860" height="1280" fill="#FFFFFF"/>
+
+  <g id="pipeline">
+    <rect class="box apex" x="210" y="24" width="440" height="84" rx="2"/>
+    <text class="title" x="430" y="56" text-anchor="middle">BCCC-DeFiFraudTrans-2025</text>
+    <text class="body" x="430" y="86" text-anchor="middle">fraud + legitimate CSV merge</text>
+
+    <rect class="box mid" x="210" y="128" width="440" height="60" rx="2"/>
+    <text class="body" x="430" y="164" text-anchor="middle">Full corpus: 1.03M rows, 172 columns</text>
+
+    <rect class="box mid" x="170" y="208" width="520" height="76" rx="2"/>
+    <text class="body" x="430" y="240" text-anchor="middle">Subsample 50,000 transactions</text>
+    <text class="body" x="430" y="268" text-anchor="middle">seed = 42; fraud rate approx. 8.7%</text>
+
+    <rect class="box mid" x="170" y="304" width="520" height="76" rx="2"/>
+    <text class="body" x="430" y="336" text-anchor="middle">Remove leakage columns</text>
+    <text class="body" x="430" y="364" text-anchor="middle">flag, fraud, and label fields</text>
+
+    <rect class="box mid" x="170" y="400" width="520" height="76" rx="2"/>
+    <text class="body" x="430" y="432" text-anchor="middle">Select 21 behavioral features</text>
+    <text class="body" x="430" y="460" text-anchor="middle">transfers, gas, addresses, nonce</text>
+
+    <rect class="box mid" x="170" y="496" width="520" height="76" rx="2"/>
+    <text class="body" x="430" y="528" text-anchor="middle">Clean values and scale</text>
+    <text class="body" x="430" y="556" text-anchor="middle">StandardScaler fit on train only</text>
+
+    <rect class="box apex" x="170" y="592" width="520" height="76" rx="2"/>
+    <text class="body" x="430" y="624" text-anchor="middle">Grouped hold-out split</text>
+    <text class="body" x="430" y="652" text-anchor="middle">by wallet address</text>
+
+    <line class="line" x1="430" y1="108" x2="430" y2="124"/>
+    <line class="line" x1="430" y1="188" x2="430" y2="204"/>
+    <line class="line" x1="430" y1="284" x2="430" y2="300"/>
+    <line class="line" x1="430" y1="380" x2="430" y2="396"/>
+    <line class="line" x1="430" y1="476" x2="430" y2="492"/>
+    <line class="line" x1="430" y1="572" x2="430" y2="588"/>
+    <line class="line" x1="430" y1="668" x2="430" y2="704"/>
+
+    <line class="line" x1="430" y1="704" x2="150" y2="748"/>
+    <line class="line" x1="430" y1="704" x2="430" y2="748"/>
+    <line class="line" x1="430" y1="704" x2="710" y2="748"/>
+
+    <rect class="box note" x="30" y="756" width="240" height="76" rx="2"/>
+    <text class="body" x="150" y="790" text-anchor="middle">Train set</text>
+    <text class="body" x="150" y="818" text-anchor="middle">37,715 rows</text>
+
+    <rect class="box note" x="310" y="756" width="240" height="76" rx="2"/>
+    <text class="body" x="430" y="790" text-anchor="middle">Validation set</text>
+    <text class="body" x="430" y="818" text-anchor="middle">7,145 rows</text>
+
+    <rect class="box note" x="590" y="756" width="240" height="76" rx="2"/>
+    <text class="body" x="710" y="790" text-anchor="middle">Test set</text>
+    <text class="body" x="710" y="818" text-anchor="middle">5,140 rows</text>
+  </g>
+</svg>

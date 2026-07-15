@@ -1,0 +1,16 @@
+flowchart TB
+  BAD["<b>LOCAL_BANK</b> &mdash; violates BCNF<br/>institution_id (PK)<br/>bank_tier_id<br/>base_rate, kink_utilisation, rate_above_kink, max_rate<br/>(determined by bank_tier_id &mdash; a non-key determinant)"]
+  R["Apply BCNF: extract the rate parameters into a table<br/>keyed by their determinant"]
+  G1["<b>INTEREST_RATE_TIER</b><br/>tier_id (PK)<br/>base_rate, kink_utilisation,<br/>rate_above_kink, max_rate"]
+  G2["<b>LOCAL_BANK</b><br/>institution_id (PK)<br/>tier_id (FK)"]
+
+  BAD --> R
+  R --> G1
+  G1 -->|"referenced by"| G2
+
+  classDef bad fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  classDef note fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1px,color:#111111;
+  classDef good fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class BAD bad;
+  class R note;
+  class G1,G2 good;

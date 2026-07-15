@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1313.0 1131.0" font-family="Georgia, 'Times New Roman', serif">
+<defs>
+  <marker id="arrow" markerWidth="13.5" markerHeight="13.5" refX="10.5" refY="5.25" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L12,5.25 L0,10.5 Z" fill="#333"/>
+  </marker>
+</defs>
+<rect x="0" y="0" width="1313.0" height="1131.0" fill="#ffffff"/>
+<g transform="scale(1.3)">
+<rect x="30" y="20" width="940" height="190" rx="12" ry="12" fill="#ffffff" stroke="#2b2b2b" stroke-width="1.7"/>
+<text x="56" y="50" text-anchor="start" font-family="Georgia, 'Times New Roman', serif" font-size="21.45" font-weight="700" fill="#1a1a1a" letter-spacing="0.3">Presentation Layer</text>
+<rect x="240" y="88" width="230" height="100" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(355,110) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1" y="1" width="18" height="12" rx="1.5"/><line x1="7" y1="17" x2="13" y2="17"/><line x1="10" y1="13" x2="10" y2="17"/>
+    </g>
+<text x="355.0" y="137.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">React UI</text>
+<text x="355.0" y="156.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">+ wallet signing</text>
+<rect x="510" y="88" width="260" height="100" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(640,110) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 2 h18 v11 h-11 l-4 4 v-4 h-3 z"/>
+    <circle cx="6" cy="7.5" r="0.9" fill="#2b2b2b" stroke="none"/><circle cx="10" cy="7.5" r="0.9" fill="#2b2b2b" stroke="none"/><circle cx="14" cy="7.5" r="0.9" fill="#2b2b2b" stroke="none"/>
+    </g>
+<text x="640.0" y="137.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Conversational Agent</text>
+<text x="640.0" y="156.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Qwen3-8B + MCP</text>
+<text x="640.0" y="175.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">(Phase III)</text>
+<rect x="30" y="230" width="940" height="310" rx="12" ry="12" fill="#ffffff" stroke="#2b2b2b" stroke-width="1.7"/>
+<text x="56" y="260" text-anchor="start" font-family="Georgia, 'Times New Roman', serif" font-size="21.45" font-weight="700" fill="#1a1a1a" letter-spacing="0.3">Off-Chain Services</text>
+<rect x="390" y="298" width="220" height="70" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(500,320) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10" cy="10" r="3.4"/>
+    <path d="M10 1.5 v2.2 M10 16.3 v2.2 M18.5 10 h-2.2 M3.7 10 h-2.2 M15.9 4.1 l-1.55 1.55 M5.65 14.35 l-1.55 1.55 M15.9 15.9 l-1.55 -1.55 M5.65 5.65 l-1.55 -1.55"/>
+    </g>
+<text x="500.0" y="347.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Express REST API</text>
+<rect x="125" y="398" width="210" height="120" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(230,420) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="10" cy="4" rx="8" ry="2.6"/>
+    <path d="M2 4 v11 c0 1.4 3.6 2.6 8 2.6 s8 -1.2 8 -2.6 v-11"/>
+    <path d="M2 9.5 c0 1.4 3.6 2.6 8 2.6 s8 -1.2 8 -2.6"/>
+    </g>
+<text x="230.0" y="447.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">PostgreSQL</text>
+<text x="230.0" y="466.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">51 entities (3NF)</text>
+<rect x="380" y="398" width="250" height="120" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(505,420) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1.5 18 h17"/>
+    <rect x="3" y="10" width="3.4" height="8" fill="#bfe0f5" stroke="#2b2b2b"/>
+    <rect x="8.3" y="5.5" width="3.4" height="12.5" fill="#bfe0f5" stroke="#2b2b2b"/>
+    <rect x="13.6" y="12.5" width="3.4" height="5.5" fill="#bfe0f5" stroke="#2b2b2b"/>
+    </g>
+<text x="505.0" y="447.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">ML Risk Service</text>
+<text x="505.0" y="466.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">RF + Isolation Forest</text>
+<text x="505.0" y="485.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">+ SHAP</text>
+<rect x="675" y="398" width="210" height="120" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(780,420) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 1.6 l7.5 2.8 v6 c0 5 -3.2 7.7 -7.5 9.2 c-4.3 -1.5 -7.5 -4.2 -7.5 -9.2 v-6 z"/>
+    <path d="M6.3 10.2 l2.6 2.6 l5 -5.3"/>
+    </g>
+<text x="780.0" y="447.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">KYC / AML</text>
+<text x="780.0" y="466.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">(off-chain)</text>
+<rect x="335" y="560" width="340" height="110" rx="12" ry="12" fill="#ffffff" stroke="#2b2b2b" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="505.0" y="580" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="12.5" font-style="italic" fill="#5b6b76">Oracle Layer · stretch goal</text>
+<g transform="translate(505,598) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1.2" y="6" width="8" height="8" rx="4"/><rect x="10.8" y="6" width="8" height="8" rx="4"/>
+    </g>
+<text x="505.0" y="629.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="400" fill="#1a1a1a">Commit-Reveal Oracle</text>
+<text x="505.0" y="648.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="400" fill="#1a1a1a">Chainlink Functions</text>
+<rect x="30" y="690" width="940" height="170" rx="12" ry="12" fill="#ffffff" stroke="#2b2b2b" stroke-width="1.7"/>
+<text x="56" y="720" text-anchor="start" font-family="Georgia, 'Times New Roman', serif" font-size="21.45" font-weight="700" fill="#1a1a1a" letter-spacing="0.3">On-Chain — Four-Tier Hierarchy (EVM)</text>
+<rect x="65" y="758" width="190" height="80" rx="10" ry="10" fill="#a9d6f5" stroke="#2b2b2b" stroke-width="2"/>
+<g transform="translate(160,780) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="160.0" y="807.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="700" fill="#1a1a1a">Tier 1</text>
+<text x="160.0" y="826.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="700" fill="#1a1a1a">World Bank Reserve</text>
+<rect x="295" y="758" width="190" height="80" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(390,780) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="390.0" y="807.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Tier 2</text>
+<text x="390.0" y="826.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">National Bank</text>
+<rect x="525" y="758" width="190" height="80" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(620,780) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1 7 l9 -5.5 l9 5.5 z"/><line x1="1" y1="7" x2="19" y2="7"/>
+    <line x1="3" y1="7" x2="3" y2="15.5"/><line x1="7.3" y1="7" x2="7.3" y2="15.5"/><line x1="12.7" y1="7" x2="12.7" y2="15.5"/><line x1="17" y1="7" x2="17" y2="15.5"/>
+    <line x1="0.5" y1="18" x2="19.5" y2="18"/>
+    </g>
+<text x="620.0" y="807.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Tier 3</text>
+<text x="620.0" y="826.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Local Bank / MFI</text>
+<rect x="755" y="758" width="190" height="80" rx="10" ry="10" fill="#eef6fc" stroke="#2b2b2b" stroke-width="1.6"/>
+<g transform="translate(850,780) scale(1.2) translate(-10,-10)" stroke="#2b2b2b" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10" cy="6" r="4"/><path d="M2 18 c0 -5 4 -7.5 8 -7.5 s8 2.5 8 7.5"/>
+    </g>
+<text x="850.0" y="807.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Tier 4</text>
+<text x="850.0" y="826.0" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="15" font-weight="400" fill="#1a1a1a">Client</text>
+<path d="M255,798.0 L295,798.0" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M485,798.0 L525,798.0" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M715,798.0 L755,798.0" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M355.0,188 L430,298" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M640.0,188 L580,298" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M420,368 L230.0,398" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M500.0,368 L505.0,398" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M580,368 L780.0,398" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M390,340 L50,340 L50,798 L65,798" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M505.0,518 L505.0,560" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+<path d="M505.0,670 L620.0,758" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+</g>
+</svg>

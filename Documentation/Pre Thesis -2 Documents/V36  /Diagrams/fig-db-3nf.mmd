@@ -1,0 +1,14 @@
+flowchart TB
+  BAD["<b>LOCAL_BANK</b> &mdash; violates 3NF<br/>institution_id (PK)<br/>national_bank_id (FK)<br/>total_borrowed (derivable &rarr; transitive dependency)"]
+  R["Apply 3NF: drop the derived column;<br/>compute at query time as SUM over TRANSACTION"]
+  G["<b>LOCAL_BANK</b><br/>institution_id (PK)<br/>national_bank_id (FK)"]
+
+  BAD --> R
+  R --> G
+
+  classDef bad fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  classDef note fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1px,color:#111111;
+  classDef good fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class BAD bad;
+  class R note;
+  class G good;

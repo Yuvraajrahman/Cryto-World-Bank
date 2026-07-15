@@ -1,0 +1,25 @@
+flowchart TB
+  WB["World Bank Reserve<br/>Tier 1"]
+  NB["National Bank<br/>Tier 2"]
+  NBp["National Bank (peer)<br/>Tier 2"]
+  LB["Local Bank<br/>Tier 3"]
+  LBp["Local Bank (peer)<br/>Tier 3"]
+  CL["Client<br/>Tier 4"]
+
+  WB ==>|"capital (downward)"| NB
+  NB ==>|"capital (downward)"| LB
+  LB ==>|"loan disbursement"| CL
+
+  CL -.->|"repayment"| LB
+  LB -.->|"surplus deposit (upward)"| NB
+  NB -.->|"surplus deposit (upward)"| WB
+
+  NB <-->|"interbank (same-tier)"| NBp
+  LB <-->|"interbank (same-tier)"| LBp
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef leaf fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class WB apex;
+  class NB,NBp,LB,LBp mid;
+  class CL leaf;

@@ -1,0 +1,26 @@
+flowchart TB
+  A["<b>Records identified</b><br/>892 from 6 databases"]
+  B["<b>After duplicate removal</b><br/>614 unique records"]
+  C["<b>Title / abstract screened</b><br/>614 records"]
+  D["<b>Full-text assessed</b><br/>114 records"]
+  E["<b>Included in synthesis</b><br/>116 entries"]
+  X1["Excluded at screening<br/>500: out of scope / low quality"]
+  X2["Excluded at full-text<br/>23: tangential to CWB scope"]
+  O["Other sources<br/>17: grey literature, policy docs"]
+
+  A --> B --> C --> D --> E
+  C -.-> X1
+  D -.-> X2
+  O -.-> E
+
+  classDef apex fill:#dce8f8,stroke:#1b1b1b,stroke-width:1.4px,color:#111111;
+  classDef mid  fill:#eef2f7,stroke:#1b1b1b,stroke-width:1.1px,color:#111111;
+  classDef excl fill:#f2f2f2,stroke:#6f6f6f,stroke-width:1px,color:#222222;
+  class E apex;
+  class A mid;
+  class B mid;
+  class C mid;
+  class D mid;
+  class X1 excl;
+  class X2 excl;
+  class O excl;

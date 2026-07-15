@@ -1,0 +1,87 @@
+%%{init: {"theme":"neutral","themeVariables":{"fontSize":"18px","primaryColor":"#ECECFF","primaryBorderColor":"#4C4C9E","lineColor":"#4C4C9E"},"flowchart":{"htmlLabels":true,"curve":"basis","nodeSpacing":40,"rankSpacing":50,"padding":20}} }%%
+flowchart TB
+
+    subgraph P[" Presentation Layer "]
+        direction LR
+        ReactSPA["«component»<br/><b>React SPA</b><br/><span>TypeScript · Tailwind · MUI</span>"]
+        WalletConn["«component»<br/><b>Wallet Connector</b><br/><span>Wagmi · RainbowKit · Viem</span>"]
+        ApproverUI["«component»<br/><b>Approver Dashboard</b><br/><span>Authority Brief UI</span>"]
+    end
+    ReactSPA --- ApproverUI
+    ReactSPA --- WalletConn
+
+    IRestAPI(((IRestAPI)))
+    IAgentChat(((IAgentChat)))
+    IWalletRPC(((IWalletRPC)))
+    ReactSPA -.-> IRestAPI
+    ReactSPA -.-> IAgentChat
+    WalletConn -.-> IWalletRPC
+
+    subgraph A[" Application Services Layer "]
+        direction LR
+        ExpressAPI["«component»<br/><b>Express.js API Gateway</b><br/><span>REST orchestration<br/>context injection</span>"]
+        FastAPIScore["«component»<br/><b>FastAPI Scoring Service</b><br/><span>RF + IF + stacking<br/>SHAP explainability</span>"]
+        MCPAgent["«component»<br/><b>MCP Agent Server</b><br/><span>Qwen3-8B<br/>MVT 3–5 tool schema</span>"]
+        EventListener["«component»<br/><b>Event Listener</b><br/><span>Node.js · Socket.IO</span>"]
+    end
+    ExpressAPI --- IRestAPI
+    ExpressAPI --- IAgentChat
+    ExpressAPI ==>|delegates| MCPAgent
+
+    IScoringAPI(((IScoringAPI)))
+    IOracle(((IOracle<br/>CommitReveal)))
+    IContractCall(((IContractCall)))
+    IEventStream(((IEventStream)))
+    IPersistRepo(((IPersist<br/>Repo)))
+    ICacheRepo(((ICacheRepo)))
+    IVectorStore(((IVectorStore)))
+
+    ExpressAPI -.-> IScoringAPI
+    ExpressAPI -.-> IContractCall
+    ExpressAPI -.-> IPersistRepo
+    ExpressAPI -.-> ICacheRepo
+    MCPAgent -.-> IVectorStore
+    MCPAgent -.-> IRestAPI
+    FastAPIScore --- IScoringAPI
+    FastAPIScore -.-> IOracle
+    FastAPIScore -.-> IPersistRepo
+    EventListener -.-> IEventStream
+    EventListener -.-> IPersistRepo
+
+    subgraph D[" Persistence Layer "]
+        direction LR
+        PG["«component»<br/><b>PostgreSQL</b><br/><span>51-entity 3NF schema</span>"]
+        Redis["«component»<br/><b>Redis Cache</b>"]
+        Chroma["«component»<br/><b>ChromaDB</b><br/><span>RAG vector store</span>"]
+    end
+    PG --- IPersistRepo
+    Redis --- ICacheRepo
+    Chroma --- IVectorStore
+
+    subgraph C[" On-Chain &amp; Ledger Layer "]
+        direction LR
+        Core["«component»<br/><b>Core Tier Contracts</b><br/><span>WorldBankReserve · NationalBank<br/>LocalBank · LoanController</span>"]
+        Prod["«component»<br/><b>Banking Product Contracts</b><br/><span>SavingsVault · FixedDeposit<br/>GroupLendingPool · CurrentAccount<br/>InsuranceFund</span>"]
+        Multi["«component»<br/><b>Multi-Entity Contracts</b><br/><span>InterBankLendingPool<br/>UpwardDepositFacility · SyndicatedLoan<br/>TranchedPool · TreasurySwap<br/>FXModule · LiquidationEngine<br/>NettingEngine</span>"]
+        EVM["«component»<br/><b>EVM Testnet</b><br/><span>Ethereum Sepolia<br/>Polygon Amoy</span>"]
+        Chainlink["«component» (planned)<br/><b>Chainlink DON</b><br/><span>Functions · Automation<br/>Price Feeds · PoR</span>"]
+    end
+    Core --- IContractCall
+    Prod --- IContractCall
+    Multi --- IContractCall
+    Core --- IOracle
+    EVM --- IEventStream
+    EVM --- IWalletRPC
+    Core -.- EVM
+
+    P ~~~ A
+    A ~~~ D
+    D ~~~ C
+
+    class Chainlink planned;
+    classDef planned fill:#f5f5f5,stroke:#999,stroke-width:1.5px,stroke-dasharray:6 4,color:#666;
+
+    classDef component fill:#ECECFF,stroke:#4C4C9E,stroke-width:1.5px,text-align:left;
+    classDef iface fill:#FFF6DA,stroke:#B8860B,stroke-width:1.5px;
+    class ReactSPA,WalletConn,ApproverUI,ExpressAPI,FastAPIScore,MCPAgent,EventListener,PG,Redis,Chroma,Core,Prod,Multi,EVM component;
+    class IRestAPI,IAgentChat,IWalletRPC,IScoringAPI,IOracle,IContractCall,IEventStream,IPersistRepo,ICacheRepo,IVectorStore iface;

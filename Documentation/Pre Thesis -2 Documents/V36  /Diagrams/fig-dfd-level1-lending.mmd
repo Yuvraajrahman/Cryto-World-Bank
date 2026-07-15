@@ -1,0 +1,72 @@
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '19.2px', 'primaryColor': '#ffffff', 'primaryBorderColor': '#000000', 'primaryTextColor': '#000000', 'lineColor': '#000000', 'fontFamily': 'Helvetica'}, 'flowchart': {'htmlLabels': true, 'nodeSpacing': 70, 'rankSpacing': 58, 'padding': 10}}}%%
+flowchart LR
+    %% Level-1 DFD — horizontal layout for landscape page
+
+    classDef entity fill:#f2f2f2,stroke:#000000,stroke-width:1.2px,color:#000000;
+    classDef process fill:#ffffff,stroke:#000000,stroke-width:2px,color:#000000,font-weight:bold;
+    classDef store fill:#ffffff,stroke:#000000,stroke-width:1px,color:#000000;
+
+    subgraph ENT["External entities"]
+        direction LR
+        CLIENT["Client / Borrower"]:::entity
+        APPROVER["Local Bank Approver"]:::entity
+        NATBANK["National Bank"]:::entity
+        MLSVC["ML Risk Scoring Service"]:::entity
+        CHAIN["Blockchain Ledger"]:::entity
+    end
+
+    subgraph PROC["Processes"]
+        direction LR
+        P1("1.0<br/>Submit &amp; Validate<br/>Loan Application"):::process
+        P2("2.0<br/>Compute &amp; Commit<br/>Risk Score"):::process
+        P3("3.0<br/>Review &amp; Approve /<br/>Reject Loan"):::process
+        P4("4.0<br/>Disburse Loan<br/>Funds"):::process
+        P5("5.0<br/>Generate &amp; Process<br/>Installments"):::process
+        P1 --> P2 --> P3 --> P4 --> P5
+    end
+
+    subgraph STO["Data stores"]
+        direction LR
+        D1[["D1   LOAN_REQUEST"]]:::store
+        D6[["D6   BORROWING_LIMIT"]]:::store
+        D4[["D4   LOAN_RISK_ASSESSMENT"]]:::store
+        D2[["D2   LOAN"]]:::store
+        D5[["D5   BLOCKCHAIN_EVENT_LOG"]]:::store
+        D3[["D3   INSTALLMENT"]]:::store
+    end
+
+    ENT ~~~ PROC
+    PROC ~~~ STO
+
+    CLIENT -- "Loan application" --> P1
+    P1 -- "Application confirmation" --> CLIENT
+    P1 -- "Read six/twelve-month limit" --> D6
+    P1 -- "Write request" --> D1
+
+    P2 -- "Applicant feature vector" --> MLSVC
+    MLSVC -- "Committed score hash /<br/>revealed score + SHAP" --> P2
+    P2 -- "Commit tx<br/>h = keccak256(s‖nonce)" --> CHAIN
+    CHAIN -- "Reveal confirmation" --> P2
+    P2 -- "Write risk assessment" --> D4
+
+    P3 -- "Read request" --> D1
+    P3 -- "Authority Brief" --> APPROVER
+    APPROVER -- "Approve / reject decision" --> P3
+    P3 -- "Update status" --> D1
+
+    P4 -- "Reserve draw-down check" --> NATBANK
+    NATBANK -- "Reserve confirmation" --> P4
+    P4 -- "Disbursement tx" --> CHAIN
+    CHAIN -- "LoanDisbursed event" --> P4
+    P4 -- "Write loan record" --> D2
+    P4 -- "Log event" --> D5
+    P4 -- "Disbursement notification" --> CLIENT
+
+    P5 -- "Generate schedule" --> D3
+    CLIENT -- "Installment payment" --> P5
+    P5 -- "Payment tx" --> CHAIN
+    CHAIN -- "InstallmentPaid event" --> P5
+    P5 -- "Update installment" --> D3
+    P5 -- "Recalculate rolling exposure" --> D6
+    P5 -- "Log event" --> D5
+    P5 -- "Repayment confirmation" --> CLIENT

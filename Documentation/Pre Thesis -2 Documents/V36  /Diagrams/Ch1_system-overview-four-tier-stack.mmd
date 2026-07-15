@@ -1,0 +1,42 @@
+flowchart TB
+  subgraph L1["Presentation Layer"]
+    direction LR
+    UI["React UI<br/>+ wallet signing"]
+    AG["Conversational Agent<br/>Qwen3-8B + MCP (Phase III)"]
+  end
+  subgraph L2["Off-Chain Services"]
+    direction LR
+    API["Express REST API"]
+    DB["PostgreSQL<br/>51 entities (3NF)"]
+    MLS["ML Risk Service<br/>RF + Isolation Forest + SHAP"]
+    KYC["KYC / AML<br/>(off-chain)"]
+  end
+  subgraph L3["Oracle Layer"]
+    OR["Commit-Reveal Oracle<br/>Chainlink Functions (stretch)"]
+  end
+  subgraph L4["On-Chain: Four-Tier Hierarchy (EVM)"]
+    direction TB
+    WB["Tier 1 &mdash; World Bank Reserve"]
+    NB["Tier 2 &mdash; National Bank"]
+    LB["Tier 3 &mdash; Local Bank / MFI"]
+    CL["Tier 4 &mdash; Client"]
+    WB --> NB --> LB --> CL
+  end
+
+  UI --> API
+  AG --> API
+  API --> DB
+  API --> MLS
+  API --> KYC
+  MLS --> OR
+  OR --> LB
+  API --> WB
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef leaf fill:#FFFFFF,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef neutral fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class WB apex;
+  class NB,LB mid;
+  class CL leaf;
+  class UI,AG,API,DB,MLS,KYC,OR neutral;

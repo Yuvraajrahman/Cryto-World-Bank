@@ -1,0 +1,48 @@
+<svg viewBox="0 0 820 480" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+
+  <rect x="1" y="1" width="818" height="478" fill="white" stroke="#cccccc" stroke-width="1"/>
+
+  <text x="410" y="34" text-anchor="middle" font-size="20" font-weight="bold" fill="#111">UpwardDepositFacility — Surplus Repatriation</text>
+  <text x="410" y="55" text-anchor="middle" font-size="13" font-style="italic" fill="#333">Lower-tier reserves above the minimum requirement are funded upward and earn interest</text>
+
+  <!-- Local Bank -->
+  <rect x="320" y="90" width="180" height="70" rx="6" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.5"/>
+  <text x="410" y="120" text-anchor="middle" font-size="15" font-weight="bold" fill="#111">Local Bank</text>
+  <text x="410" y="138" text-anchor="middle" font-size="12" fill="#333">(surplus reserves, Tier 3)</text>
+
+  <!-- Reserve check note -->
+  <rect x="560" y="95" width="220" height="60" rx="6" fill="#fdf5e6" stroke="#c9a96a" stroke-width="1"/>
+  <text x="670" y="118" text-anchor="middle" font-size="11.5" fill="#5a4520">Eligible only if reserves</text>
+  <text x="670" y="134" text-anchor="middle" font-size="11.5" fill="#5a4520">exceed the min. requirement</text>
+
+  <!-- National Bank -->
+  <rect x="320" y="230" width="180" height="70" rx="6" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.5"/>
+  <text x="410" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="#111">National Bank</text>
+  <text x="410" y="278" text-anchor="middle" font-size="12" fill="#333">(parent, Tier 2)</text>
+
+  <!-- World Bank -->
+  <rect x="320" y="370" width="180" height="70" rx="6" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.5"/>
+  <text x="410" y="400" text-anchor="middle" font-size="15" font-weight="bold" fill="#111">World Bank</text>
+  <text x="410" y="418" text-anchor="middle" font-size="12" fill="#333">(root, Tier 1)</text>
+
+  <!-- Arrows Local -> National -->
+  <line x1="395" y1="160" x2="395" y2="225" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#arrow2)"/>
+  <text x="330" y="195" text-anchor="middle" font-size="12" fill="#111">deposit</text>
+  <line x1="425" y1="225" x2="425" y2="160" stroke="#555" stroke-width="1.3" stroke-dasharray="5,4" marker-end="url(#arrow2)"/>
+  <text x="495" y="195" text-anchor="middle" font-size="12" fill="#333">withdraw + interest</text>
+
+  <!-- Arrows National -> World -->
+  <line x1="395" y1="300" x2="395" y2="365" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#arrow2)"/>
+  <text x="330" y="335" text-anchor="middle" font-size="12" fill="#111">deposit</text>
+  <line x1="425" y1="365" x2="425" y2="300" stroke="#555" stroke-width="1.3" stroke-dasharray="5,4" marker-end="url(#arrow2)"/>
+  <text x="495" y="335" text-anchor="middle" font-size="12" fill="#333">withdraw + interest</text>
+
+  <!-- Footer -->
+  <rect x="60" y="450" width="700" height="20" rx="6" fill="#fafafa" stroke="#bbbbbb" stroke-width="1"/>
+  <text x="410" y="464" text-anchor="middle" font-size="12" fill="#222">Deposits chain upward one tier at a time; each hop is a separate facility instance.</text>
+</svg>

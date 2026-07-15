@@ -1,0 +1,21 @@
+flowchart TB
+  S(("start"))
+  A1["Isolation Forest flags wallet<br/>anomaly_score &gt; 0.75"]
+  A2["Record: LOAN_RISK_ASSESSMENT (per-loan)<br/>+ SECURITY_EVENT_LOG (system-wide)"]
+  A3["Express emits aml-alert; compliance dashboard consumes"]
+  A4["Bank officer reviews alert in admin queue"]
+  D{"Confirmed?"}
+  FP["False positive: dismiss + document reason (audit_logs)"]
+  CF["Generate SAR (audit_logs);<br/>INSTITUTION_MESSAGE SAR_ESCALATION to National Bank;<br/>freezeAccount(clientId)"]
+  E(("end"))
+
+  S --> A1 --> A2 --> A3 --> A4 --> D
+  D -- no --> FP --> E
+  D -- yes --> CF --> E
+
+  classDef term fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef act fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class S,E term;
+  class A1,A2,A3,A4,FP,CF act;
+  class D dec;

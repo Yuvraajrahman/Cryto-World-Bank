@@ -1,0 +1,205 @@
+%%{init: {"theme": "neutral", "themeVariables": {"fontSize": "33px"}, "flowchart": {"htmlLabels": true, "curve": "basis", "nodeSpacing": 54, "rankSpacing": 126, "padding": 24}} }%%
+%% =====================================================================================
+%%  Crypto World Bank -- Full Relational ERD (Crow's-Foot-Style Cardinalities)
+%%  Complete logical data model: 51 documented entities (Table "Core database entities" +
+%%  Table "Deferred and extension entities") plus 2 Phase-IV platform-configuration
+%%  tables that sit outside the 51-entity count (CHAIN_REGISTRY, SESSION_KEY_PERMISSION).
+%%  Rendered as a layout-controlled table diagram rather than Mermaid's native erDiagram,
+%%  because the automatic ER layout does not stay within one landscape page at this scale.
+%%  Notation:
+%%    - Rectangle = one relation (table); header = table name, colour = migration tier
+%%    - <u>attribute</u> = primary key (composite keys: both parts underlined)
+%%    - "(FK)"  = foreign key column           "(UK)" = unique key column
+%%    - Edge label "1-1" / "1-N" / "1-0..N"    = cardinality, read parent-to-child
+%%    - Solid edge  = mandatory (NOT NULL) FK    Dashed edge = optional / nullable FK
+%% =====================================================================================
+flowchart LR
+
+    classDef m1 fill:#eaf1fb,stroke:#1b4f72,stroke-width:2px,color:#111,font-size:33px;
+    classDef m2 fill:#eafaf1,stroke:#196f3d,stroke-width:2px,color:#111,font-size:33px;
+    classDef m3 fill:#f4ecf7,stroke:#6c3483,stroke-width:2px,color:#111,font-size:33px;
+    classDef stub fill:#f2f3f4,stroke:#616a6b,stroke-width:2px,stroke-dasharray:8 5,color:#111,font-size:33px;
+    classDef future fill:#fbfbfb,stroke:#909497,stroke-width:2px,stroke-dasharray:4 6,color:#333,font-size:33px;
+    classDef p4 fill:#fef9e7,stroke:#9a7d0a,stroke-width:2px,stroke-dasharray:4 6,color:#333,font-size:33px;
+    classDef legend fill:#ffffff,stroke:#909497,stroke-width:2px,color:#111,font-size:30px;
+
+    subgraph LEGEND[" Notation Key "]
+    direction LR
+        LGA["<b>M1 core</b> (13)"]:::m1
+        LGB["<b>M2</b> (12)"]:::m2
+        LGC["<b>M3</b> (7)"]:::m3
+        LGD["<b>Stub</b> (10)"]:::stub
+        LGE["<b>Future work</b> (9)"]:::future
+        LGF["<b>Phase IV</b> (2, outside 51)"]:::p4
+        LGG["<u>PK</u> underlined &nbsp;·&nbsp; (FK)/(UK) tags &nbsp;·&nbsp; edge label = cardinality &nbsp;·&nbsp; dashed edge = optional"]:::legend
+        LGA ~~~ LGB ~~~ LGC ~~~ LGD ~~~ LGE ~~~ LGF ~~~ LGG
+    end
+
+    %% ============================ COLUMN 1: INSTITUTIONS + ACTORS =======================
+    subgraph COL1[" Institutions and Actors (M1) "]
+    direction TB
+        T_INST["<b>INSTITUTION</b><hr/><u>institution_id</u><br/>name, institution_type<br/>contract_address (UK)"]:::m1
+        T_CTY["<b>COUNTRY</b><hr/><u>country_code</u><br/>country_name"]:::m1
+        T_WB["<b>WORLD_BANK</b><hr/><u>institution_id</u> (FK)<br/>CHECK = 1"]:::m1
+        T_NB["<b>NATIONAL_BANK</b><hr/><u>institution_id</u> (FK)<br/>country_code (FK,UK)<br/>parent_world_bank_id (FK)"]:::m1
+        T_LB["<b>LOCAL_BANK</b><hr/><u>institution_id</u> (FK)<br/>national_bank_id (FK)"]:::m1
+        T_BU["<b>BANK_USER</b><hr/><u>bank_user_id</u><br/>bank_type<br/>institution_id (FK)"]:::m1
+        T_BR["<b>BORROWER</b><hr/><u>borrower_id</u><br/>wallet_address (UK)<br/>registered_local_bank_id (FK)<br/>kyc_level"]:::m1
+
+        T_INST ---|"1-0..1"| T_WB
+        T_INST ---|"1-N"| T_NB
+        T_INST ---|"1-N"| T_LB
+        T_CTY ---|"1-0..1"| T_NB
+        T_WB ---|"1-N"| T_NB
+        T_NB ---|"1-N"| T_LB
+        T_INST ---|"1-N"| T_BU
+        T_LB ---|"1-N"| T_BR
+    end
+
+    %% ======================== COLUMN 2: LENDING LIFECYCLE + SYNC (M1) ====================
+    subgraph COL2[" Lending Lifecycle, Sync, Assets, Audit (M1) "]
+    direction TB
+        T_LR["<b>LOAN_REQUEST</b><hr/><u>request_id</u><br/>borrower_id (FK)<br/>local_bank_id (FK)<br/>status, oracle_state<br/>blockchain_tx_hash (UK)<br/>submission/approval_event_log_id (FK)"]:::m1
+        T_LN["<b>LOAN</b><hr/><u>loan_id</u><br/>loan_request_id (FK)<br/>collateral_asset_id (FK)<br/>loan_asset_id (FK)<br/>disbursement_event_log_id (FK)"]:::m1
+        T_INS["<b>INSTALLMENT</b> (weak)<hr/><u>loan_id, installment_number</u><br/>payment_event_log_id (FK)<br/>amount_due, status"]:::m1
+        T_BEL["<b>BLOCKCHAIN_EVENT_LOG</b><hr/><u>event_id</u><br/>tx_hash (UK), event_name"]:::m1
+        T_AST["<b>ASSETS</b><hr/><u>asset_id</u><br/>symbol (UK), asset_type"]:::m1
+        T_AUD["<b>AUDIT_LOGS</b><hr/><u>audit_id</u><br/>bank_user_id (FK)<br/>action_type (append-only)"]:::m1
+
+        T_BR --- |"1-N"| T_LR
+        T_LB --- |"1-N"| T_LR
+        T_LR ---|"1-1"| T_LN
+        T_LN ---|"1-N"| T_INS
+        T_AST ---|"1-N"| T_LN
+        T_LR -.->|"0..1 each"| T_BEL
+        T_LN -.->|"0..1"| T_BEL
+        T_INS -.->|"0..1"| T_BEL
+        T_BU -.->|"0..N"| T_AUD
+    end
+
+    %% =============== COLUMN 3: LEDGER, CREDIT, RATE TIER, ML RISK (M2 / M3) ===============
+    subgraph COL3[" Ledger, Credit Passport, Rates, ML Risk (M2/M3) "]
+    direction TB
+        T_TXN["<b>TRANSACTION</b><hr/><u>transaction_id</u><br/>borrower_id (FK)<br/>origin/counterparty_institution_id (FK)<br/>CHECK: >=1 non-null"]:::m2
+        T_BLM["<b>BORROWING_LIMIT</b><hr/><u>limit_id</u><br/>borrower_id (FK,UK)<br/>on_chain_enforced_limit"]:::m2
+        T_CP["<b>CREDIT_PASSPORT</b><hr/><u>passport_id</u><br/>borrower_id (FK,UK)<br/>credit_score, risk_tier"]:::m2
+        T_CPH["<b>CREDIT_PASSPORT_HISTORY</b><hr/><u>history_id</u><br/>passport_id (FK)<br/>(append-only)"]:::m2
+        T_IP["<b>INCOME_PROOF</b><hr/><u>proof_id</u><br/>borrower_id (FK)<br/>document_hash"]:::m2
+        T_IRT["<b>INTEREST_RATE_TIER</b><hr/><u>tier_id</u><br/>bank_tier_type (UK)<br/>base_rate, kink_utilisation<br/>rate_above_kink, max_rate"]:::m2
+        T_LRA["<b>LOAN_RISK_ASSESSMENT</b><hr/><u>assessment_id</u><br/>loan_request_id (FK)<br/>model_id (FK)<br/>fraud_probability, shap_vector"]:::m3
+        T_MR["<b>MODEL_REGISTRY</b><hr/><u>model_id</u><br/>model_name, version"]:::m3
+        T_SEC["<b>SECURITY_EVENT_LOG</b><hr/><u>security_event_id</u><br/>event_type (append-only)"]:::m3
+
+        T_BR ---|"1-N"| T_TXN
+        T_INST -.->|"0..N origin"| T_TXN
+        T_INST -.->|"0..N counterparty"| T_TXN
+        T_BR ---|"1-1"| T_BLM
+        T_BR ---|"1-1"| T_CP
+        T_CP ---|"1-N"| T_CPH
+        T_BR ---|"1-N"| T_IP
+        T_LR ---|"1-N"| T_LRA
+        T_MR ---|"1-N"| T_LRA
+    end
+
+    %% =========== COLUMN 4: GROUP LENDING + AGENT / SESSION LINEAGE (M2 / M3) ==============
+    subgraph COL4[" Group Lending and Agent Sessions (M2/M3) "]
+    direction TB
+        T_LG["<b>LOAN_GROUP</b><hr/><u>group_id</u><br/>local_bank_id (FK)"]:::m2
+        T_GM["<b>GROUP_MEMBER</b><hr/><u>member_id</u><br/>group_id (FK)<br/>borrower_id (FK)"]:::m2
+        T_GC["<b>GROUP_CONSENT</b><hr/><u>consent_id</u><br/>loan_request_id (FK)<br/>member_id (FK)"]:::m2
+        T_SES["<b>SESSIONS</b><hr/><u>session_id</u><br/>borrower_id (FK)<br/>scope_json, expires_at"]:::m3
+        T_AAL["<b>AGENT_ACTION_LOG</b><hr/><u>action_id</u><br/>session_id (FK)<br/>confirmation_turn_id (FK)<br/>(append-only)"]:::m3
+        T_ACT["<b>AGENT_CONVERSATION_TURN</b><hr/><u>turn_id</u><br/>session_id (FK)"]:::m3
+        T_SAN["<b>SESSION_ANCESTOR</b><hr/><u>session_id, ancestor_session_id</u> (FK)"]:::m3
+        T_SKP["<b>SESSION_KEY_PERMISSION</b><hr/><u>permission_id</u><br/>session_id (FK)<br/>tool_allowlist"]:::p4
+
+        T_LB ---|"1-N"| T_LG
+        T_LG ---|"1-N"| T_GM
+        T_BR ---|"1-N"| T_GM
+        T_LR ---|"1-N"| T_GC
+        T_GM ---|"1-N"| T_GC
+        T_BR ---|"1-N"| T_SES
+        T_SES ---|"1-N"| T_AAL
+        T_ACT ---|"1-N"| T_AAL
+        T_SES ---|"1-N"| T_ACT
+        T_SES ---|"1-N"| T_SAN
+        T_SES ---|"1-N"| T_SKP
+    end
+
+    %% ========= COLUMN 5: MULTI-ENTITY CAPITAL OPS + DEPOSIT PRODUCTS (M2 / Stub) =========
+    subgraph COL5[" Multi-Entity Capital Ops and Deposit Products (M2/Stub) "]
+    direction TB
+        T_SAV["<b>SAVINGS_ACCOUNT</b><hr/><u>account_id</u><br/>borrower_id (FK)<br/>local_bank_id (FK)"]:::m2
+        T_IBL["<b>INTERBANK_LOAN</b><hr/><u>interbank_loan_id</u><br/>lender/borrower_institution_id (FK)"]:::m2
+        T_UD["<b>UPWARD_DEPOSIT</b><hr/><u>deposit_id</u><br/>depositor/parent_institution_id (FK)"]:::m2
+        T_FD["<b>FIXED_DEPOSIT</b><hr/><u>deposit_id</u><br/>borrower_id (FK)<br/>local_bank_id (FK)"]:::stub
+        T_CA["<b>CURRENT_ACCOUNT</b><hr/><u>account_id</u><br/>borrower_id (FK)<br/>local_bank_id (FK)"]:::stub
+        T_INSF["<b>INSURANCE_FUND</b><hr/><u>fund_id</u><br/>local_bank_id (FK)"]:::stub
+        T_SYN["<b>SYNDICATE</b><hr/><u>syndicate_id</u><br/>lead_institution_id (FK)<br/>borrower_id (FK)"]:::stub
+        T_SYNM["<b>SYNDICATE_MEMBER</b><hr/><u>syndicate_member_id</u><br/>syndicate_id (FK)<br/>member_institution_id (FK)"]:::stub
+        T_TP["<b>TRANCHED_POOL</b><hr/><u>pool_id</u><br/>sponsor_institution_id (FK)"]:::stub
+        T_TPS["<b>TRANCHED_POOL_SUBSCRIPTION</b><hr/><u>subscription_id</u><br/>pool_id (FK)<br/>subscriber_id (FK)"]:::stub
+        T_TSW["<b>TREASURY_SWAP</b><hr/><u>swap_id</u><br/>initiator_institution_id (FK)<br/>from/to_asset_id (FK)"]:::stub
+        T_NB2["<b>NETTING_BATCH</b><hr/><u>batch_id</u><br/>coordinator_id (FK)"]:::stub
+        T_NE["<b>NETTING_ENTRY</b><hr/><u>entry_id</u><br/>batch_id (FK)<br/>participant_institution_id (FK)"]:::stub
+        T_NCS["<b>NETTING_COORDINATOR_STATE</b><hr/><u>state_id</u><br/>batch_id (FK)"]:::future
+
+        T_BR ---|"1-N"| T_SAV
+        T_LB ---|"1-N"| T_SAV
+        T_INST ---|"1-N"| T_IBL
+        T_INST ---|"1-N"| T_IBL
+        T_INST ---|"1-N"| T_UD
+        T_INST ---|"1-N"| T_UD
+        T_BR ---|"1-N"| T_FD
+        T_LB ---|"1-N"| T_FD
+        T_BR ---|"1-N"| T_CA
+        T_LB ---|"1-N"| T_CA
+        T_LB ---|"1-N"| T_INSF
+        T_INST ---|"1-N"| T_SYN
+        T_BR ---|"1-N"| T_SYN
+        T_SYN ---|"1-N"| T_SYNM
+        T_INST ---|"1-N"| T_SYNM
+        T_INST ---|"1-N"| T_TP
+        T_TP ---|"1-N"| T_TPS
+        T_BU ---|"1-N"| T_TPS
+        T_INST ---|"1-N"| T_TSW
+        T_AST ---|"1-N"| T_TSW
+        T_AST ---|"1-N"| T_TSW
+        T_BU ---|"1-N"| T_NB2
+        T_NB2 ---|"1-N"| T_NE
+        T_INST ---|"1-N"| T_NE
+        T_NB2 ---|"1-0..1"| T_NCS
+    end
+
+    %% ============ COLUMN 6: MESSAGING, ORACLE CACHES, KYC, CONFIG (Future/P4) ============
+    subgraph COL6[" Messaging, Oracle Caches, KYC, Config (Future/Phase IV) "]
+    direction TB
+        T_CM["<b>CHAT_MESSAGE</b><hr/><u>message_id</u><br/>session_id (FK)"]:::future
+        T_IM["<b>INSTITUTION_MESSAGE</b><hr/><u>message_id</u><br/>sender/receiver_institution_id (FK)"]:::future
+        T_PS["<b>PROFILE_SETTING</b><hr/><u>setting_id</u><br/>borrower_id (FK)<br/>preference_key"]:::future
+        T_MD["<b>MARKET_DATA</b><hr/><u>market_data_id</u><br/>asset_id (FK)<br/>price"]:::future
+        T_CPR["<b>CHAINLINK_PRICE_ROUND</b><hr/><u>round_id</u><br/>asset_id (FK)<br/>answered_in_round"]:::future
+        T_OHM["<b>ORACLE_HEARTBEAT_MONITOR</b><hr/><u>monitor_id</u><br/>round_id (FK)<br/>last_checked"]:::future
+        T_COLP["<b>COLLATERAL_POSITION</b><hr/><u>position_id</u><br/>borrower_id (FK)<br/>loan_id (FK)<br/>asset_id (FK)"]:::future
+        T_KYC["<b>KYC_VERIFICATION_REQUEST</b><hr/><u>request_id</u><br/>borrower_id (FK)<br/>zk_proof_hash"]:::future
+        T_CR["<b>CHAIN_REGISTRY</b><hr/><u>chain_id</u><br/>rpc_endpoint<br/>delegation_contract_address"]:::p4
+
+        T_SES ---|"1-N"| T_CM
+        T_INST ---|"1-N"| T_IM
+        T_INST ---|"1-N"| T_IM
+        T_BR ---|"1-N"| T_PS
+        T_AST -.->|"0..N"| T_MD
+        T_AST -.->|"0..N"| T_CPR
+        T_CPR ---|"1-N"| T_OHM
+        T_BR ---|"1-N"| T_COLP
+        T_LN ---|"1-N"| T_COLP
+        T_AST ---|"1-N"| T_COLP
+        T_BR ---|"1-N"| T_KYC
+    end
+
+    LEGEND ~~~ COL1
+    COL1 ~~~ COL2
+    COL2 ~~~ COL3
+    COL3 ~~~ COL4
+    COL4 ~~~ COL5
+    COL5 ~~~ COL6

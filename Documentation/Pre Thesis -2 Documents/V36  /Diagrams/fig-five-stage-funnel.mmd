@@ -1,0 +1,13 @@
+flowchart TB
+  S1["Stage 1 &mdash; Browse<br/>zero friction, no account"]
+  S2["Stage 2 &mdash; Account<br/>wallet connect / ERC-4337 (email, social); home Local Bank assigned"]
+  S3["Stage 3 &mdash; KYC<br/>document capture, automated verification (2-5 min)"]
+  S4["Stage 4 &mdash; First loan<br/>plain-language terms, USDC schedule, optional fiat display"]
+  S5["Stage 5 &mdash; Power user<br/>self-custody MetaMask, explorer visibility, group lending"]
+
+  S1 --> S2 --> S3 --> S4 --> S5
+
+  classDef apex fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef mid fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  class S1 apex;
+  class S2,S3,S4,S5 mid;

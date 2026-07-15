@@ -1,0 +1,27 @@
+flowchart TB
+  S(("start"))
+  A1["Client signs in (wallet / AA)"]
+  A2["Load dashboard<br/>(balances, loans, credit passport)"]
+  D1{"Select action"}
+  A3["Chat with bank / AI agent"]
+  A4["View market data / FX rates"]
+  A5["Manage savings / fixed deposit"]
+  A6["Loan / installment action"]
+  D2{"More<br/>actions?"}
+  A7["Sign out"]
+  E(("end"))
+
+  S --> A1 --> A2 --> D1
+  D1 -- chat --> A3 --> D2
+  D1 -- market --> A4 --> D2
+  D1 -- deposit --> A5 --> D2
+  D1 -- loan --> A6 --> D2
+  D2 -- yes --> D1
+  D2 -- no --> A7 --> E
+
+  classDef term fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef act fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class S,E term;
+  class A1,A2,A3,A4,A5,A6,A7 act;
+  class D1,D2 dec;

@@ -1,0 +1,38 @@
+{
+  "dataset": "BCCC-DeFiFraudTrans-2025",
+  "subset": "mini",
+  "synthetic": false,
+  "n_train": 37715,
+  "n_val": 7145,
+  "n_test": 5140,
+  "n_features": 21,
+  "seed": 42,
+  "rf_trees": 80,
+  "device_profile": "mac-m4-air-16gb",
+  "models": [
+    "RandomForest",
+    "IsolationForest",
+    "LogisticStacking"
+  ],
+  "test": {
+    "precision": 0.8742138364779874,
+    "recall": 0.9084967320261438,
+    "f1": 0.8910256410256411,
+    "roc_auc": 0.991311932211941
+  },
+  "confusion_matrix": [
+    [
+      4621,
+      60
+    ],
+    [
+      42,
+      417
+    ]
+  ],
+  "fraud_rate_sample": 0.0865,
+  "split_mode": "grouped_by_address",
+  "balanced_sample": false,
+  "note": "BCCC behavioral features; leakage columns (flag) removed; StandardScaler on train.",
+  "generated_at": "2026-06-22T19:39:03.094736+00:00"
+}

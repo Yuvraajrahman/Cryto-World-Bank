@@ -1,0 +1,34 @@
+flowchart TB
+  S(("start"))
+  A1["Client submits loan application"]
+  D1{"KYC level<br/>sufficient?"}
+  A2["Prompt KYC upgrade"]
+  A3["ML risk scoring<br/>(RF + Isolation Forest + SHAP)"]
+  D2{"Within<br/>borrowing limit?"}
+  A4["Reject: limit exceeded"]
+  A5["Bank Admin review"]
+  D3{"Approved?"}
+  A6["Reject + notify reason"]
+  A7["Disburse USDC on-chain"]
+  A8["Generate installment schedule"]
+  A9["Client repays installment"]
+  D4{"All installments<br/>paid?"}
+  A10["Close loan;<br/>update Credit Passport"]
+  E(("end"))
+
+  S --> A1 --> D1
+  D1 -- no --> A2 --> E
+  D1 -- yes --> A3 --> D2
+  D2 -- no --> A4 --> E
+  D2 -- yes --> A5 --> D3
+  D3 -- no --> A6 --> E
+  D3 -- yes --> A7 --> A8 --> A9 --> D4
+  D4 -- no --> A9
+  D4 -- yes --> A10 --> E
+
+  classDef term fill:#D6E4F7,stroke:#1B1B1B,stroke-width:1.2px,color:#111111;
+  classDef act fill:#EAF1FB,stroke:#1B1B1B,stroke-width:1.1px,color:#111111;
+  classDef dec fill:#F2F4F7,stroke:#8A8A8A,stroke-width:1px,color:#111111;
+  class S,E term;
+  class A1,A2,A3,A4,A5,A6,A7,A8,A9,A10 act;
+  class D1,D2,D3,D4 dec;

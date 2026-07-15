@@ -1,0 +1,355 @@
+% Extract: Section 4.2.3 Blockchain Platform Selection — full text, tables, figures
+% Output: chpater 4.2.3test.pdf (compile from test/ directory)
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,width=155mm,top=25mm,bottom=25mm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\captionsetup{labelfont={bf,small}, textfont={small}, skip=6pt, format=hang}
+
+\definecolor{RowShade}{gray}{0.965}
+\definecolor{TableHeadBg}{gray}{0.88}
+\newcommand{\tableheadcolor}{\rowcolor{TableHeadBg}}
+
+\newcommand*{\ThesisDiagDir}{../Diagrams/}
+\graphicspath{{../Diagrams/}{./../Diagrams/}}
+
+\newcommand{\ThesisIncludeGraphics}[2][]{%
+  \IfFileExists{\ThesisDiagDir#2.pdf}{%
+    \includegraphics[#1]{\ThesisDiagDir#2.pdf}}{%
+  \IfFileExists{\ThesisDiagDir#2}{%
+    \includegraphics[#1]{\ThesisDiagDir#2}}{%
+    \fbox{\parbox{0.9\linewidth}{\centering\small Missing: \texttt{#2}}}}%
+  }%
+}
+\newcommand{\BalancedDiagram}[2][]{%
+  \if\relax\detokenize{#1}\relax
+    \ThesisIncludeGraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{#2}%
+  \else
+    \ThesisIncludeGraphics[#1,height=0.72\textheight,keepaspectratio]{#2}%
+  \fi
+}
+
+\begin{document}
+
+\section{Blockchain Platform Selection}
+\label{sec:blockchain-platform-selection}
+
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,height=0.40\textheight,keepaspectratio]{fig-blockchain-stack}
+\caption[Layered blockchain and application stack]{Layered blockchain and application stack}
+\label{fig:blockchain-stack}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption[Blockchain platform selection criteria and justification]{Blockchain platform selection criteria and justification.}
+\label{tab:blockchain-selection}
+\begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
+\toprule
+\tableheadcolor
+\textbf{Criterion} & \textbf{Selection} & \textbf{Justification} \\
+\midrule
+Platform & Ethereum Virtual Machine (EVM) & Largest EVM ecosystem; mature tooling. \\
+Network & Ethereum Sepolia (primary) and/or Polygon Amoy PoS (secondary prototype implementation) & Free public testnets; zkEVM evaluated, not default prototype chain. \\
+Consensus & Public-testnet consensus (PoS/L1 testnet) & Stable testnet consensus; ZK settlement is a design preference only. \\
+Smart contract language & Solidity 0.8.20 & Industry standard; overflow-safe compiler; rich libraries. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption[Blockchain platform selection (continued)]{Blockchain platform selection (continued): operational and deployment factors.}
+\label{tab:blockchain-selection-cont}
+\begin{tabular}{p{3.5cm}p{3.5cm}p{6.5cm}}
+\toprule
+\tableheadcolor
+\textbf{Criterion} & \textbf{Selection} & \textbf{Justification} \\
+\midrule
+Gas cost & \$0.001--\$0.01 per transaction & Far below mainnet; viable for micro-loans. \\
+Block finality & $\approx$2 seconds & Fast retail UX; L1-anchored security. \\
+Developer tooling & Hardhat + OpenZeppelin & Hardhat tests; audited OpenZeppelin libs. \\
+Testnet availability & Amoy (Polygon PoS), Sepolia (Ethereum) & Free faucets; EVM-identical; no real funds. \\
+Security model & Public-testnet security model & Testnet PoS; ZK settlement evaluated separately. \\
+Migration path & EVM-compatible & Portable Solidity across EVM chains. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Transaction Verification and Consensus}
+
+The prototype deploys on \textbf{Ethereum Sepolia} (primary) with \textbf{Polygon Amoy} as a secondary fallback (Tables~\ref{tab:blockchain-selection}). Both are public PoS testnets with free faucets and no real-asset exposure. Polygon zkEVM Cardona remains a \textbf{design-preference} target for future ZK-anchored settlement but is not the default MVP chain. The retail loan lifecycle involves multiple on-chain state transitions per client; projected gas cost stays well below 0.01\% of interest on a representative micro-loan and is validated in Phase~IV (gas cost analysis, Chapter~3).
+
+\subsection{Oracle Architecture: Off-Chain AI to On-Chain Decision}
+\label{sec:oracle-architecture}
+
+Off-chain ML risk scores must reach the on-chain loan approval workflow without trusting a single party at decision time (the oracle problem~[40, 41]). The graded MVT path is a \textbf{commit--reveal relay}: the FastAPI scoring service commits $h = \text{keccak256}(s \,\|\, \text{nonce})$ to \texttt{LoanController}, then reveals the score~$s$ and nonce within the decision window. The contract verifies the hash and stores $s$ immutably, giving an audit trail and preventing post-commit score changes. A trusted backend relay may assist integration in Phases~I--II only.
+
+Figure~\ref{fig:oracle-architecture} summarises the authoritative MVT path and the documented Chainlink upgrade routes. Table~\ref{tab:chainlink-upgrade-paths} maps each Chainlink service to its production role and the zero-cost demonstration substitute (risk management and design-vs-demo tables, Chapter~3).
+
+\begin{table}[H]
+\centering
+\caption[Chainlink upgrade paths versus MVT substitutes]{Chainlink upgrade paths versus MVT demonstration substitutes.}
+\label{tab:chainlink-upgrade-paths}
+\small
+\begin{tabular}{@{}p{2.6cm}p{4.8cm}p{5.8cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Service} & \textbf{Production role} & \textbf{MVT / demo substitute} \\
+\midrule
+Chainlink Functions &
+  DON-signed fetch of ML risk score from the off-chain service &
+  Commit--reveal relay (authoritative at MVT scope) \\
+\rowcolor{RowShade}
+Chainlink Automation &
+  On-chain upkeep for overdue installments and interest accrual &
+  Node.js cron calling \texttt{checkOverdueLoans()} \\
+Price feeds &
+  \texttt{FXModule} and fiat-equivalent UI via \texttt{AggregatorV3Interface} &
+  \texttt{MockPriceFeed.sol} with fixed testnet answers \\
+\rowcolor{RowShade}
+Proof of Reserve &
+  External attestation of \texttt{WorldBankReserve} solvency &
+  On-chain \texttt{getReserveSummary()} view; PoR job is Future Work \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Chainlink Functions adds roughly 30--60\,s latency and a per-call fee, acceptable at loan origination but unnecessary for the graded prototype. Production contract interfaces for reserve reporting and FX conversion are specified in Appendix~D; integration code remains in the repository rather than in this chapter.
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{fig-oracle-architecture}
+\caption[Oracle architecture]{Oracle architecture}
+\label{fig:oracle-architecture}
+\end{figure}
+
+\newpage
+
+\begin{table}[H]
+\centering
+\caption[Technology stack summary]{Technology stack summary.}
+\label{tab:tech-stack}
+\begin{tabular}{p{3cm}p{4cm}p{6.5cm}}
+\toprule
+\tableheadcolor
+\textbf{Layer} & \textbf{Technology} & \textbf{Version / Notes} \\
+\midrule
+Smart Contract & Solidity, OpenZeppelin & 0.8.20; Ownable, ReentrancyGuard \\
+Frontend & React, TypeScript & Material UI; Design 3 \\
+Wallet Integration & Wagmi, RainbowKit, Viem & EIP-1193 compliant \\
+Build and Test & Hardhat & Automated test suite; deployment scripts \\
+Backend API & Express.js, Node.js & REST API; middleware architecture \\
+Database & PostgreSQL (designed) & 51 entities (31 core + 6 extension + 14 stubs), 3NF; relational integrity \\
+Target Network & Ethereum Sepolia (primary) and/or Polygon Amoy PoS (secondary single-chain prototype) & Stable public testnets for delivery; Polygon zkEVM retained as evaluated design preference \\
+AI Agent Engine & Qwen3-8B (llama.cpp, Q4\_K\_M) & MCP tool server; per-user context namespace; human confirmation gate \\
+MCP Tool Server & Minimal MVT tool subset (3--5 tools); prompt injection scanner; confirmation audit hook middleware & Exposes a small read+write surface to the agent with typed parameter schemas \\
+Session Keys & EIP-7702 (Future Work) & Scoped, time-bound, value-capped agent wallet authorisation \\
+Oracle Network & Commit--reveal (MVT) + Chainlink Functions (stretch) & Commit--reveal enforces auditable score commitment; DON upgrade when supported \\
+Price Feeds & Chainlink AggregatorV3Interface & Fiat/USD pairs (e.g.\ EUR/USD) and ETH/USD; 8-decimal precision \\
+Automation & Chainlink Automation & Trustless installment due-date checking; replaces centralised cron job \\
+Proof of Reserve & Chainlink PoR & Cryptographically verifiable WorldBankReserve balance \\
+Event Indexing & PostgreSQL event listener & Stability-first indexing baseline (GraphQL over The Graph optional later) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Five-Layer Defense-in-Depth Security Architecture}
+\label{sec:defense-in-depth}
+
+Security spans five layers (Table~\ref{tab:defense-layers}): L5 operational keys (Safe multisigs), L4 runtime monitoring (Tenderly alerts), L3 ML fraud scoring with human review, L2 API auth and rate limits, L1 contract RBAC + \texttt{ReentrancyGuard} + Foundry fuzz tests. Each layer fails closed: if ML is unreachable, loans route to manual review rather than auto-approval.
+
+\begin{table}[H]
+\centering
+\caption[Five-layer defense-in-depth model]{Five-layer defense-in-depth model.}
+\label{tab:defense-layers}
+\small
+\begin{tabular}{@{}p{1.2cm}p{3.2cm}p{10.0cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Layer} & \textbf{Component} & \textbf{CWB control (MVT)} \\
+\midrule
+L5 & Operational & Safe 2-of-3 for \texttt{WorldBankAdmin} \\
+L4 & Monitoring & Tenderly alerts on large disbursement, low reserve, pause \\
+L3 & AI/ML & RF + IF + SHAP; commit--reveal oracle; human approver gate \\
+L2 & Application & JWT auth, rate limits, prompt-injection scan on agent input \\
+L1 & Smart contract & OpenZeppelin RBAC, CEI, pause, Hardhat + Foundry tests \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{On-Chain and Off-Chain Data Partitioning}
+\label{sec:data-partitioning}
+
+\begin{table}[H]
+\centering
+\caption[Data partitioning between on-chain and off-chain storage]{Data partitioning between on-chain and off-chain storage.}
+\label{tab:data-partitioning}
+\begin{tabular}{p{4.5cm}p{2.5cm}p{6.5cm}}
+\toprule
+\tableheadcolor
+\textbf{Data Category} & \textbf{Storage} & \textbf{Rationale} \\
+\midrule
+Reserve balances, loan requests, approval/rejection events, repayment transactions & On-chain & Immutability, public auditability, trustless verification. \\
+User profiles, income verification documents, chat messages, loan risk assessments, security event logs & Off-chain (database) & Data privacy, query flexibility, storage cost optimisation. \\
+Borrowing limit computations & Off-chain with on-chain enforcement & Complex temporal aggregation; results committed as on-chain constraints via \texttt{LocalBank.updateBorrowingLimit(borrowerId, newLimit)} (see sync protocol below). \\
+Cryptocurrency market data (non-Chainlink) & Off-chain (\texttt{MARKET\_DATA}) & CoinGecko and other fallback feeds; high-frequency updates; external API dependency. \\
+Chainlink oracle price data & Off-chain (\texttt{CHAINLINK\_PRICE\_ROUND}) & Each \texttt{latestRoundData()} round cached with \texttt{answered\_in\_round} for staleness detection; on-chain \texttt{AggregatorV3Interface} is authoritative. \texttt{MARKET\_DATA} does \textit{not} store Chainlink rounds. \\
+Agent action execution log & Off-chain (append-only DB) & Immutable audit trail of every agent write-tool call, linked to on-chain tx hash; not stored on-chain to save gas. \\
+Session key material & Off-chain (\texttt{sessions} table) & EIP-7702 session key hash, scope JSON, and TTL stored off-chain; the scope restrictions are enforced on-chain by the session key contract at signing time. \\
+Session lineage chains (SESSIONS, message history, compression summaries) & Off-chain (PostgreSQL) & Full transcript history is too large for on-chain storage. The lineage chain enables searchable long-term memory without gas cost. \texttt{AGENT\_ACTION\_LOG} provides the on-chain audit link via confirmed transaction hashes. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Borrowing limit sync protocol.}
+Borrowing limits are enforced on-chain, but the rolling exposure that feeds those limits is derived from off-chain transaction history. When a \texttt{LoanDisbursed} or \texttt{LoanRepaid} event arrives, the event listener first records it in \texttt{TRANSACTION} and recalculates the borrower's six-month and one-year windows. If the new figure no longer matches \texttt{on\_chain\_enforced\_limit} stored in \texttt{BORROWING\_LIMIT}, the Express API submits an on-chain update through \texttt{LocalBank.updateBorrowingLimit}. Once the chain emits \texttt{BorrowingLimitUpdated}, the listener refreshes the projection row and clears any \texttt{sync\_discrepancy\_flag}, keeping the database aligned with the authoritative contract state.
+
+\paragraph{Projection vs.\ application tables.}
+The database splits cleanly between tables the application writes and tables the event listener maintains as read models. Projection tables---\texttt{CREDIT\_PASSPORT}, \texttt{CREDIT\_PASSPORT\_HISTORY}, \texttt{BORROWING\_LIMIT}, and \texttt{COLLATERAL\_POSITION}---are populated only from chain events; Express.js may read them for dashboards and API responses but cannot insert or update them directly, a rule enforced by PostgreSQL row-level security (integrity constraints table, Chapter~4). Workflow tables such as \texttt{LOAN\_REQUEST}, \texttt{CHAT\_MESSAGE}, and \texttt{PROFILE\_SETTING} remain Express-owned. \texttt{LOAN\_REQUEST} is the one hybrid case: most columns are application-writable, but \texttt{oracle\_state} is reserved for the listener, with column-level privileges preventing the API role from modifying it while still allowing the listener to track commit--reveal oracle progress independently of user-facing application state.
+
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,height=0.34\textheight,keepaspectratio]{fig-data-partitioning}
+\caption[On-chain versus off-chain data partitioning]{On-chain versus off-chain data partitioning}
+\label{fig:data-partitioning}
+\end{figure}
+
+\subsubsection{Financial Data Authority and Lifecycle}
+\label{sec:financial-data-lifecycle}
+
+On-chain contract state is the \textbf{authoritative source of truth} for settlement: reserve balances, loan lifecycle transitions, role bindings, and enforced borrowing limits. PostgreSQL holds workflow metadata, PII, ML inference records, and \textbf{read-only projections} synchronised from chain events by the event listener (FR-07; real-time dashboard pipeline, Chapter~4). Where the two layers disagree after a confirmed transaction, the on-chain record prevails; projection tables exist for fast queries and dashboards, not for independent financial ledgering.
+
+\paragraph{Retail loan write path.}
+The end-to-end flow for a standard retail loan is: (1)~the client submits an application (wallet-signed \texttt{requestLoan} on \texttt{LocalBank}, with optional off-chain document hash in \texttt{LOAN\_REQUEST}); (2)~the ML service scores features off-chain and the commit--reveal oracle records the risk score on-chain (Section~\ref{sec:oracle-architecture}); (3)~the Local Bank approver signs \texttt{approveLoan}, which atomically updates loan state and disburses funds; (4)~the event listener ingests \texttt{LoanRequested}, \texttt{LoanApproved}, and \texttt{LoanDisbursed} events into \texttt{BLOCKCHAIN\_EVENT\_LOG} and updates \texttt{LOAN}, \texttt{INSTALLMENT}, and projection tables (loan flow sequence, Chapter~4). Repayments follow the same pattern: \texttt{payInstallment} on-chain, then listener projection.
+
+\vspace{2pt}
+\noindent\textit{\small At MVT scope, loan denomination may use \texttt{MockUSDC} or native ETH on the demonstration testnet (design-vs-demo table, Chapter~3); the authority rules above are unchanged---only the settlement asset differs.}
+
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{fig-financial-data-lifecycle}
+\caption[Financial data authority and lifecycle]{Financial data authority and lifecycle: on-chain settlement state, off-chain workflow and projections, and the event-listener bridge.}
+\label{fig:financial-data-lifecycle}
+\end{figure}
+
+\newpage
+
+\newpage
+
+\subsubsection{In-product assistant: local large language model (LLM) integration (prototype) --- Member 1}
+\label{sec:local-llm}
+
+\paragraph{Purpose.}
+The in-product assistant is a \textbf{planned Phase~III Must deliverable} (Section~4.2.17), providing a plain-language interface alongside the React dashboard. It combines a locally hosted, privacy-preserving large language model (Qwen3-8B, Apache~2.0~licence) with a Model Context Protocol (MCP) tool server exposing a minimal MVT subset of \textbf{3--5 tools} (Section~4.2.17). The full \textbf{17-tool} suite (9 read tools, including a session history search tool, and 8 write tools requiring human confirmation) remains a specified Future Work expansion rather than the graded prototype baseline. The agent can both answer questions---via retrieval-augmented generation (RAG) from policy documents---and execute on-chain banking operations via the MVT write-tool subset, subject to an explicit human confirmation gate before any state-modifying action is taken. Local hosting keeps conversation data on institutional infrastructure, supporting data-sovereignty requirements in regulated pilots. A client who prefers the React UI experiences no reduction in available functionality, since every operation the agent can perform is equally available through the standard dashboard.
+
+\paragraph{Model and runtime (local development).}
+The inference endpoint follows the \textbf{OpenAI Chat Completions} contract (\texttt{/v1/chat/completions}) with \texttt{stream: true}, proxied from the project backend to a local service such as \texttt{http://127.0.0.1:1234}. During early development, the assistant used a locally hosted \textbf{Gemma-4-E4B} checkpoint (Google mixture-of-experts model, $\sim$26B total / 4B active parameters) via LM Studio in GGUF form (e.g., \texttt{Q4\_K\_M} quantization) for a laptop-friendly footprint. For the final thesis evaluation, the assistant is replaced by \textbf{Qwen3-8B} (Alibaba Cloud Qwen team, released April~28~2025, Apache~2.0~licence)~[67], a dense 8.19B-parameter causal language model with a 32K-token native context window (extendable to 131K tokens via YaRN scaling) and support for 100+ languages and dialects. A distinguishing architectural feature of Qwen3-8B is its \emph{switchable reasoning mode}: the model operates in \textbf{thinking mode} (chain-of-thought wrapped in \texttt{<redacted\_thinking>} tokens, suited to multi-step compliance or policy questions) and \textbf{non-thinking mode} (direct, low-latency responses for general navigation queries), selectable per-turn with \texttt{/think} or \texttt{/no\_think} in the system prompt. For Q\&A and retrieval-augmented generation (RAG) queries, non-thinking mode is the default; thinking mode is activated only for the red-team regulatory-compliance prompts in the evaluation protocol of Section~4.2.17. For agent tool-calling, non-thinking mode is the default for read tools and confirmation summaries; thinking mode is activated for complex multi-step operations such as EMI calculation or group signature coordination. The per-user context namespace (see Section~4.2.16) is prepended to every system prompt as a structured JSON block, so the model has full account context before reading the user's message. The API model identifier is environment-driven; the integration layer remains identical for both models.
+
+\paragraph{End-to-end behavior.}
+The user interface assembles a short transcript (user/assistant messages) and posts it to the backend streaming route. Before the user message reaches the model, the context assembly layer: (a)~selects the active toolset based on intent classification, (b)~applies prompt injection scanning to all user-sourced fields, and (c)~assembles the three-tier system prompt (Stable + Context + Volatile), injecting the compression summary from the parent session into the Volatile tier if this is a continuation session. The active toolset name and any injection scan flag are recorded in \texttt{AGENT\_ACTION\_LOG} for every turn. The backend then opens a streaming request to the local model server, converts upstream token events into \textbf{server-sent events (SSE)} for the browser, and the UI incrementally appends text. The message renderer uses Markdown (including GitHub-flavored extensions), math (KaTeX) for \texttt{\$\$...\$\$} blocks, and line-break rules appropriate for chat transcripts.
+
+For write-tool requests, the agent assembles the full parameter set from the user's request and the injected on-chain state, then presents a confirmation summary. Only after the user sends explicit affirmative consent does the agent call the corresponding MCP write tool via the Express.js banking API layer. The EIP-7702 session key (if active) signs the resulting on-chain transaction within its approved scope. Every executed write tool is logged to \texttt{agent\_action\_log} with the confirmation message ID as the audit reference.
+
+\paragraph{Live on-chain context injection.}
+The Express.js backend injects the client's full on-chain state as a structured JSON context block into every system prompt before forwarding the user's message to the model. The per-user context namespace is:
+\begin{verbatim}
+{
+  "tier": "volatile",
+  "borrower_id": "550e8400-e29b-41d4-a716-446655440000",
+  "wallet_address": "0xABC...",
+  "language": "en",
+  "credit_tier": "Silver",
+  "credit_score": 512,
+  "active_loans": [
+    {
+      "loan_id": "L-4821",
+      "amount": 100,
+      "next_due": "2026-06-15",
+      "installment": 17.5
+    }
+  ],
+  "savings_balance": 250.0,
+  "pool_utilisation": 0.67,
+  "kyc_tier": 1,
+  "session_id": "sess_20260602_xyz",
+  "parent_session_id": "sess_20260515_abc",
+  "compression_summary": "Client asked about Gold tier eligibility.
+  Was told 2 more on-time repayments required. No action taken.",
+  "conversation_history": [ "...last 10 turns..." ]
+}
+\end{verbatim}
+The \texttt{compression\_summary} field is injected only when this is a child session (i.e., when \texttt{parent\_session\_id} is non-null). It provides the prior-session context without exceeding the Volatile tier token budget. This context block is injected only when the user is authenticated and the \texttt{eth\_call} round-trip completes within a 200~ms timeout (falling back to a static-context response otherwise). The model uses the injected context to ground its answers in the user's actual account data rather than generic policy text, materially reducing hallucination risk for account-specific queries.
+
+\paragraph{Security and limitations (prototype stance).}
+The agent's safety posture is enforced at four levels. (1)~\textbf{Tool-schema boundary:} the agent interacts with CWB exclusively through the MVT MCP tool schema (\textbf{3--5 tools}) and cannot execute arbitrary code, make unapproved API calls, or read data outside that schema. The full 17-tool suite remains a specified but undeployed Future Work expansion. (2)~\textbf{Human confirmation gate:} every write tool requires explicit affirmative consent in the conversation history; the confirmation turn ID is logged as the audit reference. (3)~\textbf{Session key scope:} the EIP-7702 session key is scoped to specific tools, value-capped, time-bound to 24~hours, and revocable at any time. A session that attempts to call an out-of-scope tool is rejected at the key level, not just at the application level. (4)~\textbf{Prompt injection scanning and lifecycle hook middleware:} user-sourced content is scanned for injection patterns before entering the prompt (Layer~2 control, Section~4.2.16), and every write-tool HTTP POST is intercepted by a middleware stack that enforces the confirmation invariant at the application layer independently of the model's output. Together, these four levels form a defence-in-depth posture in which no single point of failure can circumvent a critical safety constraint. Hallucination risk is bounded by: (a) the injected on-chain state grounding account-specific answers, and (b) the refusal layer for regulatory and legal queries (100\% target on the red-team set, Section~4.2.17).
+
+\newpage
+
+\subsubsection{Alternative same work by Member 2}
+
+\subsubsection{Use of local large language model (LLM) integration (prototype)}
+\label{sec:local-llm-member2}
+
+\paragraph{Purpose.}
+The in-product assistant is a long-term, expected Phase~III Must deliverable (Sec-). It includes a plain-language interface (in addition to the React interface) in its new version, Graydon 4.2.17. It integrates a local hosted, privacy-preserving large language model Qwen3-8B. Centura will use a Model Context Protocol (MCP) tool server that provides a minimal (Apache 2.0 licence) implementation of the Model Context Protocol. MVT subset of 3--5 tools (Section 4.2.17). The complete set of 17 tools (9 -- read, 5 -- write). The total number of session history search AND writers with human verification (2, 4): a particular FEATURES TO BE IMPLEMENTED expansion instead of the graded prototype baseline. The Services can answer questions, using retrieval-augmented generation (RAG) from the policy documents---and makes banking transactions on-chain with the write-tool subset, subject to a state-modifying action that explicitly requires human confirmation. taken. Local hosting retains conversation data on institutional infrastructure, enables support of local groups, and allows for backup of conversations. As for regulatory pilots, data-sovereignty needs are specified in those pilots. A framework for clients who use the React UI. perform on the Oracle databases can be carried out on it without losing any functionality. This can also be done from the regular dashboard interface with perform.
+
+\paragraph{Model and run (local development).}
+The Ope- Inference endpoint is given below. Using the nAI Chat Completions contract(\texttt{/v1/chat/completions}) \texttt{stream: true}, prox- A local service could be anything, for example, \texttt{http://127.0.0.1:1234} from the Web server backend of the project. During 198 version) in conjuction with hardware serial \& Ethernet communication.In addition to hardware serial \& Ethernet communication, the assistant supported early development with a locally-hosted Gemme-4-E4B checkpoint (Google 198 version). A Mixture of Experts model (GB total network size is $\sim$26B, active parameters is 4B), which is compatible with LM Studio in the form of a .gguf file. They feature all the modulations, such as (\texttt{Q4\_K\_M} quantization) to ensure a laptop-friendly footprint. For the final thesis appraisal, and the assistant is replaced by the Alibaba team's Qwen3-8B (released April 28, 2025). The model used is a dense causal language model released under the Apache 2.0 licence, with 32K-token 8.19B-parameter model [67]. The intent is to extend and change the ``native context window'' to 131K tokens; support for 100+ languages and dialects. One unique architectural hallmark of Qwen3-8B is its switching mechanism.One special architectural note of Qwen3-8B is its switching mechanism. There is a thought mode called reasoning mode which has a wrapper round it, called ``chain-of-thought.'' Think ability tags, appropriate for multiple step compliance or multiple policy questions, and non-think ability tags. An option available per turn.An option that is available for general navigation questions (direct, low-latency responses). Alternatively, to write a \texttt{/think} or \texttt{/no\_think} in the system prompt. Choose the corresponding arrow to see the answer and to clear that question. Non-thinking mode is the default mode that eration (RAG) queries will be executed in; thinking mode is only used for eration (RAG) queries. The evaluation protocol of section 4.2.17 has red-team regulatory-compliance prompts. Non-thinking mode is enabled as the default for non-thinking mode tools when calling, and is enabled as the default for confirmation when read, except where specified above. summaries; thinking mode is activated for complex multi-step operations such as EMI calcu-lation. Co-ordinated lation/groupsignature. It is also possible to create any number of per-user context namespaces (see Section 4.2.16). Each system prompt is preceded by the is prefix in the form of a structured block of JSON, with the model having full access to it. Count context before reading the message of the user. The model identifier in an API is environment- The model's integration layer is the same in both cases as they are driven.
+
+\paragraph{End-to-end behavior.}
+The user interface puts together a short transcript (user/assistant) Sends the messages to the backend streaming pipe (messages). While the user message is not yet reached by the context assembly layer selects the active toolset, according to intent classi- Using prompt injection scanning for all fields sourced by user, and (c) assembling updates the RAM with the latest P-code instructions.with the compression sum-) ensures that the only instructions the RAM gets are the latest P-code instructions. If this is a continuation session, copy over mary from the parent session to the Volatile tier. The If an active toolset name and/or the injection scan flag are present, they are saved on AGENT\_ACTION\_LOG for the ev- ery turn. The backend then makes a streaming request to its local model server and converts, Transform upstream events as tokens into server-sent events (SSE) for the browser, and the UI incrementally increases as time goes on. mentally appends text. The message renderer is based on Markdown (with GitHub flavored). For \texttt{\$\$...\$\$} sections use math (KaTeX), for chat use line-break rules, for extensions use whatever. transcripts.
+
+For write-tools it collects all the parameters from the user's request and then creates the full parameter set to be passed to the tool. Then, displays a confirmation summary if and only if it injected on the chain state. Only after the user asks the agent to call MCP write tool for corresponding sends explicit affirmative consent the Express.js banking API component layer. The resulting is signed by the EIP-7702 session key (if enabled). A successful on-chain transaction in its given scope. Each write tool that is executed is logged to With the confirmation message ID as the audit reference, you want to call \texttt{agent\_action\_log}.
+
+\paragraph{Dynamic injection of live contexts on the chain.}
+The Express.js backend pushes all of the client's on- Include a structured JSON context block in all prompts to the system: In this case, the user's input to the model. The per-user context namespace is:
+\begin{verbatim}
+{
+"tier": "volatile",
+"borrower_id": "550e8400-e29b-41d4-a716-446655440000",
+"wallet_address": "0xABC...",
+"language": "en",
+"credit_tier": "Silver",
+"credit_score": 512,
+"active_loans": [
+{
+"loan_id": "L-4821",
+"amount": 100,
+"next_due": "2026-06-15",
+"installment": 17.5
+}
+],
+"savings_balance": 250.0,
+"pool_utilisation": 0.67,
+"kyc_tier": 1,
+"session_id": "sess_20260602_xyz",
+"parent_session_id": "sess_20260515_abc",
+The Client expressed an interest in the Gold tier eligibility.
+He was informed he would need to make 2 other repayments that would arrive on time. No action taken.",
+"conversation_history": [ "...last 10 turns..." ]
+}
+\end{verbatim}
+If this is a child session (when this reset is one of a child session) then the compression\_summary field will be injected. parent\_session\_id is non-null). It delivers the information from the previous session with a minimum of complexity. The token budget for the Volatile tier. This context block is only injected in the user is authen- The ticated round-tripping and the eth\_call round-trip is obtained within the 200ms timeout (falling back to a static-context response otherwise). The inherent context of the model is derived from the injected context. swers in the specific terms of the user's account information, rather than in terms of general policy, substantially limited, Risk of hallucinating for account-specific queries.
+
+\paragraph{Assessment of the printable web pages for security and limitations (prototype stance).}
+The agent's safety attitude is reinforced at four levels. (1) Agent only Communicate with WB: only a schema of tools exists.(1) Tool-schema boundary: when there is only a tool schema. does not have the ability to run arbitrary code through the MVT MCP tool schema (3--5 tools). Access data to unapproved API calls, or read data outside that schema. The complete 17-vig tool set is included: Undeployed Future Work set in the systems (FWSYS). (2) Conformation gate of human: all Write tool must be uniformly confirmed in the conversation log; confirmation The audit reference is the `turn ID'. (3) Session key scope: The session key which EIP-7702 uses is Limited to certain tools, subject to a maximum value, and limited in time to 24 hours with a revocation at any time. During a session, an out-of-scope tool will try to access it, it will not be accepted at the key level, but at the call level. the application level. (4) Lifecycle Hook Middleware and Prompt Injection Scanning:
+
+\newpage
+\section*{References}
+\phantomsection
+\input{references-section.tex}
+
+\end{document}

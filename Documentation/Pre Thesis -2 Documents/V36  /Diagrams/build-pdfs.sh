@@ -8,6 +8,19 @@ MERMAID_PUPPET="$DIR/puppeteer-config.json"
 [[ -f "$MERMAID_STYLE" ]] || MERMAID_STYLE="$DIR/../mermaid-diagrams/style/mermaid-config.json"
 [[ -f "$MERMAID_PUPPET" ]] || MERMAID_PUPPET="$DIR/../mermaid-diagrams/style/puppeteer-config.json"
 
+# Hand-authored SVG exports from test figures/ — skip mmdc and rebuild PDF via rsvg.
+is_hand_authored_svg() {
+  case "$1" in
+    fig-blockchain-stack|fig-component-architecture|fig-erd-core|fig-erd-extended|ERD_diagram_relational|\
+    Ch3_use-case-nine-actor-taxonomy|fig-activity-lending|fig-activity-onboarding-id|fig-dfd-level0-lending|\
+    fig-uml-class|fig-governance-dual-path|fig-sar-aml-workflow|fig-defense-in-depth|fig-local-llm-compact|\
+    1_InterBankLendingPool|2_UpwardDepositFacility|3_SyndicatedLoan|4_TranchedPool|5_TreasurySwap|6_NettingEngine)
+      return 0 ;;
+    *)
+      return 1 ;;
+  esac
+}
+
 # Width x height (px) tuned for thesis figure slots
 figure_canvas() {
   local base="$1"
@@ -108,9 +121,27 @@ figure_canvas() {
       echo "1600 1100" ;;
     fig-ml-metrics-bars|fig-ml-confusion-matrix|fig-ml-shap-importance|Ch4_rq2-latency-plan|fig-revenue-by-tier|fig-apr-spread)
       echo "1500 950" ;;
+    1_InterBankLendingPool|5_TreasurySwap)
+      echo "2000 1120" ;;
+    2_UpwardDepositFacility)
+      echo "2000 1170" ;;
+    3_SyndicatedLoan)
+      echo "2000 1270" ;;
+    4_TranchedPool|6_NettingEngine)
+      echo "2000 1220" ;;
     *)
       echo "1600 1150" ;;
   esac
+}
+
+svg_to_pdf() {
+  local name="$1" svg="$2"
+  if [[ "$name" == "ERD_diagram_relational" ]]; then
+    rsvg-convert -f pdf -o "$DIR/${name}.pdf" "$svg"
+    return
+  fi
+  read -r W _H <<<"$(figure_canvas "$name")"
+  rsvg-convert -w "$W" -f pdf -o "$DIR/${name}.pdf" "$svg"
 }
 
 mmdc_common_opts() {
@@ -138,22 +169,16 @@ if command -v mmdc >/dev/null 2>&1; then
   else
     for mmd in "${mmd_files[@]}"; do
       name="$(basename "$mmd" .mmd)"
-      if [[ "$name" == "ERD_diagram_relational" && -f "$DIR/ERD_diagram_relational.svg" ]]; then
-        echo "skip mmdc $name (hand-authored SVG)"
-        continue
-      fi
-      if [[ "$name" == "fig-erd-core" && -f "$DIR/fig-erd-core.svg" ]]; then
-        echo "skip mmdc $name (hand-authored SVG)"
-        continue
-      fi
-      if [[ "$name" == "fig-erd-extended" && -f "$DIR/fig-erd-extended.svg" ]]; then
+      if is_hand_authored_svg "$name" && [[ -f "$DIR/${name}.svg" ]]; then
         echo "skip mmdc $name (hand-authored SVG)"
         continue
       fi
       read -r W H <<<"$(figure_canvas "$name")"
       echo "mmdc  $name (${W}x${H})"
-      mmdc -i "$mmd" -o "$DIR/${name}.pdf" "${MMC_OPTS[@]}" -w "$W" -H "$H" -e pdf -f
-      mmdc -i "$mmd" -o "$DIR/${name}.svg" "${MMC_OPTS[@]}" -w "$W" -H "$H" || true
+      mmdc -i "$mmd" -o "$DIR/${name}.pdf" "${MMC_OPTS[@]}" -w "$W" -H "$H" -e pdf -f \
+        || echo "WARN: mmdc failed for $name (continuing with SVG/rsvg if available)" >&2
+      mmdc -i "$mmd" -o "$DIR/${name}.svg" "${MMC_OPTS[@]}" -w "$W" -H "$H" \
+        || true
       finalize_figure_pdf "$name" "$W"
     done
   fi
@@ -165,17 +190,14 @@ fi
   for svg in "$DIR"/*.svg; do
     [[ -f "$svg" ]] || continue
     name="$(basename "$svg" .svg)"
-    # Hand-authored SVG replaces mmdc output for the full relational ERD.
-    if [[ -f "$DIR/${name}.mmd" && "$name" != "ERD_diagram_relational" && "$name" != "fig-erd-core" && "$name" != "fig-erd-extended" ]]; then
+    # Keep mmdc PDFs unless a hand-authored SVG is the source of truth.
+    if [[ -f "$DIR/${name}.mmd" ]] && ! is_hand_authored_svg "$name"; then
       echo "skip rsvg $name (mmdc PDF kept)"
       continue
     fi
-    echo "rsvg  $name"
-    if [[ "$name" == "ERD_diagram_relational" ]]; then
-      rsvg-convert -f pdf -o "$DIR/${name}.pdf" "$svg"
-    else
-      rsvg-convert -w 1200 -f pdf -o "$DIR/${name}.pdf" "$svg"
-    fi
+    read -r W _H <<<"$(figure_canvas "$name")"
+    echo "rsvg  $name (${W}px wide)"
+    svg_to_pdf "$name" "$svg"
   done
 else
   echo "WARN: rsvg-convert missing; skipping SVG PDFs" >&2

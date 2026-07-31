@@ -2732,6 +2732,10 @@ The purpose of the AI/ML layer is to provide a risk score per loan approval that
 \subsection{Conversational Agent (Phase III--IV)}
 \label{sec:optional-agent}
 
+\subsubsection{Agentic Model Selection, and Integration}
+
+\paragraph{Agentic Capabilities.} A conversational model with higher parameter counts with top class accuracy may not be good at agentic workload if not trained for the purpose. Qwen3-8B is an open source model trained with the intention of agentic workload with tool calling accuracy with top of the class agentic task completion abilities for its size category. It can output perfect structurally accurate JSON matching with our database schema to execute commands with near perfect accuracy for a long time in sequential commands.
+
 The conversational agent that has been designed to assist the clients to better navigate the platform is planned to be completed by Phase~III. It is an auxiliary feature that works alongside the standard web UI for those who may not be familiar with the banking system of the project and have less domain knowledge and want to understand the platform and how to navigate with it. The schema of the full MCP agent has been shown in Table~\ref{tab:mcp-tools}; explainability for approvers is documented in Section~\ref{sec:ml-explainability}.
 
 \paragraph{Agent six-step pipeline.} Clients are expected to interact with the frontend UI like any other typical user-friendly banking website. The agent works as a guiding assistant and its tool-calling abilities use the same Express.js API endpoints; the same smart contracts are considered for functionalities. This six-step pipeline lets the Qwen3-8B model have access to the live on-chain context injection layer that helps the agent process related instant and consistent information that is relevant to how a client is interacting with the platform. The layers have been described shortly below:

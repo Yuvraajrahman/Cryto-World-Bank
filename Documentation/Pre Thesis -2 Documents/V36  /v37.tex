@@ -1724,7 +1724,7 @@ NettingEngine & Multi-entity & Future Work & ERD stubs only; Section~\ref{sec:fu
 
 \begin{figure}[H]
 \centering
-\ThesisIncludeGraphics[width=\linewidth,height=0.40\textheight,keepaspectratio]{fig-blockchain-stack}
+\BalancedDiagram{fig-blockchain-stack}
 \caption[Blockchain stack]{Blockchain stack.}
 \label{fig:blockchain-stack}
 \end{figure}
@@ -1811,6 +1811,47 @@ Proof of Reserve &
 \caption[Oracle architecture]{Oracle architecture.}
 \label{fig:oracle-architecture}
 \end{figure}
+
+
+\subsection{Transaction Lifecycle, Hashing, and Cross-Layer State Propagation}
+\label{sec:tx-lifecycle-hashing}
+
+This section traces a single client action end to end---from the moment it is entered in the React/TypeScript frontend to the point the resulting state change is confirmed on-chain and reflected back into the PostgreSQL-backed server state. It expands on the commit--reveal hashing already introduced in Section~\ref{sec:oracle-architecture} and the sequence diagrams in Section~\ref{sec:system-modeling} with a layer-by-layer technical walkthrough.
+
+\subsubsection{Frontend-to-Gateway Request Flow}
+\label{sec:frontend-gateway-flow}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe how a user action in the React/TypeScript UI (e.g.\ clicking ``Apply for Loan'') is captured, validated client-side, and forwarded to the Express.js API gateway---request shape, wallet-connection state (Wagmi/RainbowKit/Viem), auth headers, and any client-side pre-checks before the call leaves the browser.]}
+\vspace{1.5cm}
+
+\subsubsection{API and Network Layer Sequencing}
+\label{sec:api-network-sequencing}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe what happens inside the Express.js gateway once the request lands---middleware order (auth, validation, rate limiting), how the request is sequenced over the network (REST call vs.\ the SSE channel used in Section~\ref{sec:optional-agent} step~1), and how the gateway decides whether a request needs an on-chain call at all.]}
+\vspace{1.5cm}
+
+\subsubsection{Transaction Construction, Hashing, and Signing}
+\label{sec:tx-construction-hashing}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe how the gateway (or the client wallet) builds the actual on-chain transaction---function selector and calldata encoding, where keccak256 is used beyond the commit--reveal score hash of Section~\ref{sec:oracle-architecture} (e.g.\ event topics, EIP-712 typed-data signing), and who signs what (client wallet vs.\ EIP-7702 session key).]}
+\vspace{1.5cm}
+
+\subsubsection{On-Chain State Transition and Block Confirmation}
+\label{sec:onchain-state-transition}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe the transaction's path from mempool submission to block inclusion on Sepolia/Amoy---state-variable changes inside the relevant contract (e.g.\ \texttt{LoanController}, \texttt{WorldBankReserve}), which events are emitted, and how finality/confirmation depth is handled by the frontend.]}
+\vspace{1.5cm}
+
+\subsubsection{Server-Side State Synchronization}
+\label{sec:server-state-sync}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe how the confirmed on-chain event is picked up by the PostgreSQL event listener (Section~\ref{sec:realtime}), written back into the relational schema, and propagated to the dashboard/WebSocket layer---include how the server reconciles on-chain truth with off-chain cached state if they briefly disagree.]}
+\vspace{1.5cm}
 
 
 \subsection{Data Model and Database Design}
@@ -2196,55 +2237,93 @@ SBT involves credit score (1--1000), risk tier (Bronze, Silver, Gold, Platinum, 
 \label{fig:multi-entity-ops}
 \end{figure}
 
-Besides lending down to clients, banks in the hierarchy also need to move capital sideways (between peers at the same tier), upwards (returning surplus to a parent bank), and together (sharing large loans). Figure~\ref{fig:multi-entity-ops} gives an overview. The subsections below describe five on-chain mechanisms for these flows; batch settlement netting (\texttt{NettingEngine}) is left for future work (Section~\ref{sec:future-work}).
+Besides lending down to clients, banks in the hierarchy also need to move capital sideways between peers at the same tier, upwards to return surplus to a parent bank, and together to share large loans. The subsections below describe five on-chain mechanisms for these flows; batch settlement netting (\texttt{NettingEngine}) is left for future work (Section~\ref{sec:future-work}).
 
-\subsubsection{InterBankLendingPool: Same-Tier Lending}
+\subsubsection{Same-Tier Lending (InterBankLendingPool)}
 \label{sec:interbank-pool}
 
-When two banks at the same tier need short-term liquidity from each other, they use an \texttt{InterBankLendingPool} (IBLP)---one pool per tier for National Banks (\texttt{IBLP\_NB}) and Local Banks (\texttt{IBLP\_LB}). Loans run for 1, 7, or 30~days in USDC, and only banks with an active role in that tier may participate (Section~\ref{sec:defense-in-depth}).
+For each tier there is a separate pool for lending facilities among banks of the same tier. Banks with an active role can contribute to or receive lending facilities from same-tier banks instead of from the parent tier. One bank can lend to another bank based on lending limits and controlled interest rates, for a flexible duration.
 
-\paragraph{Interest rate.}
-The pool borrow rate $r_{\text{IB}}(U)$ uses the same kinked curve as retail lending (Section~\ref{sec:kinked-rate}, Formulas~18--19), with utilisation kink $U^{*}_{\text{IB}} = 0.90$. It may never exceed the rate at which the parent tier lends downward, minus a small spread $\delta$ that prevents arbitrage:
-\begin{equation}
-r_{\text{IB}}(U) \le r_{\text{downward}}(U) - \delta
-\end{equation}
-\noindent $\delta$ is set by governance and checked on every rate update via \texttt{getCurrentBorrowRate()}.
+[FORMULA PLACEHOLDER]
 
-\paragraph{When a borrower defaults.}
-If an interbank loan is not repaid at maturity, losses are covered in order: first from the borrower's reserve buffer, then from the \texttt{InsuranceFund}, and finally by the parent tier. Serious cases can trigger a role suspension through the TimeLock.
+\begin{figure}[H]
+\centering
+\BalancedDiagram{1_InterBankLendingPool}
+\caption[InterBankLendingPool]{InterBankLendingPool.}
+\label{fig:interbank-pool}
+\end{figure}
 
-\subsubsection{Upward Surplus Repatriation}
+\subsubsection{Surplus Repatriation (UpwardDepositFacility)}
 \label{sec:upward-flow}
 
-A bank that holds more reserves than required (at least 20\% above the minimum) may place the extra funds with its parent bank through \texttt{UpwardDepositFacility} and earn deposit interest. The upward deposit rate must stay below the downward lending rate minus the same spread $\delta$:
-\begin{equation}
-r_{\text{up}} < r_{\text{down}} - \delta
-\end{equation}
-\noindent Withdrawals are blocked if they would push the bank below its minimum reserve ratio. Other limits: no more than 20\% of upward deposits may be withdrawn per day, and total upward exposure may not exceed 30\% of on-chain assets.
+When a bank has more reserves than the minimum requirement and is able to fund extra to the parent banks, a lower-tier bank is able to fund upper-tier banks through the \texttt{UpwardDepositFacility} and earn interest on the funded amount.
 
-\subsubsection{Syndicated and Club Lending}
+[FORMULA PLACEHOLDER]
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{2_UpwardDepositFacility}
+\caption[UpwardDepositFacility]{UpwardDepositFacility.}
+\label{fig:upward-deposit}
+\end{figure}
+
+\subsubsection{SyndicatedLoan}
 \label{sec:syndicated-lending}
 
-A single bank may not fund a very large loan alone. In a \texttt{SyndicatedLoan}, several banks share the exposure: one Lead Arranger, one or more Co-Lenders, and the Borrower (always a retail client via a Local Bank). The deal closes only when total commitments reach at least 90\% of the loan amount and Co-Lenders representing at least 75\% of committed capital agree. Each bank's share is stored on-chain; principal, interest, and any recovery after default are split in proportion to those shares.
+Some loans can be funded by multiple banks together, and multiple banks can request a single loan together from a parent bank. Primarily, one bank is registered for the loan and other banks are considered co-lender banks. The interest rate and other contributions are distributed based on the invested or contributed amount by each bank.
 
-\subsubsection{Senior--Junior Tranched Lending Pools}
+[FORMULA PLACEHOLDER]
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{3_SyndicatedLoan}
+\caption[SyndicatedLoan]{SyndicatedLoan.}
+\label{fig:syndicated-loan}
+\end{figure}
+
+\subsubsection{TranchedPool}
 \label{sec:tranched-pools}
 
-A \texttt{TranchedPool} divides pooled capital into two parts. Senior tranche holders take lower risk and receive lower returns; junior tranche holders take higher risk and receive higher returns but absorb losses first. On repayment, senior interest is paid before junior interest, then senior principal before junior principal. Losses follow the reverse order. The junior-to-senior ratio must fall between 10/90 and 30/70 when the pool is created.
+Banks can choose the risk level of their invested amount by signing up as a senior or junior tranche. The senior holder gets low risk and low return, and the junior holder gets high risk and high return. The senior holder receives the first payment for interest, so their advantage shows in low risk of returns, but junior holders get high repayments, with the risk of high loss too. To maintain this classification, the junior share is limited to 10\% to 30\% of the pool.
 
-\subsubsection{Cross-Tier Treasury FX Swap}
+[FORMULA PLACEHOLDER]
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{4_TranchedPool}
+\caption[TranchedPool]{TranchedPool.}
+\label{fig:tranched-pool}
+\end{figure}
+
+\subsubsection{TreasurySwap}
 \label{sec:treasury-fx}
 
-Banks holding different assets can exchange them atomically through \texttt{TreasurySwap}, using oracle prices:
-\begin{equation}
-\text{Amount}_{\text{to}} = \text{Amount}_{\text{from}} \times \frac{P_{\text{from}}}{P_{\text{to}}} \times (1 - \text{spread})
-\end{equation}
-\noindent $P_{\text{from}}$ and $P_{\text{to}}$ come from Chainlink feeds; the treasury charges a spread of 5--10~bps. After the swap, the bank must still meet its minimum reserve ratio. Swaps above \$1M require two signatures on a Safe multisig.
+A bank can swap assets with other banks based on asset value from the Chainlink feeds. Banks are only allowed to swap reserves that meet the minimum reserve ratio of 20\%. A swap of asset value over 1M USDC requires 2 signatures from a multisig before it is submitted for processing.
 
-\subsubsection{Multilateral Settlement Netting Engine (Future Work)}
+[FORMULA PLACEHOLDER]
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{5_TreasurySwap}
+\caption[TreasurySwap]{TreasurySwap.}
+\label{fig:treasury-swap}
+\end{figure}
+
+\subsubsection{NettingEngine (Future Work)}
 \label{sec:netting-settlement}
 
-\noindent\textit{Future Work.} A \texttt{NettingEngine} would combine many bilateral obligations from IBLP and \texttt{TreasurySwap} into fewer net payments, with support for partial settlement and a dispute window. This is described in Section~\ref{sec:future-work}; only placeholder database tables (\texttt{NETTING\_BATCH}, \texttt{NETTING\_ENTRY}) exist in the schema for now.
+The \texttt{NettingEngine} works as a mechanism for partial settlement of \texttt{InterBankLendingPool} loans and \texttt{TreasurySwap} obligations. It works by batching large payments into smaller net payments.
+
+[FORMULA PLACEHOLDER]
+
+Details are shown in the figure below.
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{6_NettingEngine}
+\caption[NettingEngine]{NettingEngine.}
+\label{fig:netting-engine}
+\end{figure}
 
 \subsubsection{Database, Phase, and Contract Consistency for Multi-Entity Operations}
 \label{sec:multi-entity-consistency}
@@ -2390,7 +2469,71 @@ Figure~\ref{fig:uml-class} shows the main software classes in the lending domain
 \subsubsection{User Interface Design}
 \label{sec:ui-design}
 
-Screen layouts for the retail borrower flow and the bank approver dashboard are kept in \textbf{Appendix~F} (Section~\ref{app:ui-prototypes}) as Figma exports; Figures~\ref{fig:ui-wireframe-retail} and~\ref{fig:ui-wireframe-approver} will be inserted there before final submission.
+User Interface protype designs are shown below. some of the key features are desined for the initial stages, all the prototype pages will be ready as development phases continue.
+
+\paragraph{Retail loan application flow.}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-retail}
+\caption[Retail loan wireframe]{Retail loan wireframe.}
+\label{fig:ui-wireframe-retail}
+\end{figure}
+
+\paragraph{Authority Brief approver dashboard.}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-approver}
+\caption[Approver dashboard wireframe]{Approver dashboard wireframe.}
+\label{fig:ui-wireframe-approver}
+\end{figure}
+
+\paragraph{Client onboarding funnel (KYC levels).}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-onboarding}
+\caption[Onboarding wireframe]{Onboarding wireframe.}
+\label{fig:ui-wireframe-onboarding}
+\end{figure}
+
+\paragraph{Reserve transparency dashboard (Tier~1).}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-reserve}
+\caption[Reserve dashboard wireframe]{Reserve dashboard wireframe.}
+\label{fig:ui-wireframe-reserve}
+\end{figure}
+
+\paragraph{Conversational banking agent (chat).}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-agent}
+\caption[Banking agent wireframe]{Banking agent wireframe.}
+\label{fig:ui-wireframe-agent}
+\end{figure}
+
+\paragraph{Group solidarity lending application.}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-group-lending}
+\caption[Group lending wireframe]{Group lending wireframe.}
+\label{fig:ui-wireframe-group-lending}
+\end{figure}
+
+\paragraph{Compliance and AML alert review.}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-compliance}
+\caption[Compliance wireframe]{Compliance wireframe.}
+\label{fig:ui-wireframe-compliance}
+\end{figure}
+
+\paragraph{Mobile navigation and responsive layout.}
+\begin{figure}[H]
+\centering
+\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-mobile}
+\caption[Mobile layout wireframe]{Mobile layout wireframe.}
+\label{fig:ui-wireframe-mobile}
+\end{figure}
 
 \subsubsection{Four-Tier Capital Flow}
 
@@ -2404,21 +2547,22 @@ Figure~\ref{fig:four-tier} shows how capital moves down the World $\to$ National
 \end{figure}
 
 
-\subsection{Group Solidarity Lending}
-\label{sec:banking-products}
-
-Groups of 3--20 clients borrow via \texttt{GroupLendingPool} with shared collateral. Per-member share is $\text{LoanTotal}/N_{\text{members}}$. Default uses collateral first, then SBT \texttt{riskTier} downgrade~[94].
-
-\paragraph{Over-indebtedness risk control.}
-\label{sec:over-indebt}
-Max two simultaneous group loans, 30-day cooling-off, and cross-bank check via \texttt{ICreditPassport.getScore()}. Reject if debt-to-income $\text{DTI} > 0.40$ (Formula in List of Formulas).
-
-\begin{figure}[H]
-\centering
-\BalancedDiagram{fig-group-lending-lifecycle}
-\caption[Group lending lifecycle]{Group lending lifecycle.}
-\label{fig:group-lending-lifecycle}
-\end{figure}
+% REMOVED per request (commented out so it does not render):
+% \subsection{Group Solidarity Lending}
+% \label{sec:banking-products}
+%
+% Groups of 3--20 clients borrow via \texttt{GroupLendingPool} with shared collateral. Per-member share is $\text{LoanTotal}/N_{\text{members}}$. Default uses collateral first, then SBT \texttt{riskTier} downgrade~[94].
+%
+% \paragraph{Over-indebtedness risk control.}
+% \label{sec:over-indebt}
+% Max two simultaneous group loans, 30-day cooling-off, and cross-bank check via \texttt{ICreditPassport.getScore()}. Reject if debt-to-income $\text{DTI} > 0.40$ (Formula in List of Formulas).
+%
+% \begin{figure}[H]
+% \centering
+% \BalancedDiagram{fig-group-lending-lifecycle}
+% \caption[Group lending lifecycle]{Group lending lifecycle.}
+% \label{fig:group-lending-lifecycle}
+% \end{figure}
 
 
 \subsection{Governance Framework}
@@ -2426,7 +2570,7 @@ Max two simultaneous group loans, 30-day cooling-off, and cross-bank check via \
 \label{sec:governance-dual-path}
 \label{sec:regulatory-compliance}
 
-Parameter changes route through a 48-hour \texttt{TimelockController} with snapshot voting and 60\% quorum. Emergency pause uses a 2-of-3 multisig; production admin keys use Safe multisigs (Table~\ref{tab:governance-summary}). Prototype runs on public testnets; SAR workflow: Isolation Forest $\to$ compliance queue $\to$ \texttt{freezeAccount} (Section~\ref{sec:system-modeling}).
+If any changes are required for the system settings or any functionalities need an update, the \textbf{TimelockController} function adds a \textbf{48-hour waiting period} to apply those changes to the whole system. It also requires \textbf{60\% votes} from the users or accounts with admin role for the change to take action. \textbf{System pause feature} is also built in that requires \textbf{2/3 admin votes} to activate it, just in case of emergency. For advanced security of the admin role interaction with the system, \textbf{safe multisig wallets} are being utilized instead of a single private key, so power is not accumulated to one person's decision. The \textbf{fraud detection models} utilized to find any fraud attempts to the system, suspected wallet interactions or abnormal user behaviors are \textbf{flagged} and sent for reviewing, and accounts can be \textbf{frozen} based on those evidences until being manually reviewed by authorities.
 
 \begin{figure}[H]
 \centering
@@ -2474,7 +2618,7 @@ Regulatory & Audit logs via contract events; sandbox pilots for production; zkKY
 \label{fig:defense-in-depth}
 \end{figure}
 
-Security spans five layers (Table~\ref{tab:defense-layers}): L5 operational keys (Safe multisigs), L4 runtime monitoring (Tenderly alerts), L3 ML fraud scoring with human review, L2 API auth and rate limits, L1 contract RBAC + \texttt{ReentrancyGuard} + Foundry fuzz tests. Each layer fails closed: if ML is unreachable, loans route to manual review rather than auto-approval.
+A fully sophisticated \textbf{5-layer defense system} has been implemented instead of simple security layers. On the top, \textbf{Admin control} has been distributed to multiple \textbf{safe multisig wallets} so no one can hold power to admin-level decisions alone. \textbf{Layer 4} is feature packed with \textbf{anomaly and security alert system}, it logs the changes and alert systems are triggered. \textbf{Layer 3} is more advanced with \textbf{ML fraud detection services}. The service automatically scans, compares, flags, even forwards instructions to the system if certain wallets should be \textbf{frozen} before further manual reviews or inquiries. \textbf{Layer 2} consists of \textbf{API protection services} alongside with \textbf{rate limiting} service. \textbf{Layer 1} is functional at the core, with all the abilities of \textbf{smart contracts}. It applies \textbf{role checks}, guarding against repeated attack calls. Despite having all the security layers, major decisions regarding providing a loan, financial transaction or any changes to the system, required \textbf{manual human confirmation} before any important decision is being approved.
 
 \begin{table}[H]
 \centering
@@ -2498,7 +2642,9 @@ L1 & Smart contract & OpenZeppelin RBAC, CEI, pause, Hardhat + Foundry tests \\
 \subsection{Threat Model and Security Controls}
 \label{sec:threat-model}
 
-Table~\ref{tab:threat-model} maps primary threats to mitigations across the five layers.
+With the documented security layers to provide a very well protected financial services, there are still risks that are needed much careful attention. Here listed some of the common risks that may temper with the functionality and security of the system and the planned mitigations.
+
+The first risk to consider is \textbf{reentrancy}, when an attacker attempts multiple transaction requests from the same wallet before one transaction is completed. This attempt is made to create a false scenario of sending more or receiving less than the expected amount. This risk is mitigated in \textbf{Layer 1} smart contract guard that prevents response to multiple calls before one transaction is completed with confirmation handshake. Second risk is bad estimation of current price of assets and currencies from the \textbf{oracle}. This risk has been solved with \textbf{Chainlink up-to-date price feeds}. Third risk of admin's ability to make major decisions without the considerations of permission from majority, which has been resolved with the \textbf{safe multisig wallets}, \textbf{timelock waiting periods}, and \textbf{admin roles with time limitations}, applied across Level~1 to Level~5. The login tokens and API keys can create vulnerabilities too with flooded requests which are considered as the 4th risk. This issue has been addressed and solved in \textbf{Layer 2} with short time login access and limited requests. Fifth risk is the fraud models being bypassed by some experts, and the risk is considered heavily and as a solution to this, all major decisions regarding loan approval are manually reviewed by the \textbf{human review gate} with \textbf{SHAP explanations} to guide them, in security \textbf{Layer 3}.
 
 \begin{table}[H]
 \centering
@@ -2653,9 +2799,67 @@ The purpose of the AI/ML layer is to provide a risk score per loan approval that
 \end{figure}
 
 
+\subsection{AI/ML Model Internals, Training Mechanics, and Security}
+\label{sec:aiml-internals}
+
+The subsections below go beneath the risk-scoring pipeline of Section~\ref{sec:aiml-support} and the agentic pipeline of Section~\ref{sec:optional-agent} to document how the underlying models actually compute, learn, and are protected---covering both the off-chain fraud-detection models (Random Forest / Isolation Forest, Section~\ref{sec:ml-workload}) and the Qwen-based conversational agent.
+
+\subsubsection{Neuron-Level Computation and Forward Pass}
+\label{sec:neuron-forward-pass}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: walk through a single forward pass at the computation-graph level---for the tree-based fraud models, show a decision path through one tree; for the Qwen transformer, show one layer's matrix multiplications, activation function, and residual connection, with a figure of the computation graph.]}
+\vspace{1.5cm}
+
+\subsubsection{Training Dynamics: Loss, Backpropagation, and Optimization}
+\label{sec:training-dynamics}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe the loss function(s) used, how gradients are computed and propagated (backpropagation for the transformer; impurity/information-gain splitting for the trees), the optimizer and learning-rate schedule, and include a training/validation loss curve figure.]}
+\vspace{1.5cm}
+
+\subsubsection{Transformer Architecture and Self-Attention Mechanism}
+\label{sec:transformer-architecture}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe the Qwen model's transformer block---self-attention (Q/K/V projections, attention scores), feed-forward sublayer, positional encoding, and how many layers/heads are used at the chosen model size; include an attention-mechanism diagram.]}
+\vspace{1.5cm}
+
+\subsubsection{Tokenization and Autoregressive Token Generation}
+\label{sec:tokenization-generation}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe the tokenizer (vocabulary size, BPE/byte-level scheme), how the injected on-chain context JSON of Section~\ref{sec:optional-agent} is tokenized alongside the conversation, and how tokens are sampled/generated at inference time (temperature, top-p, stopping conditions).]}
+\vspace{1.5cm}
+
+\subsubsection{Multimodal Recognition: Text and Image Understanding}
+\label{sec:multimodal-recognition}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe how the agent processes non-text input---the image/document understanding pathway used for the document-scanning workflow of Section~\ref{sec:document-scanning-workflow}, including whether this is handled natively by the model's vision encoder or by a separate OCR step, and how recognized content is merged back into the text context.]}
+\vspace{1.5cm}
+
+\subsubsection{Model Performance Characterization}
+\label{sec:model-performance-characterization}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: report measured latency, tokens/second, and memory footprint on the target inference hardware for both the fraud-detection models and the conversational agent, and compare against the NFR targets already stated elsewhere in the report.]}
+\vspace{1.5cm}
+
+\subsubsection{AI/ML Security Layers}
+\label{sec:aiml-security-layers}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe protections specific to the ML/agent layer---adversarial-input and prompt-injection defenses, output/tool-call sandboxing, data isolation between client sessions, and how this subsection maps onto the Five-Layer Defense-in-Depth architecture of Section~\ref{sec:defense-in-depth}.]}
+\vspace{1.5cm}
+
 
 \subsection{Conversational Agent (Phase III--IV)}
 \label{sec:optional-agent}
+
+\subsubsection{Agentic Model Selection, and Integration}
+
+\paragraph{Agentic Capabilities.} A conversational model with higher parameter counts with top class accuracy may not be good at agentic workload if not trained for the purpose. Qwen3-8B is an open source model trained with the intention of agentic workload with tool calling accuracy with top of the class agentic task completion abilities for its size category. It can output perfect structurally accurate JSON matching with our database schema to execute commands with near perfect accuracy for a long time in sequential commands.
 
 The conversational agent that has been designed to assist the clients to better navigate the platform is planned to be completed by Phase~III. It is an auxiliary feature that works alongside the standard web UI for those who may not be familiar with the banking system of the project and have less domain knowledge and want to understand the platform and how to navigate with it. The schema of the full MCP agent has been shown in Table~\ref{tab:mcp-tools}; explainability for approvers is documented in Section~\ref{sec:ml-explainability}.
 
@@ -2690,22 +2894,8 @@ The conversational agent that has been designed to assist the clients to better 
 \end{tabular}
 \end{table}
 
-\subsubsection{In-product assistant: local large language model (LLM) integration (prototype)}
-\label{sec:local-llm}
-
-\paragraph{Purpose.}
-The in-product assistant is a \textbf{planned Phase~III Must deliverable} (Section~\ref{sec:optional-agent}), providing a plain-language interface alongside the React dashboard. It combines a locally hosted, privacy-preserving large language model (Qwen3-8B, Apache~2.0~licence) with a Model Context Protocol (MCP) tool server exposing a minimal MVT subset of \textbf{3--5 tools} (Section~\ref{sec:optional-agent}). The full \textbf{17-tool} suite (9 read tools, including a session history search tool, and 8 write tools requiring human confirmation) remains a specified Future Work expansion rather than the graded prototype baseline. The agent can both answer questions---via retrieval-augmented generation (RAG) from policy documents---and execute on-chain banking operations via the MVT write-tool subset, subject to an explicit human confirmation gate before any state-modifying action is taken. Local hosting keeps conversation data on institutional infrastructure, supporting data-sovereignty requirements in regulated pilots. A client who prefers the React UI experiences no reduction in available functionality, since every operation the agent can perform is equally available through the standard dashboard.
-
-\paragraph{Model and runtime (local development).}
-The inference endpoint follows the \textbf{OpenAI Chat Completions} contract (\texttt{/v1/chat/completions}) with \texttt{stream: true}, proxied from the project backend to a local service such as \texttt{http://127.0.0.1:1234}. During early development, the assistant used a locally hosted \textbf{Gemma-4-E4B} checkpoint (Google mixture-of-experts model, $\sim$26B total / 4B active parameters) via LM Studio in GGUF form (e.g., \texttt{Q4\_K\_M} quantization) for a laptop-friendly footprint. For the final thesis evaluation, the assistant is replaced by \textbf{Qwen3-8B} (Alibaba Cloud Qwen team, released April~28~2025, Apache~2.0~licence)~[67], a dense 8.19B-parameter causal language model with a 32K-token native context window (extendable to 131K tokens via YaRN scaling) and support for 100+ languages and dialects. A distinguishing architectural feature of Qwen3-8B is its \emph{switchable reasoning mode}: the model operates in \textbf{thinking mode} (chain-of-thought wrapped in \texttt{<think>} tokens, suited to multi-step compliance or policy questions) and \textbf{non-thinking mode} (direct, low-latency responses for general navigation queries), selectable per-turn with \texttt{/think} or \texttt{/no\_think} in the system prompt. For Q\&A and retrieval-augmented generation (RAG) queries, non-thinking mode is the default; thinking mode is activated only for the red-team regulatory-compliance prompts in the evaluation protocol of Section~\ref{sec:optional-agent}. For agent tool-calling, non-thinking mode is the default for read tools and confirmation summaries; thinking mode is activated for complex multi-step operations such as EMI calculation or group signature coordination. The per-user context namespace (see Section~\ref{sec:aiml-support}) is prepended to every system prompt as a structured JSON block, so the model has full account context before reading the user's message. The API model identifier is environment-driven; the integration layer remains identical for both models.
-
-\paragraph{End-to-end behavior.}
-The user interface assembles a short transcript (user/assistant messages) and posts it to the backend streaming route. Before the user message reaches the model, the context assembly layer: (a)~selects the active toolset based on intent classification, (b)~applies prompt injection scanning to all user-sourced fields, and (c)~assembles the three-tier system prompt (Stable + Context + Volatile), injecting the compression summary from the parent session into the Volatile tier if this is a continuation session. The active toolset name and any injection scan flag are recorded in \texttt{AGENT\_ACTION\_LOG} for every turn. The backend then opens a streaming request to the local model server, converts upstream token events into \textbf{server-sent events (SSE)} for the browser, and the UI incrementally appends text. The message renderer uses Markdown (including GitHub-flavored extensions), math (KaTeX) for \texttt{\$\$...\$\$} blocks, and line-break rules appropriate for chat transcripts.
-
-For write-tool requests, the agent assembles the full parameter set from the user's request and the injected on-chain state, then presents a confirmation summary. Only after the user sends explicit affirmative consent does the agent call the corresponding MCP write tool via the Express.js banking API layer. The EIP-7702 session key (if active) signs the resulting on-chain transaction within its approved scope. Every executed write tool is logged to \texttt{agent\_action\_log} with the confirmation message ID as the audit reference.
-
 \paragraph{Live on-chain context injection.}
-The Express.js backend injects the client's full on-chain state as a structured JSON context block into every system prompt before forwarding the user's message to the model. The per-user context namespace is:
+client's infromation is injected tot he model in a JSON file structure. the Express.js backend injects the JSON file beore each promt is being processed by the Model to provide assistacnce and read/write tool services.
 \begin{verbatim}
 {
   "tier": "volatile",
@@ -2775,6 +2965,33 @@ Event Indexing & PostgreSQL event listener & Stability-first indexing baseline (
 \end{tabular}
 \end{table}
 
+\subsubsection{Voice Interaction Layer: Speech-to-Text Pipeline}
+\label{sec:voice-interaction-layer}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe the voice-chat option---since the chosen agent model is text-only, explain the speech-to-text front end (model/library used, streaming vs.\ push-to-talk capture, language handling), how transcribed text is handed to the six-step pipeline of Section~\ref{sec:optional-agent}, and whether a text-to-speech reply path is included.]}
+\vspace{1.5cm}
+
+\subsubsection{Document Scanning and Approval-Summary Workflow}
+\label{sec:document-scanning-workflow}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe the document-scanning option---capture method (camera/upload), how the scanned document is read (native vision recognition vs.\ OCR service), how the agent turns the extracted content into a plain-language request summary, and the human-confirmation gate before the summary is forwarded to bank authorities (link to Section~\ref{sec:optional-agent} step~5).]}
+\vspace{1.5cm}
+
+\subsubsection{Agent Fine-Tuning and Training Pipeline}
+\label{sec:agent-finetuning-pipeline}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe how the agent model is adapted for this project---dataset used for tool-call/JSON fine-tuning examples, fine-tuning method (e.g.\ LoRA/QLoRA), training hardware and software stack, and evaluation of the fine-tuned agent against the base model on tool-call accuracy.]}
+\vspace{1.5cm}
+
+\subsubsection{Agent-Specific Security Layers and Guardrails}
+\label{sec:agent-security-guardrails}
+
+\vspace{1.5cm}
+\noindent\textit{[Comments for this section: describe guardrails specific to the agent---the prompt-injection scanner mentioned in Table~\ref{tab:tech-stack}, the confirmation-gate audit hook, rate limiting/lockout behaviour on repeated vague responses (Section~\ref{sec:optional-agent} step~5), and how this ties into Section~\ref{sec:aiml-security-layers}.]}
+\vspace{1.5cm}
 
 
 \subsection{Real-Time Dashboard Pipeline and Runtime Monitoring}
@@ -3164,262 +3381,264 @@ This field requires much research, as financial flow is heavily manipulated and 
 
 \appendix
 
-\chapter{Database Schema Reference}
-\label{app:db-schema-reference}
-
-This appendix records the physical-schema details moved from Chapter~\ref{ch:design-alternatives} to keep the main design chapter focused on conceptual design.
-
-\section{Full Relational ERD}
-\label{sec:appendix-erd-full}
-
-Figure~\ref{fig:erd-relational} is the complete logical data model: 51 documented entities plus two Phase-IV configuration tables (\texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION}), with Chen notation (entity rectangles, relationship diamonds, cardinality labels), migration-tier colour coding, and a notation key. It spans two portrait sheets (Figures~\ref{fig:erd-relational} and~\ref{fig:erd-relational-p2}) so entity text and connectors remain legible. Deferred stub and future-work relations are listed in Table~\ref{tab:db-entities-ext2}.
-
-\begin{figure}[p]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,height=0.92\textheight,keepaspectratio]{ERD_diagram_relational_p1}
-\caption[Full relational ERD (sheet 1)]{Full relational ERD (sheet 1 of 2).}
-\label{fig:erd-relational}
-\end{figure}
-
-\begin{figure}[p]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,height=0.92\textheight,keepaspectratio]{ERD_diagram_relational_p2}
-\caption[Full relational ERD (sheet 2)]{Full relational ERD (sheet 2 of 2).}
-\label{fig:erd-relational-p2}
-\end{figure}
-
-\section{Indexing Strategy}
-\label{sec:indexing-strategy}
-
-B-tree indexes (the PostgreSQL default) support efficient retrieval on frequently queried columns:
-
-\begin{table}[H]
-\centering
-\caption[Indexing strategy]{Indexing strategy.}
-\label{tab:indexing-strategy}
-\begingroup
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{@{}%
-  >{\raggedright\arraybackslash}p{0.19\linewidth}%
-  >{\raggedright\arraybackslash}p{0.41\linewidth}%
-  >{\raggedright\arraybackslash}p{0.36\linewidth}@{}}
-\toprule
-\tableheadcolor
-\textbf{Index} & \textbf{Table / Column(s)} & \textbf{Rationale} \\
-\midrule
-\texttt{idx\_loan\_borrower} &
-  \texttt{LOAN\_REQUEST}(\texttt{borrower\_id}) &
-  High-frequency lookup for borrower loan history. \\
-\texttt{idx\_loan\_status} &
-  \texttt{LOAN\_REQUEST}(\texttt{status}, \texttt{oracle\_state}) &
-  Efficient filtering of application lifecycle and oracle pipeline states. \\
-\texttt{idx\_installment\_due} &
-  \texttt{INSTALLMENT}(\texttt{due\_date}, \texttt{status})\newline
-  \texttt{WHERE status = 'PENDING'} &
-  Partial-index range query for pending overdue installment detection. \\
-\texttt{idx\_txn\_created} &
-  \texttt{TRANSACTION}(\texttt{created\_at}) &
-  Time-window aggregation for 6-month and 1-year borrowing limits. \\
-\texttt{idx\_txn\_borrower} &
-  \texttt{TRANSACTION}(\texttt{borrower\_id}) &
-  Per-borrower transaction history retrieval. \\
-\texttt{idx\_market\_symbol} &
-  \texttt{MARKET\_DATA}(\texttt{symbol},\newline
-  \texttt{recorded\_at}) &
-  Composite index for price feed time-series queries. \\
-\texttt{idx\_loan\_bank\_status} &
-  \texttt{LOAN}(\texttt{local\_bank\_id}, \texttt{status},\newline
-  \texttt{created\_at DESC}) &
-  Loan lifecycle queries by bank and status. \\
-\texttt{idx\_loan\_borrower\_active} &
-  \texttt{LOAN}(\texttt{borrower\_id}, \texttt{status})\newline
-  \texttt{WHERE status = 'ACTIVE'} &
-  Partial index for per-borrower open-loan count. \\
-\texttt{idx\_agent\_session\_date} &
-  \texttt{AGENT\_ACTION\_LOG}(\texttt{session\_id},\newline
-  \texttt{created\_at DESC}) &
-  Per-session agent action history retrieval (join to \texttt{SESSIONS} for borrower). \\
-\texttt{idx\_agent\_status} &
-  \texttt{AGENT\_ACTION\_LOG}(\texttt{status})\newline
-  \texttt{WHERE status = 'PENDING'} &
-  Partial index for the agent status-monitoring loop. \\
-\texttt{idx\_risk\_score} &
-  \texttt{LOAN\_RISK\_ASSESSMENT}(\texttt{anomaly\_score DESC})\newline
-  \texttt{WHERE anomaly\_score > 0.5} &
-  Partial index for AML alert queue (SAR workflow). \\
-\texttt{idx\_ib\_loan\_status} &
-  \texttt{INTERBANK\_LOAN}(\texttt{status}, \texttt{lender\_institution\_id}) &
-  IBLP default cascade and maturity monitoring. \\
-\texttt{idx\_institution\_type} &
-  \texttt{INSTITUTION}(\texttt{institution\_type}, \texttt{status}) &
-  Tier-scoped institution lookups for multi-entity operations. \\
-\texttt{idx\_txn\_institution} &
-  \texttt{TRANSACTION}(\texttt{origin\_institution\_id}, \texttt{created\_at DESC}) &
-  Institution-to-institution ledger history retrieval. \\
-\texttt{idx\_chainlink\_feed} &
-  \texttt{CHAINLINK\_PRICE\_ROUND}(\texttt{feed\_address},\newline
-  \texttt{updated\_at DESC}) &
-  Latest round lookup per Chainlink feed for LTV staleness checks. \\
-\texttt{idx\_session\_parent} &
-  \texttt{SESSIONS}(\texttt{parent\_session\_id})\newline
-  \texttt{WHERE parent\_session\_id IS NOT NULL} &
-  Partial index for session lineage chain traversal. \\
-\texttt{idx\_collateral\_borrower} &
-  \texttt{COLLATERAL\_POSITION}(\texttt{borrower\_id}, \texttt{loan\_id}) &
-  Health-factor lookup per borrower and per loan. \\
-\texttt{idx\_event\_log\_txhash} &
-  \texttt{BLOCKCHAIN\_EVENT\_LOG}(\texttt{tx\_hash}) &
-  Deduplication guard: event listener checks this before INSERT. \\
-\texttt{idx\_event\_log\_block} &
-  \texttt{BLOCKCHAIN\_EVENT\_LOG}(\texttt{block\_number}, \texttt{chain\_id}) &
-  Catchup-sync replay from a given block. \\
-\bottomrule
-\end{tabular}
-\endgroup
-\end{table}
-
-\section{Functional Dependencies}
-
-\begin{table}[H]
-\centering
-\caption[Functional dependencies]{Functional dependencies.}
-\label{tab:functional-deps}
-\begingroup
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}%
-  >{\raggedright\arraybackslash}p{0.17\linewidth}%
-  >{\raggedright\arraybackslash}p{0.43\linewidth}%
-  >{\raggedright\arraybackslash}p{0.36\linewidth}@{}}
-\toprule
-\tableheadcolor
-\textbf{Relation} & \textbf{Functional Dependency} & \textbf{Notes} \\
-\midrule
-LOAN\_REQUEST & \texttt{request\_id} $\to$ all attributes & Application row keyed by request identifier. \\
-LOAN\_REQUEST & \texttt{borrower\_id, local\_bank\_id} $\to$ \texttt{status}, \texttt{oracle\_state}, \texttt{amount}, \ldots & Lifecycle \texttt{status} and oracle pipeline \texttt{oracle\_state} are separate columns. \\
-LOAN & \texttt{loan\_id} $\to$ all attributes & Disbursement record keyed by loan identifier. \\
-LOAN & \texttt{loan\_request\_id} $\to$ \texttt{loan\_id} & 1:1 link from approved request to disbursed loan. \\
-BORROWING\_LIMIT & \texttt{borrower\_id} $\to$ \texttt{six\_month\_limit}, \texttt{one\_year\_limit}, \newline \texttt{on\_chain\_enforced\_limit}, \texttt{last\_synced\_block}, \ldots & 1:1 with BORROWER; event-listener owned projection. \\
-CREDIT\_PASSPORT & \texttt{passport\_id} $\to$ all attributes;\newline \texttt{borrower\_id} $\to$ \texttt{passport\_id} & Read-model projection of on-chain SBT; event-listener owned. \\
-BORROWER & \texttt{wallet\_address} $\to$ \texttt{borrower\_id}, all attributes;\newline \texttt{registered\_local\_bank\_id} $\to$ home Local Bank;\newline \texttt{kyc\_level} $\to$ borrowing-cap tier (Section~\ref{sec:tiered-kyc}) & Unique candidate key in the prototype; Phase~IV may use \texttt{(wallet\_address, chain\_id)}. \\
-INSTITUTION & \texttt{institution\_id} $\to$ \texttt{institution\_type}, \texttt{name}, \texttt{wallet\_address}, \texttt{contract\_address}, \texttt{status} & Supertype for cross-tier FK anchors. \\
-NATIONAL\_BANK & \texttt{country\_code} $\to$ \texttt{institution\_id} & One national reserve per nation (\texttt{UNIQUE}). \\
-MODEL\_REGISTRY & \texttt{model\_id} $\to$ \texttt{model\_name}, \texttt{version}, \texttt{training\_date}, \texttt{metrics}, \texttt{is\_active} & Model lineage for explainability audit. \\
-LOAN\_RISK\_ASSESSMENT & \texttt{assessment\_id} $\to$ all attributes;\newline \texttt{model\_id} $\to$ \texttt{fraud\_probability}, \texttt{anomaly\_score}, \texttt{shap\_vector} & Per-loan ML inference; FK to \texttt{MODEL\_REGISTRY}. \\
-INSTALLMENT & \texttt{loan\_id, installment\_number} $\to$ \texttt{amount}, \texttt{due\_date}, \texttt{status}, \texttt{payment\_event\_log\_id} & Composite primary key. \\
-SESSIONS & \texttt{session\_id} $\to$ \texttt{borrower\_id}, \texttt{wallet\_address}, \texttt{session\_key\_hash}, \newline \texttt{session\_key\_scope}, \texttt{session\_key\_expires\_at}, \newline \texttt{expires\_at}, \texttt{revoked} & Retail-client agent sessions only at MVT; bank-authority sessions are Future Work. \\
-AGENT\_ACTION\_LOG & \texttt{action\_id} $\to$ \texttt{session\_id}, \texttt{tool\_name}, \newline \texttt{parameters}, \texttt{confirmation\_turn\_id}, \newline \texttt{onchain\_tx\_hash}, \texttt{status}, \texttt{created\_at} & Links every write-tool execution to the user's consent turn in \texttt{AGENT\_CONVERSATION\_TURN}. \\
-ASSETS & \texttt{asset\_id} $\to$ \texttt{symbol}, \texttt{name}, \texttt{asset\_type}, \newline \texttt{network}, \texttt{decimals}, \texttt{is\_active};\newline \texttt{symbol} $\to$ \texttt{asset\_id} & \texttt{symbol} is a unique candidate key. \\
-INTEREST\_RATE\_TIER & \texttt{tier\_id} $\to$ \texttt{base\_rate}, \texttt{kink\_utilization}, \newline \texttt{rate\_above\_kink}, \texttt{max\_rate}, \texttt{bank\_tier\_type}, \texttt{effective\_from}, \texttt{effective\_to}, \texttt{is\_active} & Eliminates transitive dependency; temporal versioning for governance changes. \\
-\bottomrule
-\end{tabular}
-\endgroup
-\end{table}
-
-\section{Materialized Views and Agent Query Optimisation}
-
-The MCP tool \texttt{get\_account\_state} joins \texttt{BORROWER}, \texttt{CREDIT\_PASSPORT}, \texttt{COLLATERAL\_POSITION}, active \texttt{LOAN} rows, pending \texttt{INSTALLMENT} rows, \texttt{SAVINGS\_ACCOUNT}, and \texttt{BORROWING\_LIMIT}. To avoid six-to-seven table joins on every agent call, the schema defines a materialized view refreshed by the event listener after any event that modifies component tables:
-
-\begin{verbatim}
-CREATE MATERIALIZED VIEW mv_client_dashboard AS
-SELECT
-    b.borrower_id,
-    b.wallet_address,
-    b.kyc_level,
-    cp.credit_score,
-    cp.risk_tier,
-    bl.six_month_remaining,
-    bl.one_year_remaining,
-    count(l.loan_id) FILTER (WHERE l.status = 'ACTIVE') AS active_loan_count,
-    max(i.due_date) FILTER (WHERE i.status = 'PENDING') AS next_installment_due,
-    sum(sa.balance) AS total_savings_balance,
-    sum(col.locked_amount) AS total_collateral_locked
-FROM borrower b
-LEFT JOIN credit_passport cp USING (borrower_id)
-LEFT JOIN borrowing_limit bl USING (borrower_id)
-LEFT JOIN loan l USING (borrower_id)
-LEFT JOIN installment i USING (loan_id)
-LEFT JOIN savings_account sa USING (borrower_id)
-LEFT JOIN collateral_position col USING (borrower_id)
-GROUP BY b.borrower_id, b.wallet_address, b.kyc_level,
-         cp.credit_score, cp.risk_tier,
-         bl.six_month_remaining, bl.one_year_remaining;
-
-CREATE UNIQUE INDEX ON mv_client_dashboard (borrower_id);
-\end{verbatim}
-
-\noindent Refresh strategy: \texttt{REFRESH MATERIALIZED VIEW CONCURRENTLY mv\_client\_dashboard} triggered by the event listener after processing events on projection or lending tables (Phase~III).
-
-\section{Representative SQL Queries}
-\label{sec:sql-queries}
-
-The following queries illustrate Database Design coursework competencies (joins, aggregates, subqueries, and views) on the prototype schema. They map to FR-02, FR-04, and FR-07 in Table~\ref{tab:functional-requirements}.
-
-\paragraph{Q1 --- Active loans per Local Bank with borrower KYC level (INNER JOIN + aggregate).}
-\begin{verbatim}
-SELECT lb.name AS local_bank,
-       COUNT(l.loan_id) AS active_loans,
-       AVG(l.principal_amount) AS avg_principal
-FROM loan l
-JOIN local_bank lb ON l.local_bank_id = lb.institution_id
-JOIN borrower b ON l.borrower_id = b.borrower_id
-WHERE l.status = 'ACTIVE'
-GROUP BY lb.institution_id, lb.name
-ORDER BY active_loans DESC;
-\end{verbatim}
-
-\paragraph{Q2 --- Overdue installments with borrower contact hash (JOIN + filter).}
-\begin{verbatim}
-SELECT i.loan_id, i.installment_number, i.due_date, i.amount,
-       b.wallet_address, b.kyc_level
-FROM installment i
-JOIN loan l ON i.loan_id = l.loan_id
-JOIN borrower b ON l.borrower_id = b.borrower_id
-WHERE i.status = 'PENDING' AND i.due_date < CURRENT_DATE
-ORDER BY i.due_date ASC;
-\end{verbatim}
-
-\paragraph{Q3 --- Borrowers exceeding six-month rolling limit (subquery).}
-\begin{verbatim}
-SELECT b.borrower_id, b.wallet_address,
-       bl.six_month_limit,
-       (SELECT COALESCE(SUM(t.amount), 0)
-        FROM transaction t
-        WHERE t.borrower_id = b.borrower_id
-          AND t.transaction_type = 'LOAN_DISBURSEMENT'
-          AND t.created_at >= NOW() - INTERVAL '6 months') AS disbursed_6mo
-FROM borrower b
-JOIN borrowing_limit bl ON b.borrower_id = bl.borrower_id
-WHERE (SELECT COALESCE(SUM(t.amount), 0) FROM transaction t
-       WHERE t.borrower_id = b.borrower_id
-         AND t.transaction_type = 'LOAN_DISBURSEMENT'
-         AND t.created_at >= NOW() - INTERVAL '6 months')
-      > bl.six_month_limit;
-\end{verbatim}
-
-\paragraph{Q4 --- High-risk assessments awaiting approver review (JOIN + ORDER BY).}
-\begin{verbatim}
-SELECT lr.request_id, lra.composite_score, lra.anomaly_score,
-       lra.created_at, mr.model_name, mr.version
-FROM loan_request lr
-JOIN loan_risk_assessment lra ON lr.request_id = lra.loan_request_id
-JOIN model_registry mr ON lra.model_id = mr.model_id
-WHERE lr.status = 'UNDER_REVIEW'
-  AND lra.composite_score BETWEEN 0.4 AND 0.7
-ORDER BY lra.composite_score DESC;
-\end{verbatim}
-
-\paragraph{Q5 --- Client dashboard via materialized view (simplified SELECT).}
-\begin{verbatim}
-SELECT borrower_id, wallet_address, credit_score, risk_tier,
-       active_loan_count, next_installment_due, total_savings_balance
-FROM mv_client_dashboard
-WHERE borrower_id = $1;
-\end{verbatim}
-
+% REMOVED per request (Appendix A: Database Schema Reference no longer needed):
+%
+% \chapter{Database Schema Reference}
+% \label{app:db-schema-reference}
+%
+% This appendix records the physical-schema details moved from Chapter~\ref{ch:design-alternatives} to keep the main design chapter focused on conceptual design.
+%
+% \section{Full Relational ERD}
+% \label{sec:appendix-erd-full}
+%
+% Figure~\ref{fig:erd-relational} is the complete logical data model: 51 documented entities plus two Phase-IV configuration tables (\texttt{CHAIN\_REGISTRY}, \texttt{SESSION\_KEY\_PERMISSION}), with Chen notation (entity rectangles, relationship diamonds, cardinality labels), migration-tier colour coding, and a notation key. It spans two portrait sheets (Figures~\ref{fig:erd-relational} and~\ref{fig:erd-relational-p2}) so entity text and connectors remain legible. Deferred stub and future-work relations are listed in Table~\ref{tab:db-entities-ext2}.
+%
+% \begin{figure}[p]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,height=0.92\textheight,keepaspectratio]{ERD_diagram_relational_p1}
+% \caption[Full relational ERD (sheet 1)]{Full relational ERD (sheet 1 of 2).}
+% \label{fig:erd-relational}
+% \end{figure}
+%
+% \begin{figure}[p]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,height=0.92\textheight,keepaspectratio]{ERD_diagram_relational_p2}
+% \caption[Full relational ERD (sheet 2)]{Full relational ERD (sheet 2 of 2).}
+% \label{fig:erd-relational-p2}
+% \end{figure}
+%
+% \section{Indexing Strategy}
+% \label{sec:indexing-strategy}
+%
+% B-tree indexes (the PostgreSQL default) support efficient retrieval on frequently queried columns:
+%
+% \begin{table}[H]
+% \centering
+% \caption[Indexing strategy]{Indexing strategy.}
+% \label{tab:indexing-strategy}
+% \begingroup
+% \footnotesize
+% \setlength{\tabcolsep}{4pt}
+% \renewcommand{\arraystretch}{1.2}
+% \begin{tabular}{@{}%
+%   >{\raggedright\arraybackslash}p{0.19\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.41\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.36\linewidth}@{}}
+% \toprule
+% \tableheadcolor
+% \textbf{Index} & \textbf{Table / Column(s)} & \textbf{Rationale} \\
+% \midrule
+% \texttt{idx\_loan\_borrower} &
+%   \texttt{LOAN\_REQUEST}(\texttt{borrower\_id}) &
+%   High-frequency lookup for borrower loan history. \\
+% \texttt{idx\_loan\_status} &
+%   \texttt{LOAN\_REQUEST}(\texttt{status}, \texttt{oracle\_state}) &
+%   Efficient filtering of application lifecycle and oracle pipeline states. \\
+% \texttt{idx\_installment\_due} &
+%   \texttt{INSTALLMENT}(\texttt{due\_date}, \texttt{status})\newline
+%   \texttt{WHERE status = 'PENDING'} &
+%   Partial-index range query for pending overdue installment detection. \\
+% \texttt{idx\_txn\_created} &
+%   \texttt{TRANSACTION}(\texttt{created\_at}) &
+%   Time-window aggregation for 6-month and 1-year borrowing limits. \\
+% \texttt{idx\_txn\_borrower} &
+%   \texttt{TRANSACTION}(\texttt{borrower\_id}) &
+%   Per-borrower transaction history retrieval. \\
+% \texttt{idx\_market\_symbol} &
+%   \texttt{MARKET\_DATA}(\texttt{symbol},\newline
+%   \texttt{recorded\_at}) &
+%   Composite index for price feed time-series queries. \\
+% \texttt{idx\_loan\_bank\_status} &
+%   \texttt{LOAN}(\texttt{local\_bank\_id}, \texttt{status},\newline
+%   \texttt{created\_at DESC}) &
+%   Loan lifecycle queries by bank and status. \\
+% \texttt{idx\_loan\_borrower\_active} &
+%   \texttt{LOAN}(\texttt{borrower\_id}, \texttt{status})\newline
+%   \texttt{WHERE status = 'ACTIVE'} &
+%   Partial index for per-borrower open-loan count. \\
+% \texttt{idx\_agent\_session\_date} &
+%   \texttt{AGENT\_ACTION\_LOG}(\texttt{session\_id},\newline
+%   \texttt{created\_at DESC}) &
+%   Per-session agent action history retrieval (join to \texttt{SESSIONS} for borrower). \\
+% \texttt{idx\_agent\_status} &
+%   \texttt{AGENT\_ACTION\_LOG}(\texttt{status})\newline
+%   \texttt{WHERE status = 'PENDING'} &
+%   Partial index for the agent status-monitoring loop. \\
+% \texttt{idx\_risk\_score} &
+%   \texttt{LOAN\_RISK\_ASSESSMENT}(\texttt{anomaly\_score DESC})\newline
+%   \texttt{WHERE anomaly\_score > 0.5} &
+%   Partial index for AML alert queue (SAR workflow). \\
+% \texttt{idx\_ib\_loan\_status} &
+%   \texttt{INTERBANK\_LOAN}(\texttt{status}, \texttt{lender\_institution\_id}) &
+%   IBLP default cascade and maturity monitoring. \\
+% \texttt{idx\_institution\_type} &
+%   \texttt{INSTITUTION}(\texttt{institution\_type}, \texttt{status}) &
+%   Tier-scoped institution lookups for multi-entity operations. \\
+% \texttt{idx\_txn\_institution} &
+%   \texttt{TRANSACTION}(\texttt{origin\_institution\_id}, \texttt{created\_at DESC}) &
+%   Institution-to-institution ledger history retrieval. \\
+% \texttt{idx\_chainlink\_feed} &
+%   \texttt{CHAINLINK\_PRICE\_ROUND}(\texttt{feed\_address},\newline
+%   \texttt{updated\_at DESC}) &
+%   Latest round lookup per Chainlink feed for LTV staleness checks. \\
+% \texttt{idx\_session\_parent} &
+%   \texttt{SESSIONS}(\texttt{parent\_session\_id})\newline
+%   \texttt{WHERE parent\_session\_id IS NOT NULL} &
+%   Partial index for session lineage chain traversal. \\
+% \texttt{idx\_collateral\_borrower} &
+%   \texttt{COLLATERAL\_POSITION}(\texttt{borrower\_id}, \texttt{loan\_id}) &
+%   Health-factor lookup per borrower and per loan. \\
+% \texttt{idx\_event\_log\_txhash} &
+%   \texttt{BLOCKCHAIN\_EVENT\_LOG}(\texttt{tx\_hash}) &
+%   Deduplication guard: event listener checks this before INSERT. \\
+% \texttt{idx\_event\_log\_block} &
+%   \texttt{BLOCKCHAIN\_EVENT\_LOG}(\texttt{block\_number}, \texttt{chain\_id}) &
+%   Catchup-sync replay from a given block. \\
+% \bottomrule
+% \end{tabular}
+% \endgroup
+% \end{table}
+%
+% \section{Functional Dependencies}
+%
+% \begin{table}[H]
+% \centering
+% \caption[Functional dependencies]{Functional dependencies.}
+% \label{tab:functional-deps}
+% \begingroup
+% \footnotesize
+% \setlength{\tabcolsep}{3pt}
+% \renewcommand{\arraystretch}{1.15}
+% \begin{tabular}{@{}%
+%   >{\raggedright\arraybackslash}p{0.17\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.43\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.36\linewidth}@{}}
+% \toprule
+% \tableheadcolor
+% \textbf{Relation} & \textbf{Functional Dependency} & \textbf{Notes} \\
+% \midrule
+% LOAN\_REQUEST & \texttt{request\_id} $\to$ all attributes & Application row keyed by request identifier. \\
+% LOAN\_REQUEST & \texttt{borrower\_id, local\_bank\_id} $\to$ \texttt{status}, \texttt{oracle\_state}, \texttt{amount}, \ldots & Lifecycle \texttt{status} and oracle pipeline \texttt{oracle\_state} are separate columns. \\
+% LOAN & \texttt{loan\_id} $\to$ all attributes & Disbursement record keyed by loan identifier. \\
+% LOAN & \texttt{loan\_request\_id} $\to$ \texttt{loan\_id} & 1:1 link from approved request to disbursed loan. \\
+% BORROWING\_LIMIT & \texttt{borrower\_id} $\to$ \texttt{six\_month\_limit}, \texttt{one\_year\_limit}, \newline \texttt{on\_chain\_enforced\_limit}, \texttt{last\_synced\_block}, \ldots & 1:1 with BORROWER; event-listener owned projection. \\
+% CREDIT\_PASSPORT & \texttt{passport\_id} $\to$ all attributes;\newline \texttt{borrower\_id} $\to$ \texttt{passport\_id} & Read-model projection of on-chain SBT; event-listener owned. \\
+% BORROWER & \texttt{wallet\_address} $\to$ \texttt{borrower\_id}, all attributes;\newline \texttt{registered\_local\_bank\_id} $\to$ home Local Bank;\newline \texttt{kyc\_level} $\to$ borrowing-cap tier (Section~\ref{sec:tiered-kyc}) & Unique candidate key in the prototype; Phase~IV may use \texttt{(wallet\_address, chain\_id)}. \\
+% INSTITUTION & \texttt{institution\_id} $\to$ \texttt{institution\_type}, \texttt{name}, \texttt{wallet\_address}, \texttt{contract\_address}, \texttt{status} & Supertype for cross-tier FK anchors. \\
+% NATIONAL\_BANK & \texttt{country\_code} $\to$ \texttt{institution\_id} & One national reserve per nation (\texttt{UNIQUE}). \\
+% MODEL\_REGISTRY & \texttt{model\_id} $\to$ \texttt{model\_name}, \texttt{version}, \texttt{training\_date}, \texttt{metrics}, \texttt{is\_active} & Model lineage for explainability audit. \\
+% LOAN\_RISK\_ASSESSMENT & \texttt{assessment\_id} $\to$ all attributes;\newline \texttt{model\_id} $\to$ \texttt{fraud\_probability}, \texttt{anomaly\_score}, \texttt{shap\_vector} & Per-loan ML inference; FK to \texttt{MODEL\_REGISTRY}. \\
+% INSTALLMENT & \texttt{loan\_id, installment\_number} $\to$ \texttt{amount}, \texttt{due\_date}, \texttt{status}, \texttt{payment\_event\_log\_id} & Composite primary key. \\
+% SESSIONS & \texttt{session\_id} $\to$ \texttt{borrower\_id}, \texttt{wallet\_address}, \texttt{session\_key\_hash}, \newline \texttt{session\_key\_scope}, \texttt{session\_key\_expires\_at}, \newline \texttt{expires\_at}, \texttt{revoked} & Retail-client agent sessions only at MVT; bank-authority sessions are Future Work. \\
+% AGENT\_ACTION\_LOG & \texttt{action\_id} $\to$ \texttt{session\_id}, \texttt{tool\_name}, \newline \texttt{parameters}, \texttt{confirmation\_turn\_id}, \newline \texttt{onchain\_tx\_hash}, \texttt{status}, \texttt{created\_at} & Links every write-tool execution to the user's consent turn in \texttt{AGENT\_CONVERSATION\_TURN}. \\
+% ASSETS & \texttt{asset\_id} $\to$ \texttt{symbol}, \texttt{name}, \texttt{asset\_type}, \newline \texttt{network}, \texttt{decimals}, \texttt{is\_active};\newline \texttt{symbol} $\to$ \texttt{asset\_id} & \texttt{symbol} is a unique candidate key. \\
+% INTEREST\_RATE\_TIER & \texttt{tier\_id} $\to$ \texttt{base\_rate}, \texttt{kink\_utilization}, \newline \texttt{rate\_above\_kink}, \texttt{max\_rate}, \texttt{bank\_tier\_type}, \texttt{effective\_from}, \texttt{effective\_to}, \texttt{is\_active} & Eliminates transitive dependency; temporal versioning for governance changes. \\
+% \bottomrule
+% \end{tabular}
+% \endgroup
+% \end{table}
+%
+% \section{Materialized Views and Agent Query Optimisation}
+%
+% The MCP tool \texttt{get\_account\_state} joins \texttt{BORROWER}, \texttt{CREDIT\_PASSPORT}, \texttt{COLLATERAL\_POSITION}, active \texttt{LOAN} rows, pending \texttt{INSTALLMENT} rows, \texttt{SAVINGS\_ACCOUNT}, and \texttt{BORROWING\_LIMIT}. To avoid six-to-seven table joins on every agent call, the schema defines a materialized view refreshed by the event listener after any event that modifies component tables:
+%
+% \begin{verbatim}
+% CREATE MATERIALIZED VIEW mv_client_dashboard AS
+% SELECT
+%     b.borrower_id,
+%     b.wallet_address,
+%     b.kyc_level,
+%     cp.credit_score,
+%     cp.risk_tier,
+%     bl.six_month_remaining,
+%     bl.one_year_remaining,
+%     count(l.loan_id) FILTER (WHERE l.status = 'ACTIVE') AS active_loan_count,
+%     max(i.due_date) FILTER (WHERE i.status = 'PENDING') AS next_installment_due,
+%     sum(sa.balance) AS total_savings_balance,
+%     sum(col.locked_amount) AS total_collateral_locked
+% FROM borrower b
+% LEFT JOIN credit_passport cp USING (borrower_id)
+% LEFT JOIN borrowing_limit bl USING (borrower_id)
+% LEFT JOIN loan l USING (borrower_id)
+% LEFT JOIN installment i USING (loan_id)
+% LEFT JOIN savings_account sa USING (borrower_id)
+% LEFT JOIN collateral_position col USING (borrower_id)
+% GROUP BY b.borrower_id, b.wallet_address, b.kyc_level,
+%          cp.credit_score, cp.risk_tier,
+%          bl.six_month_remaining, bl.one_year_remaining;
+%
+% CREATE UNIQUE INDEX ON mv_client_dashboard (borrower_id);
+% \end{verbatim}
+%
+% \noindent Refresh strategy: \texttt{REFRESH MATERIALIZED VIEW CONCURRENTLY mv\_client\_dashboard} triggered by the event listener after processing events on projection or lending tables (Phase~III).
+%
+% \section{Representative SQL Queries}
+% \label{sec:sql-queries}
+%
+% The following queries illustrate Database Design coursework competencies (joins, aggregates, subqueries, and views) on the prototype schema. They map to FR-02, FR-04, and FR-07 in Table~\ref{tab:functional-requirements}.
+%
+% \paragraph{Q1 --- Active loans per Local Bank with borrower KYC level (INNER JOIN + aggregate).}
+% \begin{verbatim}
+% SELECT lb.name AS local_bank,
+%        COUNT(l.loan_id) AS active_loans,
+%        AVG(l.principal_amount) AS avg_principal
+% FROM loan l
+% JOIN local_bank lb ON l.local_bank_id = lb.institution_id
+% JOIN borrower b ON l.borrower_id = b.borrower_id
+% WHERE l.status = 'ACTIVE'
+% GROUP BY lb.institution_id, lb.name
+% ORDER BY active_loans DESC;
+% \end{verbatim}
+%
+% \paragraph{Q2 --- Overdue installments with borrower contact hash (JOIN + filter).}
+% \begin{verbatim}
+% SELECT i.loan_id, i.installment_number, i.due_date, i.amount,
+%        b.wallet_address, b.kyc_level
+% FROM installment i
+% JOIN loan l ON i.loan_id = l.loan_id
+% JOIN borrower b ON l.borrower_id = b.borrower_id
+% WHERE i.status = 'PENDING' AND i.due_date < CURRENT_DATE
+% ORDER BY i.due_date ASC;
+% \end{verbatim}
+%
+% \paragraph{Q3 --- Borrowers exceeding six-month rolling limit (subquery).}
+% \begin{verbatim}
+% SELECT b.borrower_id, b.wallet_address,
+%        bl.six_month_limit,
+%        (SELECT COALESCE(SUM(t.amount), 0)
+%         FROM transaction t
+%         WHERE t.borrower_id = b.borrower_id
+%           AND t.transaction_type = 'LOAN_DISBURSEMENT'
+%           AND t.created_at >= NOW() - INTERVAL '6 months') AS disbursed_6mo
+% FROM borrower b
+% JOIN borrowing_limit bl ON b.borrower_id = bl.borrower_id
+% WHERE (SELECT COALESCE(SUM(t.amount), 0) FROM transaction t
+%        WHERE t.borrower_id = b.borrower_id
+%          AND t.transaction_type = 'LOAN_DISBURSEMENT'
+%          AND t.created_at >= NOW() - INTERVAL '6 months')
+%       > bl.six_month_limit;
+% \end{verbatim}
+%
+% \paragraph{Q4 --- High-risk assessments awaiting approver review (JOIN + ORDER BY).}
+% \begin{verbatim}
+% SELECT lr.request_id, lra.composite_score, lra.anomaly_score,
+%        lra.created_at, mr.model_name, mr.version
+% FROM loan_request lr
+% JOIN loan_risk_assessment lra ON lr.request_id = lra.loan_request_id
+% JOIN model_registry mr ON lra.model_id = mr.model_id
+% WHERE lr.status = 'UNDER_REVIEW'
+%   AND lra.composite_score BETWEEN 0.4 AND 0.7
+% ORDER BY lra.composite_score DESC;
+% \end{verbatim}
+%
+% \paragraph{Q5 --- Client dashboard via materialized view (simplified SELECT).}
+% \begin{verbatim}
+% SELECT borrower_id, wallet_address, credit_score, risk_tier,
+%        active_loan_count, next_installment_due, total_savings_balance
+% FROM mv_client_dashboard
+% WHERE borrower_id = $1;
+% \end{verbatim}
+%
 \chapter{Agent Harness Reference}
 \label{app:agent-harness}
 
@@ -3467,19 +3686,21 @@ The Express.js context injection layer:
 \end{tabular}
 \end{table}
 
-\section{Lifecycle Hooks and Optional Capabilities}
-
-\paragraph{Lifecycle hook middleware.}
-Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook (Phase~II) verifies a logged confirmation turn or returns HTTP~403; (2)~session-key scope pre-check (Phase~III); (3)~AML pre-check against \texttt{LOAN\_RISK\_ASSESSMENT} and \texttt{SECURITY\_EVENT\_LOG} (Phase~IV).
-
-\paragraph{Agent capabilities.}
-\begin{itemize}[noitemsep]
-\item \textbf{Proactive installment reminders} via \texttt{get\_installment\_schedule} and \texttt{pay\_installment}.
-\item \textbf{Credit Passport coaching} via \texttt{get\_credit\_score} and Table~\ref{tab:credit-tiers}.
-\item \textbf{Loan calculator} with live FX from \texttt{get\_market\_data}.
-\item \textbf{Group lending coordination} and \textbf{KYC tier upgrade guidance} via write/read tools.
-\item \textbf{Cross-session context retrieval} via \texttt{get\_session\_history}.
-\end{itemize}
+% REMOVED per request (B.3 Lifecycle Hooks and Optional Capabilities):
+%
+% \section{Lifecycle Hooks and Optional Capabilities}
+%
+% \paragraph{Lifecycle hook middleware.}
+% Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook (Phase~II) verifies a logged confirmation turn or returns HTTP~403; (2)~session-key scope pre-check (Phase~III); (3)~AML pre-check against \texttt{LOAN\_RISK\_ASSESSMENT} and \texttt{SECURITY\_EVENT\_LOG} (Phase~IV).
+%
+% \paragraph{Agent capabilities.}
+% \begin{itemize}[noitemsep]
+% \item \textbf{Proactive installment reminders} via \texttt{get\_installment\_schedule} and \texttt{pay\_installment}.
+% \item \textbf{Credit Passport coaching} via \texttt{get\_credit\_score} and Table~\ref{tab:credit-tiers}.
+% \item \textbf{Loan calculator} with live FX from \texttt{get\_market\_data}.
+% \item \textbf{Group lending coordination} and \textbf{KYC tier upgrade guidance} via write/read tools.
+% \item \textbf{Cross-session context retrieval} via \texttt{get\_session\_history}.
+% \end{itemize}
 
 \chapter{Smart Contract Capabilities}
 \label{app:smart-contract-capabilities}
@@ -3527,11 +3748,12 @@ NettingEngine & Multi-entity & --- & Future Work & Multilateral settlement netti
 
 
 %% APPENDIX D: SMART CONTRACT INTERFACE
-\chapter*{Appendix D: WorldBankReserve Contract Interface}
+\chapter*{Appendix C: WorldBankReserve Contract Interface}
 \phantomsection
-\addcontentsline{toc}{chapter}{Appendix D: WorldBankReserve Contract Interface}
+\addcontentsline{toc}{chapter}{Appendix C: WorldBankReserve Contract Interface}
 
-The following Solidity interface documents the public API of the \texttt{WorldBankReserve} contract---the formally specified Tier~1 contract (Phase~I deployment target). Three design annotations follow the listing:
+% REMOVED per request (intro paragraph):
+% The following Solidity interface documents the public API of the \texttt{WorldBankReserve} contract---the formally specified Tier~1 contract (Phase~I deployment target). Three design annotations follow the listing:
 
 \begin{lstlisting}[language=Solidity,basicstyle=\ttfamily\scriptsize,breaklines=true,
     commentstyle=\color{GrayText},keywordstyle=\color{PrimaryBlue}\bfseries,
@@ -3574,107 +3796,110 @@ contract WorldBankReserve is ReentrancyGuard, AccessControl {
 }
 \end{lstlisting}
 
-\chapter*{Appendix E: Internal Industry Research Notes}
-\phantomsection
-\addcontentsline{toc}{chapter}{Appendix E: Internal Industry Research Notes}
-\label{app:internal-research}
-
-\noindent Repository: \href{https://github.com/Yuvraajrahman/Cryto-World-Bank}{github.com/Yuvraajrahman/Cryto-World-Bank}; path \texttt{Documentation/2nd Phase (Bokhtiar)/Improvements/}.
-
-\begin{table}[H]
-\centering
-\caption[Industry research corpus]{Industry research corpus.}
-\label{tab:internal-research}
-\begingroup
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}%
-  >{\raggedright\arraybackslash}p{0.07\linewidth}%
-  >{\raggedright\arraybackslash}p{0.36\linewidth}%
-  >{\raggedright\arraybackslash}p{0.53\linewidth}@{}}
-\toprule
-\tableheadcolor
-\textbf{ID} & \textbf{Document} & \textbf{Thesis use} \\
-\midrule
-IR-1 & \texttt{Binance\_FTX\_Full\_Report.md} & CEX vs.\ CWB comparison; FTT/BNB token lesson; SAFU and Binance Earn analogues; PoR and commingling safeguards \\
-IR-2 & \texttt{blockchain platforms research.csv} & Five-exchange matrix (Binance, Bybit, Coinbase, OKX, Kraken) \\
-IR-3 & \texttt{Binance Business Analysis.md} & Exchange revenue taxonomy (fees, listing, OTC) \\
-IR-4 & \texttt{binance\_software\_engineering\_architecture.md} & Nine-actor taxonomy (Section~\ref{sec:onboarding}); use-case and sequence-diagram conventions \\
-IR-5 & \texttt{binance\_architecture\_research.md} & Off-chain PostgreSQL/Redis patterns (background; not cited in body text) \\
-\bottomrule
-\end{tabular}
-\endgroup
-\end{table}
-
-\chapter*{Appendix F: UI Prototype Wireframes (Figma)}
-\phantomsection
-\addcontentsline{toc}{chapter}{Appendix F: UI Prototype Wireframes (Figma)}
-\label{app:ui-prototypes}
-
-\paragraph{Retail loan application flow.}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-retail}
-\caption[Retail loan wireframe]{Retail loan wireframe.}
-\label{fig:ui-wireframe-retail}
-\end{figure}
-
-\paragraph{Authority Brief approver dashboard.}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-approver}
-\caption[Approver dashboard wireframe]{Approver dashboard wireframe.}
-\label{fig:ui-wireframe-approver}
-\end{figure}
-
-\paragraph{Client onboarding funnel (KYC levels).}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-onboarding}
-\caption[Onboarding wireframe]{Onboarding wireframe.}
-\label{fig:ui-wireframe-onboarding}
-\end{figure}
-
-\paragraph{Reserve transparency dashboard (Tier~1).}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-reserve}
-\caption[Reserve dashboard wireframe]{Reserve dashboard wireframe.}
-\label{fig:ui-wireframe-reserve}
-\end{figure}
-
-\paragraph{Conversational banking agent (chat).}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-agent}
-\caption[Banking agent wireframe]{Banking agent wireframe.}
-\label{fig:ui-wireframe-agent}
-\end{figure}
-
-\paragraph{Group solidarity lending application.}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-group-lending}
-\caption[Group lending wireframe]{Group lending wireframe.}
-\label{fig:ui-wireframe-group-lending}
-\end{figure}
-
-\paragraph{Compliance and AML alert review.}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-compliance}
-\caption[Compliance wireframe]{Compliance wireframe.}
-\label{fig:ui-wireframe-compliance}
-\end{figure}
-
-\paragraph{Mobile navigation and responsive layout.}
-\begin{figure}[H]
-\centering
-\ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-mobile}
-\caption[Mobile layout wireframe]{Mobile layout wireframe.}
-\label{fig:ui-wireframe-mobile}
-\end{figure}
+% REMOVED per request (Appendix E: Internal Industry Research Notes):
+%
+% \chapter*{Appendix E: Internal Industry Research Notes}
+% \phantomsection
+% \addcontentsline{toc}{chapter}{Appendix E: Internal Industry Research Notes}
+% \label{app:internal-research}
+%
+% \noindent Repository: \href{https://github.com/Yuvraajrahman/Cryto-World-Bank}{github.com/Yuvraajrahman/Cryto-World-Bank}; path \texttt{Documentation/2nd Phase (Bokhtiar)/Improvements/}.
+%
+% \begin{table}[H]
+% \centering
+% \caption[Industry research corpus]{Industry research corpus.}
+% \label{tab:internal-research}
+% \begingroup
+% \footnotesize
+% \setlength{\tabcolsep}{4pt}
+% \renewcommand{\arraystretch}{1.15}
+% \begin{tabular}{@{}%
+%   >{\raggedright\arraybackslash}p{0.07\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.36\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.53\linewidth}@{}}
+% \toprule
+% \tableheadcolor
+% \textbf{ID} & \textbf{Document} & \textbf{Thesis use} \\
+% \midrule
+% IR-1 & \texttt{Binance\_FTX\_Full\_Report.md} & CEX vs.\ CWB comparison; FTT/BNB token lesson; SAFU and Binance Earn analogues; PoR and commingling safeguards \\
+% IR-2 & \texttt{blockchain platforms research.csv} & Five-exchange matrix (Binance, Bybit, Coinbase, OKX, Kraken) \\
+% IR-3 & \texttt{Binance Business Analysis.md} & Exchange revenue taxonomy (fees, listing, OTC) \\
+% IR-4 & \texttt{binance\_software\_engineering\_architecture.md} & Nine-actor taxonomy (Section~\ref{sec:onboarding}); use-case and sequence-diagram conventions \\
+% IR-5 & \texttt{binance\_architecture\_research.md} & Off-chain PostgreSQL/Redis patterns (background; not cited in body text) \\
+% \bottomrule
+% \end{tabular}
+% \endgroup
+% \end{table}
+%
+% MOVED to Section 4.2.9 (User Interface Design, \label{sec:ui-design}) per request; content commented out here to avoid duplication and duplicate labels.
+% \chapter*{Appendix F: UI Prototype Wireframes (Figma)}
+% \phantomsection
+% \addcontentsline{toc}{chapter}{Appendix F: UI Prototype Wireframes (Figma)}
+% \label{app:ui-prototypes}
+%
+% \paragraph{Retail loan application flow.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-retail}
+% \caption[Retail loan wireframe]{Retail loan wireframe.}
+% \label{fig:ui-wireframe-retail}
+% \end{figure}
+%
+% \paragraph{Authority Brief approver dashboard.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-approver}
+% \caption[Approver dashboard wireframe]{Approver dashboard wireframe.}
+% \label{fig:ui-wireframe-approver}
+% \end{figure}
+%
+% \paragraph{Client onboarding funnel (KYC levels).}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-onboarding}
+% \caption[Onboarding wireframe]{Onboarding wireframe.}
+% \label{fig:ui-wireframe-onboarding}
+% \end{figure}
+%
+% \paragraph{Reserve transparency dashboard (Tier~1).}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-reserve}
+% \caption[Reserve dashboard wireframe]{Reserve dashboard wireframe.}
+% \label{fig:ui-wireframe-reserve}
+% \end{figure}
+%
+% \paragraph{Conversational banking agent (chat).}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-agent}
+% \caption[Banking agent wireframe]{Banking agent wireframe.}
+% \label{fig:ui-wireframe-agent}
+% \end{figure}
+%
+% \paragraph{Group solidarity lending application.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-group-lending}
+% \caption[Group lending wireframe]{Group lending wireframe.}
+% \label{fig:ui-wireframe-group-lending}
+% \end{figure}
+%
+% \paragraph{Compliance and AML alert review.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-compliance}
+% \caption[Compliance wireframe]{Compliance wireframe.}
+% \label{fig:ui-wireframe-compliance}
+% \end{figure}
+%
+% \paragraph{Mobile navigation and responsive layout.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-mobile}
+% \caption[Mobile layout wireframe]{Mobile layout wireframe.}
+% \label{fig:ui-wireframe-mobile}
+% \end{figure}
 
 %% REFERENCES
 \chapter*{References}

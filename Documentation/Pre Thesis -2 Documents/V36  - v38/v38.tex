@@ -353,7 +353,11 @@
 {\LARGE\bfseries\color{PrimaryBlue} Decentralized Crypto World Bank}\\[0.4em]
 {\large\color{PrimaryBlue!80} A Blockchain-Based Banking Platform\\[0.15em]with AI-Enhanced Security and Assistance}
 
-\vspace{1.2cm}
+\vspace{0.6cm}
+
+{\large Thesis ID: P26101123}
+
+\vspace{0.8cm}
 
 {\large by}
 
@@ -852,8 +856,8 @@ Atzei et al.\ (2017) [7] · SC security & SoK of Ethereum attacks & Lists re-ent
 Werner et al.\ (2022) [1] · DeFi SoK & Survey of 12+ protocol types & Main gap CWB targets is DeFi lending having no bank hierarchy \\
 Bastankhah et al.\ (2024) [2] · Adaptive lending & Dual fast/slow control & Dynamic rates support our kinked-rate modules as it beats static curves \\
 Hartmann \& Hasan (2021) [33] · P2P lending & Smart-contract origination & Gas is cut in on-chain P2P, which is a minor input for loan-facing clients \\
-Hasan et al.\ (2022) [34] · Federated fraud & FL on encrypted features & Lack of raw-data sharing features by banks leaves future cross-bank options \\
-Wang et al.\ (2020) [105] · SC vulnerabilities & ML on bytecode & Common bytecode bugs spotting by ML helps provide extra security over manual audit \\
+Pranto et al.\ (2022) [34] · Privacy-preserving fraud ML & Incentive-based fraud detection & Lack of raw-data sharing features by banks leaves future cross-bank options \\
+Wang et al.\ (2021) [105] · SC vulnerabilities & ML on bytecode & Common bytecode bugs spotting by ML helps provide extra security over manual audit \\
 Liao et al.\ (2019) [106] · Audit automation & Classification + fuzzing & Workflow idea for Phase~V is inspired from ML prioritizing fuzzing speed \\
 \bottomrule
 \end{tabular}%
@@ -2171,7 +2175,7 @@ View reserve summary (public) & YES & YES & YES & YES & READ \\
 
 \begin{figure}[H]
 \centering
-\ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{Ch3_actor-permission-matrix}
+\ThesisIncludeGraphics[width=0.9\linewidth,keepaspectratio]{Ch3_actor-permission-matrix_updated}
 \caption[Permission matrix diagram]{Permission matrix diagram.}
 \label{fig:permission-matrix}
 \end{figure}
@@ -3946,324 +3950,337 @@ contract WorldBankReserve is ReentrancyGuard, AccessControl {
 
 {\small
 \begin{enumerate}[label={[\arabic*]}]
-\item S.~M. Werner, D.~Perez, L.~Gudgeon, A.~Klages-Mundt, D.~Harz, and W.~J. Knottenbelt. 2022. SoK: Decentralized Finance (DeFi). \emph{arXiv preprint arXiv:2101.08778}. \url{https://arxiv.org/abs/2101.08778}
+\item S.~M. Werner, D.~Perez, L.~Gudgeon, A.~Klages-Mundt, D.~Harz, and W.~J. Knottenbelt. 2022. SoK: Decentralized Finance (DeFi). \emph{arXiv preprint arXiv:2101.08778v6}. [Online]. Available: \url{https://arxiv.org/abs/2101.08778}. Accessed: Aug.~1, 2026.
 
+\item M.~Bastankhah, V.~Nadkarni, C.~Jin, S.~Kulkarni, and P.~Viswanath. 2024. Thinking Fast and Slow: Data-Driven Adaptive DeFi Borrow-Lending Protocol. In \emph{Proc. 6th Conf. Advances in Financial Technologies (AFT)} (LIPIcs, Vol.~316). Article 27, 23 pages. [Online]. Available: \url{https://doi.org/10.4230/LIPIcs.AFT.2024.27}. Accessed: Aug.~1, 2026.
 
-\item M.~Bastankhah, V.~Nadkarni, C.~Jin, S.~Kulkarni, and P.~Viswanath. 2024. Thinking Fast and Slow: Data-Driven Adaptive DeFi Borrow-Lending Protocol. In \emph{Proc. 6th Conf. Advances in Financial Technologies (AFT)} (LIPIcs, Vol.~316). Article 27, 23 pages. \url{https://doi.org/10.4230/LIPIcs.AFT.2024.27}
+\item G.~Palaiokrassas, S.~Scherrers, I.~Ofeidis, and L.~Tassiulas. 2024. Leveraging Machine Learning for Multichain DeFi Fraud Detection. In \emph{Proc. IEEE Int. Conf. Blockchain and Cryptocurrency (ICBC)}. [Online]. Available: \url{https://doi.org/10.1109/ICBC59979.2024.10634350}. Accessed: Aug.~1, 2026.
 
+\item I.~T.~Adom, C.~O.~Julius, S.~Akuma, and S.~U.~Otor. 2025. Comparative Analysis of Explainable AI Frameworks (LIME and SHAP) in Loan Approval Systems. \emph{International Journal of Information Engineering and Electronic Business (IJIEEB)}, vol.~17, no.~6. [Online]. Available: \url{https://doi.org/10.5815/ijieeb.2025.06.05}. Accessed: Aug.~1, 2026.
 
-\item G.~Palaiokrassas, S.~Scherrers, I.~Ofeidis, and L.~Tassiulas. 2024. Leveraging Machine Learning for Multichain DeFi Fraud Detection. In \emph{Proc. IEEE Int. Conf. Blockchain and Cryptocurrency (ICBC)}. \url{https://doi.org/10.1109/ICBC59979.2024.10634350}
+\item B.~W. Tan. 2023. Central Bank Digital Currency and Financial Inclusion. \emph{IMF Working Paper WP/23/69}. [Online]. Available: \url{https://www.imf.org/en/Publications/WP/Issues/2023/03/27/Central-Bank-Digital-Currency-and-Financial-Inclusion-531273}. Accessed: Aug.~1, 2026.
 
+\item F.~T. Liu, K.~M. Ting, and Z.-H. Zhou. 2008. Isolation Forest. In \emph{Proc. IEEE Int. Conf. Data Mining (ICDM)}, pages 413--422. [Online]. Available: \url{https://doi.org/10.1109/ICDM.2008.17}. Accessed: Aug.~1, 2026.
 
-\item D.~Adom, E.~O. Acheampong, and M.~Boateng. 2022. LIME and SHAP: A Comparison of Model-Agnostic Approaches to Explainability in Loan Approval Systems. \emph{International Journal of Advanced Computer Science and Applications} 13, 11. \url{https://thesai.org/Downloads/Volume13No11/Paper_90-LIME_and_SHAP_A_Comparison.pdf}
+\item N.~Atzei, M.~Bartoletti, and T.~Cimoli. 2017. A Survey of Attacks on Ethereum Smart Contracts (SoK). In \emph{Proc. Int. Conf. Principles of Security and Trust (POST)}, pages 164--186. [Online]. Available: \url{https://doi.org/10.1007/978-3-662-54455-6_8}. Accessed: Aug.~1, 2026.
 
+\item DefiLlama. 2024. Lending Protocols --- DeFi TVL and Protocol Rankings. [Online]. Available: \url{https://defillama.com/protocols/Lending}. Accessed: Aug.~1, 2026.
 
-\item B.~W. Tan. 2023. Central Bank Digital Currency and Financial Inclusion. \emph{IMF Working Paper WP/23/69}. \url{https://www.imf.org/en/Publications/WP/Issues/2023/03/27/Central-Bank-Digital-Currency-and-Financial-Inclusion-531273}
+\item World Bank. 2021. The Global Findex Database 2021: Financial Inclusion, Digital Payments, and Resilience. [Online]. Available: \url{https://www.worldbank.org/en/publication/globalfindex}. Accessed: Aug.~1, 2026.
 
+% [10] unused — commented out:
+% \item Aave. 2024. Aave Protocol Documentation. [Online]. Available: \url{https://docs.aave.com/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item F.~T. Liu, K.~M. Ting, and Z.-H. Zhou. 2008. Isolation Forest. In \emph{Proc. IEEE Int. Conf. Data Mining (ICDM)}, pages 413--422. \url{https://doi.org/10.1109/ICDM.2008.17}
+% [11] unused — commented out:
+% \item Compound. 2024. Compound Protocol Documentation. [Online]. Available: \url{https://docs.compound.finance/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [12] unused — commented out:
+% \item World Bank. 2022. World Development Report 2022: Finance for an Equitable Recovery. [Online]. Available: \url{https://www.worldbank.org/en/publication/wdr2022}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item N.~Atzei, M.~Bartoletti, and T.~Cimoli. 2017. A Survey of Attacks on Ethereum Smart Contracts (SoK). In \emph{Proc. Int. Conf. Principles of Security and Trust (POST)}, pages 164--186. \url{https://doi.org/10.1007/978-3-662-54455-6_8}
+\item International Finance Corporation (IFC). 2017. MSME Finance Gap: Assessment of the Shortfalls and Opportunities in Financing Micro, Small, and Medium Enterprises in Emerging Markets. World Bank. [Online]. Available: \url{https://openknowledge.worldbank.org/entities/publication/ff4c9839-21ac-5676-a23a-7cf6f745df0c}. Accessed: Aug.~1, 2026.
 
+% [14] unused — commented out:
+% \item Bank for International Settlements. 2024. DeFi Lending: Intermediation Without Information?. BIS Working Paper No.~1183. [Online]. Available: \url{https://www.bis.org/publ/work1183.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item DefiLlama. 2024. Lending Protocols --- DeFi TVL and Protocol Rankings. \url{https://defillama.com/protocols/Lending}
+\item Committee on Payments and Market Infrastructures and Bank for International Settlements. 2016. Correspondent Banking --- Technical Report. CPMI Papers No.~147. [Online]. Available: \url{https://www.bis.org/cpmi/publ/d147.pdf}. Accessed: Aug.~1, 2026.
 
+% [16] unused — commented out:
+% \item Ripple Labs. 2025. RLUSD Stablecoin Product Overview. Ripple Documentation. [Online]. Available: \url{https://ripple.com/solutions/stablecoin/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item World Bank. 2021. The Global Findex Database 2021: Financial Inclusion, Digital Payments, and Resilience. \url{https://www.worldbank.org/en/publication/globalfindex}
+\item World Bank. 2024. Remittance Prices Worldwide: Making Markets More Transparent. Migration and Development Brief~40. [Online]. Available: \url{https://remittanceprices.worldbank.org/}. Accessed: Aug.~1, 2026.
 
+\item DefiLlama. 2026. Aave V3 TVL, Fees, Revenue \& Income Statement. March. [Online]. Available: \url{https://defillama.com/protocol/aave-v3}. Accessed: Aug.~1, 2026.
 
-\item Aave. 2024. Aave Protocol Documentation. \url{https://docs.aave.com/}
+\item DefiLlama. 2026. Compound V3 TVL, Fees, Revenue \& Income Statement. March. [Online]. Available: \url{https://defillama.com/protocol/compound-v3}. Accessed: Aug.~1, 2026.
 
+\item Fensory. 2026. Sky Protocol Projects \$611M Revenue in 2026 as USDS Supply Targets \$20.6 Billion. February. [Online]. Available: \url{https://www.fensory.com/intelligence/rwa/sky-protocol-tokenization-regatta-solana-february-2026}. Accessed: Aug.~1, 2026.
 
-\item Compound. 2024. Compound Protocol Documentation. \url{https://docs.compound.finance/}
+\item Fensory. 2026. Maple Finance --- Institutional DeFi Lending Protocol. [Online]. Available: \url{https://www.fensory.com/insights/protocols/maple-finance}. Accessed: Aug.~1, 2026.
 
+% [22] unused — commented out:
+% \item Fensory. 2026. DeFi Credit Platforms Hit \$2.4B Milestone. March. [Online]. Available: \url{https://www.fensory.com/intelligence/rwa/defi-private-credit-platforms-2-4-billion-loans-ethereum}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item World Bank. 2022. World Development Report 2022: Finance for an Equitable Recovery. \url{https://www.worldbank.org/en/publication/wdr2022}
+\item Financial Stability Board. 2020. Enhancing Cross-border Payments: Stage 3 Roadmap. [Online]. Available: \url{https://www.fsb.org/2020/10/enhancing-cross-border-payments-stage-3-roadmap/}. Accessed: Aug.~1, 2026.
 
+% [24] unused — commented out:
+% \item GlobeNewswire. 2025. R3's Corda Leads Tokenized RWA Market with Over \$10 Billion in On-chain Assets. February. [Online]. Available: \url{https://www.globenewswire.com/news-release/2025/02/13/3025637/0/en/R3-s-Corda-leads-tokenized-RWA-market-with-over-10-billion-in-on-chain-assets-and-unrivalled-industry-adoption.html}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item International Finance Corporation (IFC). 2017. MSME Finance Gap: Assessment of the Shortfalls and Opportunities in Financing Micro, Small, and Medium Enterprises in Emerging Markets. World Bank. \url{https://openknowledge.worldbank.org/entities/publication/ff4c9839-21ac-5676-a23a-7cf6f745df0c}
+\item World Bank. 2025. World Bank Group Tracks Project Funds with New Blockchain Tool. Press Release, September. [Online]. Available: \url{https://www.worldbank.org/en/news/press-release/2025/09/26/world-bank-group-tracks-project-funds-with-new-blockchain-tool}. Accessed: Aug.~1, 2026.
 
+\item JPMorgan. 2025. Kinexys Digital Payments: Real-Time Multicurrency Payments. [Online]. Available: \url{https://www.jpmorgan.com/kinexys/index}. Accessed: Aug.~1, 2026.
 
-\item Bank for International Settlements. 2024. DeFi Lending: Intermediation Without Information?. BIS Working Paper No.~1183. \url{https://www.bis.org/publ/work1183.pdf}
+% [27] unused — commented out:
+% \item World Economic Forum. 2022. Why Decentralized Finance Is a Leapfrog Technology for the 1.1 Billion People Who Are Unbanked. September. [Online]. Available: \url{https://www.weforum.org/stories/2022/09/decentralized-finance-a-leapfrog-technology-for-the-unbanked/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [28] unused — commented out:
+% \item Opera Newsroom. 2026. 160M CELO Allocation Proposal to Grow Opera from Distribution Partner into Key Network Stakeholder. March. [Online]. Available: \url{https://press.opera.com/2026/03/19/opera-celo-partnership-2026/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item Committee on Payments and Market Infrastructures and Bank for International Settlements. 2016. Correspondent Banking --- Technical Report. CPMI Papers No.~147. \url{https://www.bis.org/cpmi/publ/d147.pdf}
+% [29] unused — commented out:
+% \item Morpho. 2026. Network Data. March. [Online]. Available: \url{https://data.morpho.org/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-
-\item Ripple Labs. 2025. RLUSD Stablecoin Product Overview. Ripple Documentation. \url{https://ripple.com/solutions/stablecoin/}
-
-
-\item World Bank. 2024. Remittance Prices Worldwide: Making Markets More Transparent. Migration and Development Brief~40. \url{https://remittanceprices.worldbank.org/}
-
-
-\item DefiLlama. 2026. Aave V3 TVL, Fees, Revenue \& Income Statement. March. \url{https://defillama.com/protocol/aave-v3}
-
-
-\item DefiLlama. 2026. Compound V3 TVL, Fees, Revenue \& Income Statement. March. \url{https://defillama.com/protocol/compound-v3}
-
-
-\item Fensory. 2026. Sky Protocol Projects \$611M Revenue in 2026 as USDS Supply Targets \$20.6 Billion. February. \url{https://www.fensory.com/intelligence/rwa/sky-protocol-tokenization-regatta-solana-february-2026}
-
-
-\item Fensory. 2026. Maple Finance --- Institutional DeFi Lending Protocol. \url{https://www.fensory.com/insights/protocols/maple-finance}
-
-
-\item Fensory. 2026. DeFi Credit Platforms Hit \$2.4B Milestone. March. \url{https://www.fensory.com/intelligence/rwa/defi-private-credit-platforms-2-4-billion-loans-ethereum}
-
-
-\item Financial Stability Board. 2020. Enhancing Cross-border Payments: Stage 3 Roadmap. \url{https://www.fsb.org/2020/10/enhancing-cross-border-payments-stage-3-roadmap/}
-
-
-\item GlobeNewswire. 2025. R3's Corda Leads Tokenized RWA Market with Over \$10 Billion in On-chain Assets. February. \url{https://www.globenewswire.com/news-release/2025/02/13/3025637/0/en/R3-s-Corda-leads-tokenized-RWA-market-with-over-10-billion-in-on-chain-assets-and-unrivalled-industry-adoption.html}
-
-
-\item World Bank. 2025. World Bank Group Tracks Project Funds with New Blockchain Tool. Press Release, September. \url{https://www.worldbank.org/en/news/press-release/2025/09/26/world-bank-group-tracks-project-funds-with-new-blockchain-tool}
-
-
-\item JPMorgan. 2025. Kinexys Digital Payments: Real-Time Multicurrency Payments. \url{https://www.jpmorgan.com/kinexys/index}
-
-
-\item World Economic Forum. 2022. Why Decentralized Finance Is a Leapfrog Technology for the 1.1 Billion People Who Are Unbanked. September. \url{https://www.weforum.org/stories/2022/09/decentralized-finance-a-leapfrog-technology-for-the-unbanked/}
-
-
-\item Opera Newsroom. 2026. 160M CELO Allocation Proposal to Grow Opera from Distribution Partner into Key Network Stakeholder. March. \url{https://press.opera.com/2026/03/19/opera-celo-partnership-2026/}
-
-
-\item Morpho. 2026. Network Data. March. \url{https://data.morpho.org/}
-
-
-\item Stellar. 2025. End of Year 2025 Report --- Execution at Scale. \url{https://www.stellar.org/blog/foundation-news/2025-year-in-review}
-
+% [30] unused — commented out:
+% \item Stellar. 2025. End of Year 2025 Report --- Execution at Scale. [Online]. Available: \url{https://www.stellar.org/blog/foundation-news/2025-year-in-review}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
 \item Y.~Chen, S.~Bin, and H.~He. 2024. Design and Implementation of a Multi-Chain Lending Model in Blockchain. In \emph{Proc. 3rd Int. Conf. Artificial Intelligence and Computer Information Technology (AICIT)}, pages 97--102.
 
+\item S.~Yang and W.~Cui. 2023. An Evaluation System for DeFi Lending Protocols. \emph{arXiv preprint arXiv:2303.01022}. [Online]. Available: \url{https://arxiv.org/abs/2303.01022}. Accessed: Aug.~1, 2026.
 
-\item S.~Yang and W.~Cui. 2023. An Evaluation System for DeFi Lending Protocols. \emph{arXiv preprint arXiv:2303.01022}. \url{https://arxiv.org/abs/2303.01022}
+\item J.~Hartmann and O.~Hasan. 2021. A Social-Capital Based Approach to Blockchain-Enabled Peer-to-Peer Lending. In \emph{Proc. IEEE Int. Conf. Blockchain Computing and Applications (BCCA)}, pages 105--110. [Online]. Available: \url{https://hal.science/hal-03371872}. Accessed: Aug.~1, 2026.
 
+\item T.~H.~Pranto, H.~T.~A.~Hasib, M.~R.~Tahsinur, A.~B.~Haque, A.~K.~M.~N.~Islam, and R.~M.~Rahman. 2022. Blockchain and Machine Learning for Fraud Detection: A Privacy-Preserving and Adaptive Incentive Based Approach. \emph{IEEE Access}, vol.~10, pages 87115--87131. [Online]. Available: \url{https://ieeexplore.ieee.org/document/9857827}. Accessed: Aug.~1, 2026.
 
-\item J.~Hartmann and O.~Hasan. 2021. A Social-Capital Based Approach to Blockchain-Enabled Peer-to-Peer Lending. In \emph{Proc. IEEE Int. Conf. Blockchain Computing and Applications (BCCA)}, pages 105--110. \url{https://hal.science/hal-03371872}
+\item Bank for International Settlements et al. 2020. Central Bank Digital Currencies: Foundational Principles and Core Features. BIS and Central Banks Joint Report. [Online]. Available: \url{https://www.bis.org/publ/othp33.htm}. Accessed: Aug.~1, 2026.
 
+\item M.~Asaduzzaman, F.~Hasib, and Z.~B.~Hafiz. 2020. Towards Using Blockchain Technology for Microcredit Industry in Bangladesh. In \emph{Proc. 23rd Int. Conf. Computer and Information Technology (ICCIT)}, pages 1--6. [Online]. Available: \url{https://doi.org/10.1109/ICCIT51783.2020.9392730}. Accessed: Aug.~1, 2026.
 
-\item P.~T.~Hasan, H.~K.~T.~Akhter, M.~R.~Tahsinur, A.~B.~Haque, A.~K.~M.~N.~Islam, and R.~M.~Rahman. 2022. Blockchain and Machine Learning for Fraud Detection: A Privacy-Preserving and Adaptive Incentive Based Approach. \emph{IEEE Access}, vol.~10, pages 87115--87131. \url{https://ieeexplore.ieee.org/document/9857827}
+\item H.~Kim and D.~Kim. 2024. Optimal Gas Fee Minimization in DeFi: Enhancing Efficiency and Security on the Ethereum Blockchain. \emph{IEEE Access}, vol.~12, pages 173810--173823. [Online]. Available: \url{https://ieeexplore.ieee.org/document/10750187}. Accessed: Aug.~1, 2026.
 
+\item X.~Yuan. 2024. SHAP-based Interpretable Models for Credit Default Assessment Using Machine Learning. In \emph{Proc. 14th Int. Conf. Software Technology and Engineering (ICSTE)}, pages 213--217. [Online]. Available: \url{https://doi.org/10.1109/ICSTE63875.2024.00044}. Accessed: Aug.~1, 2026.
 
-\item Bank for International Settlements et al. 2020. Central Bank Digital Currencies: Foundational Principles and Core Features. BIS and Central Banks Joint Report. \url{https://www.bis.org/publ/othp33.htm}
+\item T.~Dao, T.~Trinh, and V.~Pham. 2025. Optimizing Credit Scoring Models for Decentralized Financial Applications. In \emph{Information and Communication Technology}, Springer. [Online]. Available: \url{https://doi.org/10.1007/978-981-96-4282-3_36}. Accessed: Aug.~1, 2026.
 
+% [40] unused — commented out:
+% \item A.~Beniiche. 2020. A Study of Blockchain Oracles. \emph{arXiv preprint arXiv:2004.07140}. [Online]. Available: \url{https://arxiv.org/pdf/2004.07140}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item M.~Asaduzzaman, F.~Hasib, and Z.~B.~Hafiz. 2020. Towards Using Blockchain Technology for Microcredit Industry in Bangladesh. In \emph{Proc. 23rd Int. Conf. Computer and Information Technology (ICCIT)}, pages 1--6. \url{https://doi.org/10.1109/ICCIT51783.2020.9392730}
+% [41] unused — commented out:
+% \item A.~Pasdar, Y.~C.~Lee, and Z.~Dong. 2023. Connect API with Blockchain: A Survey on Blockchain Oracle Implementation. \emph{ACM Computing Surveys}, 55, 10. [Online]. Available: \url{https://doi.org/10.1145/3567582}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item L.~Gudgeon, S.~M.~Werner, D.~Perez, and W.~J.~Knottenbelt. 2020. DeFi Protocols for Loanable Funds: Interest Rates, Liquidity and Market Efficiency. In \emph{Proc. 2nd ACM Conf. Advances in Financial Technologies (AFT)}, pages 92--112. [Online]. Available: \url{https://doi.org/10.1145/3419614.3423254}. Accessed: Aug.~1, 2026.
 
-\item H.~Kim and D.~Kim. 2024. Optimal Gas Fee Minimization in DeFi: Enhancing Efficiency and Security on the Ethereum Blockchain. \emph{IEEE Access}, vol.~12, pages 173810--173823. \url{https://ieeexplore.ieee.org/document/10750187}
+% [43] unused — commented out:
+% \item K.~W.~Wu. 2024. Strengthening DeFi Security: A Static Analysis Approach to Flash Loan Vulnerabilities. \emph{arXiv preprint arXiv:2411.01230}.
+\stepcounter{enumi}
 
+% [44] unused — commented out:
+% \item Y.~Li et al. 2025. A Comprehensive Study of Exploitable Patterns in Smart Contracts: From Vulnerability to Defense. \emph{arXiv preprint arXiv:2504.21480}. [Online]. Available: \url{https://arxiv.org/abs/2504.21480}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item X.~Yuan. 2024. SHAP-based Interpretable Models for Credit Default Assessment Using Machine Learning. In \emph{Proc. 14th Int. Conf. Software Technology and Engineering (ICSTE)}, pages 213--217. \url{https://doi.org/10.1109/ICSTE63875.2024.00044}
+% [45] unused — commented out:
+% \item F.~Piper, K.~Wolf, and J.~Heiss. 2025. Privacy-Preserving On-chain Permissioning for KYC-Compliant Decentralized Applications. TU Berlin, \emph{arXiv preprint arXiv:2510.05807}.
+\stepcounter{enumi}
 
+% [46] unused — commented out:
+% \item N.~Decker. 2025. Zero-Knowledge Proofs: Cryptographic Model for Financial Compliance and Global Banking Security. \emph{SSRN Working Paper No.~5170068}.
+\stepcounter{enumi}
 
-\item T.~Dao, T.~Trinh, and V.~Pham. 2025. Optimizing Credit Scoring Models for Decentralized Financial Applications. In \emph{Information and Communication Technology}, Springer. \url{https://doi.org/10.1007/978-981-96-4282-3_36}
+% [47] unused — commented out:
+% \item Grameen Bank. 2024. Grameen Bank at a Glance. Grameen Communications. [Online]. Available: \url{https://www.grameen-info.org/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [48] unused — commented out:
+% \item A.~Carstens et al. 2021. Stablecoins: Risks, Potential and Regulation. \emph{BIS Working Papers No.~905}, Bank for International Settlements. [Online]. Available: \url{https://www.bis.org/publ/work905.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item A.~Beniiche. 2020. A Study of Blockchain Oracles. \emph{arXiv preprint arXiv:2004.07140}. \url{https://arxiv.org/pdf/2004.07140}
+% [49] unused — commented out:
+% \item J.~A.~Ocampo and K.~Gallagher. 2024. The Role of Multilateral Development Banks and Development Assistance in the Provision of Global Public Goods. UNDP Background Paper. [Online]. Available: \url{https://hdr.undp.org/system/files/documents/background-paper-document/2024jaocampokdgonzaleztheroleofmultilateraldevlmntbanks.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [50] unused — commented out:
+% \item F.~A.~Aponte-Novoa, A.~L.~S.~Orozco, R.~Villanueva-Polanco, and P.~Wightman. 2021. The 51\% Attack on Blockchains: A Mining Behavior Study. \emph{IEEE Access}, vol.~9, pages 140549--140564. [Online]. Available: \url{https://doi.org/10.1109/ACCESS.2021.3119291}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item A.~Pasdar, Y.~C.~Lee, and Z.~Dong. 2023. Connect API with Blockchain: A Survey on Blockchain Oracle Implementation. \emph{ACM Computing Surveys}, 55, 10. \url{https://doi.org/10.1145/3567582}
+% [51] unused — commented out:
+% \item Sygnum Bank. 2026. Institutional DeFi in 2025: The Disconnect Between Infrastructure and Allocation. Sygnum Blog, May 2025. [Online]. Available: \url{https://www.sygnum.com/blog/2025/05/30/institutional-defi-in-2025-the-disconnect-between-infrastructure-and-allocation/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item M.~J.~Page, J.~E.~McKenzie, P.~M.~Bossuyt, I.~Boutron, T.~C.~Hoffmann, C.~D.~Mulrow, et~al. 2021. The PRISMA 2020 statement: an updated guideline for reporting systematic reviews. \emph{BMJ}, vol.~372, n71. [Online]. Available: \url{https://doi.org/10.1136/bmj.n71}. Accessed: Aug.~1, 2026.
 
-\item L.~Gudgeon, S.~M.~Werner, D.~Perez, and W.~J.~Knottenbelt. 2020. DeFi Protocols for Loanable Funds: Interest Rates, Liquidity and Market Efficiency. In \emph{Proc. 2nd ACM Conf. Advances in Financial Technologies (AFT)}, pages 92--112. \url{https://doi.org/10.1145/3419614.3423254}
+% [53] unused — commented out:
+% \item D.~Cheng, X.~Wang, Y.~Zhang, and L.~Zhang. 2022. Graph Neural Network for Fraud Detection via Spatial-Temporal Attention. \emph{IEEE Trans. Knowledge and Data Engineering}, 34, 8, pages 3800--3813. [Online]. Available: \url{https://ieeexplore.ieee.org/document/9356317}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [54] unused — commented out:
+% \item D.~Wang, B.~Wu, X.~Yuan, L.~Wu, Y.~Zhou, and H.~Cui. 2024. DeFiGuard: A Price Manipulation Detection Service in DeFi Using Graph Neural Networks. \emph{arXiv preprint arXiv:2406.11157}. [Online]. Available: \url{https://arxiv.org/abs/2406.11157}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item K.~W.~Wu. 2024. Strengthening DeFi Security: A Static Analysis Approach to Flash Loan Vulnerabilities. \emph{arXiv preprint arXiv:2411.01230}.
+% [55] unused — commented out:
+% \item B.~McMahan, E.~Moore, D.~Ramage, S.~Hampson, and B.~A.~y Arcas. 2017. Communication-Efficient Learning of Deep Networks from Decentralized Data. In \emph{Proc. Int. Conf. Artificial Intelligence and Statistics (AISTATS)}.
+\stepcounter{enumi}
 
+% [56] unused — commented out:
+% \item Z.~Chen, J.~Chen, M.~Sra, et~al. 2025. Standard Benchmarks Fail --- Auditing LLM Agents in Finance Must Prioritize Risk. \emph{arXiv preprint arXiv:2502.15865}. [Online]. Available: \url{https://arxiv.org/abs/2502.15865}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item Y.~Li et al. 2025. A Comprehensive Study of Exploitable Patterns in Smart Contracts: From Vulnerability to Defense. \emph{arXiv preprint arXiv:2504.21480}. \url{https://arxiv.org/abs/2504.21480}
+% [57] unused — commented out:
+% \item MicroSave Consulting. 2025. Shaping a Sustainable Microfinance Sector in Bangladesh. MSC Signature Project, September. [Online]. Available: \url{https://www.microsave.net/signature_projects/shaping-a-sustainable-microfinance-sector-in-bangladesh-through-mscs-transformation-feasibility-study/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item European Parliament and Council of the European Union. 2024. Regulation (EU) 2023/1114 of 31 May 2023 on Markets in Crypto-Assets (MiCA). \emph{Official Journal of the European Union}, L~150/40, June 2023; fully applicable from 30 December. [Online]. Available: \url{https://eur-lex.europa.eu/eli/reg/2023/1114/oj}. Accessed: Aug.~1, 2026.
 
-\item F.~Piper, K.~Wolf, and J.~Heiss. 2025. Privacy-Preserving On-chain Permissioning for KYC-Compliant Decentralized Applications. TU Berlin, \emph{arXiv preprint arXiv:2510.05807}.
+% [59] unused — commented out:
+% \item European Banking Authority. 2024. Guidelines on the Minimum Content of the Governance Arrangements for Issuers of Asset-Referenced Tokens under MiCAR. EBA/GL//06, June. [Online]. Available: \url{https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/asset-referenced-and-e-money-tokens-micar/guidelines-internal-governance-arrangements-issuers-arts-under-micar}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item United States Congress. 2025. Guiding and Establishing National Innovation for U.S. Stablecoins (GENIUS) Act. Pub.~L.~No.~119-27, July~18. [Online]. Available: \url{https://www.govinfo.gov/content/pkg/PLAW-119publ27/pdf/PLAW-119publ27.pdf}. Accessed: Aug.~1, 2026.
 
-\item N.~Decker. 2025. Zero-Knowledge Proofs: Cryptographic Model for Financial Compliance and Global Banking Security. \emph{SSRN Working Paper No.~5170068}.
+\item Bank for International Settlements Innovation Hub. 2024. Project mBridge: Connecting Economies through CBDC --- Reaches Minimum Viable Product. BIS Innovation Hub Report, June. [Online]. Available: \url{https://www.bis.org/about/bisih/topics/cbdc/mcbdc_bridge.htm}. Accessed: Aug.~1, 2026.
 
+\item Bank for International Settlements and Central Banks of France, Japan, Korea, Mexico, Switzerland, the UK, and the US. 2024. Project Agora: Tokenization of Cross-Border Payments using Unified Ledgers. BIS Innovation Hub Working Paper, April. [Online]. Available: \url{https://www.bis.org/about/bisih/topics/fmis/agora.htm}. Accessed: Aug.~1, 2026.
 
-\item Grameen Bank. 2024. Grameen Bank at a Glance. Grameen Communications. \url{https://www.grameen-info.org/}
+% [63] unused — commented out:
+% \item Bangladesh Bank. 2025. FE Circular No.~06: Electronic Communication for Letters of Credit and Trade Finance Instruments. Foreign Exchange Policy Department, January. [Online]. Available: \url{https://www.bb.org.bd/mediaroom/circulars/fepd/jan172025fepd06.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [64] unused — commented out:
+% \item Bangladesh Bank. 2025. Financial Inclusion in Bangladesh: Progress and Gender-Disaggregated Outlook 2024--25. Special Publication SP-02, Financial Inclusion Department, June. [Online]. Available: \url{https://www.bb.org.bd/pub/special/SP2025-02.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item A.~Carstens et al. 2021. Stablecoins: Risks, Potential and Regulation. \emph{BIS Working Papers No.~905}, Bank for International Settlements. \url{https://www.bis.org/publ/work905.pdf}
+% [65] unused — commented out:
+% \item BRAC. 2025. BRAC Microfinance Annual Performance Report 2025: Women-Centric Lending Outcomes. BRAC Research and Evaluation Division. [Online]. Available: \url{https://www.brac.net/program/microfinance/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [66] unused — commented out:
+% \item Ethereum Improvement Proposals. 2025. EIP-4626: Tokenized Vault Standard. Ethereum Foundation, April 2022. ; ``EIP-7540: Asynchronous ERC-4626 Tokenized Vaults,'' Ethereum Foundation, 2023. ; ``EIP-3643: T-REX -- Token for Regulated EXchanges,'' Ethereum Foundation, 2021. See also: Spectral Finance, ``On-Chain Credit Scoring for DeFi Lending,'' 2023. ; RociFi Labs, ``Undercollateralized DeFi Lending via On-Chain Credit Score,'' 2023. ; Qwen Team (Alibaba Cloud), ``Qwen3 Technical Report,'' \emph{arXiv preprint arXiv:2505.09388}. [Online]. Available: \url{https://eips.ethereum.org/EIPS/eip-4626}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item J.~A.~Ocampo and K.~Gallagher. 2024. The Role of Multilateral Development Banks and Development Assistance in the Provision of Global Public Goods. UNDP Background Paper. \url{https://hdr.undp.org/system/files/documents/background-paper-document/2024jaocampokdgonzaleztheroleofmultilateraldevlmntbanks.pdf}
+% [67] unused — commented out:
+% \item Ethereum Improvement Proposals. 2022--2025. EIP-4626, EIP-7540, EIP-3643; Spectral Finance and RociFi documentation; Qwen Team. 2025. Qwen3 Technical Report (\emph{arXiv:2505.09388}). [Online]. Available: \url{https://eips.ethereum.org/EIPS/eip-4626}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item Elliptic. 2019. The Elliptic Data Set. Kaggle. [Online]. Available: \url{https://www.kaggle.com/datasets/ellipticco/elliptic-data-set}. Accessed: Aug.~1, 2026.
 
-\item F.~A.~Aponte-Novoa, A.~L.~S.~Orozco, R.~Villanueva-Polanco, and P.~Wightman. 2021. The 51\% Attack on Blockchains: A Mining Behavior Study. \emph{IEEE Access}, vol.~9, pages 140549--140564. \url{https://doi.org/10.1109/ACCESS.2021.3119291}
+% [69] unused — commented out:
+% \item M.~Alizadeh, M.~Gholampour, A.~Imani, and J.~Schulz. 2026. Simple Prompt Injection Attacks Can Leak Personal Data Observed by LLM Agents During Task Execution. \emph{arXiv preprint arXiv:2506.01055}, University of Zurich / IPM, June.
+\stepcounter{enumi}
 
+% [70] unused — commented out:
+% \item OWASP Foundation. 2026. OWASP Top 10 for Large Language Model Applications and Agents, 2026 Edition. OWASP Foundation. [Online]. Available: \url{https://owasp.org/www-project-top-10-for-large-language-model-applications/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item Sygnum Bank. 2026. Institutional DeFi in 2025: The Disconnect Between Infrastructure and Allocation. Sygnum Blog, May 2025. \url{https://www.sygnum.com/blog/2025/05/30/institutional-defi-in-2025-the-disconnect-between-infrastructure-and-allocation/}
+% [71] unused — commented out:
+% \item E.~Gamma, R.~Helm, R.~Johnson, and J.~Vlissides. 1994. \emph{Design Patterns: Elements of Reusable Object-Oriented Software}. Addison-Wesley.
+\stepcounter{enumi}
 
+% [72] unused — commented out:
+% \item G.~Aspris and J.~Svec. 2025. Institutionalizing Risk Curation in Decentralized Credit. \emph{arXiv preprint arXiv:2512.11976}. [Online]. Available: \url{https://arxiv.org/abs/2512.11976}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item M.~J.~Page, J.~E.~McKenzie, P.~M.~Bossuyt, I.~Boutron, T.~C.~Hoffmann, C.~D.~Mulrow, et~al. 2021. The PRISMA 2020 statement: an updated guideline for reporting systematic reviews. \emph{BMJ}, vol.~372, n71. \url{https://doi.org/10.1136/bmj.n71}
+% [73] unused — commented out:
+% \item S.~Jaffer. 1999. Microfinance and the Mechanics of Solidarity Lending. Harvard Law School, \emph{SSRN Working Paper No.~162548}. [Online]. Available: \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=162548}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [74] unused — commented out:
+% \item R.~Sherratt. 2016. From Solidarity to Coercion: The Dynamics of Group Liability. \emph{Oxford Economic Papers}, 68, 4, pages 955--974. [Online]. Available: \url{https://doi.org/10.1093/oep/gpw018}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item D.~Cheng, X.~Wang, Y.~Zhang, and L.~Zhang. 2022. Graph Neural Network for Fraud Detection via Spatial-Temporal Attention. \emph{IEEE Trans. Knowledge and Data Engineering}, 34, 8, pages 3800--3813. \url{https://ieeexplore.ieee.org/document/9356317}
+% [75] unused — commented out:
+% \item H.~Fazliani, A.~Pasdar, and Y.~C.~Lee. 2025. Ensemble-Based Semi-Supervised Learning for Illicit Account Detection in Ethereum DeFi Transactions. \emph{arXiv preprint arXiv:2412.02408}, rev.~October. [Online]. Available: \url{https://arxiv.org/abs/2412.02408}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [76] unused — commented out:
+% \item H.~Alhasawi, A.~Almutairi, and S.~Alharbi. 2025. FedFraud: A Federated Approach to Scalable and Trustworthy Financial Fraud Detection. \emph{Security and Privacy}, Wiley. [Online]. Available: \url{https://doi.org/10.1002/spy2.70012}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item D.~Wang, B.~Wu, X.~Yuan, L.~Wu, Y.~Zhou, and H.~Cui. 2024. DeFiGuard: A Price Manipulation Detection Service in DeFi Using Graph Neural Networks. \emph{arXiv preprint arXiv:2406.11157}. \url{https://arxiv.org/abs/2406.11157}
+% [77] unused — commented out:
+% \item European Parliament and Council of the European Union. 2026. Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (AI Act). \emph{Official Journal of the European Union}, L~2024/1689, July 2024; high-risk credit-scoring provisions applicable from August. [Online]. Available: \url{https://eur-lex.europa.eu/eli/reg/2024/1689/oj}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item L.~Dong, Y.~Qiu, and F.~Xu. 2023. Blockchain-Enabled Deep-Tier Supply Chain Finance. \emph{Manufacturing \& Service Operations Management}, 25, 6, pages 2021--2037. [Online]. Available: \url{https://doi.org/10.1287/msom.2022.1123}. Accessed: Aug.~1, 2026.
 
-\item B.~McMahan, E.~Moore, D.~Ramage, S.~Hampson, and B.~A.~y Arcas. 2017. Communication-Efficient Learning of Deep Networks from Decentralized Data. In \emph{Proc. Int. Conf. Artificial Intelligence and Statistics (AISTATS)}.
+\item U.~Bindseil. 2020. Tiered CBDC and the Financial System. \emph{ECB Working Paper Series}, no.~2351, January. [Online]. Available: \url{https://www.ecb.europa.eu/pub/pdf/scpwps/ecb.wp2351~c8c18bbd60.en.pdf}. Accessed: Aug.~1, 2026.
 
+\item J.~Kiff, J.~Alwazir, S.~Davidovic, A.~Farias, A.~Khan, T.~Khiaonarong, M.~Malaika, H.~Monroe, N.~Sugimoto, H.~Tourpe, and P.~Zhou. 2020. A Survey of Research on Retail Central Bank Digital Currency. \emph{IMF Working Paper WP/20/104}, June. [Online]. Available: \url{https://www.imf.org/en/Publications/WP/Issues/2020/06/26/A-Survey-of-Research-on-Retail-Central-Bank-Digital-Currency-49069}. Accessed: Aug.~1, 2026.
 
-\item Z.~Chen, J.~Chen, M.~Sra, et~al. 2025. Standard Benchmarks Fail --- Auditing LLM Agents in Finance Must Prioritize Risk. \emph{arXiv preprint arXiv:2502.15865}. \url{https://arxiv.org/abs/2502.15865}
+% [81] unused — commented out:
+% \item R.~Auer and R.~B\"{o}hme. 2020. The Technology of Retail Central Bank Digital Currency. \emph{BIS Quarterly Review}, March; see also BIS Working Paper No.~948. [Online]. Available: \url{https://www.bis.org/publ/qtrpdf/r_qt2003j.htm}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [82] unused — commented out:
+% \item L.~Ante. 2025. From Adoption to Continuance: Stablecoins in Cross-Border Remittances and the Role of Digital and Financial Literacy. \emph{Telematics and Informatics}, vol.~97, art.~102230. [Online]. Available: \url{https://doi.org/10.1016/j.tele.2024.102230}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item MicroSave Consulting. 2025. Shaping a Sustainable Microfinance Sector in Bangladesh. MSC Signature Project, September. \url{https://www.microsave.net/signature_projects/shaping-a-sustainable-microfinance-sector-in-bangladesh-through-mscs-transformation-feasibility-study/}
+% [83] unused — commented out:
+% \item Y.~Li, Y.~Xiang, Q.~Wang, T.~H.~Yuen, A.~Deppeler, and J.~Yu. 2026. SoK: Stablecoins in Retail Payments. \emph{arXiv preprint arXiv:2601.00196}. [Online]. Available: \url{https://arxiv.org/abs/2601.00196}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [84] unused — commented out:
+% \item W.~Du, C.~Huang, and D.~Scharfstein. 2026. Competing Rails for Cross-Border Payments: Banks, Fintechs, and Stablecoins. Harvard Business School Working Paper, February. [Online]. Available: \url{https://www.hbs.edu/faculty/Pages/item.aspx?num=66992}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item European Parliament and Council of the European Union. 2024. Regulation (EU) 2023/1114 of 31 May 2023 on Markets in Crypto-Assets (MiCA). \emph{Official Journal of the European Union}, L~150/40, June 2023; fully applicable from 30 December. \url{https://eur-lex.europa.eu/eli/reg/2023/1114/oj}
+% [85] unused — commented out:
+% \item M.~Fr\"{o}hlich, J.~A.~Vega Vermehren, F.~Alt, and A.~Schmidt. 2022. Implementation and Evaluation of a Point-Of-Sale Payment System Using Bitcoin Lightning. In \emph{Proc. NordiCHI}. [Online]. Available: \url{http://www.medien.ifi.lmu.de/pubdb/publications/pub/froehlich2022nordichi/froehlich2022nordichi.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [86] unused — commented out:
+% \item K.~Zhang, T.-M.~Choi, S.-H.~Chung, Y.~Dai, and X.~Wen. 2024. Blockchain Adoption in Retail Operations: Stablecoins and Traceability. \emph{European Journal of Operational Research}, 315, 1, pages 147--160. [Online]. Available: \url{https://doi.org/10.1016/j.ejor.2023.11.026}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item European Banking Authority. 2024. Guidelines on the Minimum Content of the Governance Arrangements for Issuers of Asset-Referenced Tokens under MiCAR. EBA/GL//06, June. \url{https://www.eba.europa.eu/activities/single-rulebook/regulatory-activities/asset-referenced-and-e-money-tokens-micar/guidelines-internal-governance-arrangements-issuers-arts-under-micar}
+% [87] unused — commented out:
+% \item J.~Lin, M.~Liu, S.~Li, and X.~Wang. 2025. SecurePay: Enabling Secure and Fast Payment Processing for Platform Economy. In \emph{Proc. IEEE/ACM Int. Symp. Quality of Service (IWQoS)}; \emph{arXiv:2505.17466}. [Online]. Available: \url{https://arxiv.org/abs/2505.17466}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [88] unused — commented out:
+% \item Committee on Payments and Market Infrastructures. 2023. Considerations for the Use of Stablecoin Arrangements in Cross-Border Payments. Bank for International Settlements, July. [Online]. Available: \url{https://www.bis.org/cpmi/publ/d220.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item United States Congress. 2025. Guiding and Establishing National Innovation for U.S. Stablecoins (GENIUS) Act. Pub.~L.~No.~119-27, July~18. \url{https://www.congress.gov/bill/119th-congress/senate-bill/919}
+% [89] unused — commented out:
+% \item A.~Kosse, J.~Lisack, and N.~Boakye-Agyeman. 2023. The Impact of Stablecoins on the International Monetary and Financial System. \emph{BIS Papers}, no.~170, February. [Online]. Available: \url{https://www.bis.org/publ/bppdf/bispap170.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item E.~Cerutti, M.~Firat, and H.~P\'{e}rez-Saiz. 2025. Estimating the Impact of Digital Money on Cross-Border Flows: Scenario Analysis Covering the Intensive Margin. \emph{IMF Fintech Notes} 2025/002, February. [Online]. Available: \url{https://www.imf.org/-/media/files/publications/ftn063/2025/english/ftnea2025002.pdf}. Accessed: Aug.~1, 2026.
 
-\item Bank for International Settlements Innovation Hub. 2024. Project mBridge: Connecting Economies through CBDC --- Reaches Minimum Viable Product. BIS Innovation Hub Report, June. \url{https://www.bis.org/about/bisih/topics/cbdc/mcbdc_bridge.htm}
+% [91] unused — commented out:
+% \item S.~Chaliasos, M.~Charalambous, L.~Zhou, R.~Galanopoulou, A.~Gervais, D.~Mitropoulos, and B.~Livshits. 2024. Smart Contract and DeFi Security: Insights from Tool Evaluations and Practitioner Surveys. In \emph{Proc. IEEE/ACM 46th Int. Conf. Software Engineering (ICSE)}, pages 160:1--160:13. [Online]. Available: \url{https://doi.org/10.1145/3597503.3623302}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [92] unused — commented out:
+% \item K.~Qin, L.~Zhou, B.~Livshits, and A.~Gervais. 2021. Attacking the DeFi Ecosystem with Flash Loans for Fun and Profit. In \emph{Financial Cryptography and Data Security (FC)}, pages 3--32. [Online]. Available: \url{https://arxiv.org/abs/2003.03810}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item Bank for International Settlements and Central Banks of France, Japan, Korea, Mexico, Switzerland, the UK, and the US. 2024. Project Agora: Tokenization of Cross-Border Payments using Unified Ledgers. BIS Innovation Hub Working Paper, April. \url{https://www.bis.org/about/bisih/topics/fmis/agora.htm}
+% [93] unused — commented out:
+% \item T.~Mackinga, T.~Nadahalli, and R.~Wattenhofer. 2024. SoK: Attacks on DAOs. \emph{arXiv preprint arXiv:2406.15071}. [Online]. Available: \url{https://arxiv.org/abs/2406.15071}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item E.~G.~Weyl, P.~Ohlhaver, and V.~Buterin. 2022. Decentralized Society: Finding Web3's Soul. \emph{SSRN Working Paper No.~4105763}. [Online]. Available: \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4105763}. Accessed: Aug.~1, 2026.
 
-\item Bangladesh Bank. 2025. FE Circular No.~06: Electronic Communication for Letters of Credit and Trade Finance Instruments. Foreign Exchange Policy Department, January. \url{https://www.bb.org.bd/mediaroom/circulars/fepd/jan172025fepd06.pdf}
+% [95] unused — commented out:
+% \item SmartContractSecurity. 2020. SWC Registry: Smart Contract Weakness Classification and Test Cases. [Online]. Available: \url{https://swcregistry.io/}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+\item G.~Caldarelli. 2025. Can Artificial Intelligence Solve the Blockchain Oracle Problem? Unpacking the Challenges and Possibilities. \emph{Frontiers in Blockchain}, vol.~8, art.~1682623. [Online]. Available: \url{https://doi.org/10.3389/fbloc.2025.1682623}. Accessed: Aug.~1, 2026.
 
-\item Bangladesh Bank. 2025. Financial Inclusion in Bangladesh: Progress and Gender-Disaggregated Outlook 2024--25. Special Publication SP-02, Financial Inclusion Department, June. \url{https://www.bb.org.bd/pub/special/SP2025-02.pdf}
+% [97] unused — commented out:
+% \item M.~Gurupriya, R.~Gayathri, C.~Yadav, and U.~Umamaheshwar. 2025. Blockchain-Powered Platform for Microloans and Lending Solutions. In \emph{Proc. Int. Conf. on Intelligent Computing, Instrumentation and Control Technologies (ICICT)}, pages 1--6. [Online]. Available: \url{https://doi.org/10.1109/ICTEST64710.2025.11042350}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
+% [98] unused — commented out:
+% \item V.~Buterin, Y.~Weiss, K.~Gazso, N.~Patel, D.~Tirosh, S.~Nacson, and T.~Hess. 2021. ERC-4337: Account Abstraction Using Alt Mempool. Ethereum Improvement Proposals. [Online]. Available: \url{https://eips.ethereum.org/EIPS/eip-4337}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item BRAC. 2025. BRAC Microfinance Annual Performance Report 2025: Women-Centric Lending Outcomes. BRAC Research and Evaluation Division. \url{https://www.brac.net/program/microfinance/}
+\item Behaviour-Centric Cybersecurity Center (BCCC), York University. 2025. BCCC-DeFiFraudTrans-2025: A Labelled Ethereum DeFi Fraud Transaction Dataset. [Online]. Available: \url{https://www.yorku.ca/research/bccc/ucs-technical/cybersecurity-datasets-cds/defi-fraud-transactions-bccc-defifraudtrans-2025/}. Accessed: Aug.~1, 2026.
 
+% [100] unused — commented out:
+% \item P.~K.~Ozili. 2024. Central Bank Digital Currency Adoption Challenges. \emph{Journal of Central Banking Theory and Practice}, 13, 1, pages 5--24. [Online]. Available: \url{https://doi.org/10.2478/jcbtp-2024-0001}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item Ethereum Improvement Proposals. 2025. EIP-4626: Tokenized Vault Standard. Ethereum Foundation, April 2022. ; ``EIP-7540: Asynchronous ERC-4626 Tokenized Vaults,'' Ethereum Foundation, 2023. ; ``EIP-3643: T-REX -- Token for Regulated EXchanges,'' Ethereum Foundation, 2021.  See also: Spectral Finance, ``On-Chain Credit Scoring for DeFi Lending,'' 2023. ; RociFi Labs, ``Undercollateralized DeFi Lending via On-Chain Credit Score,'' 2023. ; Qwen Team (Alibaba Cloud), ``Qwen3 Technical Report,'' \emph{arXiv preprint arXiv:2505.09388}. \url{https://eips.ethereum.org/EIPS/eip-4626}
+\item McKinsey \& Company. 2018. Global Payments 2018: A Dynamic Industry Continues to Defy Predictions. McKinsey Global Payments Map. [Online]. Available: \url{https://www.mckinsey.com/industries/financial-services/our-insights/global-payments-a-dynamic-industry-continues-to-defy-predictions}. Accessed: Aug.~1, 2026.
 
+\item Y.~Wang, Q.~Zhang, K.~Li, Y.~Tang, J.~Chen, X.~Luo, and T.~Chen. 2021. iBatch: Saving Ethereum Fees via Secure and Cost-Effective Batching of Smart-Contract Invocations. In \emph{Proc. ACM Joint Eur. Software Engineering Conf. and Symp. Foundations of Software Engineering (ESEC/FSE)}, pages 566--577. [Online]. Available: \url{https://doi.org/10.1145/3468264.3468568}. Accessed: Aug.~1, 2026.
 
-\item Ethereum Improvement Proposals. 2022--2025. EIP-4626, EIP-7540, EIP-3643; Spectral Finance and RociFi documentation; Qwen Team. 2025. Qwen3 Technical Report (\emph{arXiv:2505.09388}). \url{https://eips.ethereum.org/EIPS/eip-4626}
+\item World Inequality Lab. 2026. Exorbitant Privilege. \emph{World Inequality Report 2026}. [Online]. Available: \url{https://wir2026.wid.world/insight/exorbitant-privilege/}. Accessed: Aug.~1, 2026.
 
+% [104] unused — commented out:
+% \item G.~Wood. 2023. Ethereum: A Secure Decentralised Generalised Transaction Ledger (Yellow Paper). Ethereum Foundation. [Online]. Available: \url{https://ethereum.github.io/yellowpaper/paper.pdf}. Accessed: Aug.~1, 2026.
+\stepcounter{enumi}
 
-\item Elliptic. 2019. The Elliptic Data Set. Kaggle. \url{https://www.kaggle.com/datasets/ellipticco/elliptic-data-set}
+\item W.~Wang, J.~Song, G.~Xu, Y.~Li, H.~Wang, and C.~Su. 2021. ContractWard: Automated Vulnerability Detection Models for Ethereum Smart Contracts. \emph{IEEE Trans. Network Science and Engineering}, vol.~8, no.~2, pages 1133--1144. [Online]. Available: \url{https://doi.org/10.1109/TNSE.2020.2968505}. Accessed: Aug.~1, 2026.
 
+\item J.-W.~Liao, T.-T.~Tsai, C.-K.~He, and C.-W.~Tien. 2019. SoliAudit: Smart Contract Vulnerability Assessment Based on Machine Learning and Fuzz Testing. In \emph{Proc. 6th Int. Conf. Internet of Things: Systems, Management and Security (IOTSMS)}, pages 458--465. [Online]. Available: \url{https://doi.org/10.1109/iotsms48152.2019.8939256}. Accessed: Aug.~1, 2026.
 
-\item M.~Alizadeh, M.~Gholampour, A.~Imani, and J.~Schulz. 2026. Simple Prompt Injection Attacks Can Leak Personal Data Observed by LLM Agents During Task Execution. \emph{arXiv preprint arXiv:2506.01055}, University of Zurich / IPM, June.
-
-
-\item OWASP Foundation. 2026. OWASP Top 10 for Large Language Model Applications and Agents, 2026 Edition. OWASP Foundation. \url{https://owasp.org/www-project-top-10-for-large-language-model-applications/}
-
-
-\item E.~Gamma, R.~Helm, R.~Johnson, and J.~Vlissides. 1994. \emph{Design Patterns: Elements of Reusable Object-Oriented Software}. Addison-Wesley.
-
-
-\item G.~Aspris and J.~Svec. 2025. Institutionalizing Risk Curation in Decentralized Credit. \emph{arXiv preprint arXiv:2512.11976}. \url{https://arxiv.org/abs/2512.11976}
-
-
-\item S.~Jaffer. 1999. Microfinance and the Mechanics of Solidarity Lending. Harvard Law School, \emph{SSRN Working Paper No.~162548}. \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=162548}
-
-
-\item R.~Sherratt. 2016. From Solidarity to Coercion: The Dynamics of Group Liability. \emph{Oxford Economic Papers}, 68, 4, pages 955--974. \url{https://doi.org/10.1093/oep/gpw018}
-
-
-\item H.~Fazliani, A.~Pasdar, and Y.~C.~Lee. 2025. Ensemble-Based Semi-Supervised Learning for Illicit Account Detection in Ethereum DeFi Transactions. \emph{arXiv preprint arXiv:2412.02408}, rev.~October. \url{https://arxiv.org/abs/2412.02408}
-
-
-\item H.~Alhasawi, A.~Almutairi, and S.~Alharbi. 2025. FedFraud: A Federated Approach to Scalable and Trustworthy Financial Fraud Detection. \emph{Security and Privacy}, Wiley. \url{https://doi.org/10.1002/spy2.70012}
-
-
-\item European Parliament and Council of the European Union. 2026. Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (AI Act). \emph{Official Journal of the European Union}, L~2024/1689, July 2024; high-risk credit-scoring provisions applicable from August. \url{https://eur-lex.europa.eu/eli/reg/2024/1689/oj}
-
-
-\item L.~Dong, Y.~Qiu, and F.~Xu. 2023. Blockchain-Enabled Deep-Tier Supply Chain Finance. \emph{Manufacturing \& Service Operations Management}, 25, 6, pages 2021--2037. \url{https://doi.org/10.1287/msom.2022.1123}
-
-
-\item U.~Bindseil. 2020. Tiered CBDC and the Financial System. \emph{ECB Working Paper Series}, no.~2351, January. \url{https://www.ecb.europa.eu/pub/pdf/scpwps/ecb.wp2351~c8c18bbd60.en.pdf}
-
-
-\item J.~Kiff, J.~Alwazir, S.~Davidovic, A.~Farias, A.~Khan, T.~Khiaonarong, M.~Malaika, H.~Monroe, N.~Sugimoto, H.~Tourpe, and P.~Zhou. 2020. A Survey of Research on Retail Central Bank Digital Currency. \emph{IMF Working Paper WP/20/104}, June. \url{https://www.imf.org/en/Publications/WP/Issues/2020/06/26/A-Survey-of-Research-on-Retail-Central-Bank-Digital-Currency-49069}
-
-
-\item R.~Auer and R.~B\"{o}hme. 2020. The Technology of Retail Central Bank Digital Currency. \emph{BIS Quarterly Review}, March; see also BIS Working Paper No.~948. \url{https://www.bis.org/publ/qtrpdf/r_qt2003j.htm}
-
-
-\item L.~Ante. 2025. From Adoption to Continuance: Stablecoins in Cross-Border Remittances and the Role of Digital and Financial Literacy. \emph{Telematics and Informatics}, vol.~97, art.~102230. \url{https://doi.org/10.1016/j.tele.2024.102230}
-
-
-\item Y.~Li, Y.~Xiang, Q.~Wang, T.~H.~Yuen, A.~Deppeler, and J.~Yu. 2026. SoK: Stablecoins in Retail Payments. \emph{arXiv preprint arXiv:2601.00196}. \url{https://arxiv.org/abs/2601.00196}
-
-
-\item W.~Du, C.~Huang, and D.~Scharfstein. 2026. Competing Rails for Cross-Border Payments: Banks, Fintechs, and Stablecoins. Harvard Business School Working Paper, February. \url{https://www.hbs.edu/faculty/Pages/item.aspx?num=66992}
-
-
-\item M.~Fr\"{o}hlich, J.~A.~Vega Vermehren, F.~Alt, and A.~Schmidt. 2022. Implementation and Evaluation of a Point-Of-Sale Payment System Using Bitcoin Lightning. In \emph{Proc. NordiCHI}. \url{http://www.medien.ifi.lmu.de/pubdb/publications/pub/froehlich2022nordichi/froehlich2022nordichi.pdf}
-
-
-\item K.~Zhang, T.-M.~Choi, S.-H.~Chung, Y.~Dai, and X.~Wen. 2024. Blockchain Adoption in Retail Operations: Stablecoins and Traceability. \emph{European Journal of Operational Research}, 315, 1, pages 147--160. \url{https://doi.org/10.1016/j.ejor.2023.11.026}
-
-
-\item J.~Lin, M.~Liu, S.~Li, and X.~Wang. 2025. SecurePay: Enabling Secure and Fast Payment Processing for Platform Economy. In \emph{Proc. IEEE/ACM Int. Symp. Quality of Service (IWQoS)}; \emph{arXiv:2505.17466}. \url{https://arxiv.org/abs/2505.17466}
-
-
-\item Committee on Payments and Market Infrastructures. 2023. Considerations for the Use of Stablecoin Arrangements in Cross-Border Payments. Bank for International Settlements, July. \url{https://www.bis.org/cpmi/publ/d220.pdf}
-
-
-\item A.~Kosse, J.~Lisack, and N.~Boakye-Agyeman. 2023. The Impact of Stablecoins on the International Monetary and Financial System. \emph{BIS Papers}, no.~170, February. \url{https://www.bis.org/publ/bppdf/bispap170.pdf}
-
-
-\item E.~Cerutti, M.~Firat, and H.~P\'{e}rez-Saiz. 2025. Estimating the Impact of Digital Money on Cross-Border Flows: Scenario Analysis Covering the Intensive Margin. \emph{IMF Fintech Notes} 2025/002, February. \url{https://www.imf.org/-/media/files/publications/ftn063/2025/english/ftnea2025002.pdf}
-
-
-\item S.~Chaliasos, M.~Charalambous, L.~Zhou, R.~Galanopoulou, A.~Gervais, D.~Mitropoulos, and B.~Livshits. 2024. Smart Contract and DeFi Security: Insights from Tool Evaluations and Practitioner Surveys. In \emph{Proc. IEEE/ACM 46th Int. Conf. Software Engineering (ICSE)}, pages 160:1--160:13. \url{https://doi.org/10.1145/3597503.3623302}
-
-
-\item K.~Qin, L.~Zhou, B.~Livshits, and A.~Gervais. 2021. Attacking the DeFi Ecosystem with Flash Loans for Fun and Profit. In \emph{Financial Cryptography and Data Security (FC)}, pages 3--32. \url{https://doi.org/10.1007/978-3-662-63514-3_1}
-
-
-\item T.~Mackinga, T.~Nadahalli, and R.~Wattenhofer. 2024. SoK: Attacks on DAOs. \emph{arXiv preprint arXiv:2406.15071}. \url{https://arxiv.org/abs/2406.15071}
-
-
-\item E.~G.~Weyl, P.~Ohlhaver, and V.~Buterin. 2022. Decentralized Society: Finding Web3's Soul. \emph{SSRN Working Paper No.~4105763}. \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4105763}
-
-
-\item SmartContractSecurity. 2020. SWC Registry: Smart Contract Weakness Classification and Test Cases. \url{https://swcregistry.io/}
-
-
-\item G.~Caldarelli. 2025. Can Artificial Intelligence Solve the Blockchain Oracle Problem? Unpacking the Challenges and Possibilities. \emph{Frontiers in Blockchain}, vol.~8, art.~1682623. \url{https://doi.org/10.3389/fbloc.2025.1682623}
-
-
-\item M.~Gurupriya, R.~Gayathri, C.~Yadav, and U.~Umamaheshwar. 2025. Blockchain-Powered Platform for Microloans and Lending Solutions. In \emph{Proc. Int. Conf. on Intelligent Computing, Instrumentation and Control Technologies (ICICT)}, pages 1--6. \url{https://doi.org/10.1109/ICTEST64710.2025.11042350}
-
-
-\item V.~Buterin, Y.~Weiss, K.~Gazso, N.~Patel, D.~Tirosh, S.~Nacson, and T.~Hess. 2021. ERC-4337: Account Abstraction Using Alt Mempool. Ethereum Improvement Proposals. \url{https://eips.ethereum.org/EIPS/eip-4337}
-
-
-\item Behaviour-Centric Cybersecurity Center (BCCC), York University. 2025. BCCC-DeFiFraudTrans-2025: A Labelled Ethereum DeFi Fraud Transaction Dataset. Accessed June 29, 2026. \url{https://www.yorku.ca/research/bccc/ucs-technical/cybersecurity-datasets-cds/defi-fraud-transactions-bccc-defifraudtrans-2025/}
-
-\item P.~K.~Ozili. 2024. Central Bank Digital Currency Adoption Challenges. \emph{Journal of Central Banking Theory and Practice}, 13, 1, pages 5--24. \url{https://doi.org/10.2478/jcbtp-2024-0001}
-
-
-\item McKinsey \& Company. 2018. Global Payments 2018: A Dynamic Industry Continues to Defy Predictions. McKinsey Global Payments Map. \url{https://www.mckinsey.com/industries/financial-services/our-insights/global-payments-a-dynamic-industry-continues-to-defy-predictions}
-
-
-\item Y.~Wang, Q.~Zhang, K.~Li, Y.~Tang, J.~Chen, X.~Luo, and T.~Chen. 2021. iBatch: Saving Ethereum Fees via Secure and Cost-Effective Batching of Smart-Contract Invocations. In \emph{Proc. ACM Joint Eur. Software Engineering Conf. and Symp. Foundations of Software Engineering (ESEC/FSE)}, pages 777--789. \url{https://doi.org/10.1145/3468264.3468574}
-
-
-\item World Inequality Lab. 2026. Exorbitant Privilege. \emph{World Inequality Report 2026}. \url{https://wir2026.wid.world/insight/exorbitant-privilege/}
-
-
-\item G.~Wood. 2023. Ethereum: A Secure Decentralised Generalised Transaction Ledger (Yellow Paper). Ethereum Foundation. \url{https://ethereum.github.io/yellowpaper/paper.pdf}
-
-
-\item Y.~Wang, J.~Liu, and Z.~Chen. 2020. ContractWard: Automated Vulnerability Detection Models for Ethereum Smart Contracts. \emph{IEEE Trans. Network Science and Engineering}, vol.~8, no.~2, pages 1133--1144. \url{https://doi.org/10.1109/TNSE.2020.2968505}
-
-
-\item J.-W.~Liao, T.-T.~Tsai, C.-K.~He, and C.-W.~Tien. 2019. SoliAudit: Smart Contract Vulnerability Assessment Based on Machine Learning and Fuzz Testing. In \emph{Proc. 6th Int. Conf. Internet of Things: Systems, Management and Security (IOTSMS)}, pages 458--465. \url{https://doi.org/10.1109/iotsms48152.2019.8939256}
-
-
-\item Federal Reserve Bank of New York and Bank for International Settlements Innovation Hub. 2025. Project Pine: Central Bank Open Market Operations with Smart Contracts. BIS Innovation Hub / NY Fed Joint Report, May. \url{https://www.bis.org/publ/othp95.htm}
+\item Federal Reserve Bank of New York and Bank for International Settlements Innovation Hub. 2025. Project Pine: Central Bank Open Market Operations with Smart Contracts. BIS Innovation Hub / NY Fed Joint Report, May. [Online]. Available: \url{https://www.bis.org/publ/othp95.htm}. Accessed: Aug.~1, 2026.
 
 \end{enumerate}
 }

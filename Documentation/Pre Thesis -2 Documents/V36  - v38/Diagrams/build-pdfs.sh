@@ -22,7 +22,8 @@ is_hand_authored_svg() {
     1_InterBankLendingPool_updated|2_UpwardDepositFacility_updated|3_SyndicatedLoan_updated|\
     4_TranchedPool_updated|5_TreasurySwap_updated|6_NettingEngine_updated|\
     fig-frontend-gateway-flow|fig-tx-construction-confirmation|\
-    fig-server-state-synchronization|fig-onchain-state-transition)
+    fig-server-state-synchronization|fig-onchain-state-transition|\
+    Ch3_actor-permission-matrix_updated)
       return 0 ;;
     *)
       return 1 ;;
@@ -67,7 +68,7 @@ figure_canvas() {
       echo "1920 1200" ;;
     fig-tier-model|fig-five-stage-funnel|fig-agent-six-step-pipeline)
       echo "1400 1000" ;;
-    Ch3_actor-permission-matrix)
+    Ch3_actor-permission-matrix|Ch3_actor-permission-matrix_updated)
       echo "1100 1500" ;;
     Ch4_mvt-status)
       echo "1600 1800" ;;

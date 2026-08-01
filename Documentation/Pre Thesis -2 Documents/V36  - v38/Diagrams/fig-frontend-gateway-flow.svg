@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 590" font-family="Georgia, 'Times New Roman', 'Palatino Linotype', serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111111"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="590" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="500" y="38" text-anchor="middle" font-size="25" font-weight="bold" fill="#111111">Frontend Request Flow &amp; Gateway Sequencing</text>
+
+  <!-- Row 1: Box A -->
+  <rect x="40" y="65" width="290" height="150" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="185" y="95" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">1. User Action</text>
+  <text x="185" y="127" text-anchor="middle" font-size="16" fill="#111111">Click "Apply for Loan"</text>
+  <text x="185" y="151" text-anchor="middle" font-size="16" fill="#111111">React/TS validates input</text>
+  <text x="185" y="175" text-anchor="middle" font-size="16" fill="#111111">Wallet state via Wagmi/Viem</text>
+  <!-- Icon: Box A -->
+  <g transform="translate(66,88) scale(2) translate(-66,-88)">
+    <polygon points="62,81 62,95 74,88" fill="#154A73"/>
+  </g>
+
+  <!-- Row 1: Box B -->
+  <rect x="355" y="65" width="290" height="150" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="500" y="95" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">2. Auth &amp; Payload</text>
+  <text x="500" y="127" text-anchor="middle" font-size="16" fill="#111111">Attach JWT/SIWE auth header</text>
+  <text x="500" y="151" text-anchor="middle" font-size="16" fill="#111111">Serialize payload as JSON</text>
+  <text x="500" y="175" text-anchor="middle" font-size="16" fill="#111111">Dispatch REST call to gateway</text>
+  <!-- Icon: Box B -->
+  <g transform="translate(382,89) scale(2) translate(-382,-89)">
+    <g stroke="#154A73" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="377" y="88" width="10" height="7" rx="1.3"/>
+      <path d="M379,88 v-2.5 a3,3 0 0,1 6,0 v2.5"/>
+    </g>
+  </g>
+
+  <!-- Row 1: Box C -->
+  <rect x="670" y="65" width="290" height="150" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="815" y="95" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">3. Gateway Middleware</text>
+  <text x="815" y="127" text-anchor="middle" font-size="16" fill="#111111">Auth &#8594; Validate &#8594; Rate-limit</text>
+  <text x="815" y="151" text-anchor="middle" font-size="16" fill="#111111">(Express.js middleware chain)</text>
+  <text x="815" y="175" text-anchor="middle" font-size="16" fill="#111111">Choose REST vs SSE (&#167;4.2.17)</text>
+  <!-- Icon: Box C -->
+  <g transform="translate(703,88) scale(2) translate(-703,-88)">
+    <g stroke="#154A73" stroke-width="1.5" fill="none" stroke-linecap="round">
+      <line x1="691" y1="84" x2="703" y2="84"/>
+      <line x1="693" y1="88" x2="701" y2="88"/>
+      <line x1="695" y1="92" x2="699" y2="92"/>
+    </g>
+  </g>
+
+  <!-- Arrows row 1 -->
+  <line x1="330" y1="140" x2="352" y2="140" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="645" y1="140" x2="667" y2="140" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Elbow connector C -> Diamond -->
+  <polyline points="815,215 815,240 500,240 500,262" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Diamond: decision -->
+  <polygon points="500,265 630,335 500,405 370,335" fill="#B2D5F2" stroke="#111111" stroke-width="2"/>
+  <text x="500" y="329" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">4. On-Chain Call</text>
+  <text x="500" y="351" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">Required?</text>
+  <!-- Icon: Diamond -->
+  <g transform="translate(500,288) scale(2) translate(-500,-288)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round">
+      <circle cx="496" cy="288" r="4.2"/>
+      <circle cx="504" cy="288" r="4.2"/>
+    </g>
+  </g>
+
+  <!-- Arrow Diamond -> Box E (Yes) -->
+  <line x1="630" y1="335" x2="697" y2="335" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="663" y="320" text-anchor="middle" font-size="16" font-style="italic" fill="#3a4a58">Yes</text>
+
+  <!-- Box E: Yes branch -->
+  <rect x="700" y="265" width="260" height="140" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="830" y="295" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">5a. To Transaction Layer</text>
+  <text x="830" y="327" text-anchor="middle" font-size="16" fill="#111111">Build &amp; sign transaction</text>
+  <text x="830" y="351" text-anchor="middle" font-size="16" fill="#111111">&#8212; continues in Fig. 2</text>
+  <!-- Icon: Box E -->
+  <g transform="translate(727,288) scale(2) translate(-727,-288)">
+    <g stroke="#154A73" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="721" y1="288" x2="731" y2="288"/>
+      <polyline points="727,283 733,288 727,293"/>
+    </g>
+  </g>
+
+  <!-- Arrow Diamond -> Box F (No) -->
+  <line x1="500" y1="405" x2="500" y2="447" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="525" y="430" text-anchor="start" font-size="16" font-style="italic" fill="#3a4a58">No</text>
+
+  <!-- Box F: No branch -->
+  <rect x="250" y="450" width="500" height="110" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="500" y="478" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">5b. Direct Gateway Response</text>
+  <text x="500" y="508" text-anchor="middle" font-size="16" fill="#111111">Query/update PostgreSQL directly</text>
+  <text x="500" y="530" text-anchor="middle" font-size="16" fill="#111111">Return JSON response to client</text>
+  <!-- Icon: Box F -->
+  <g transform="translate(277,471) scale(2) translate(-277,-471)">
+    <g stroke="#154A73" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="277" cy="471" r="7"/>
+      <polyline points="273.5,471 276,474 281,467"/>
+    </g>
+  </g>
+
+</svg>

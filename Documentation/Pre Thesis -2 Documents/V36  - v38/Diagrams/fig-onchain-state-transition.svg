@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" font-family="Georgia, 'Times New Roman', 'Palatino Linotype', serif">
+  <defs>
+    <marker id="arrow4" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#111111"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="720" fill="#FFFFFF"/>
+
+  <!-- Title -->
+  <text x="500" y="38" text-anchor="middle" font-size="25" font-weight="bold" fill="#111111">On-Chain State Transition &amp; Block Confirmation</text>
+
+  <!-- Row 1: Box 1 -->
+  <rect x="40" y="65" width="290" height="150" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="185" y="95" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">1. Broadcast to Mempool</text>
+  <text x="185" y="127" text-anchor="middle" font-size="16" fill="#111111">Signed tx sent to RPC node</text>
+  <text x="185" y="151" text-anchor="middle" font-size="16" fill="#111111">Awaits validator pickup</text>
+  <text x="185" y="175" text-anchor="middle" font-size="16" fill="#111111">Nonce ordering enforced</text>
+  <!-- Icon: Box 1 (queue) -->
+  <g transform="translate(67,88) scale(2) translate(-67,-88)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="61" y1="85" x2="73" y2="85"/>
+      <line x1="61" y1="90" x2="73" y2="90"/>
+      <line x1="61" y1="95" x2="69" y2="95"/>
+    </g>
+  </g>
+
+  <!-- Row 1: Box 2 -->
+  <rect x="355" y="65" width="290" height="150" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="500" y="95" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">2. Block Inclusion</text>
+  <text x="500" y="127" text-anchor="middle" font-size="16" fill="#111111">Tx bundled into new block</text>
+  <text x="500" y="151" text-anchor="middle" font-size="16" fill="#111111">Block appended to chain</text>
+  <text x="500" y="175" text-anchor="middle" font-size="16" fill="#111111">Receipt returns block number</text>
+  <!-- Icon: Box 2 (chained blocks) -->
+  <g transform="translate(382,87.5) scale(2) translate(-382,-87.5)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="376" y="84" width="8" height="8" rx="1"/>
+      <rect x="388" y="84" width="8" height="8" rx="1"/>
+      <line x1="384" y1="88" x2="388" y2="88"/>
+    </g>
+  </g>
+
+  <!-- Row 1: Box 3 -->
+  <rect x="670" y="65" width="290" height="150" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="815" y="95" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">3. Contract State Delta</text>
+  <text x="815" y="127" text-anchor="middle" font-size="16" fill="#111111">LoanController / Reserve</text>
+  <text x="815" y="151" text-anchor="middle" font-size="16" fill="#111111">state updated on call type</text>
+  <text x="815" y="175" text-anchor="middle" font-size="16" fill="#111111">Emits LoanApproved event</text>
+  <!-- Icon: Box 3 (gear) -->
+  <g transform="translate(697,87.5) scale(1.8) translate(-697,-87.5)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="697" cy="87.5" r="4"/>
+      <line x1="697" y1="82" x2="697" y2="80.5"/>
+      <line x1="697" y1="93" x2="697" y2="94.5"/>
+      <line x1="692" y1="87.5" x2="690.5" y2="87.5"/>
+      <line x1="702" y1="87.5" x2="703.5" y2="87.5"/>
+      <line x1="693.3" y1="83.8" x2="692.3" y2="82.8"/>
+      <line x1="700.7" y1="91.2" x2="701.7" y2="92.2"/>
+      <line x1="693.3" y1="91.2" x2="692.3" y2="92.2"/>
+      <line x1="700.7" y1="83.8" x2="701.7" y2="82.8"/>
+    </g>
+  </g>
+
+  <!-- Arrows row 1 -->
+  <line x1="330" y1="140" x2="352" y2="140" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow4)"/>
+  <line x1="645" y1="140" x2="667" y2="140" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow4)"/>
+
+  <!-- Elbow connector Box3 -> Diamond -->
+  <polyline points="815,215 815,240 500,240 500,262" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow4)"/>
+
+  <!-- Diamond: decision -->
+  <polygon points="500,265 630,335 500,405 370,335" fill="#B2D5F2" stroke="#111111" stroke-width="2"/>
+  <text x="500" y="329" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">4. Confirmation</text>
+  <text x="500" y="351" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">Depth Met?</text>
+  <!-- Icon: Diamond (stacked blocks) -->
+  <g transform="translate(500,289) scale(2) translate(-500,-289)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="495" y="290" width="10" height="4"/>
+      <rect x="495" y="285" width="10" height="4"/>
+      <rect x="495" y="280" width="10" height="4"/>
+    </g>
+  </g>
+
+  <!-- Arrow Diamond -> Box 5a (Yes) -->
+  <line x1="630" y1="335" x2="697" y2="335" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow4)"/>
+  <text x="663" y="320" text-anchor="middle" font-size="16" font-style="italic" fill="#3a4a58">Yes</text>
+
+  <!-- Box 5a: Yes branch -->
+  <rect x="700" y="265" width="260" height="140" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="830" y="300" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">5a. Transaction</text>
+  <text x="830" y="322" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">Finalized</text>
+  <text x="830" y="354" text-anchor="middle" font-size="16" fill="#111111">Considered irreversible;</text>
+  <text x="830" y="376" text-anchor="middle" font-size="16" fill="#111111">pending action complete</text>
+  <!-- Icon: Box 5a (checkmark) -->
+  <g transform="translate(727,293) scale(2) translate(-727,-293)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M722,293 l4,4 l7,-9"/>
+    </g>
+  </g>
+
+  <!-- Arrow Diamond -> Box 5b (No) -->
+  <line x1="500" y1="405" x2="500" y2="447" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow4)"/>
+  <text x="525" y="430" text-anchor="start" font-size="16" font-style="italic" fill="#3a4a58">No</text>
+
+  <!-- Box 5b: No branch -->
+  <rect x="250" y="450" width="500" height="90" rx="8" fill="#EAF3FB" stroke="#111111" stroke-width="2"/>
+  <text x="500" y="476" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">5b. Continue Listening &amp; Watch for Reorg</text>
+  <text x="500" y="500" text-anchor="middle" font-size="16" fill="#111111">Frontend keeps polling; UI stays in pending state</text>
+  <!-- Icon: Box 5b (retry loop) -->
+  <g transform="translate(277,469) scale(1.7) translate(-277,-469)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M271,469 A6,6 0 1,1 283,469"/>
+      <polygon points="283,469 278,467.5 279.5,472.5" fill="#154A73" stroke="none"/>
+    </g>
+  </g>
+
+  <!-- Converging arrows into Box 6 -->
+  <polyline points="830,405 830,545 760,545 760,578" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow4)"/>
+  <polyline points="500,540 500,562 350,562 350,578" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#arrow4)"/>
+
+  <!-- Box 6: merged final step -->
+  <rect x="150" y="580" width="700" height="120" rx="8" fill="#B2D5F2" stroke="#111111" stroke-width="2"/>
+  <text x="500" y="610" text-anchor="middle" font-size="17" font-weight="bold" fill="#111111">6. Finalized State Ready for Sync</text>
+  <text x="500" y="640" text-anchor="middle" font-size="16" fill="#111111">Confirmed event now available on-chain</text>
+  <text x="500" y="663" text-anchor="middle" font-size="16" fill="#111111">Feeds PostgreSQL event listener (&#167;4.2.18)</text>
+  <text x="500" y="686" text-anchor="middle" font-size="16" fill="#111111">Hands off into Server-Side State Sync (Fig. 3)</text>
+  <!-- Icon: Box 6 (finality flag) -->
+  <g transform="translate(177,603) scale(2) translate(-177,-603)">
+    <g stroke="#154A73" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="172" y1="595" x2="172" y2="609"/>
+      <path d="M172,596 h9 l-2.5,3 l2.5,3 h-9 z"/>
+    </g>
+  </g>
+
+</svg>

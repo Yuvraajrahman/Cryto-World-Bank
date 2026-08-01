@@ -28,7 +28,7 @@
   <text x="590" y="82" font-size="13.5" font-weight="bold">Client Tier</text>
 
   <!-- Off-Chain Backend -->
-  <rect x="580" y="215" width="790" height="260" fill="none" stroke="#2b2b2b" stroke-width="1.4"/>
+  <rect x="580" y="215" width="810" height="260" fill="none" stroke="#2b2b2b" stroke-width="1.4"/>
   <rect x="580" y="215" width="178" height="24" fill="white" stroke="#2b2b2b" stroke-width="1.4"/>
   <text x="590" y="232" font-size="13.5" font-weight="bold">Off-Chain Backend</text>
 
@@ -92,7 +92,7 @@
 
   <!-- Auth / RBAC -->
   <rect x="1210" y="360" width="140" height="70" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.4"/>
-  <use href="#cicon" x="1338" y="370"/>
+  <use href="#cicon" x="1318" y="362"/>
   <text x="1280" y="391" text-anchor="middle" font-size="15" font-weight="bold">Auth / RBAC</text>
   <text x="1280" y="408" text-anchor="middle" font-size="12" font-style="italic">«component»</text>
 
@@ -111,8 +111,8 @@
   <text x="820" y="670" text-anchor="middle" font-size="12">Tier IV — Storage / State</text>
 
   <!-- ============ ARROWS ============ -->
-  <!-- React SPA -> Express -->
-  <line x1="710" y1="175" x2="710" y2="246" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#ar)"/>
+  <!-- React SPA -> Express (jogs right to avoid the Off-Chain Backend tab label) -->
+  <polyline points="710,175 710,203 770,203 770,242 710,242 710,246" fill="none" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#ar)"/>
 
   <!-- Express -> ML Scoring (main) + bus junction -->
   <line x1="710" y1="320" x2="710" y2="356" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#ar)"/>
@@ -139,7 +139,7 @@
   <polyline points="810,285 830,285 830,555" fill="none" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#ar)"/>
 
   <!-- Wallet -> Smart Contracts (signed tx, direct) -->
-  <polyline points="1230,175 1230,192 1392,192 1392,555 955,555" fill="none" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#ar)"/>
+  <polyline points="1230,175 1230,192 1405,192 1405,555 955,555" fill="none" stroke="#1a1a1a" stroke-width="1.6" marker-end="url(#ar)"/>
 
   <!-- Smart Contracts -> Event Listener (async event notification) -->
   <polyline points="880,555 880,542 1362,542 1362,285 1314,285" fill="none" stroke="#444" stroke-width="1.6" stroke-dasharray="7,4" marker-end="url(#ar2)"/>

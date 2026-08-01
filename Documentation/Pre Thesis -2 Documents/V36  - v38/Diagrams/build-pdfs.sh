@@ -14,7 +14,15 @@ is_hand_authored_svg() {
     fig-blockchain-stack|fig-component-architecture|fig-erd-core|fig-erd-extended|ERD_diagram_relational|\
     Ch3_use-case-nine-actor-taxonomy|fig-activity-lending|fig-activity-onboarding-id|fig-dfd-level0-lending|\
     fig-uml-class|fig-governance-dual-path|fig-sar-aml-workflow|fig-defense-in-depth|fig-local-llm-compact|\
-    1_InterBankLendingPool|2_UpwardDepositFacility|3_SyndicatedLoan|4_TranchedPool|5_TreasurySwap|6_NettingEngine)
+    1_InterBankLendingPool|2_UpwardDepositFacility|3_SyndicatedLoan|4_TranchedPool|5_TreasurySwap|6_NettingEngine|\
+    fig-blockchain-stack_updated|fig-component-architecture_updated|fig-erd-core_updated|\
+    Ch3_use-case-nine-actor-taxonomy_updated|fig-activity-lending_updated|fig-activity-onboarding-id_updated|\
+    fig-dfd-level0-lending_updated|fig-uml-class_updated|fig-governance-dual-path_updated|\
+    fig-sar-aml-workflow_updated|fig-defense-in-depth_updated|fig-local-llm-compact_updated|\
+    1_InterBankLendingPool_updated|2_UpwardDepositFacility_updated|3_SyndicatedLoan_updated|\
+    4_TranchedPool_updated|5_TreasurySwap_updated|6_NettingEngine_updated|\
+    fig-frontend-gateway-flow|fig-tx-construction-confirmation|\
+    fig-server-state-synchronization|fig-onchain-state-transition)
       return 0 ;;
     *)
       return 1 ;;
@@ -25,13 +33,13 @@ is_hand_authored_svg() {
 figure_canvas() {
   local base="$1"
   case "$base" in
-    fig-erd-core|fig-erd-extended|fig-eer-model|fig-db-full-schema)
+    fig-erd-core|fig-erd-core_updated|fig-erd-extended|fig-eer-model|fig-db-full-schema)
       echo "2000 1500" ;;
     ERD_diagram_relational)
       echo "16800 9600" ;;
-    Ch3_use-case-nine-actor-taxonomy|fig-activity-onboarding-id)
+    Ch3_use-case-nine-actor-taxonomy|Ch3_use-case-nine-actor-taxonomy_updated|fig-activity-onboarding-id|fig-activity-onboarding-id_updated)
       echo "1900 1400" ;;
-    fig-activity-lending)
+    fig-activity-lending|fig-activity-lending_updated)
       echo "4110 3030" ;;
     Ch3_data-flow-diagrams)
       echo "2280 1680" ;;
@@ -73,17 +81,17 @@ figure_canvas() {
       echo "1800 1300" ;;
     fig-architecture-data-flow)
       echo "1900 1400" ;;
-    fig-dfd-level0-lending)
+    fig-dfd-level0-lending|fig-dfd-level0-lending_updated)
       echo "1800 1440" ;;
     fig-dfd-level1-lending)
       echo "3840 2160" ;;
     d1_system_component_architecture)
       echo "2800 4200" ;;
-    fig-component-architecture)
+    fig-component-architecture|fig-component-architecture_updated)
       echo "2200 1500" ;;
-    fig-uml-class)
+    fig-uml-class|fig-uml-class_updated)
       echo "2400 1700" ;;
-    fig-blockchain-stack)
+    fig-blockchain-stack|fig-blockchain-stack_updated)
       echo "2400 1100" ;;
     fig-data-partitioning)
       echo "1200 420" ;;
@@ -95,11 +103,11 @@ figure_canvas() {
       echo "1500 1300" ;;
     fig-group-lending-lifecycle)
       echo "1900 1200" ;;
-    fig-governance-dual-path)
+    fig-governance-dual-path|fig-governance-dual-path_updated)
       echo "2000 1200" ;;
-    fig-sar-aml-workflow)
+    fig-sar-aml-workflow|fig-sar-aml-workflow_updated)
       echo "1900 1300" ;;
-    fig-defense-in-depth)
+    fig-defense-in-depth|fig-defense-in-depth_updated)
       echo "1700 1300" ;;
     fig-security-controls)
       echo "1800 1300" ;;
@@ -117,18 +125,20 @@ figure_canvas() {
       echo "1800 1050" ;;
     fig-local-llm)
       echo "1800 1400" ;;
-    fig-local-llm-compact)
+    fig-local-llm-compact|fig-local-llm-compact_updated)
       echo "1600 1100" ;;
     fig-ml-metrics-bars|fig-ml-confusion-matrix|fig-ml-shap-importance|Ch4_rq2-latency-plan|fig-revenue-by-tier|fig-apr-spread)
       echo "1500 950" ;;
-    1_InterBankLendingPool|5_TreasurySwap)
+    1_InterBankLendingPool|1_InterBankLendingPool_updated|5_TreasurySwap|5_TreasurySwap_updated)
       echo "2000 1120" ;;
-    2_UpwardDepositFacility)
+    2_UpwardDepositFacility|2_UpwardDepositFacility_updated)
       echo "2000 1170" ;;
-    3_SyndicatedLoan)
+    3_SyndicatedLoan|3_SyndicatedLoan_updated)
       echo "2000 1270" ;;
-    4_TranchedPool|6_NettingEngine)
+    4_TranchedPool|4_TranchedPool_updated|6_NettingEngine|6_NettingEngine_updated)
       echo "2000 1220" ;;
+    fig-frontend-gateway-flow|fig-tx-construction-confirmation|fig-server-state-synchronization|fig-onchain-state-transition)
+      echo "2000 1200" ;;
     *)
       echo "1600 1150" ;;
   esac

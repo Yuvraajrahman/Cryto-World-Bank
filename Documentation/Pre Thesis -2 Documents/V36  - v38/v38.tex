@@ -588,6 +588,9 @@ We would like to express our sincere gratitude to our panel members for their gu
     \item[Upward deposit rate cap:] \(r_{\text{up}} < r_{\text{down}} - \delta\)
     \item[FX conversion:] \(\text{Amount}_B = \text{Amount}_A \times \frac{P_A}{P_B}\)
     \item[Treasury swap:] \(\text{Amount}_{\text{to}} = \text{Amount}_{\text{from}} \times \frac{P_{\text{from}}}{P_{\text{to}}} \times (1 - \text{spread})\)
+    \item[Syndicated share:] \(\text{Share}_i = \frac{C_i}{\sum_{j} C_j}, \quad \text{Payout}_i = \text{Total} \times \text{Share}_i\)
+    \item[Junior tranche share:] \(0.10 \leq \frac{J}{J+S} \leq 0.30\)
+    \item[Net settlement:] \(\text{Net}_i = \sum_{j} O_{ij} - \sum_{j} O_{ji}\)
     \item[Oracle commit--reveal:] \(h = \text{keccak256}(s \,\|\, \text{nonce})\)
     \item[Group loan share:] \(\text{Share}_i = \frac{\text{LoanTotal}}{N_{\text{members}}}\)
     \item[On-chain credit score:] \(CS = \sum_i w_i \cdot \text{feature}_i\)
@@ -1390,7 +1393,7 @@ Implementing the Foundry fuzz suite, fully functional 300-client simulation, tes
 \midrule
 DT-IV.01 & Must & 300-client Foundry simulation on Anvil/Hardhat (deterministic seed); gas-cost table and reserve-dynamics manifest to \texttt{deployments/testnet/}; optional Sepolia replay for explorer evidence & 7 \\
 DT-IV.02 & Should & LLM evaluation protocol: task accuracy, action accuracy, human-gate bypass (Section~\ref{sec:optional-agent}; MVT item~12) & 5 \\
-DT-IV.03 & Future Work & Certora reserve proofs: CVL specs for Invariant~1 (reserve never under-collateralised) and Invariant~2 (no over-allocation downstream); specs in Appendix~B & 5 \\
+DT-IV.03 & Future Work & Certora reserve proofs: CVL specs for Invariant~1 (reserve never under-collateralised) and Invariant~2 (no over-allocation downstream); specs in Appendix~\ref{app:combined} & 5 \\
 DT-IV.04 & Should & Foundry invariant + fuzz suite: solvency, role segregation, capital-flow direction; 10{,}000 fuzz runs per CI build & 4 \\
 DT-IV.05 & Should & AML pre-check (Hook~3): IF anomaly gate before disbursement writes; compliance queue routing; requires Phase~III IF pipeline & 3 \\
 DT-IV.06 & Could & Groth16 zkKYC (Circom~2.0): ID possession proof without PII; circuit I/O specification & 5 \\
@@ -2263,7 +2266,9 @@ Besides lending down to clients, banks in the hierarchy also need to move capita
 
 For each tier there is a separate pool for lending facilities among banks of the same tier. Banks with an active role can contribute to or receive lending facilities from same-tier banks instead of from the parent tier. One bank can lend to another bank based on lending limits and controlled interest rates, for a flexible duration.
 
-[FORMULA PLACEHOLDER]
+\[
+r_{\text{IB}}(U) \leq r_{\text{downward}}(U) - \delta
+\]
 
 \begin{figure}[H]
 \centering
@@ -2277,7 +2282,9 @@ For each tier there is a separate pool for lending facilities among banks of the
 
 When a bank has more reserves than the minimum requirement and is able to fund extra to the parent banks, a lower-tier bank is able to fund upper-tier banks through the \texttt{UpwardDepositFacility} and earn interest on the funded amount.
 
-[FORMULA PLACEHOLDER]
+\[
+r_{\text{up}} < r_{\text{down}} - \delta
+\]
 
 \begin{figure}[H]
 \centering
@@ -2291,7 +2298,9 @@ When a bank has more reserves than the minimum requirement and is able to fund e
 
 Some loans can be funded by multiple banks together, and multiple banks can request a single loan together from a parent bank. Primarily, one bank is registered for the loan and other banks are considered co-lender banks. The interest rate and other contributions are distributed based on the invested or contributed amount by each bank.
 
-[FORMULA PLACEHOLDER]
+\[
+\text{Share}_i = \frac{C_i}{\sum_{j} C_j}, \qquad \text{Payout}_i = \text{Total} \times \text{Share}_i
+\]
 
 \begin{figure}[H]
 \centering
@@ -2305,7 +2314,9 @@ Some loans can be funded by multiple banks together, and multiple banks can requ
 
 Banks can choose the risk level of their invested amount by signing up as a senior or junior tranche. The senior holder gets low risk and low return, and the junior holder gets high risk and high return. The senior holder receives the first payment for interest, so their advantage shows in low risk of returns, but junior holders get high repayments, with the risk of high loss too. To maintain this classification, the junior share is limited to 10\% to 30\% of the pool.
 
-[FORMULA PLACEHOLDER]
+\[
+0.10 \leq \frac{J}{J+S} \leq 0.30
+\]
 
 \begin{figure}[H]
 \centering
@@ -2319,7 +2330,9 @@ Banks can choose the risk level of their invested amount by signing up as a seni
 
 A bank can swap assets with other banks based on asset value from the Chainlink feeds. Banks are only allowed to swap reserves that meet the minimum reserve ratio of 20\%. A swap of asset value over 1M USDC requires 2 signatures from a multisig before it is submitted for processing.
 
-[FORMULA PLACEHOLDER]
+\[
+\text{Amount}_{\text{to}} = \text{Amount}_{\text{from}} \times \frac{P_{\text{from}}}{P_{\text{to}}} \times (1 - \text{spread})
+\]
 
 \begin{figure}[H]
 \centering
@@ -2333,7 +2346,9 @@ A bank can swap assets with other banks based on asset value from the Chainlink 
 
 The \texttt{NettingEngine} works as a mechanism for partial settlement of \texttt{InterBankLendingPool} loans and \texttt{TreasurySwap} obligations. It works by batching large payments into smaller net payments.
 
-[FORMULA PLACEHOLDER]
+\[
+\text{Net}_i = \sum_{j} O_{ij} - \sum_{j} O_{ji}
+\]
 
 Details are shown in the figure below.
 
@@ -2818,59 +2833,60 @@ The purpose of the AI/ML layer is to provide a risk score per loan approval that
 \end{figure}
 
 
-\subsection{AI/ML Model Internals, Training Mechanics, and Security}
-\label{sec:aiml-internals}
-
-The subsections below go beneath the risk-scoring pipeline of Section~\ref{sec:aiml-support} and the agentic pipeline of Section~\ref{sec:optional-agent} to document how the underlying models actually compute, learn, and are protected---covering both the off-chain fraud-detection models (Random Forest / Isolation Forest, Section~\ref{sec:ml-workload}) and the Qwen-based conversational agent.
-
-\subsubsection{Neuron-Level Computation and Forward Pass}
-\label{sec:neuron-forward-pass}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: walk through a single forward pass at the computation-graph level---for the tree-based fraud models, show a decision path through one tree; for the Qwen transformer, show one layer's matrix multiplications, activation function, and residual connection, with a figure of the computation graph.]}
-\vspace{1.5cm}
-
-\subsubsection{Training Dynamics: Loss, Backpropagation, and Optimization}
-\label{sec:training-dynamics}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe the loss function(s) used, how gradients are computed and propagated (backpropagation for the transformer; impurity/information-gain splitting for the trees), the optimizer and learning-rate schedule, and include a training/validation loss curve figure.]}
-\vspace{1.5cm}
-
-\subsubsection{Transformer Architecture and Self-Attention Mechanism}
-\label{sec:transformer-architecture}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe the Qwen model's transformer block---self-attention (Q/K/V projections, attention scores), feed-forward sublayer, positional encoding, and how many layers/heads are used at the chosen model size; include an attention-mechanism diagram.]}
-\vspace{1.5cm}
-
-\subsubsection{Tokenization and Autoregressive Token Generation}
-\label{sec:tokenization-generation}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe the tokenizer (vocabulary size, BPE/byte-level scheme), how the injected on-chain context JSON of Section~\ref{sec:optional-agent} is tokenized alongside the conversation, and how tokens are sampled/generated at inference time (temperature, top-p, stopping conditions).]}
-\vspace{1.5cm}
-
-\subsubsection{Multimodal Recognition: Text and Image Understanding}
-\label{sec:multimodal-recognition}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe how the agent processes non-text input---the image/document understanding pathway used for the document-scanning workflow of Section~\ref{sec:document-scanning-workflow}, including whether this is handled natively by the model's vision encoder or by a separate OCR step, and how recognized content is merged back into the text context.]}
-\vspace{1.5cm}
-
-\subsubsection{Model Performance Characterization}
-\label{sec:model-performance-characterization}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: report measured latency, tokens/second, and memory footprint on the target inference hardware for both the fraud-detection models and the conversational agent, and compare against the NFR targets already stated elsewhere in the report.]}
-\vspace{1.5cm}
-
-\subsubsection{AI/ML Security Layers}
-\label{sec:aiml-security-layers}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe protections specific to the ML/agent layer---adversarial-input and prompt-injection defenses, output/tool-call sandboxing, data isolation between client sessions, and how this subsection maps onto the Five-Layer Defense-in-Depth architecture of Section~\ref{sec:defense-in-depth}.]}
-\vspace{1.5cm}
+% Removed (commented out) — former §4.2.16 AI/ML Model Internals, Training Mechanics, and Security
+% \subsection{AI/ML Model Internals, Training Mechanics, and Security}
+% \label{sec:aiml-internals}
+%
+% The subsections below go beneath the risk-scoring pipeline of Section~\ref{sec:aiml-support} and the agentic pipeline of Section~\ref{sec:optional-agent} to document how the underlying models actually compute, learn, and are protected---covering both the off-chain fraud-detection models (Random Forest / Isolation Forest, Section~\ref{sec:ml-workload}) and the Qwen-based conversational agent.
+%
+% \subsubsection{Neuron-Level Computation and Forward Pass}
+% \label{sec:neuron-forward-pass}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: walk through a single forward pass at the computation-graph level---for the tree-based fraud models, show a decision path through one tree; for the Qwen transformer, show one layer's matrix multiplications, activation function, and residual connection, with a figure of the computation graph.]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Training Dynamics: Loss, Backpropagation, and Optimization}
+% \label{sec:training-dynamics}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe the loss function(s) used, how gradients are computed and propagated (backpropagation for the transformer; impurity/information-gain splitting for the trees), the optimizer and learning-rate schedule, and include a training/validation loss curve figure.]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Transformer Architecture and Self-Attention Mechanism}
+% \label{sec:transformer-architecture}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe the Qwen model's transformer block---self-attention (Q/K/V projections, attention scores), feed-forward sublayer, positional encoding, and how many layers/heads are used at the chosen model size; include an attention-mechanism diagram.]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Tokenization and Autoregressive Token Generation}
+% \label{sec:tokenization-generation}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe the tokenizer (vocabulary size, BPE/byte-level scheme), how the injected on-chain context JSON of Section~\ref{sec:optional-agent} is tokenized alongside the conversation, and how tokens are sampled/generated at inference time (temperature, top-p, stopping conditions).]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Multimodal Recognition: Text and Image Understanding}
+% \label{sec:multimodal-recognition}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe how the agent processes non-text input---the image/document understanding pathway used for the document-scanning workflow of Section~\ref{sec:document-scanning-workflow}, including whether this is handled natively by the model's vision encoder or by a separate OCR step, and how recognized content is merged back into the text context.]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Model Performance Characterization}
+% \label{sec:model-performance-characterization}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: report measured latency, tokens/second, and memory footprint on the target inference hardware for both the fraud-detection models and the conversational agent, and compare against the NFR targets already stated elsewhere in the report.]}
+% \vspace{1.5cm}
+%
+% \subsubsection{AI/ML Security Layers}
+% \label{sec:aiml-security-layers}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe protections specific to the ML/agent layer---adversarial-input and prompt-injection defenses, output/tool-call sandboxing, data isolation between client sessions, and how this subsection maps onto the Five-Layer Defense-in-Depth architecture of Section~\ref{sec:defense-in-depth}.]}
+% \vspace{1.5cm}
 
 
 \subsection{Conversational Agent (Phase III--IV)}
@@ -2984,33 +3000,34 @@ Event Indexing & PostgreSQL event listener & Stability-first indexing baseline (
 \end{tabular}
 \end{table}
 
-\subsubsection{Voice Interaction Layer: Speech-to-Text Pipeline}
-\label{sec:voice-interaction-layer}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe the voice-chat option---since the chosen agent model is text-only, explain the speech-to-text front end (model/library used, streaming vs.\ push-to-talk capture, language handling), how transcribed text is handed to the six-step pipeline of Section~\ref{sec:optional-agent}, and whether a text-to-speech reply path is included.]}
-\vspace{1.5cm}
-
-\subsubsection{Document Scanning and Approval-Summary Workflow}
-\label{sec:document-scanning-workflow}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe the document-scanning option---capture method (camera/upload), how the scanned document is read (native vision recognition vs.\ OCR service), how the agent turns the extracted content into a plain-language request summary, and the human-confirmation gate before the summary is forwarded to bank authorities (link to Section~\ref{sec:optional-agent} step~5).]}
-\vspace{1.5cm}
-
-\subsubsection{Agent Fine-Tuning and Training Pipeline}
-\label{sec:agent-finetuning-pipeline}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe how the agent model is adapted for this project---dataset used for tool-call/JSON fine-tuning examples, fine-tuning method (e.g.\ LoRA/QLoRA), training hardware and software stack, and evaluation of the fine-tuned agent against the base model on tool-call accuracy.]}
-\vspace{1.5cm}
-
-\subsubsection{Agent-Specific Security Layers and Guardrails}
-\label{sec:agent-security-guardrails}
-
-\vspace{1.5cm}
-\noindent\textit{[Comments for this section: describe guardrails specific to the agent---the prompt-injection scanner mentioned in Table~\ref{tab:tech-stack}, the confirmation-gate audit hook, rate limiting/lockout behaviour on repeated vague responses (Section~\ref{sec:optional-agent} step~5), and how this ties into Section~\ref{sec:aiml-security-layers}.]}
-\vspace{1.5cm}
+% Removed (commented out) — Voice / Document / Fine-tuning / Agent security placeholders under Conversational Agent
+% \subsubsection{Voice Interaction Layer: Speech-to-Text Pipeline}
+% \label{sec:voice-interaction-layer}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe the voice-chat option---since the chosen agent model is text-only, explain the speech-to-text front end (model/library used, streaming vs.\ push-to-talk capture, language handling), how transcribed text is handed to the six-step pipeline of Section~\ref{sec:optional-agent}, and whether a text-to-speech reply path is included.]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Document Scanning and Approval-Summary Workflow}
+% \label{sec:document-scanning-workflow}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe the document-scanning option---capture method (camera/upload), how the scanned document is read (native vision recognition vs.\ OCR service), how the agent turns the extracted content into a plain-language request summary, and the human-confirmation gate before the summary is forwarded to bank authorities (link to Section~\ref{sec:optional-agent} step~5).]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Agent Fine-Tuning and Training Pipeline}
+% \label{sec:agent-finetuning-pipeline}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe how the agent model is adapted for this project---dataset used for tool-call/JSON fine-tuning examples, fine-tuning method (e.g.\ LoRA/QLoRA), training hardware and software stack, and evaluation of the fine-tuned agent against the base model on tool-call accuracy.]}
+% \vspace{1.5cm}
+%
+% \subsubsection{Agent-Specific Security Layers and Guardrails}
+% \label{sec:agent-security-guardrails}
+%
+% \vspace{1.5cm}
+% \noindent\textit{[Comments for this section: describe guardrails specific to the agent---the prompt-injection scanner mentioned in Table~\ref{tab:tech-stack}, the confirmation-gate audit hook, rate limiting/lockout behaviour on repeated vague responses (Section~\ref{sec:optional-agent} step~5), and how this ties into Section~\ref{sec:aiml-security-layers}.]}
+% \vspace{1.5cm}
 
 
 \subsection{Real-Time Dashboard Pipeline and Runtime Monitoring}
@@ -3400,6 +3417,7 @@ This field requires much research, as financial flow is heavily manipulated and 
 
 \appendix
 
+% Former Appendices A/B/C combined into single \chapter{Appendix} below.
 % REMOVED per request (Appendix A: Database Schema Reference no longer needed):
 %
 % \chapter{Database Schema Reference}
@@ -3658,10 +3676,13 @@ This field requires much research, as financial flow is heavily manipulated and 
 % WHERE borrower_id = $1;
 % \end{verbatim}
 %
-\chapter{Agent Harness Reference}
+\chapter{Appendix}
+\label{app:combined}
+
+\section{Agent Harness Reference}
 \label{app:agent-harness}
 
-\section{Per-User Context and Prompt Assembly}
+\subsection{Per-User Context and Prompt Assembly}
 
 The Express.js context injection layer:
 
@@ -3687,7 +3708,7 @@ The Express.js context injection layer:
 }
 \end{verbatim}
 
-\section{Session Lineage, Compression, and Toolset Scoping}
+\subsection{Session Lineage, Compression, and Toolset Scoping}
 
 \begin{table}[H]
 \centering
@@ -3721,7 +3742,7 @@ The Express.js context injection layer:
 % \item \textbf{Cross-session context retrieval} via \texttt{get\_session\_history}.
 % \end{itemize}
 
-\chapter{Smart Contract Capabilities}
+\section{Smart Contract Capabilities}
 \label{app:smart-contract-capabilities}
 
 \begin{table}[H]
@@ -3766,10 +3787,8 @@ NettingEngine & Multi-entity & --- & Future Work & Multilateral settlement netti
 \end{table}
 
 
-%% APPENDIX D: SMART CONTRACT INTERFACE
-\chapter*{Appendix C: WorldBankReserve Contract Interface}
-\phantomsection
-\addcontentsline{toc}{chapter}{Appendix C: WorldBankReserve Contract Interface}
+\section{WorldBankReserve Contract Interface}
+\label{app:worldbank-reserve-interface}
 
 % REMOVED per request (intro paragraph):
 % The following Solidity interface documents the public API of the \texttt{WorldBankReserve} contract---the formally specified Tier~1 contract (Phase~I deployment target). Three design annotations follow the listing:

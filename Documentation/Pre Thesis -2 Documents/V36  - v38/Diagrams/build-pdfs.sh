@@ -23,7 +23,7 @@ is_hand_authored_svg() {
     4_TranchedPool_updated|5_TreasurySwap_updated|6_NettingEngine_updated|\
     fig-frontend-gateway-flow|fig-tx-construction-confirmation|\
     fig-server-state-synchronization|fig-onchain-state-transition|\
-    Ch3_actor-permission-matrix_updated)
+    Ch3_actor-permission-matrix_updated|fig-data-partitioning-and-lifecycle)
       return 0 ;;
     *)
       return 1 ;;
@@ -96,6 +96,8 @@ figure_canvas() {
       echo "2400 1100" ;;
     fig-data-partitioning)
       echo "1200 420" ;;
+    fig-data-partitioning-and-lifecycle)
+      echo "2000 1100" ;;
     fig-financial-data-lifecycle)
       echo "1300 520" ;;
     fig-activity-aux)

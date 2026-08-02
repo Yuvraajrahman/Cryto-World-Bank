@@ -22,7 +22,7 @@ const COLUMNS = [
   {
     title: "Resources",
     links: [
-      { label: "Connect wallet", href: "/login" },
+      { label: "Open an account", href: "/login" },
       { label: "Contract addresses", href: "/reserve#contracts" },
       { label: "Audit status", href: "/reserve#proof" },
       { label: "AI assistant", href: "/app/assistant" },
@@ -48,11 +48,11 @@ export default function Footer() {
           <div className="footer-brand">
             <Link className="logo" to="/">
               <LogoMark />
-              WorldBankReserve
+              Crypto World Bank
             </Link>
             <p>
-              A four-tier, collateral- and credit-based lending reserve, custodied on-chain and open
-              to public audit.
+              An institutional digital reserve for lending, deposits, and credit — organised across
+              four tiers, with solvency attested on-chain.
             </p>
           </div>
           {COLUMNS.map((col) => (
@@ -69,7 +69,7 @@ export default function Footer() {
           ))}
         </div>
         <div className="footer-bottom">
-          <span>© 2026 WorldBankReserve — Deployed on Sepolia Testnet</span>
+          <span>© 2026 Crypto World Bank — Deployed on Sepolia Testnet</span>
           <span>Not a licensed depository institution</span>
         </div>
       </div>

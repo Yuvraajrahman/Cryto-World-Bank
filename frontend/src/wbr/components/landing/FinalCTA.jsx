@@ -9,18 +9,19 @@ export default function FinalCTA() {
   return (
     <section className="final-cta">
       <Glass ref={ref} className={`final-cta-card ${className}`} style={style}>
-        <p className="eyebrow center">Get Started</p>
-        <h2>Connect a wallet. See your tier in seconds.</h2>
+        <p className="eyebrow center">Client onboarding</p>
+        <h2>Establish your account.</h2>
         <p>
-          No paperwork to start — connect, complete KYC when you&apos;re ready to borrow, and the
-          rest of the reserve opens up.
+          Authenticate with your wallet to enter your assigned tier. Complete identity verification
+          when you require credit facilities; deposit services and reserve inspection remain
+          available earlier.
         </p>
         <div className="hero-cta">
           <Button as={Link} to="/login" variant="primary">
-            Connect Wallet
+            Open an account
           </Button>
           <Button as={Link} to="/reserve" variant="ghost" showArrow={false}>
-            View reserve transparency
+            Inspect reserves
           </Button>
         </div>
       </Glass>

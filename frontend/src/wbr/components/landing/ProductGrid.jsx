@@ -7,12 +7,36 @@ import { useGlassTilt } from '../../hooks/useGlassTilt';
 import { useCarouselIndex } from '../../hooks/useCarouselIndex';
 
 const PRODUCTS = [
-  { icon: 'loan', title: 'Retail Loans', desc: 'Collateral-based or credit-based applications, scored and disbursed on-chain.' },
-  { icon: 'group', title: 'Group Lending', desc: 'Pooled borrowing with multisig consent and shared credit exposure.' },
-  { icon: 'savings', title: 'Savings & Deposits', desc: 'Savings vaults, fixed deposits, and current accounts that earn in reserve.' },
-  { icon: 'passport', title: 'Credit Passport', desc: 'A soulbound credit identity that travels with you across every tier.' },
-  { icon: 'agent', title: 'AI Banking Agent', desc: 'A conversational agent for balances, applications, and everyday banking.' },
-  { icon: 'eye', title: 'Reserve Transparency', desc: 'A public dashboard of reserve health, verifiable against the chain.' },
+  {
+    icon: "loan",
+    title: "Credit facilities",
+    desc: "Collateral-backed or credit-based lending. Approvals and disbursement settle on-chain.",
+  },
+  {
+    icon: "group",
+    title: "Group credit",
+    desc: "Shared-liability facilities with explicit member consent before any funds are released.",
+  },
+  {
+    icon: "savings",
+    title: "Deposits & savings",
+    desc: "Flexible vaults, term deposits, and a transactional balance for routine transfers.",
+  },
+  {
+    icon: "passport",
+    title: "Credit Passport",
+    desc: "A portable on-chain credit record recognised across banks and tiers in the hierarchy.",
+  },
+  {
+    icon: "agent",
+    title: "Client advisory",
+    desc: "Guided assistance on balances, limits, and applications — with human approval for actions.",
+  },
+  {
+    icon: "eye",
+    title: "Public reserve board",
+    desc: "Aggregate reserves, ratios, and attestation available for inspection without login.",
+  },
 ];
 
 function ProductCard({ icon, title, desc, delay }) {
@@ -43,8 +67,14 @@ export default function ProductGrid() {
   return (
     <section className="section" id="product">
       <div ref={head.ref} className={`section-head ${head.className}`} style={head.style}>
-        <p className="eyebrow center">On the Platform</p>
-        <h2 className="section-title center">Everything a tier needs, nothing it doesn&apos;t.</h2>
+        <p className="eyebrow center">Client services</p>
+        <h2 className="section-title center">
+          Banking products for <em>digital finance.</em>
+        </h2>
+        <p className="section-lede center">
+          Credit, deposits, identity, and reserve transparency — the operating surface of a modern
+          reserve institution, underpinned by an open ledger.
+        </p>
       </div>
       <div ref={rowRef} className="product-grid snap-row">
         {PRODUCTS.map((product, i) => (

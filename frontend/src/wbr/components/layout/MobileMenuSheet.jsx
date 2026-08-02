@@ -36,7 +36,7 @@ export default function MobileMenuSheet({
         <div className="menu-sheet-top">
           <Link className="logo" to="/" onClick={onClose}>
             <LogoMark />
-            WorldBankReserve
+            Crypto World Bank
           </Link>
           <button type="button" className="icon-btn" aria-label="Close menu" onClick={onClose}>
             <Icon name="close" size={18} />
@@ -54,7 +54,7 @@ export default function MobileMenuSheet({
 
         <div className="menu-sheet-foot">
           <Button as={Link} to="/login" variant="primary" block onClick={onClose}>
-            Get Started
+            Open an account
           </Button>
           <Button
             variant="ghost"
@@ -68,9 +68,9 @@ export default function MobileMenuSheet({
             {walletLabel}
           </Button>
           <p className="trust-strip" style={{ marginTop: 18 }}>
-            <span>Sepolia Testnet</span>
+            <span>Sepolia testnet</span>
             <span className="dot" />
-            <span>Slither &amp; Mythril Audited</span>
+            <span>Independent contract audits</span>
           </p>
         </div>
       </div>

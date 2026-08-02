@@ -114,7 +114,7 @@ export default function AppShell() {
           <div className="app-topbar-inner">
             <Link to="/app/dashboard" className="app-brand" aria-label="Home">
               <LogoMark />
-              <span className="app-brand-name">World Bank Reserve</span>
+              <span className="app-brand-name">Crypto World Bank</span>
             </Link>
 
             <nav className="app-desktop-nav glass" aria-label="Primary">

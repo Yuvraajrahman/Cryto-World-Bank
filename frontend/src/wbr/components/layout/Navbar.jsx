@@ -75,7 +75,7 @@ export default function Navbar({ links = DEFAULT_LINKS }) {
         <Glass as="div" className={`nav-inner${scrolled ? " scrolled" : ""}`}>
           <Link className="logo" to="/">
             <LogoMark />
-            WorldBankReserve
+            Crypto World Bank
           </Link>
 
           <div className="nav-links">
@@ -89,7 +89,7 @@ export default function Navbar({ links = DEFAULT_LINKS }) {
           <div className="nav-actions">
             <ThemeToggle />
             <Button as={Link} to="/login" variant="primary" size="sm" showArrow={false} className="nav-cta">
-              Get Started
+              Open an account
             </Button>
           </div>
 

@@ -2,31 +2,47 @@ import { forwardRef } from "react";
 import { Link } from "react-router-dom";
 import Button from "../ui/Button";
 
+/**
+ * Landing hero — brand-first, one headline, one line of support, CTA pair.
+ * Visual anchor is the reserve seal (not a stats dashboard).
+ */
 const Hero = forwardRef(function Hero(_props, ref) {
   return (
     <header className="hero" ref={ref}>
-      <p className="eyebrow">Decentralized Reserve Banking</p>
+      <div className="hero-seal" aria-hidden="true">
+        <svg viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="54" stroke="currentColor" strokeOpacity="0.22" strokeWidth="1.25" />
+          <circle cx="60" cy="60" r="42" stroke="currentColor" strokeOpacity="0.35" strokeWidth="1" />
+          <rect x="28" y="38" width="64" height="6" rx="3" fill="currentColor" />
+          <rect x="34" y="50" width="52" height="6" rx="3" fill="currentColor" opacity="0.78" />
+          <rect x="40" y="62" width="40" height="6" rx="3" fill="currentColor" opacity="0.56" />
+          <rect x="46" y="74" width="28" height="6" rx="3" fill="currentColor" opacity="0.36" />
+        </svg>
+      </div>
+
+      <p className="hero-brand">Crypto World Bank</p>
+      <p className="eyebrow">Institutional digital reserve</p>
       <h1>
-        Capital, held
+        Capital under
         <br />
-        <em>in the open.</em>
+        <em>disciplined custody.</em>
       </h1>
       <p className="hero-sub">
-        WorldBankReserve routes lending and deposits through four accountable tiers — World,
-        National, Local, Client — with every reserve balance verifiable on-chain.
+        Lending, deposits, and credit through a four-tier banking hierarchy — World, National,
+        Local, and Client — with reserve solvency attested on-chain and open to public inspection.
       </p>
       <div className="hero-cta">
         <Button as={Link} to="/login" variant="primary">
-          Connect Wallet
+          Open an account
         </Button>
-        <Button as={Link} to="/about" variant="ghost" showArrow={false}>
-          Learn how it works
+        <Button as={Link} to="/reserve" variant="ghost" showArrow={false}>
+          Inspect reserves
         </Button>
       </div>
       <p className="trust-strip">
-        <span>Sepolia Testnet</span>
+        <span>Sepolia deployment</span>
         <span className="dot" />
-        <span>Slither &amp; Mythril Audited</span>
+        <span>Independently audited contracts</span>
         <span className="dot" />
         <span>Chainlink Proof of Reserve</span>
       </p>

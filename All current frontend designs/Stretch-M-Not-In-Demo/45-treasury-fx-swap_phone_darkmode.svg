@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1206" height="2694" viewBox="0 0 1206 2694">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#05070c"/>
+      <stop offset="100%" stop-color="#121826"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g)"/>
+  <rect x="40" y="754.32" width="1126" height="862.08" rx="24" fill="rgba(255,255,255,0.06)" stroke="rgba(201,162,39,0.45)"/>
+  <text x="603" y="1056.048" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="42" fill="#f3f5f9">Treasury FX Swap</text>
+  <text x="603" y="1202.6016" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="28" fill="#c9a227">Stretch / not in defence demo (Section M)</text>
+  <text x="603" y="1340.5344" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#8b93a7">iPhone 17 Pro · Dark</text>
+  <rect x="0" y="2622" width="1206" height="72" fill="#0a0e18"/>
+  <text x="36" y="2669" font-family="JetBrains Mono, ui-monospace, monospace" font-size="28" fill="#c9a227">http://127.0.0.1:5173/bank/treasury/fx-swap</text>
+  <text x="1170" y="2669" text-anchor="end" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#8b93a7">p.45 · iPhone 17 Pro · Dark</text>
+</svg>

@@ -40,7 +40,7 @@ function buildSiweMessage({ address, chainId, nonce, domain, uri }) {
   return `${domain} wants you to sign in with your Ethereum account:
 ${address}
 
-Sign in to WorldBankReserve. This signature does not spend gas or move funds.
+Sign in to Crypto World Bank. This signature does not spend gas or move funds.
 
 URI: ${uri}
 Version: 1

@@ -9,9 +9,9 @@ import TransparencySection from "../components/landing/TransparencySection";
 import FinalCTA from "../components/landing/FinalCTA";
 
 const LANDING_LINKS = [
-  { label: "Product", href: "#product" },
-  { label: "Tiers", href: "#tiers" },
-  { label: "Transparency", href: "#transparency" },
+  { label: "Services", href: "#product" },
+  { label: "Structure", href: "#tiers" },
+  { label: "Reserves", href: "#transparency" },
   { label: "About", href: "/about" },
 ];
 
@@ -24,7 +24,7 @@ export default function LandingPage() {
   return (
     <PublicShell
       navLinks={LANDING_LINKS}
-      stickySlot={<StickyMobileCTA targetRef={heroRef} href="/login" label="Get Started" />}
+      stickySlot={<StickyMobileCTA targetRef={heroRef} href="/login" label="Open an account" />}
     >
       <Hero ref={heroRef} />
       <TierCascade />

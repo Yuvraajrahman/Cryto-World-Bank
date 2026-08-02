@@ -7,25 +7,25 @@ const TIERS = [
     id: 'tier-1',
     tag: 'Tier 1 · Global',
     name: 'World Bank',
-    desc: 'Global reserve custody, proof-of-reserve attestation, and national bank registration.',
+    desc: 'Custodies the global reserve, issues solvency attestations, and charters national institutions.',
   },
   {
     id: 'tier-2',
     tag: 'Tier 2 · Country',
     name: 'National Bank',
-    desc: 'Capital allocation to local branches, rate policy, and reserve ratio settings.',
+    desc: 'Sets jurisdictional policy, holds country reserves, and capitalises local branches.',
   },
   {
     id: 'tier-3',
     tag: 'Tier 3 · Branch',
     name: 'Local Bank',
-    desc: 'Loan approval, KYC review, and day-to-day community lending decisions.',
+    desc: 'Conducts KYC review, credit decisions, and day-to-day client servicing.',
   },
   {
     id: 'tier-4',
-    tag: 'Tier 4 · You',
-    name: 'Client',
-    desc: 'Borrow, save, and build credit — collateral-based or credit-based.',
+    tag: 'Tier 4 · Client',
+    name: 'Client account',
+    desc: 'Access collateral or credit facilities, deposit products, and a portable credit record.',
   },
 ];
 
@@ -56,13 +56,13 @@ export default function TierCascade() {
   return (
     <section className="section" id="tiers">
       <div ref={head.ref} className={`section-head ${head.className}`} style={head.style}>
-        <p className="eyebrow center">The Hierarchy</p>
+        <p className="eyebrow center">Institutional architecture</p>
         <h2 className="section-title center">
-          Capital cascades through <em>four tiers</em> of accountability.
+          Four tiers of <em>accountability.</em>
         </h2>
         <p className="section-lede center">
-          Every reserve balance narrows in scope as it moves down the chain — broad at the top,
-          personal at the bottom, transparent throughout.
+          Reserve capital is custodied at the apex and allocated through national and local
+          institutions — with defined authority, and transparent records, at every level.
         </p>
       </div>
 

@@ -132,6 +132,10 @@
   --z-sticky-cta:45;
   --z-sheet:80;
   --z-toast:100;
+
+  --font-display:'Cormorant Garamond', 'Times New Roman', Times, serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, monospace;
 }
 
 @media (min-width:768px){

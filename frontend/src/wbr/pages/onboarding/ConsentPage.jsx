@@ -110,7 +110,7 @@ function ConsentForm() {
           </p>
           <h3>Testnet notice</h3>
           <p>
-            WorldBankReserve on Sepolia / Hardhat is a research and demonstration deployment. It is
+            Crypto World Bank on Sepolia / Hardhat is a research and demonstration deployment. It is
             not a licensed depository institution. Do not send mainnet funds you cannot afford to
             lose.
           </p>

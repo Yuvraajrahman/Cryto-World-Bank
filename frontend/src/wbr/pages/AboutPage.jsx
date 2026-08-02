@@ -5,13 +5,62 @@ import Button from "../components/ui/Button";
 import Accordion from "../components/ui/Accordion";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
+const ABOUT_LINKS = [
+  { label: "Structure", href: "#tiers" },
+  { label: "Lending", href: "#lifecycle" },
+  { label: "Identity", href: "#kyc" },
+  { label: "Credit", href: "#credit" },
+  { label: "FAQ", href: "#faq" },
+];
+
+const TIERS = [
+  {
+    tag: "Tier 1 · Global",
+    name: "World Bank",
+    desc: "Custodies the global reserve, issues solvency attestations, and charters national institutions.",
+  },
+  {
+    tag: "Tier 2 · Country",
+    name: "National Bank",
+    desc: "Sets jurisdictional policy, holds country reserves, and capitalises local branches.",
+  },
+  {
+    tag: "Tier 3 · Branch",
+    name: "Local Bank",
+    desc: "Conducts KYC review, credit decisions, and day-to-day client servicing.",
+  },
+  {
+    tag: "Tier 4 · Client",
+    name: "Client account",
+    desc: "Access collateral or credit facilities, deposit products, and a portable credit record.",
+  },
+];
+
 const LIFECYCLE = [
-  { title: "Request", body: "Client submits a collateral- or credit-based loan application from their wallet." },
-  { title: "ML risk score", body: "A commit-reveal risk score is produced off-chain; only the commitment hits the chain first." },
-  { title: "Approver decision", body: "Local Bank Approver reviews the Authority Brief (score + SHAP) and approves or rejects." },
-  { title: "Disbursement", body: "On approval, funds move on-chain from the Local Bank pool to the client." },
-  { title: "Installments", body: "A repayment schedule is created; each payment updates credit standing." },
-  { title: "Repayment complete", body: "Loan closes; Credit Passport score adjusts based on on-time performance." },
+  {
+    title: "Application",
+    body: "Submit a facility request from your account — collateral-backed, credit-based, or combined.",
+  },
+  {
+    title: "Risk assessment",
+    body: "An off-chain risk assessment is committed on-chain first; supporting detail is revealed only at bank review.",
+  },
+  {
+    title: "Credit decision",
+    body: "A Local Bank approver evaluates the brief and records an approval or decline with rationale.",
+  },
+  {
+    title: "Disbursement",
+    body: "Upon approval, funds settle on-chain from the branch pool to the client wallet.",
+  },
+  {
+    title: "Servicing",
+    body: "An instalment schedule is established; each payment updates the client’s credit standing.",
+  },
+  {
+    title: "Discharge",
+    body: "When the obligation is settled, the Credit Passport reflects performance in good standing.",
+  },
 ];
 
 const CREDIT_TIERS = [
@@ -24,20 +73,20 @@ const CREDIT_TIERS = [
 
 const FAQ = [
   {
-    q: "Are there fees to connect or view reserves?",
-    a: "Connecting a wallet and browsing public reserve data is free. Loan disbursement and repayments incur normal network gas; protocol interest is shown before you confirm.",
+    q: "Are there fees to open an account or inspect reserves?",
+    a: "Browsing public reserves and authenticating with a wallet incurs no protocol fee. Disbursements and repayments use ordinary network gas; interest and terms are disclosed before confirmation.",
   },
   {
     q: "What is the security model?",
-    a: "Role-based access control on-chain, pausable modules, Slither/Mythril-audited contracts, and Chainlink Proof of Reserve for solvency attestation. Critical World Bank actions can require Safe multisig.",
+    a: "Role-based access on-chain, pausable modules, independently audited contracts, and Chainlink Proof of Reserve for solvency attestation. Material World Bank actions may require a Safe multisig.",
   },
   {
-    q: "What happens on default?",
-    a: "Collateralized loans may be liquidated per health-factor rules. Credit-based loans primarily downgrade the Credit Passport (SBT) score and reduce future limits rather than seizing unrelated assets.",
+    q: "What occurs in the event of default?",
+    a: "Collateralised facilities may be liquidated under health-factor rules. Credit-based facilities primarily reduce Credit Passport standing and future limits rather than seizing unrelated assets.",
   },
   {
-    q: "What data is on-chain vs off-chain?",
-    a: "Balances, roles, loan state, and document hashes are on-chain. KYC images, chat transcripts, and detailed ML features stay off-chain with access limited to authorized bank roles and regulators.",
+    q: "What is recorded on-chain versus held privately?",
+    a: "Balances, roles, loan state, and document hashes are on-chain. KYC imagery, correspondence, and detailed risk features remain off-chain, limited to authorised bank roles and regulators.",
   },
 ];
 
@@ -57,37 +106,35 @@ function SectionHead({ eyebrow, title, lede }) {
  */
 export default function AboutPage() {
   return (
-    <PublicShell>
+    <PublicShell navLinks={ABOUT_LINKS}>
       <header className="page-hero">
-        <p className="eyebrow center">How it works</p>
+        <p className="page-hero-brand">Crypto World Bank</p>
+        <p className="eyebrow center">Operating model</p>
         <h1>
-          Four tiers. One <em>open</em> reserve.
+          How the institution
+          <br />
+          <em>is organised.</em>
         </h1>
         <p className="section-lede center">
-          Understand the hierarchy, loan lifecycle, KYC levels, and Credit Passport before you
-          connect a wallet.
+          An overview of the four-tier hierarchy, lending lifecycle, identity requirements, and
+          Credit Passport — before you establish an account.
         </p>
       </header>
 
       <section className="section" id="tiers">
         <SectionHead
-          eyebrow="The Hierarchy"
-          title='Capital cascades through <em>four tiers</em> of accountability.'
-          lede="Every reserve balance narrows in scope as it moves down the chain — broad at the top, personal at the bottom, transparent throughout."
+          eyebrow="Institutional architecture"
+          title="Four tiers of <em>accountability.</em>"
+          lede="Reserve capital is custodied at the apex and allocated through national and local institutions — with defined authority at every level."
         />
         <div className="cascade">
           <div className="cascade-line" />
           <div className="cascade-pulse" />
-          {[
-            ["Tier 1 · Global", "World Bank", "Global reserve custody, proof-of-reserve attestation, and national bank registration."],
-            ["Tier 2 · Country", "National Bank", "Capital allocation to local branches, rate policy, and reserve ratio settings."],
-            ["Tier 3 · Branch", "Local Bank", "Loan approval, KYC review, and day-to-day community lending decisions."],
-            ["Tier 4 · You", "Client", "Borrow, save, and build credit — collateral-based or credit-based."],
-          ].map(([tag, name, desc], i) => (
-            <Glass key={name} className={`tier-card tier-${i + 1}`}>
-              <span className="tier-tag">{tag}</span>
-              <span className="tier-name">{name}</span>
-              <p>{desc}</p>
+          {TIERS.map((tier, i) => (
+            <Glass key={tier.name} className={`tier-card tier-${i + 1}`}>
+              <span className="tier-tag">{tier.tag}</span>
+              <span className="tier-name">{tier.name}</span>
+              <p>{tier.desc}</p>
             </Glass>
           ))}
         </div>
@@ -95,8 +142,9 @@ export default function AboutPage() {
 
       <section className="section" id="lifecycle">
         <SectionHead
-          eyebrow="Loan Lifecycle"
-          title="From request to repayment, <em>every step</em> is accountable."
+          eyebrow="Credit lifecycle"
+          title="From application to <em>discharge.</em>"
+          lede="Every facility follows a governed path — assessed, decided by a local bank, settled on-chain, and reflected in the client’s credit record."
         />
         <div className="lifecycle">
           {LIFECYCLE.map((step, i) => (
@@ -113,18 +161,18 @@ export default function AboutPage() {
 
       <section className="section" id="kyc">
         <SectionHead
-          eyebrow="Identity"
-          title="KYC unlocks <em>limits</em>, not noise."
-          lede="Level 1 gets you started. Level 2 opens higher tiers, group lending, and larger credit-based loans."
+          eyebrow="Identity verification"
+          title="KYC that governs <em>access,</em> not noise."
+          lede="Begin with essential verification. Enhance your profile when you require higher credit tiers, group facilities, or larger uncollateralised limits."
         />
         <div className="compare-grid">
           <Glass className="compare-card">
             <p className="eyebrow">Level 1</p>
             <h3>Essential</h3>
             <ul>
-              <li>Government ID + selfie</li>
-              <li>Unlocks Bronze / Silver small loans</li>
-              <li>Collateral-based applications available</li>
+              <li>Government identification and biometric selfie</li>
+              <li>Bronze and Silver facility eligibility</li>
+              <li>Collateral-backed applications</li>
               <li>Document hash recorded on-chain</li>
             </ul>
           </Glass>
@@ -132,9 +180,9 @@ export default function AboutPage() {
             <p className="eyebrow">Level 2</p>
             <h3>Enhanced</h3>
             <ul>
-              <li>Proof of address + income</li>
-              <li>Gold → Diamond eligibility path</li>
-              <li>Group lending & higher limits</li>
+              <li>Proof of address and income</li>
+              <li>Gold through Diamond eligibility</li>
+              <li>Group credit and higher limits</li>
               <li>Optional video verification</li>
             </ul>
           </Glass>
@@ -144,16 +192,25 @@ export default function AboutPage() {
       <section className="section" id="credit">
         <SectionHead
           eyebrow="Credit Passport"
-          title="A soulbound score that <em>travels</em> with you."
-          lede="Your SBT tier gates uncollateralized borrowing and modifies interest. Score range is 0–1000."
+          title="A portable record of <em>standing.</em>"
+          lede="Your on-chain Credit Passport governs uncollateralised borrowing capacity and interest modifiers. Scores range from 0 to 1000."
         />
         <div className="data-cards">
           {CREDIT_TIERS.map((row) => (
             <Glass key={row.tier} className="data-card">
               <div className="data-card-title">{row.tier}</div>
-              <div className="data-card-row"><span>Score</span><span>{row.score}</span></div>
-              <div className="data-card-row"><span>Max loan</span><span>{row.max}</span></div>
-              <div className="data-card-row"><span>Rate mod</span><span>{row.rate}</span></div>
+              <div className="data-card-row">
+                <span>Score</span>
+                <span>{row.score}</span>
+              </div>
+              <div className="data-card-row">
+                <span>Max loan</span>
+                <span>{row.max}</span>
+              </div>
+              <div className="data-card-row">
+                <span>Rate mod</span>
+                <span>{row.rate}</span>
+              </div>
             </Glass>
           ))}
         </div>
@@ -182,21 +239,29 @@ export default function AboutPage() {
       </section>
 
       <section className="section" id="faq">
-        <SectionHead eyebrow="FAQ" title="Straight answers before you <em>connect</em>." />
+        <SectionHead
+          eyebrow="Due diligence"
+          title="Material questions, <em>answered plainly.</em>"
+          lede="Fees, security, default treatment, and data residency — summarised before you authenticate."
+        />
         <Accordion items={FAQ} />
       </section>
 
       <section className="final-cta">
         <Glass className="final-cta-card">
-          <p className="eyebrow center">Ready</p>
-          <h2>Connect a wallet when you&apos;re ready.</h2>
-          <p>Sign in with your wallet — no gas for the login signature — then finish KYC when you want to borrow.</p>
+          <p className="eyebrow center">Client onboarding</p>
+          <h2>Establish your account.</h2>
+          <p>
+            Authenticate with your wallet to enter your assigned tier. Complete identity verification
+            when you require credit facilities; deposit services and reserve inspection remain
+            available earlier.
+          </p>
           <div className="hero-cta">
             <Button as={Link} to="/login" variant="primary">
-              Connect Wallet
+              Open an account
             </Button>
             <Button as={Link} to="/reserve" variant="ghost" showArrow={false}>
-              View reserve transparency
+              Inspect reserves
             </Button>
           </div>
         </Glass>

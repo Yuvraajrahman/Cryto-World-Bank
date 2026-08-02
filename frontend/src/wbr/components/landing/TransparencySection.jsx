@@ -25,12 +25,14 @@ export default function TransparencySection() {
   return (
     <section className="section" id="transparency">
       <div ref={head.ref} className={`section-head ${head.className}`} style={head.style}>
-        <p className="eyebrow center">Reserve, Live</p>
-        <h2 className="section-title center">Nothing about the reserve is hidden.</h2>
+        <p className="eyebrow center">Reserve transparency</p>
+        <h2 className="section-title center">
+          Solvency reported <em>in the open.</em>
+        </h2>
         <p className="section-lede center">
-          Aggregate figures below are pulled from the public reserve summary — no wallet required
-          to look.
-          {source === "cache" ? " Showing cached demo values while the API is unreachable." : ""}
+          Live aggregates for capital under management, active credit, and participating
+          institutions — available for inspection without authentication.
+          {source === "cache" ? " Cached demonstration figures are shown while the API is unreachable." : ""}
         </p>
       </div>
 

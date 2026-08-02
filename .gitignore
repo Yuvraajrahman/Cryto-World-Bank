@@ -79,3 +79,4 @@ Documentation/**/.docx-venv/
 # Large local datasets (do not commit)
 Datasets/
 **/data/bccc.csv
+.vercel

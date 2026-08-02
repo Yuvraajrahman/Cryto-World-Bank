@@ -10,6 +10,8 @@ import {
   Building2,
   Landmark,
   Users,
+  Scale,
+  Wrench,
 } from "lucide-react";
 import { HARDHAT_ACCOUNTS, type TestnetPersonaRole } from "@shared/hardhat-accounts";
 import { useSession } from "@/lib/store";
@@ -22,6 +24,8 @@ const roleIcons: Record<TestnetPersonaRole, typeof Landmark> = {
   LOCAL_BANK_ADMIN: Users,
   APPROVER: CheckCircle2,
   BORROWER: CircleUserRound,
+  REGULATOR: Scale,
+  DEV_ADMIN: Wrench,
 };
 
 export function WalletGate() {

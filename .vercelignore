@@ -1,4 +1,4 @@
-# Keep Vercel uploads small — only the frontend app is deployed.
+# Keep Vercel uploads/clones lean. Do NOT ignore `shared/` — frontend imports `@shared/*`.
 Documentation/
 Datasets/
 Coursework files/
@@ -9,13 +9,11 @@ contracts/
 scripts/
 test/
 ml-service/
-shared/
 artifacts/
 cache/
 coverage/
 typechain-types/
 deployments/
-.git/
 .cursor/
 .githooks/
 .tmp/

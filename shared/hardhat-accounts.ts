@@ -7,7 +7,9 @@ export type TestnetPersonaRole =
   | "NATIONAL_BANK_ADMIN"
   | "LOCAL_BANK_ADMIN"
   | "APPROVER"
-  | "BORROWER";
+  | "BORROWER"
+  | "REGULATOR"
+  | "DEV_ADMIN";
 
 export interface HardhatAccount {
   index: number;
@@ -61,6 +63,27 @@ export const HARDHAT_ACCOUNTS: HardhatAccount[] = [
     role: "BORROWER",
     label: "Borrower — Aisha",
     subtitle: "Tier 4 · first-time applicant",
+  },
+  {
+    index: 6,
+    address: "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+    role: "BORROWER",
+    label: "Borrower — Karim (group)",
+    subtitle: "Tier 4 · group lending demo",
+  },
+  {
+    index: 7,
+    address: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+    role: "REGULATOR",
+    label: "Regulatory Authority",
+    subtitle: "A6 · read-only audit portal",
+  },
+  {
+    index: 8,
+    address: "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
+    role: "DEV_ADMIN",
+    label: "Dev Admin (temporary)",
+    subtitle: "Global console · remove before production",
   },
 ];
 

@@ -334,6 +334,8 @@ export async function projectGroupCreated(input: {
   const localInst = await institutionByOnChain(input.localBank);
   await prisma.loanGroup.create({
     data: {
+      name: `On-chain group ${input.groupId}`,
+      inviteCode: `OC-${input.groupId}`.slice(0, 32),
       localBankId: localInst?.id ?? input.localBank.toLowerCase(),
       onChainId: input.groupId,
       status: "FORMING",

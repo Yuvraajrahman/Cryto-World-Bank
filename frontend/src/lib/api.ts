@@ -49,6 +49,28 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     } catch {
       /* ignore */
     }
+    if (res.status === 401 && typeof window !== "undefined" && token) {
+      try {
+        const raw = localStorage.getItem("cwb-session");
+        if (raw) {
+          const parsed = JSON.parse(raw) as { state?: Record<string, unknown> };
+          if (parsed?.state) {
+            parsed.state.token = null;
+            parsed.state.user = null;
+            parsed.state.role = "GUEST";
+            localStorage.setItem("cwb-session", JSON.stringify(parsed));
+          }
+        }
+      } catch {
+        /* ignore */
+      }
+      const pathNow = window.location.pathname + window.location.search;
+      if (!pathNow.startsWith("/login")) {
+        window.location.assign(
+          `/login?returnTo=${encodeURIComponent(pathNow)}&reason=expired`,
+        );
+      }
+    }
     throw new ApiError(message, res.status, code, details);
   }
   if (res.status === 204) {
@@ -69,6 +91,11 @@ export const api = {
       method: "PUT",
       body: body ? JSON.stringify(body) : undefined,
     }),
+  patch: <T,>(path: string, body?: unknown) =>
+    request<T>(path, {
+      method: "PATCH",
+      body: body ? JSON.stringify(body) : undefined,
+    }),
   delete: <T,>(path: string) => request<T>(path, { method: "DELETE" }),
 };
 
@@ -80,7 +107,9 @@ export type UserRole =
   | "NATIONAL_BANK_ADMIN"
   | "LOCAL_BANK_ADMIN"
   | "APPROVER"
-  | "BORROWER";
+  | "BORROWER"
+  | "REGULATOR"
+  | "DEV_ADMIN";
 
 export type BankTier = "WORLD" | "NATIONAL" | "LOCAL";
 
@@ -99,13 +128,17 @@ export interface UserDTO {
   wallet: string;
   displayName: string;
   email?: string;
+  phone?: string;
   country?: string;
+  dateOfBirth?: string;
+  accountType?: "individual" | "group";
   role: UserRole;
   bankId?: string;
   consecutivePaidLoans?: number;
   totalBorrowedLifetime?: number;
   isFirstTime?: boolean;
   monthlyIncomeUsd?: number;
+  onboardingComplete?: boolean;
 }
 
 export interface BankDTO {
@@ -220,4 +253,8 @@ export interface ChatMessageDTO {
   senderId: string;
   body: string;
   createdAt: string;
+  attachmentName?: string;
+  attachmentMime?: string;
+  attachmentSize?: number;
+  readBy?: string[];
 }

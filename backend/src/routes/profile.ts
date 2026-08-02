@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 import { AuthedRequest, requireAuth } from "../middleware/auth";
 import {
   computeBorrowingLimits,
@@ -7,11 +8,40 @@ import {
   findBankById,
   findUserById,
 } from "../store/db";
+import {
+  findUserByIdPg,
+  isEmailTakenPg,
+  updateUserPg,
+  type AppUser,
+} from "../db/users";
+import { countUnread } from "../db/notifications";
+import { getPrisma } from "../db/prisma";
+import { depositsDb, ensureBalances } from "../store/deposits";
 
 export const profileRouter = Router();
 
-profileRouter.get("/", requireAuth, (req, res) => {
-  const user = (req as AuthedRequest).user!;
+const defaultPrefs = {
+  email: true,
+  push: false,
+  inApp: true,
+  categories: {
+    loan: true,
+    kyc: true,
+    payment: true,
+    agent: true,
+    chat: true,
+    system: true,
+  },
+};
+
+function serializeUser(user: AppUser) {
+  return {
+    ...user,
+    notificationPrefs: user.notificationPrefs ?? defaultPrefs,
+  };
+}
+
+async function profilePayload(user: AppUser) {
   const bank = user.bankId ? findBankById(user.bankId) : null;
   const parentBank = bank?.parentBankId ? findBankById(bank.parentBankId) : null;
 
@@ -27,15 +57,27 @@ profileRouter.get("/", requireAuth, (req, res) => {
 
   let limits = null;
   if (user.role === "BORROWER") {
-    limits = computeBorrowingLimits(user.id);
+    try {
+      limits = computeBorrowingLimits(user.id);
+    } catch {
+      limits = null;
+    }
   }
 
-  res.json({
-    user,
+  let unreadCount = 0;
+  try {
+    unreadCount = await countUnread(user.id);
+  } catch {
+    unreadCount = 0;
+  }
+
+  return {
+    user: serializeUser(user),
     bank,
     parentBank,
     limits,
     transactions: txs,
+    unreadCount,
     incomeVerification: incomeProof
       ? {
           status: incomeProof.status,
@@ -46,21 +88,159 @@ profileRouter.get("/", requireAuth, (req, res) => {
           createdAt: incomeProof.createdAt,
         }
       : { status: "UNSUBMITTED" },
-  });
+  };
+}
+
+profileRouter.get("/", requireAuth, async (req, res, next) => {
+  try {
+    const sessionUser = (req as AuthedRequest).user!;
+    const user = (await findUserByIdPg(sessionUser.id)) ?? sessionUser;
+    res.json(await profilePayload(user));
+  } catch (err) {
+    next(err);
+  }
 });
+
+/** Retail client home aggregate (Section C). */
+profileRouter.get("/home", requireAuth, async (req, res, next) => {
+  try {
+    const sessionUser = (req as AuthedRequest).user!;
+    const user = (await findUserByIdPg(sessionUser.id)) ?? sessionUser;
+    const base = await profilePayload(user);
+
+    const loans = db.state.loans.filter((l) => l.borrowerId === user.id);
+    const active = loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
+    const outstanding = active.reduce((acc, l) => {
+      const unpaid = l.installments
+        .filter((i) => !i.paid)
+        .reduce((s, i) => s + i.amount, 0);
+      return acc + (unpaid > 0 ? unpaid : l.amount);
+    }, 0);
+
+    let nextPayment: { dueDate: string; amount: number; loanId: string } | null = null;
+    for (const loan of active) {
+      for (const inst of loan.installments) {
+        if (inst.paid) continue;
+        if (!nextPayment || inst.dueDate < nextPayment.dueDate) {
+          nextPayment = { dueDate: inst.dueDate, amount: inst.amount, loanId: loan.id };
+        }
+      }
+    }
+
+    let credit: {
+      creditScore?: number;
+      riskTier?: string;
+      available?: boolean;
+    } = { available: false };
+    try {
+      const prisma = getPrisma();
+      if (prisma) {
+        const borrower = await prisma.borrower.findUnique({
+          where: { walletAddress: user.wallet.toLowerCase() },
+          include: { creditPassport: true },
+        });
+        if (borrower?.creditPassport) {
+          credit = {
+            available: true,
+            creditScore: borrower.creditPassport.creditScore,
+            riskTier: borrower.creditPassport.riskTier,
+          };
+        }
+      }
+    } catch {
+      /* optional */
+    }
+
+    res.json({
+      ...base,
+      loans: {
+        activeCount: active.length,
+        outstandingEth: outstanding,
+        nextPayment,
+        totalLifetime: loans.length,
+      },
+      savings: (() => {
+        ensureBalances(user.id);
+        const vault = depositsDb.state.vaultBalances[user.id] ?? 0;
+        const fds = depositsDb.state.fixedDeposits.filter(
+          (f) => f.userId === user.id && (f.status === "ACTIVE" || f.status === "MATURED"),
+        );
+        return {
+          vaultEth: vault,
+          fixedDepositEth: fds.reduce((s, f) => s + f.principal, 0),
+          checkingEth: depositsDb.state.checkingBalances[user.id] ?? 0,
+          stub: false,
+        };
+      })(),
+      credit,
+      kyc: {
+        kyc1Status: user.kyc1Status ?? "NOT_STARTED",
+        kyc2Status: user.kyc2Status ?? "NOT_STARTED",
+        kyc2Skipped: Boolean(user.kyc2Skipped),
+        onboardingComplete: Boolean(user.onboardingComplete),
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const prefsSchema = z
+  .object({
+    email: z.boolean().optional(),
+    push: z.boolean().optional(),
+    inApp: z.boolean().optional(),
+    categories: z
+      .object({
+        loan: z.boolean().optional(),
+        kyc: z.boolean().optional(),
+        payment: z.boolean().optional(),
+        agent: z.boolean().optional(),
+        chat: z.boolean().optional(),
+        system: z.boolean().optional(),
+      })
+      .optional(),
+  })
+  .passthrough();
 
 const updateSchema = z.object({
   displayName: z.string().min(1).max(120).optional(),
   email: z.string().email().max(200).optional(),
+  phone: z.string().min(8).max(32).optional(),
   country: z.string().min(2).max(64).optional(),
+  notificationPrefs: prefsSchema.optional(),
 });
 
-profileRouter.put("/", requireAuth, (req, res, next) => {
+profileRouter.put("/", requireAuth, async (req, res, next) => {
   try {
-    const user = (req as AuthedRequest).user!;
+    const sessionUser = (req as AuthedRequest).user!;
     const body = updateSchema.parse(req.body);
-    Object.assign(user, body);
-    res.json({ ok: true, user });
+
+    if (body.email) {
+      const taken = await isEmailTakenPg(body.email.trim().toLowerCase(), sessionUser.id);
+      if (taken) {
+        res.status(409).json({ error: "duplicate_email", message: "Email already registered" });
+        return;
+      }
+    }
+
+    const updated = await updateUserPg(sessionUser.id, {
+      ...(body.displayName !== undefined ? { displayName: body.displayName.trim() } : {}),
+      ...(body.email !== undefined ? { email: body.email.trim().toLowerCase() } : {}),
+      ...(body.phone !== undefined ? { phone: body.phone.trim() } : {}),
+      ...(body.country !== undefined ? { country: body.country.trim() } : {}),
+      ...(body.notificationPrefs !== undefined
+        ? {
+            notificationPrefs: body.notificationPrefs as Prisma.InputJsonValue,
+          }
+        : {}),
+      ...(body.displayName || body.email || body.country || body.phone
+        ? { isFirstTime: false }
+        : {}),
+    });
+
+    (req as AuthedRequest).user = updated;
+    res.json({ ok: true, user: serializeUser(updated) });
   } catch (err) {
     next(err);
   }
@@ -75,9 +255,10 @@ profileRouter.get("/limits", requireAuth, (req, res) => {
   res.json(computeBorrowingLimits(user.id));
 });
 
-// Lightweight user lookup used by chat screens to hydrate participants.
-profileRouter.get("/users/:id", requireAuth, (req, res) => {
-  const u = findUserById(String(req.params.id));
+profileRouter.get("/users/:id", requireAuth, async (req, res) => {
+  const id = String(req.params.id);
+  const fromPg = await findUserByIdPg(id);
+  const u = fromPg ?? findUserById(id);
   if (!u) {
     res.status(404).json({ error: "not_found" });
     return;

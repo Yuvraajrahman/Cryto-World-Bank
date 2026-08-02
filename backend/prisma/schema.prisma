@@ -81,6 +81,7 @@ model Institution {
   loanRequests    LoanRequest[]
   loans           Loan[]
   assets          Asset[]
+  capital         InstitutionCapital?
 
   @@index([institutionType])
 }
@@ -211,20 +212,71 @@ model InterestRateTier {
 }
 
 model LoanGroup {
-  id          String   @id @default(cuid())
-  localBankId String
-  onChainId   String?
-  status      String   @default("FORMING")
-  createdAt   DateTime @default(now())
-  members     GroupMember[]
+  id              String   @id @default(cuid())
+  name            String   @default("Unnamed group")
+  inviteCode      String   @unique
+  organizerUserId String?
+  localBankId     String
+  onChainId       String?
+  status          String   @default("FORMING") // FORMING | ACTIVE | CLOSED
+  minMembers      Int      @default(3)
+  maxMembers      Int      @default(20)
+  termsJson       Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  members         GroupMember[]
+  loanRequests    GroupLoanRequest[]
+
+  @@index([organizerUserId])
+  @@index([status])
 }
 
 model GroupMember {
-  id         String    @id @default(cuid())
-  groupId    String
-  group      LoanGroup @relation(fields: [groupId], references: [id])
-  borrowerId String
-  consented  Boolean   @default(false)
+  id            String    @id @default(cuid())
+  groupId       String
+  group         LoanGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  /// Legacy chain projection field (Borrower.id); prefer userId for retail API
+  borrowerId    String    @default("")
+  userId        String?
+  walletAddress String?
+  role          String    @default("MEMBER") // ORGANIZER | MEMBER
+  consented     Boolean   @default(false)
+  joinedAt      DateTime  @default(now())
+
+  @@unique([groupId, userId])
+  @@index([walletAddress])
+  @@index([userId])
+}
+
+model GroupLoanRequest {
+  id             String   @id @default(cuid())
+  groupId        String
+  group          LoanGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  requestedBy    String
+  totalAmountEth Float
+  termMonths     Int
+  purpose        String
+  status         String   @default("AWAITING_CONSENT") // DRAFT | AWAITING_CONSENT | ACTIVE | CANCELLED | REJECTED
+  retailLoanId   String?  // optional link into JSON demo loan store
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  activatedAt    DateTime?
+  consents       GroupLoanConsent[]
+
+  @@index([groupId, status])
+}
+
+model GroupLoanConsent {
+  id          String           @id @default(cuid())
+  requestId   String
+  request     GroupLoanRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  userId      String
+  consentedAt DateTime?
+  signature   String?
+  declinedAt  DateTime?
+
+  @@unique([requestId, userId])
+  @@index([userId])
 }
 
 model UpwardDepositRecord {
@@ -337,6 +389,7 @@ model AuditLog {
   id         String   @id @default(cuid())
   eventType  String
   actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id])
   actorType  String?
   payload    Json?
   createdAt  DateTime @default(now())
@@ -353,6 +406,8 @@ enum UserRole {
   LOCAL_BANK_ADMIN
   APPROVER
   BORROWER
+  REGULATOR
+  DEV_ADMIN // Temporary — remove before production
 }
 
 enum VerificationStatus {
@@ -362,19 +417,116 @@ enum VerificationStatus {
   REJECTED
 }
 
+enum AccountIntent {
+  individual
+  group
+}
+
+enum KycSubmissionStatus {
+  NOT_STARTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id          String   @id @default(cuid())
-  wallet      String   @unique
-  displayName String?
-  email       String?  @unique
-  role        UserRole @default(BORROWER)
-  bankId      String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                   String              @id @default(cuid())
+  wallet               String              @unique
+  displayName          String?
+  email                String?             @unique
+  phone                String?
+  country              String?
+  dateOfBirth          DateTime?           @db.Date
+  accountType          AccountIntent       @default(individual)
+  role                 UserRole            @default(BORROWER)
+  bankId               String?
+  isFirstTime          Boolean             @default(true)
+  onboardingComplete   Boolean             @default(false)
+  consecutivePaidLoans Int                 @default(0)
+  totalBorrowedLifetime Float              @default(0)
+  monthlyIncomeUsd     Float?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  kyc1Status           KycSubmissionStatus @default(NOT_STARTED)
+  kyc1IdFrontName      String?
+  kyc1IdBackName       String?
+  kyc1SelfieName       String?
+  kyc1DocHash          String?
+  kyc1SubmittedAt      DateTime?
+  kyc1RejectionReason  String?
+
+  kyc2Status           KycSubmissionStatus @default(NOT_STARTED)
+  kyc2Skipped          Boolean             @default(false)
+  kyc2AddressDocName   String?
+  kyc2IncomeDocName    String?
+  kyc2DocHash          String?
+  kyc2SubmittedAt      DateTime?
+  kyc2RejectionReason  String?
+
+  consentRisk          Boolean?
+  consentData          Boolean?
+  consentAgent         Boolean?
+  consentedAt          DateTime?
+
+  /// Channel + category toggles for Settings (Section C).
+  notificationPrefs    Json?
 
   incomeVerification IncomeVerification?
-  messagesSent       ChatMessage[]       @relation("SentMessages")
-  messagesReceived   ChatMessage[]       @relation("ReceivedMessages")
+  messagesSent       ChatMessage[]        @relation("SentMessages")
+  messagesReceived   ChatMessage[]        @relation("ReceivedMessages")
+  auditEvents        AuditLog[]
+  notifications      Notification[]
+
+  @@index([role])
+  @@index([onboardingComplete])
+}
+
+enum NotificationCategory {
+  loan
+  kyc
+  payment
+  agent
+  chat
+  system
+  aml
+  capital
+  governance
+}
+
+model Notification {
+  id        String               @id @default(cuid())
+  userId    String
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  NotificationCategory @default(system)
+  title     String
+  body      String
+  href      String?
+  readAt    DateTime?
+  createdAt DateTime             @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
+}
+
+/// Off-chain projection of per-institution capital (FR-07 read model).
+/// Authoritative balances remain on-chain; this table powers dashboards.
+model InstitutionCapital {
+  id              String      @id @default(cuid())
+  institutionId   String      @unique
+  institution     Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  /// Reserve held at this tier (ETH units as float for demo dashboards; wei string optional)
+  reserveEth      Float       @default(0)
+  allocatedEth    Float       @default(0)
+  lentEth         Float       @default(0)
+  repaidEth       Float       @default(0)
+  insuranceEth    Float       @default(0)
+  activeLoanCount Int         @default(0)
+  syncedAt        DateTime    @default(now())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([syncedAt])
 }
 
 model IncomeVerification {

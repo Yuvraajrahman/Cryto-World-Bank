@@ -12,11 +12,8 @@
   }
 
   body {
-    background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(212,175,55,0.08), transparent 60%),
-      radial-gradient(900px 500px at -10% 10%, rgba(212,175,55,0.05), transparent 60%),
-      #060606;
-    background-attachment: fixed;
+    background: var(--bg-void, #05070c);
+    color: var(--text-1, #f4f5f8);
   }
 
   ::selection {

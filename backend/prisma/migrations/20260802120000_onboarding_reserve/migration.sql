@@ -1,0 +1,73 @@
+-- CreateEnum
+CREATE TYPE "AccountIntent" AS ENUM ('individual', 'group');
+
+-- CreateEnum
+CREATE TYPE "KycSubmissionStatus" AS ENUM ('NOT_STARTED', 'PENDING', 'APPROVED', 'REJECTED');
+
+-- AlterTable User: onboarding + KYC + consent (FR off-chain profile)
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "phone" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "country" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "dateOfBirth" DATE;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "accountType" "AccountIntent" NOT NULL DEFAULT 'individual';
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "isFirstTime" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "onboardingComplete" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "consecutivePaidLoans" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "totalBorrowedLifetime" DOUBLE PRECISION NOT NULL DEFAULT 0;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "monthlyIncomeUsd" DOUBLE PRECISION;
+
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc1Status" "KycSubmissionStatus" NOT NULL DEFAULT 'NOT_STARTED';
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc1IdFrontName" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc1IdBackName" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc1SelfieName" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc1DocHash" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc1SubmittedAt" TIMESTAMP(3);
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc1RejectionReason" TEXT;
+
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc2Status" "KycSubmissionStatus" NOT NULL DEFAULT 'NOT_STARTED';
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc2Skipped" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc2AddressDocName" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc2IncomeDocName" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc2DocHash" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc2SubmittedAt" TIMESTAMP(3);
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "kyc2RejectionReason" TEXT;
+
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "consentRisk" BOOLEAN;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "consentData" BOOLEAN;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "consentAgent" BOOLEAN;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "consentedAt" TIMESTAMP(3);
+
+CREATE INDEX IF NOT EXISTS "User_role_idx" ON "User"("role");
+CREATE INDEX IF NOT EXISTS "User_onboardingComplete_idx" ON "User"("onboardingComplete");
+
+-- CreateTable InstitutionCapital (FR-07 off-chain projection)
+CREATE TABLE IF NOT EXISTS "InstitutionCapital" (
+    "id" TEXT NOT NULL,
+    "institutionId" TEXT NOT NULL,
+    "reserveEth" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "allocatedEth" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "lentEth" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "repaidEth" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "insuranceEth" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "activeLoanCount" INTEGER NOT NULL DEFAULT 0,
+    "syncedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "InstitutionCapital_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "InstitutionCapital_institutionId_key" ON "InstitutionCapital"("institutionId");
+CREATE INDEX IF NOT EXISTS "InstitutionCapital_syncedAt_idx" ON "InstitutionCapital"("syncedAt");
+
+ALTER TABLE "InstitutionCapital"
+  DROP CONSTRAINT IF EXISTS "InstitutionCapital_institutionId_fkey";
+ALTER TABLE "InstitutionCapital"
+  ADD CONSTRAINT "InstitutionCapital_institutionId_fkey"
+  FOREIGN KEY ("institutionId") REFERENCES "Institution"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AuditLog actor → User (optional FK)
+ALTER TABLE "AUDIT_LOGS"
+  DROP CONSTRAINT IF EXISTS "AUDIT_LOGS_actorId_fkey";
+ALTER TABLE "AUDIT_LOGS"
+  ADD CONSTRAINT "AUDIT_LOGS_actorId_fkey"
+  FOREIGN KEY ("actorId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

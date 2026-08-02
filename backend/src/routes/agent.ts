@@ -63,6 +63,7 @@ async function logAction(
   toolName: string,
   payload: unknown,
   confirmed: boolean,
+  wallet = "unknown",
 ) {
   const prisma = getPrisma();
   if (!prisma) return;
@@ -70,7 +71,7 @@ async function logAction(
     let session = await prisma.agentSession.findUnique({ where: { id: sessionId } });
     if (!session) {
       session = await prisma.agentSession.create({
-        data: { id: sessionId, wallet: "unknown" },
+        data: { id: sessionId, wallet: wallet.toLowerCase() },
       });
     }
     await prisma.agentActionLog.create({
@@ -128,7 +129,7 @@ agentRouter.post("/invoke", requireAuth, async (req, res, next) => {
       role: user.role,
       wallet: user.wallet,
     });
-    await logAction(body.confirmationId ?? randomUUID(), tool.name, body.args, body.confirmed);
+    await logAction(body.confirmationId ?? randomUUID(), tool.name, body.args, body.confirmed, user.wallet);
     res.json(result);
   } catch (err) {
     next(err);
@@ -157,7 +158,7 @@ agentRouter.post("/message", requireAuth, async (req, res, next) => {
           args: intent.args,
           expiresAt: Date.now() + 5 * 60_000,
         });
-        await logAction(sessionId, intent.tool.name, intent.args, false);
+        await logAction(sessionId, intent.tool.name, intent.args, false, user.wallet);
         res.json({
           type: "confirmation_required",
           sessionId,
@@ -176,7 +177,7 @@ agentRouter.post("/message", requireAuth, async (req, res, next) => {
         role: user.role,
         wallet: user.wallet,
       });
-      await logAction(sessionId, intent.tool.name, intent.args, true);
+      await logAction(sessionId, intent.tool.name, intent.args, true, user.wallet);
       res.json({
         type: "tool_result",
         sessionId,
@@ -227,10 +228,43 @@ agentRouter.post("/confirm", requireAuth, async (req, res, next) => {
       role: user.role,
       wallet: user.wallet,
     });
-    await logAction(body.confirmationId, pending.toolName, pending.args, true);
+    await logAction(body.confirmationId, pending.toolName, pending.args, true, user.wallet);
     pendingConfirmations.delete(body.confirmationId);
     res.json({ type: "tool_result", tool: pending.toolName, result });
   } catch (err) {
     next(err);
+  }
+});
+
+/** Recent agent tool audit trail for the signed-in user (plan H.27). */
+agentRouter.get("/actions", requireAuth, async (req, res) => {
+  const user = (req as AuthedRequest).user!;
+  const prisma = getPrisma();
+  if (!prisma) {
+    res.json({ actions: [] });
+    return;
+  }
+  try {
+    const sessions = await prisma.agentSession.findMany({
+      where: { wallet: user.wallet.toLowerCase() },
+      orderBy: { startedAt: "desc" },
+      take: 5,
+      include: {
+        turns: { orderBy: { createdAt: "desc" }, take: 20 },
+      },
+    });
+    const actions = sessions.flatMap((s) =>
+      s.turns.map((a) => ({
+        id: a.id,
+        sessionId: s.id,
+        toolName: a.toolName,
+        confirmed: a.confirmed,
+        createdAt: a.createdAt,
+        payload: a.payload,
+      })),
+    );
+    res.json({ actions: actions.slice(0, 40) });
+  } catch {
+    res.json({ actions: [] });
   }
 });

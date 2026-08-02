@@ -14,8 +14,8 @@ const queryClient = new QueryClient({
     defaultOptions: { queries: { staleTime: 30000, refetchOnWindowFocus: false } },
 });
 const rainbowTheme = darkTheme({
-    accentColor: "#d4af37",
-    accentColorForeground: "#0a0a0b",
+    accentColor: "#c9a86a",
+    accentColorForeground: "#1a1406",
     borderRadius: "large",
     fontStack: "system",
     overlayBlur: "small",

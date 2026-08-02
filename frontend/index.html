@@ -1,23 +1,37 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#060606" />
+    <meta name="theme-color" content="#05070c" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <title>Crypto World Bank — Decentralized Reserve</title>
+    <title>WorldBankReserve — Capital, held in the open.</title>
     <meta
       name="description"
-      content="A four-tier blockchain lending platform. Institutional-grade transparency, programmable reserves, premium access."
+      content="A four-tier, on-chain reserve banking platform. World → National → Local → Client, with every balance verifiable."
     />
+    <script>
+      (function () {
+        try {
+          var key = "wbr-theme-pref";
+          var pref = localStorage.getItem(key) || "system";
+          var system = window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+          var resolved = pref === "light" || pref === "dark" ? pref : system;
+          document.documentElement.setAttribute("data-theme", resolved);
+          document.documentElement.style.colorScheme = resolved;
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-ink-950 text-ink-100 antialiased">
+  <body class="antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

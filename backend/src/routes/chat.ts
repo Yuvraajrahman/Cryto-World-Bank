@@ -78,7 +78,12 @@ chatRouter.get("/threads/:id/messages", requireAuth, (req, res) => {
   res.json({ messages: msgs, thread: hydrateThread(thread.id) });
 });
 
-const sendSchema = z.object({ body: z.string().min(1).max(2000) });
+const sendSchema = z.object({
+  body: z.string().min(1).max(2000),
+  attachmentName: z.string().min(1).max(180).optional(),
+  attachmentMime: z.string().min(1).max(120).optional(),
+  attachmentSize: z.number().int().positive().max(10_000_000).optional(),
+});
 
 chatRouter.post("/threads/:id/messages", requireAuth, (req, res, next) => {
   try {
@@ -95,6 +100,10 @@ chatRouter.post("/threads/:id/messages", requireAuth, (req, res, next) => {
       senderId: user.id,
       body: body.body,
       createdAt: db.nowIso(),
+      attachmentName: body.attachmentName,
+      attachmentMime: body.attachmentMime,
+      attachmentSize: body.attachmentSize,
+      readBy: [user.id],
     };
     db.state.chatMessages.push(msg);
     thread.lastMessageAt = msg.createdAt;
@@ -102,4 +111,23 @@ chatRouter.post("/threads/:id/messages", requireAuth, (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+chatRouter.post("/threads/:id/read", requireAuth, (req, res) => {
+  const user = (req as AuthedRequest).user!;
+  const thread = db.state.chatThreads.find((t) => t.id === req.params.id);
+  if (!thread || !thread.participants.includes(user.id)) {
+    res.status(404).json({ error: "not_found" });
+    return;
+  }
+  let marked = 0;
+  for (const m of db.state.chatMessages) {
+    if (m.threadId !== thread.id) continue;
+    if (!m.readBy) m.readBy = [];
+    if (!m.readBy.includes(user.id)) {
+      m.readBy.push(user.id);
+      marked += 1;
+    }
+  }
+  res.json({ ok: true, marked });
 });

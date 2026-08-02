@@ -42,6 +42,20 @@ export const HARDHAT_ACCOUNTS = [
         label: "Borrower — Aisha",
         subtitle: "Tier 4 · first-time applicant",
     },
+    {
+        index: 6,
+        address: "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        role: "BORROWER",
+        label: "Borrower — Karim (group)",
+        subtitle: "Tier 4 · group lending demo",
+    },
+    {
+        index: 7,
+        address: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+        role: "REGULATOR",
+        label: "Regulatory Authority",
+        subtitle: "A6 · read-only audit portal",
+    },
 ];
 export function findAccountByRole(role, occurrence = 0) {
     return HARDHAT_ACCOUNTS.filter((a) => a.role === role)[occurrence];

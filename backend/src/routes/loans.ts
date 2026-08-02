@@ -71,10 +71,24 @@ loansRouter.get("/:id", requireAuth, (req, res) => {
     res.status(404).json({ error: "not_found" });
     return;
   }
+  const user = (req as AuthedRequest).user!;
+  const isOwner = loan.borrowerId === user.id;
+  const isStaff =
+    user.role === "OWNER" ||
+    user.role === "APPROVER" ||
+    user.role === "LOCAL_BANK_ADMIN" ||
+    user.role === "NATIONAL_BANK_ADMIN";
+  if (!isOwner && !isStaff) {
+    res.status(403).json({ error: "forbidden" });
+    return;
+  }
   const borrower = loan.borrowerId ? findUserById(loan.borrowerId) : null;
   const bank = findBankById(loan.lenderBankId);
   const requesterBank = loan.bankRequesterId ? findBankById(loan.bankRequesterId) : null;
-  res.json({ loan, borrower, bank, requesterBank });
+  const transactions = db.state.transactions
+    .filter((t) => t.loanId === loan.id)
+    .sort((a, b) => (a.at < b.at ? 1 : -1));
+  res.json({ loan, borrower, bank, requesterBank, transactions });
 });
 
 // ---------- Create: borrower loan request ----------
@@ -85,9 +99,14 @@ const loanCreateSchema = z.object({
   purpose: z.string().min(5).max(500),
   localBankId: z.string().min(1),
   category: z.string().max(60).optional(),
+  loanType: z.enum(["collateral", "credit"]).default("credit"),
+  collateralEth: z.number().nonnegative().max(10_000).optional(),
+  ltvBps: z.number().int().min(1).max(10_000).optional(),
+  /** Dev/demo: auto-activate so pay flow works without an approver */
+  autoActivate: z.boolean().optional(),
 });
 
-loansRouter.post("/", requireAuth, (req, res, next) => {
+loansRouter.post("/", requireAuth, async (req, res, next) => {
   try {
     const user = (req as AuthedRequest).user!;
     if (user.role !== "BORROWER") {
@@ -99,6 +118,20 @@ loansRouter.post("/", requireAuth, (req, res, next) => {
     if (!bank || bank.tier !== "LOCAL") {
       res.status(400).json({ error: "invalid_bank" });
       return;
+    }
+
+    if (body.loanType === "collateral") {
+      const collateral = body.collateralEth ?? 0;
+      if (collateral <= 0) {
+        res.status(400).json({ error: "collateral_required" });
+        return;
+      }
+      const ltvBps = body.ltvBps ?? 5000;
+      const maxBorrow = (collateral * ltvBps) / 10_000;
+      if (body.amount > maxBorrow + 1e-9) {
+        res.status(400).json({ error: "exceeds_ltv", maxBorrow, ltvBps });
+        return;
+      }
     }
 
     const existingPending = db.state.loans.find(
@@ -129,18 +162,12 @@ loansRouter.post("/", requireAuth, (req, res, next) => {
       res.status(400).json({ error: "insufficient_bank_reserve" });
       return;
     }
-    if (user.isFirstTime) {
-      const proof = db.state.incomeProofs
-        .filter((p) => p.userId === user.id)
-        .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))[0];
-      if (!proof) {
-        res.status(400).json({ error: "income_proof_required" });
-        return;
-      }
-    }
 
-    const isInstallment = body.amount >= 100;
     const gasCostEth = Number((0.002 + Math.random() * 0.003).toFixed(5));
+    const shouldActivate =
+      body.autoActivate === true ||
+      (body.autoActivate !== false && process.env.NODE_ENV !== "production");
+
     const loan: Loan = {
       id: db.uid("loan"),
       kind: "BORROWER",
@@ -148,17 +175,72 @@ loansRouter.post("/", requireAuth, (req, res, next) => {
       lenderBankId: bank.id,
       amount: body.amount,
       purpose: body.purpose,
-      category: body.category,
+      category: body.category ?? (body.loanType === "collateral" ? "Collateral" : "Credit"),
+      loanType: body.loanType,
+      collateralEth: body.collateralEth,
+      ltvBps: body.ltvBps,
       aprBps: bank.aprBps,
       termMonths: body.termMonths,
       status: "PENDING",
-      isInstallment,
+      isInstallment: true,
       installments: [],
       gasCostEth,
       createdAt: db.nowIso(),
       txHash: `0x${crypto.randomBytes(16).toString("hex")}`,
+      riskScore: body.loanType === "credit" ? 0.22 + Math.random() * 0.2 : 0.15 + Math.random() * 0.15,
     };
+
+    if (shouldActivate) {
+      loan.installments = buildInstallmentSchedule(loan.amount, loan.termMonths);
+      loan.deadline = loan.installments[loan.installments.length - 1]?.dueDate;
+      loan.status = "ACTIVE";
+      loan.approvedAt = db.nowIso();
+      loan.approvedBy = "system_auto";
+      bank.reserve -= loan.amount;
+      bank.totalLent += loan.amount;
+      user.totalBorrowedLifetime += loan.amount;
+      user.isFirstTime = false;
+      db.state.transactions.push({
+        id: db.uid("tx"),
+        type: "LOAN_APPROVED",
+        userId: user.id,
+        bankId: bank.id,
+        loanId: loan.id,
+        amount: loan.amount,
+        at: db.nowIso(),
+        txHash: loan.txHash,
+        note: "Auto-activated (dev)",
+      });
+      db.state.transactions.push({
+        id: db.uid("tx"),
+        type: "LOAN_DISBURSED",
+        userId: user.id,
+        bankId: bank.id,
+        loanId: loan.id,
+        amount: loan.amount,
+        at: db.nowIso(),
+        txHash: loan.txHash,
+      });
+    }
+
     db.state.loans.push(loan);
+    db.save();
+
+    try {
+      const { createNotification } = await import("../db/notifications");
+      await createNotification({
+        userId: user.id,
+        category: "loan",
+        title: shouldActivate ? "Loan disbursed" : "Loan request submitted",
+        body: shouldActivate
+          ? `Your ${loan.amount} ETH ${loan.loanType} loan is active.`
+          : `Your ${loan.amount} ETH request is pending review.`,
+        href: `/app/loans/${loan.id}`,
+      });
+    } catch {
+      /* notifications optional if DB down */
+    }
+
     res.status(201).json({ ok: true, loan });
   } catch (err) {
     next(err);
@@ -312,57 +394,75 @@ loansRouter.post(
 
 // ---------- Installment payment ----------
 
-loansRouter.post("/:id/installments/:idx/pay", requireAuth, (req, res) => {
-  const user = (req as AuthedRequest).user!;
-  const loan = db.state.loans.find((l) => l.id === req.params.id);
-  if (!loan) {
-    res.status(404).json({ error: "not_found" });
-    return;
-  }
-  if (loan.borrowerId !== user.id) {
-    res.status(403).json({ error: "not_your_loan" });
-    return;
-  }
-  const idx = Number(req.params.idx);
-  const installment = loan.installments.find((i) => i.index === idx);
-  if (!installment) {
-    res.status(404).json({ error: "installment_not_found" });
-    return;
-  }
-  if (installment.paid) {
-    res.status(400).json({ error: "already_paid" });
-    return;
-  }
-  installment.paid = true;
-  installment.paidAt = db.nowIso();
-  installment.txHash = `0x${crypto.randomBytes(16).toString("hex")}`;
+loansRouter.post("/:id/installments/:idx/pay", requireAuth, async (req, res, next) => {
+  try {
+    const user = (req as AuthedRequest).user!;
+    const loan = db.state.loans.find((l) => l.id === req.params.id);
+    if (!loan) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+    if (loan.borrowerId !== user.id) {
+      res.status(403).json({ error: "not_your_loan" });
+      return;
+    }
+    const idx = Number(req.params.idx);
+    const installment = loan.installments.find((i) => i.index === idx);
+    if (!installment) {
+      res.status(404).json({ error: "installment_not_found" });
+      return;
+    }
+    if (installment.paid) {
+      res.status(400).json({ error: "already_paid" });
+      return;
+    }
+    installment.paid = true;
+    installment.paidAt = db.nowIso();
+    installment.txHash = `0x${crypto.randomBytes(16).toString("hex")}`;
 
-  const bank = findBankById(loan.lenderBankId);
-  if (bank) {
-    bank.reserve += installment.amount;
-    bank.totalRepaid += installment.amount;
+    const bank = findBankById(loan.lenderBankId);
+    if (bank) {
+      bank.reserve += installment.amount;
+      bank.totalRepaid += installment.amount;
+    }
+
+    db.state.transactions.push({
+      id: db.uid("tx"),
+      type: "INSTALLMENT_PAID",
+      userId: user.id,
+      bankId: loan.lenderBankId,
+      loanId: loan.id,
+      amount: installment.amount,
+      at: db.nowIso(),
+      txHash: installment.txHash,
+      note: `Installment #${idx}`,
+    });
+
+    if (loan.installments.every((i) => i.paid)) {
+      loan.status = "REPAID";
+      loan.repaidAt = db.nowIso();
+      user.consecutivePaidLoans += 1;
+    }
+
+    db.save();
+
+    try {
+      const { createNotification } = await import("../db/notifications");
+      await createNotification({
+        userId: user.id,
+        category: "payment",
+        title: "Installment paid",
+        body: `Paid installment #${idx} (${installment.amount} ETH) on loan ${loan.id}.`,
+        href: `/app/loans/${loan.id}`,
+      });
+    } catch {
+      /* optional */
+    }
+
+    res.json({ ok: true, installment, loan });
+  } catch (err) {
+    next(err);
   }
-
-  db.state.transactions.push({
-    id: db.uid("tx"),
-    type: "INSTALLMENT_PAID",
-    userId: user.id,
-    bankId: loan.lenderBankId,
-    loanId: loan.id,
-    amount: installment.amount,
-    at: db.nowIso(),
-    txHash: installment.txHash,
-    note: `Installment #${idx}`,
-  });
-
-  // If all paid, mark REPAID and tick consecutive count.
-  if (loan.installments.every((i) => i.paid)) {
-    loan.status = "REPAID";
-    loan.repaidAt = db.nowIso();
-    user.consecutivePaidLoans += 1;
-  }
-
-  res.json({ ok: true, installment, loan });
 });
 
 // Single-payment repayment (for non-installment loans)

@@ -14,7 +14,9 @@ export type UserRole =
   | "NATIONAL_BANK_ADMIN"
   | "LOCAL_BANK_ADMIN"
   | "APPROVER" // Loan approver at a local bank
-  | "BORROWER";
+  | "BORROWER"
+  | "REGULATOR" // External regulatory authority (A6) — read-only
+  | "DEV_ADMIN"; // Temporary global developer admin — remove before production
 
 export type BankTier = "WORLD" | "NATIONAL" | "LOCAL";
 
@@ -39,18 +41,53 @@ export type TxType =
 
 export type IncomeStatus = "UNSUBMITTED" | "PENDING" | "APPROVED" | "REJECTED";
 
+export type KycStatus = "NOT_STARTED" | "PENDING" | "APPROVED" | "REJECTED";
+
+export type AccountIntent = "individual" | "group";
+
 export interface User {
   id: string;
   wallet: string;
   displayName: string;
   email?: string;
   country?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  accountType?: AccountIntent;
   role: UserRole;
   bankId?: string; // Present for bank staff
   consecutivePaidLoans: number;
   totalBorrowedLifetime: number; // ETH
   isFirstTime: boolean;
   monthlyIncomeUsd?: number;
+  /** Onboarding / KYC (Group B) — persisted in the JSON snapshot store */
+  kyc1Status?: KycStatus;
+  kyc1?: {
+    idFrontName?: string;
+    idBackName?: string;
+    selfieName?: string;
+    docHash?: string;
+    submittedAt?: string;
+    rejectionReason?: string;
+  };
+  kyc2Status?: KycStatus;
+  kyc2Skipped?: boolean;
+  kyc2?: {
+    addressDocName?: string;
+    incomeDocName?: string;
+    docHash?: string;
+    submittedAt?: string;
+    rejectionReason?: string;
+  };
+  consent?: {
+    risk: boolean;
+    data: boolean;
+    agent: boolean;
+    consentedAt: string;
+  };
+  onboardingComplete?: boolean;
+  /** Channel prefs for Settings (persisted in Postgres JSON). */
+  notificationPrefs?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -68,6 +105,8 @@ export interface Bank {
   totalLent: number; // Lent to borrowers (local) or national (world)
   totalRepaid: number;
   aprBps: number; // Rate charged to the tier below
+  /** Operational status (National → Local pause control, demo off-chain) */
+  status?: "ACTIVE" | "PAUSED";
   createdAt: string;
 }
 
@@ -91,6 +130,10 @@ export interface Loan {
   aprBps: number;
   termMonths: number;
   category?: string;
+  /** Retail product path (Section D) */
+  loanType?: "collateral" | "credit";
+  collateralEth?: number;
+  ltvBps?: number;
   status: LoanStatus;
   isInstallment: boolean;
   installments: Installment[];
@@ -99,6 +142,8 @@ export interface Loan {
   approvedBy?: string; // userId
   rejectedBy?: string;
   rejectionReason?: string;
+  /** Operator notes / info requests (Local Bank ops) */
+  notes?: string;
   txHash?: string;
   deadline?: string;
   createdAt: string;
@@ -149,6 +194,12 @@ export interface ChatMessage {
   senderId: string;
   body: string;
   createdAt: string;
+  /** Optional file metadata (name only — binary not stored in JSON demo). */
+  attachmentName?: string;
+  attachmentMime?: string;
+  attachmentSize?: number;
+  /** User ids that have read this message. */
+  readBy?: string[];
 }
 
 interface DB {
@@ -383,6 +434,29 @@ function seed(): DB {
       isFirstTime: true,
       createdAt: nowIso(),
     },
+    {
+      id: "usr_regulator",
+      wallet: "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+      displayName: "Regulatory Authority",
+      email: "regulator@cwb.example",
+      role: "REGULATOR",
+      consecutivePaidLoans: 0,
+      totalBorrowedLifetime: 0,
+      isFirstTime: false,
+      createdAt: nowIso(),
+    },
+    // TEMPORARY — remove DEV_ADMIN before production
+    {
+      id: "usr_dev_admin",
+      wallet: "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
+      displayName: "Dev Admin (temporary)",
+      email: "devadmin@cwb.example",
+      role: "DEV_ADMIN",
+      consecutivePaidLoans: 0,
+      totalBorrowedLifetime: 0,
+      isFirstTime: false,
+      createdAt: nowIso(),
+    },
   ];
 
   const demoLoan: Loan = {
@@ -395,8 +469,9 @@ function seed(): DB {
     aprBps: 800,
     termMonths: 12,
     category: "Small Business",
+    loanType: "credit",
     status: "ACTIVE",
-    isInstallment: false,
+    isInstallment: true,
     installments: Array.from({ length: 12 }).map((_, i) => ({
       index: i + 1,
       amount: 0.45,
@@ -643,6 +718,22 @@ export interface BorrowingLimits {
   maxActiveLoans: number;
   exceptionApplied: boolean;
   baseCap: number;
+  contributingLoans: {
+    sixMonth: Array<{
+      id: string;
+      amount: number;
+      approvedAt: string;
+      status: LoanStatus;
+      loanType?: string;
+    }>;
+    oneYear: Array<{
+      id: string;
+      amount: number;
+      approvedAt: string;
+      status: LoanStatus;
+      loanType?: string;
+    }>;
+  };
 }
 
 export function computeBorrowingLimits(userId: string): BorrowingLimits {
@@ -661,10 +752,11 @@ export function computeBorrowingLimits(userId: string): BorrowingLimits {
       (l.status === "APPROVED" || l.status === "ACTIVE" || l.status === "REPAID"),
   );
 
+  const inWindow = (cutoff: number) =>
+    loans.filter((l) => l.approvedAt && new Date(l.approvedAt).getTime() >= cutoff);
+
   const sumSince = (cutoff: number) =>
-    loans
-      .filter((l) => l.approvedAt && new Date(l.approvedAt).getTime() >= cutoff)
-      .reduce((acc, l) => acc + l.amount, 0);
+    inWindow(cutoff).reduce((acc, l) => acc + l.amount, 0);
 
   const borrowed6m = sumSince(sixMonthCutoff);
   const borrowed1y = sumSince(yearCutoff);
@@ -696,6 +788,15 @@ export function computeBorrowingLimits(userId: string): BorrowingLimits {
   const exceptionApplied = u.consecutivePaidLoans >= 3;
   const maxActiveLoans = exceptionApplied ? 2 : 1;
 
+  const mapContrib = (list: Loan[]) =>
+    list.map((l) => ({
+      id: l.id,
+      amount: l.amount,
+      approvedAt: l.approvedAt!,
+      status: l.status,
+      loanType: l.loanType,
+    }));
+
   return {
     sixMonth: {
       limit: sixMonthCap,
@@ -711,6 +812,10 @@ export function computeBorrowingLimits(userId: string): BorrowingLimits {
     maxActiveLoans,
     exceptionApplied,
     baseCap,
+    contributingLoans: {
+      sixMonth: mapContrib(inWindow(sixMonthCutoff)),
+      oneYear: mapContrib(inWindow(yearCutoff)),
+    },
   };
 }
 

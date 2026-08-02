@@ -7,6 +7,8 @@ export type Role =
   | "LOCAL_BANK_ADMIN"
   | "APPROVER"
   | "BORROWER"
+  | "REGULATOR"
+  | "DEV_ADMIN"
   | "GUEST";
 
 export interface SessionUser {
@@ -14,13 +16,19 @@ export interface SessionUser {
   wallet: string;
   displayName: string;
   email?: string;
+  phone?: string;
   country?: string;
+  dateOfBirth?: string;
+  accountType?: "individual" | "group";
   role: Role;
   bankId?: string;
   consecutivePaidLoans?: number;
   totalBorrowedLifetime?: number;
   isFirstTime?: boolean;
   monthlyIncomeUsd?: number;
+  onboardingComplete?: boolean;
+  kyc1Status?: string;
+  kyc2Status?: string;
 }
 
 interface SessionState {

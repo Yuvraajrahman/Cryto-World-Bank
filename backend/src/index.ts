@@ -4,21 +4,35 @@ import { config } from "./config";
 import { createApp } from "./app";
 import { startIndexer } from "./chain/indexer";
 import { startOverdueJob } from "./jobs/overdue";
+import { requirePrisma } from "./db/prisma";
 
 const logger = pino({
   transport: { target: "pino-pretty", options: { colorize: true } },
 });
 
-const app = createApp();
+async function main() {
+  try {
+    const prisma = requirePrisma();
+    await prisma.$queryRaw`SELECT 1`;
+    logger.info("PostgreSQL connected");
+  } catch (err) {
+    logger.error(
+      { err },
+      "PostgreSQL unavailable — start with `docker compose up -d` then `cd backend && npx prisma migrate deploy && npx prisma db seed`",
+    );
+    process.exit(1);
+  }
 
-app.listen(config.port, () => {
-  logger.info(`Crypto World Bank API listening on :${config.port}`);
-  // Fire-and-forget: indexer never blocks API startup. When CHAIN_RPC_URL or
-  // contract addresses are missing it logs a warning and returns.
-  startIndexer(logger).catch((err) => {
-    logger.warn({ err }, "indexer failed to start");
+  const app = createApp();
+  app.listen(config.port, () => {
+    logger.info(`Crypto World Bank API listening on :${config.port}`);
+    startIndexer(logger).catch((e) => {
+      logger.warn({ err: e }, "indexer failed to start");
+    });
+    const stopOverdue = startOverdueJob(logger);
+    process.on("SIGTERM", () => stopOverdue());
+    process.on("SIGINT", () => stopOverdue());
   });
-  const stopOverdue = startOverdueJob(logger);
-  process.on("SIGTERM", () => stopOverdue());
-  process.on("SIGINT", () => stopOverdue());
-});
+}
+
+main();

@@ -24,6 +24,9 @@
     "verify:phase2:sepolia": "hardhat run scripts/verify-phase2.ts --network sepolia",
     "frontend:dev": "cd frontend && npm run dev",
     "frontend:build": "cd frontend && npm run build",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:setup": "docker compose up -d && cd backend && npm run db:setup",
     "backend:dev": "cd backend && npm run dev",
     "backend:build": "cd backend && npm run build",
     "ml:dev": "cd ml-service && uvicorn app.main:app --reload --port 8000",
@@ -38,6 +41,7 @@
     "dotenv": "^16.4.5",
     "ethers": "^6.13.2",
     "hardhat": "^2.22.10",
+    "playwright": "^1.49.1",
     "solidity-coverage": "^0.8.12",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"

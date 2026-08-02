@@ -181,6 +181,20 @@ banksRouter.post(
         res.status(400).json({ error: "insufficient_reserve" });
         return;
       }
+      // Soft reserve-ratio guard (demo parity with /api/national-bank/capital/allocate)
+      if (from.tier === "NATIONAL") {
+        const minRatio = 0.15;
+        const position = Math.max(from.totalAllocated || 0, from.reserve + (from.totalLent ?? 0), 1);
+        const available = Math.max(0, from.reserve - position * minRatio);
+        if (body.amount > available + 1e-9) {
+          res.status(400).json({
+            error: "breaches_reserve_ratio",
+            message: `Allocation would leave national reserve below ${minRatio * 100}% minimum. Available: ${available.toFixed(4)} ETH.`,
+            availableToAllocateEth: available,
+          });
+          return;
+        }
+      }
       from.reserve -= body.amount;
       from.totalAllocated += body.amount;
       to.reserve += body.amount;

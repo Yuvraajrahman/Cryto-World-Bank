@@ -84,17 +84,29 @@ npm run deploy:local              # or deploy:sepolia / deploy:amoy
 
 Addresses are written to `deployment-info.json`.
 
-### 4. Run the backend + ML service
+### 4. Start PostgreSQL + migrate + seed
+
+Auth, onboarding, and the public reserve dashboard require Postgres (not the JSON prototype store).
 
 ```bash
-# Backend (port 4000)
+# Requires Docker Desktop running
+npm run db:setup
+# equivalent: docker compose up -d && cd backend && npm run db:setup
+```
+
+`DATABASE_URL` defaults to `postgresql://cwb:cwb@localhost:5432/crypto_world_bank` (see `backend/.env.example` and root `docker-compose.yml`).
+
+### 5. Run the backend + ML service
+
+```bash
+# Backend (port 4000) — exits if Postgres is down
 npm run backend:dev
 
 # ML stub (port 8000)
 npm run ml:dev
 ```
 
-### 5. Run the frontend
+### 6. Run the frontend
 
 ```bash
 npm run frontend:dev    # http://localhost:5173

@@ -19,6 +19,17 @@ import { chainRouter } from "./routes/chain";
 import { briefRouter } from "./routes/brief";
 import { oracleRouter } from "./routes/oracle";
 import { agentRouter } from "./routes/agent";
+import { publicRouter } from "./routes/public";
+import { onboardingRouter } from "./routes/onboarding";
+import { notificationsRouter } from "./routes/notifications";
+import { groupsRouter } from "./routes/groups";
+import { depositsRouter } from "./routes/deposits";
+import { passportRouter } from "./routes/passport";
+import { localBankRouter } from "./routes/localBank";
+import { nationalBankRouter } from "./routes/nationalBank";
+import { worldBankRouter } from "./routes/worldBank";
+import { auditRouter } from "./routes/audit";
+import { devAdminRouter } from "./routes/devAdmin";
 import { errorHandler } from "./middleware/error";
 
 // Builds the Express app without binding a port. index.ts wraps it in
@@ -87,6 +98,17 @@ export function createApp(): Express {
   });
 
   app.use("/api/auth", authRouter);
+  app.use("/api/public", publicRouter);
+  app.use("/api/onboarding", onboardingRouter);
+  app.use("/api/notifications", notificationsRouter);
+  app.use("/api/groups", groupsRouter);
+  app.use("/api/deposits", depositsRouter);
+  app.use("/api/passport", passportRouter);
+  app.use("/api/local-bank", localBankRouter);
+  app.use("/api/national-bank", nationalBankRouter);
+  app.use("/api/world-bank", worldBankRouter);
+  app.use("/api/audit", auditRouter);
+  app.use("/api/dev-admin", devAdminRouter);
   app.use("/api/banks", banksRouter);
   app.use("/api/loans", loansRouter);
   app.use("/api/market", marketRouter);

@@ -43,12 +43,12 @@ const nav: NavItem[] = [
   { to: "/app/simulation", label: "Global simulation", icon: Globe2, roles: ALL },
   { to: "/app/facilities", label: "Facilities", icon: PiggyBank, roles: ALL },
   {
-    to: "/app/loans",
+    to: "/app/loans/history",
     label: "My Loans",
     icon: Coins,
     roles: ["BORROWER", "OWNER", "NATIONAL_BANK_ADMIN", "LOCAL_BANK_ADMIN", "APPROVER"],
   },
-  { to: "/app/loans/new", label: "Request Loan", icon: FilePlus2, roles: ["BORROWER"] },
+  { to: "/app/loans/apply", label: "Request Loan", icon: FilePlus2, roles: ["BORROWER"] },
   {
     to: "/app/approvals",
     label: "Approvals Queue",
@@ -61,6 +61,7 @@ const nav: NavItem[] = [
     icon: Receipt,
     roles: ["BORROWER"],
   },
+  { to: "/app/loans/limits", label: "Borrowing limits", icon: Shield, roles: ["BORROWER"] },
   { to: "/app/market", label: "Markets", icon: LineChart, roles: ALL },
   { to: "/app/chat", label: "Messages", icon: MessageSquare, roles: ALL },
   { to: "/app/assistant", label: "AI Assistant", icon: Bot, roles: ALL },
@@ -70,7 +71,7 @@ const nav: NavItem[] = [
     icon: ShieldAlert,
     roles: ["APPROVER", "LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"],
   },
-  { to: "/app/profile", label: "Profile", icon: UserRound, roles: ALL },
+  { to: "/app/settings", label: "Profile", icon: UserRound, roles: ALL },
   {
     to: "/app/admin",
     label: "Admin",

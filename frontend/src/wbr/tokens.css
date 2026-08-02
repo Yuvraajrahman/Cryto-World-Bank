@@ -1,0 +1,142 @@
+/* =========================================================
+   WorldBankReserve — Design Tokens
+   Dark is default. Light is a first-class theme via
+   [data-theme="light"] (see ThemeProvider).
+   ========================================================= */
+
+:root,
+[data-theme="dark"]{
+  color-scheme: dark;
+
+  --bg-void:#05070c;
+  --bg-deep:#080c15;
+  --bg-deep-2:#0b111e;
+
+  --glass-fill:rgba(255,255,255,.045);
+  --glass-fill-strong:rgba(255,255,255,.085);
+  --glass-fill-elevated:rgba(13,17,27,.72);
+  --glass-border:rgba(255,255,255,.10);
+  --glass-border-strong:rgba(255,255,255,.20);
+  --glass-highlight:rgba(255,255,255,.55);
+
+  --gold:#c9a86a;
+  --gold-bright:#eed6a3;
+  --gold-dim:rgba(201,168,106,.35);
+  --signal:#6fa3ff;
+  --signal-bright:#a6c7ff;
+  --signal-dim:rgba(111,163,255,.32);
+
+  --success:#6fd6ab;
+  --success-bright:#a8ecc9;
+  --success-dim:rgba(111,214,171,.30);
+  --pending:#f0ab3e;
+  --pending-bright:#f7c876;
+  --pending-dim:rgba(240,171,62,.30);
+  --danger:#ff8585;
+  --danger-bright:#ffb0b0;
+  --danger-dim:rgba(255,133,133,.30);
+
+  --text-1:#f4f5f8;
+  --text-2:#9aa3b8;
+  --text-3:#5c6479;
+  --text-inverse:#1a1406;
+
+  --scrim:rgba(4,6,10,.55);
+  --orb-opacity:.55;
+  --grain-opacity:.035;
+}
+
+/* Cool pearl canvas — glass stays translucent, gold/signal unchanged in role */
+[data-theme="light"]{
+  color-scheme: light;
+
+  --bg-void:#eef1f6;
+  --bg-deep:#e4e8f0;
+  --bg-deep-2:#d8dee9;
+
+  --glass-fill:rgba(255,255,255,.52);
+  --glass-fill-strong:rgba(255,255,255,.78);
+  --glass-fill-elevated:rgba(255,255,255,.92);
+  --glass-border:rgba(15,23,42,.09);
+  --glass-border-strong:rgba(15,23,42,.16);
+  --glass-highlight:rgba(255,255,255,.95);
+
+  --gold:#b8924a;
+  --gold-bright:#8f6d2e;
+  --gold-dim:rgba(184,146,74,.32);
+  --signal:#3d7aef;
+  --signal-bright:#2563eb;
+  --signal-dim:rgba(61,122,239,.28);
+
+  --success:#1fa971;
+  --success-bright:#148a5a;
+  --success-dim:rgba(31,169,113,.22);
+  --pending:#d4880a;
+  --pending-bright:#b87308;
+  --pending-dim:rgba(212,136,10,.22);
+  --danger:#e04848;
+  --danger-bright:#c53030;
+  --danger-dim:rgba(224,72,72,.22);
+
+  --text-1:#0f1420;
+  --text-2:#4a5568;
+  --text-3:#7a8499;
+  --text-inverse:#1a1406;
+
+  --scrim:rgba(15,23,42,.28);
+  --orb-opacity:.28;
+  --grain-opacity:.025;
+}
+
+:root{
+  /* ---------- radius ---------- */
+  --r-xs:10px;
+  --r-sm:14px;
+  --r-md:20px;
+  --r-lg:28px;
+  --r-xl:36px;
+  --r-pill:999px;
+
+  /* ---------- blur ---------- */
+  --blur-sm:14px;
+  --blur-md:20px;
+  --blur-lg:26px;
+  --blur-xl:40px;
+
+  /* ---------- motion ---------- */
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --ease-inout:cubic-bezier(.65,0,.35,1);
+  --dur-instant:120ms;
+  --dur-fast:220ms;
+  --dur-base:420ms;
+  --dur-slow:650ms;
+
+  /* ---------- spacing ---------- */
+  --sp-1:4px;  --sp-2:8px;  --sp-3:12px; --sp-4:16px;
+  --sp-5:20px; --sp-6:24px; --sp-7:32px; --sp-8:40px;
+  --sp-9:48px; --sp-10:64px; --sp-11:80px; --sp-12:96px;
+
+  --section-pad-y:88px;
+  --section-pad-x:20px;
+  --container-max:1120px;
+
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+  --safe-left:env(safe-area-inset-left, 0px);
+  --safe-right:env(safe-area-inset-right, 0px);
+
+  --tap-min:44px;
+
+  --z-nav:50;
+  --z-sticky-cta:45;
+  --z-sheet:80;
+  --z-toast:100;
+}
+
+@media (min-width:768px){
+  :root{
+    --section-pad-y:150px;
+    --section-pad-x:24px;
+  }
+}

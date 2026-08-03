@@ -485,11 +485,12 @@ async function main() {
   await prisma.interestRateTier.deleteMany();
   await prisma.interestRateTier.createMany({
     data: [
-      { tierName: "BRONZE", minScore: 0, maxScore: 299, aprBps: 1200 },
-      { tierName: "SILVER", minScore: 300, maxScore: 549, aprBps: 1000 },
-      { tierName: "GOLD", minScore: 550, maxScore: 749, aprBps: 800 },
-      { tierName: "PLATINUM", minScore: 750, maxScore: 899, aprBps: 600 },
-      { tierName: "DIAMOND", minScore: 900, maxScore: 1000, aprBps: 500 },
+      // Score bands + modifiers aligned with PASSPORT_TIERS / CreditPassport.sol
+      { tierName: "BRONZE", minScore: 0, maxScore: 299, aprBps: 1000 },
+      { tierName: "SILVER", minScore: 300, maxScore: 549, aprBps: 975 },
+      { tierName: "GOLD", minScore: 550, maxScore: 749, aprBps: 950 },
+      { tierName: "PLATINUM", minScore: 750, maxScore: 899, aprBps: 900 },
+      { tierName: "DIAMOND", minScore: 900, maxScore: 1000, aprBps: 800 },
     ],
   });
 

@@ -1,17 +1,23 @@
 /**
  * Phase 2 economy simulator — callable service (CLI + Dev Admin API).
- * Uses Neon institutions/borrowers; persists capital + run history to Postgres.
+ * Off-chain Postgres simulation with contract-rule parity (reserve ratio, kinked rates, tier limits).
+ * Does not call Hardhat allocateCapital for every bank — durable writes go to Docker Postgres / Neon.
  */
 import crypto from "node:crypto";
 import type { RiskTier } from "@prisma/client";
 import { requirePrisma } from "../db/prisma";
 import { syncBanksFromPrisma, persistBankCapital } from "../db/banksSync";
 import { upsertInstitutionCapital, adjustInstitutionCapital } from "./institutionCapital";
-import { borrowAprFromUtilization, tierForScore, PASSPORT_TIERS } from "../lib/rates";
+import {
+  applyTierModifier,
+  borrowAprFromUtilization,
+  PASSPORT_TIERS,
+  splitNetInterest,
+  tierForScore,
+} from "../lib/rates";
 import {
   configToRateParams,
   getSimulationConfig,
-  type SimulationConfigSnapshot,
 } from "./simulationConfig";
 import { verifySimulationRun, type SimulationVerification } from "./verifySimulation";
 
@@ -24,7 +30,9 @@ async function resolveWorldInstitutionId(prisma: ReturnType<typeof requirePrisma
     where: { institutionType: "WORLD" },
     orderBy: { createdAt: "asc" },
   });
-  if (!world) throw new Error("No WORLD institution in Neon — run db:seed:testing first.");
+  if (!world) {
+    throw new Error("No WORLD institution in Postgres — run npm run db:seed:testing first.");
+  }
   return world.id;
 }
 
@@ -36,6 +44,10 @@ export type SimulateEconomyParams = {
   sampleNationals?: number;
   sampleLocalsPerNational?: number;
   clientsPerLocal?: number;
+  /** Delete prior sim-tagged loans / interbank / upward rows before writing. */
+  resetSample?: boolean;
+  /** If set, reuse this SimulationRun id (already RUNNING). */
+  runId?: string;
   triggeredBy?: string;
 };
 
@@ -61,12 +73,16 @@ export type SimulationRunSummary = {
   interbankLoans: number;
   upwardDeposits: number;
   netInterestUsdc: number;
+  interestToDepositors: number;
+  interestToInsurance: number;
+  interestToProtocol: number;
   totalRepaidUsdc: number;
   aggregateBalancesUsdc: number;
   maxUtilizationBps: number;
   configKinkBps: number;
   tierSnapshots: TierSnapshot[];
   sampleInstitutionIds: string[];
+  mode: "postgres_offchain";
 };
 
 function mulberry32(seed: number) {
@@ -86,7 +102,19 @@ function usdcWei(amount: number): string {
 function maxLoanUsdcForTier(tier: RiskTier, score: number): number {
   const name = tier.charAt(0) + tier.slice(1).toLowerCase();
   const row = PASSPORT_TIERS.find((t) => t.name === name) ?? tierForScore(score);
-  return row.maxLoanUsdc / 1_000_000;
+  // PASSPORT_TIERS.maxLoanUsdc is already whole USDC (e.g. 50_000), not micro-units
+  return row.maxLoanUsdc;
+}
+
+function tierModifierBps(
+  tier: RiskTier,
+  score: number,
+  configMods: Record<string, number>,
+): number {
+  const name = (tier.charAt(0) + tier.slice(1).toLowerCase()) as string;
+  const key = name.toUpperCase();
+  if (configMods[key] != null) return configMods[key]!;
+  return (PASSPORT_TIERS.find((t) => t.name === name) ?? tierForScore(score)).rateModifierBps;
 }
 
 function shuffle<T>(arr: T[], rand: () => number): T[] {
@@ -96,6 +124,31 @@ function shuffle<T>(arr: T[], rand: () => number): T[] {
     [a[i], a[j]] = [a[j]!, a[i]!];
   }
   return a;
+}
+
+/** Remove prior simulator-tagged rows so re-runs stay idempotent. */
+async function resetSimTaggedData(prisma: ReturnType<typeof requirePrisma>): Promise<void> {
+  const simRequests = await prisma.loanRequest.findMany({
+    where: { docHash: { startsWith: "sim_" } },
+    select: { id: true },
+  });
+  const requestIds = simRequests.map((r) => r.id);
+  if (requestIds.length > 0) {
+    const loans = await prisma.loan.findMany({
+      where: { requestId: { in: requestIds } },
+      select: { id: true },
+    });
+    const loanIds = loans.map((l) => l.id);
+    if (loanIds.length > 0) {
+      await prisma.installment.deleteMany({ where: { loanId: { in: loanIds } } });
+      await prisma.loan.deleteMany({ where: { id: { in: loanIds } } });
+    }
+    await prisma.loanRequest.deleteMany({ where: { id: { in: requestIds } } });
+  }
+  await prisma.upwardDepositRecord.deleteMany({
+    where: { onChainTxHash: { startsWith: "sim_upward_" } },
+  });
+  // Interbank rows from sim have no tag — leave historical; new sample still creates a few
 }
 
 export async function simulateEconomy(
@@ -109,40 +162,65 @@ export async function simulateEconomy(
   const seed = params.seed ?? 42;
   const clientMultiplier = Math.min(2, Math.max(0.1, params.clientMultiplier ?? 1));
   const simulatedDays = params.simulatedDays ?? 365;
-  const sampleNationals = Math.min(10, Math.max(1, params.sampleNationals ?? 5));
-  const sampleLocalsPerNational = Math.min(8, Math.max(1, params.sampleLocalsPerNational ?? 3));
+  // Raised defaults for local demo (still capped for ~60s Mac runs)
+  const sampleNationals = Math.min(15, Math.max(1, params.sampleNationals ?? 8));
+  const sampleLocalsPerNational = Math.min(10, Math.max(1, params.sampleLocalsPerNational ?? 4));
   const clientsPerLocal = Math.min(
-    10,
-    Math.max(1, Math.round((params.clientsPerLocal ?? 4) * clientMultiplier)),
+    12,
+    Math.max(1, Math.round((params.clientsPerLocal ?? 6) * clientMultiplier)),
   );
+  const resetSample = params.resetSample !== false;
 
   const rand = mulberry32(seed);
-  const runId = `sim_${crypto.randomBytes(6).toString("hex")}`;
+  const runId = params.runId ?? `sim_${crypto.randomBytes(6).toString("hex")}`;
   const startedAt = new Date();
 
-  await prisma.simulationRun.create({
-    data: {
-      id: runId,
-      seed,
-      totalCapitalUsdc,
-      clientMultiplier,
-      simulatedDays,
-      sampleNationals,
-      sampleLocalsPerNational,
-      clientsPerLocal,
-      status: "RUNNING",
-      configSnapshotJson: config as object,
-      triggeredBy: params.triggeredBy,
-      startedAt,
-    },
-  });
+  if (!params.runId) {
+    await prisma.simulationRun.create({
+      data: {
+        id: runId,
+        seed,
+        totalCapitalUsdc,
+        clientMultiplier,
+        simulatedDays,
+        sampleNationals,
+        sampleLocalsPerNational,
+        clientsPerLocal,
+        status: "RUNNING",
+        configSnapshotJson: config as object,
+        triggeredBy: params.triggeredBy,
+        startedAt,
+      },
+    });
+  } else {
+    await prisma.simulationRun.update({
+      where: { id: runId },
+      data: {
+        status: "RUNNING",
+        seed,
+        totalCapitalUsdc,
+        clientMultiplier,
+        simulatedDays,
+        sampleNationals,
+        sampleLocalsPerNational,
+        clientsPerLocal,
+        configSnapshotJson: config as object,
+        triggeredBy: params.triggeredBy,
+        startedAt,
+      },
+    });
+  }
 
   try {
+    if (resetSample) {
+      await resetSimTaggedData(prisma);
+    }
+
     const worldId = await resolveWorldInstitutionId(prisma);
     const nationals = await prisma.institution.findMany({
       where: { institutionType: "NATIONAL", id: { not: worldId } },
       include: { capital: true, nationalBank: true },
-      take: 200,
+      take: 250,
     });
     const sampledNationals = shuffle(nationals, rand).slice(0, sampleNationals);
 
@@ -154,7 +232,6 @@ export async function simulateEconomy(
     let totalRepaidUsdc = 0;
     let maxUtilizationBps = 0;
 
-    // Inject capital at World Bank
     await upsertInstitutionCapital(prisma, worldId, {
       reserveEth: totalCapitalUsdc,
       allocatedEth: 0,
@@ -181,9 +258,9 @@ export async function simulateEconomy(
         repaidEth: 0,
       });
 
+      // Move capital down the hierarchy (do not keep it on the parent as allocated)
       await adjustInstitutionCapital(prisma, worldId, {
         reserveEth: -nbShare,
-        allocatedEth: nbShare,
       });
 
       const locals = await prisma.institution.findMany({
@@ -192,7 +269,7 @@ export async function simulateEconomy(
           localBank: { parentNationalBankId: nb.id },
         },
         include: { capital: true, localBank: true },
-        take: 50,
+        take: 80,
       });
       const sampledLocals = shuffle(locals, rand).slice(0, sampleLocalsPerNational);
 
@@ -216,17 +293,17 @@ export async function simulateEconomy(
 
         await adjustInstitutionCapital(prisma, nb.id, {
           allocatedEth: -lbShare,
-          reserveEth: lbShare * 0.01,
         });
 
         const borrowers = await prisma.borrower.findMany({
           where: { registeredLocalBankId: lb.id },
           include: { creditPassport: true },
-          take: 100,
+          take: 120,
         });
         const picked = shuffle(borrowers, rand).slice(0, clientsPerLocal);
 
         let lbLent = 0;
+        let localPaidCount = 0;
         for (const borrower of picked) {
           if (lbLent >= lbPool * 0.85) break;
 
@@ -237,10 +314,13 @@ export async function simulateEconomy(
           if (principal < 0.01) continue;
 
           const termMonths = Math.min(24, 6 + Math.floor(rand() * 12));
-          const aprBps = borrowAprFromUtilization(
-            Math.min(9900, Math.floor(((lbLent + principal) / Math.max(lbPool, 1)) * 10_000)),
-            rateParams,
+          const utilBps = Math.min(
+            9900,
+            Math.floor(((lbLent + principal) / Math.max(lbPool, 1)) * 10_000),
           );
+          const baseApr = borrowAprFromUtilization(utilBps, rateParams);
+          const mod = tierModifierBps(tier, score, config.tierModifiers);
+          const aprBps = applyTierModifier(baseApr, mod);
 
           const req = await prisma.loanRequest.create({
             data: {
@@ -268,6 +348,7 @@ export async function simulateEconomy(
 
           const perInstallment = principal / termMonths;
           const installments = [];
+          let paidThisLoan = 0;
           for (let k = 0; k < termMonths; k++) {
             const due = new Date();
             due.setDate(due.getDate() + (k + 1) * 30);
@@ -276,6 +357,7 @@ export async function simulateEconomy(
             const paid = rand() < payProb;
             if (paid) {
               installmentsPaid += 1;
+              paidThisLoan += 1;
               totalRepaidUsdc += perInstallment;
             } else if (daysUntilDue <= simulatedDays) {
               installmentsLate += 1;
@@ -292,11 +374,13 @@ export async function simulateEconomy(
           await prisma.installment.createMany({ data: installments });
 
           const interest = (principal * aprBps * termMonths) / (10000 * 12);
-          netInterestUsdc += interest * (installmentsPaid / termMonths);
+          netInterestUsdc += interest * (paidThisLoan / Math.max(termMonths, 1));
+          localPaidCount += paidThisLoan;
 
           lbLent += principal;
           loansCreated += 1;
         }
+        void localPaidCount;
 
         const utilizationBps = Math.floor((lbLent / Math.max(lbPool, 1)) * 10_000);
         maxUtilizationBps = Math.max(maxUtilizationBps, utilizationBps);
@@ -307,7 +391,7 @@ export async function simulateEconomy(
             where: { id: lbRow.id },
             data: {
               lentEth: lbLent,
-              allocatedEth: lbPool - lbLent,
+              allocatedEth: Math.max(0, lbPool - lbLent),
               activeLoanCount: picked.length,
               syncedAt: new Date(),
             },
@@ -316,18 +400,17 @@ export async function simulateEconomy(
       }
     }
 
-    // Interbank + upward sample flows
     let interbankLoans = 0;
     if (sampledNationals.length >= 2) {
       const pairs = Math.min(3, sampledNationals.length - 1);
       for (let p = 0; p < pairs; p++) {
         const lender = sampledNationals[p]!;
-        const borrower = sampledNationals[p + 1]!;
+        const borrowerNb = sampledNationals[p + 1]!;
         const amount = 50_000 + rand() * 200_000;
         await prisma.interbankLoanRecord.create({
           data: {
             lenderId: lender.id,
-            borrowerId: borrower.id,
+            borrowerId: borrowerNb.id,
             principalWei: usdcWei(amount),
             tenorDays: 7 + Math.floor(rand() * 30),
             status: rand() > 0.3 ? "REPAID" : "ACTIVE",
@@ -343,7 +426,6 @@ export async function simulateEconomy(
       take: 5,
     });
     for (const lb of localSample) {
-      if (!lb.id.startsWith("bank_lb")) continue;
       const parent = await prisma.localBank.findUnique({ where: { institutionId: lb.id } });
       if (!parent) continue;
       const amount = 10_000 + rand() * 50_000;
@@ -390,6 +472,8 @@ export async function simulateEconomy(
       0,
     );
 
+    const interestSplit = splitNetInterest(netInterestUsdc);
+
     const summary: SimulationRunSummary = {
       runId,
       seed,
@@ -400,12 +484,14 @@ export async function simulateEconomy(
       interbankLoans,
       upwardDeposits,
       netInterestUsdc,
+      ...interestSplit,
       totalRepaidUsdc,
       aggregateBalancesUsdc,
       maxUtilizationBps,
       configKinkBps: config.kinkBps,
       tierSnapshots,
       sampleInstitutionIds: [...touchedIds],
+      mode: "postgres_offchain",
     };
 
     const verification = verifySimulationRun(summary, config.minReserveRatio);
@@ -434,10 +520,103 @@ export async function simulateEconomy(
   }
 }
 
+/**
+ * Create a RUNNING row and execute simulation in the background (for UI polling).
+ */
+export async function startSimulationAsync(
+  params: SimulateEconomyParams = {},
+): Promise<{ runId: string }> {
+  const prisma = requirePrisma();
+  const config = await getSimulationConfig();
+  const runId = `sim_${crypto.randomBytes(6).toString("hex")}`;
+  const totalCapitalUsdc = params.totalCapitalUsdc ?? 100_000_000;
+  const seed = params.seed ?? 42;
+  const clientMultiplier = Math.min(2, Math.max(0.1, params.clientMultiplier ?? 1));
+  const simulatedDays = params.simulatedDays ?? 365;
+  const sampleNationals = Math.min(15, Math.max(1, params.sampleNationals ?? 8));
+  const sampleLocalsPerNational = Math.min(10, Math.max(1, params.sampleLocalsPerNational ?? 4));
+  const clientsPerLocal = Math.min(
+    12,
+    Math.max(1, Math.round((params.clientsPerLocal ?? 6) * clientMultiplier)),
+  );
+
+  await prisma.simulationRun.create({
+    data: {
+      id: runId,
+      seed,
+      totalCapitalUsdc,
+      clientMultiplier,
+      simulatedDays,
+      sampleNationals,
+      sampleLocalsPerNational,
+      clientsPerLocal,
+      status: "RUNNING",
+      configSnapshotJson: config as object,
+      triggeredBy: params.triggeredBy,
+      startedAt: new Date(),
+    },
+  });
+
+  void simulateEconomy({ ...params, runId }).catch(() => {
+    /* status FAILED persisted inside simulateEconomy */
+  });
+
+  return { runId };
+}
+
+/** Sequential 100M random vs 1B optimized contrast (Phase 3 light). */
+export async function runContrastSimulations(opts: {
+  triggeredBy?: string;
+  randomSeed?: number;
+}): Promise<{
+  random100M: { summary: SimulationRunSummary; verification: SimulationVerification };
+  optimized1B: { summary: SimulationRunSummary; verification: SimulationVerification };
+}> {
+  const seed = opts.randomSeed ?? Math.floor(Math.random() * 99_999);
+  const random100M = await simulateEconomy({
+    totalCapitalUsdc: 100_000_000,
+    seed,
+    resetSample: true,
+    triggeredBy: opts.triggeredBy,
+    sampleNationals: 8,
+    sampleLocalsPerNational: 4,
+    clientsPerLocal: 6,
+  });
+
+  const { optimizeSimulationConfig } = await import("./optimizeSimulation");
+  const { updateSimulationConfig, getSimulationConfig } = await import("./simulationConfig");
+  const current = await getSimulationConfig();
+  const preview = optimizeSimulationConfig(current, 1_000_000_000);
+  await updateSimulationConfig(preview.optimized, {
+    changedBy: opts.triggeredBy,
+    note: "Contrast run: apply optimized config for 1B",
+  });
+
+  const optimized1B = await simulateEconomy({
+    totalCapitalUsdc: 1_000_000_000,
+    seed: seed + 1,
+    resetSample: true,
+    triggeredBy: opts.triggeredBy,
+    sampleNationals: 8,
+    sampleLocalsPerNational: 4,
+    clientsPerLocal: 6,
+  });
+
+  return { random100M, optimized1B };
+}
+
 export async function getLatestSimulationRun() {
   const prisma = requirePrisma();
   return prisma.simulationRun.findFirst({
     orderBy: { startedAt: "desc" },
+  });
+}
+
+export async function listSimulationRuns(limit = 10) {
+  const prisma = requirePrisma();
+  return prisma.simulationRun.findMany({
+    orderBy: { startedAt: "desc" },
+    take: limit,
   });
 }
 

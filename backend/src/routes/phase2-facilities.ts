@@ -5,6 +5,7 @@ import { getPrisma } from "../db/prisma";
 import { getChainProvider } from "../chain/provider";
 import { fetchCapitalRequests } from "../chain/capitalRequests";
 import { scanOverdueLoans } from "../jobs/overdue";
+import { PASSPORT_TIERS } from "../lib/rates";
 
 export function registerPhase2FacilityRoutes(router: Router): void {
   router.get("/capital-requests", async (req, res) => {
@@ -200,14 +201,17 @@ export function registerPhase2FacilityRoutes(router: Router): void {
         return;
       }
     }
+    // Fallback aligned with PASSPORT_TIERS (CreditPassport.sol / rates.ts)
+    const baseApr = 1000;
     res.json({
-      tiers: [
-        { tierName: "BRONZE", minScore: 0, maxScore: 399, aprBps: 1200 },
-        { tierName: "SILVER", minScore: 400, maxScore: 549, aprBps: 1000 },
-        { tierName: "GOLD", minScore: 550, maxScore: 699, aprBps: 800 },
-        { tierName: "PLATINUM", minScore: 700, maxScore: 799, aprBps: 600 },
-        { tierName: "DIAMOND", minScore: 800, maxScore: 850, aprBps: 500 },
-      ],
+      tiers: PASSPORT_TIERS.map((t) => ({
+        tierName: t.name.toUpperCase(),
+        minScore: t.minScore,
+        maxScore: t.maxScore,
+        aprBps: baseApr + t.rateModifierBps,
+        rateModifierBps: t.rateModifierBps,
+        maxLoanUsdc: t.maxLoanUsdc,
+      })),
     });
   });
 

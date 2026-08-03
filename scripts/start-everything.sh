@@ -271,18 +271,25 @@ else
   warn "Could not detect tunnel URL — check logs/tunnel.log"
 fi
 
-# Push tunnel URL to Vercel frontend (VITE_* is baked at build time → redeploy)
+# Point Vercel UI at Mac via same-origin rewrites (avoids ngrok free-tier CORS interstitial).
+# Browser → cryto-world-bank.vercel.app/api/* → rewrite → tunnel → localhost:4000
 # Project link lives at repo root (.vercel → cryto-world-bank).
 if [[ "$SKIP_VERCEL" -eq 1 ]]; then
   warn "Skipping Vercel env/redeploy (--skip-vercel)"
 elif [[ -n "$TUNNEL_URL" ]] && command -v vercel >/dev/null 2>&1; then
-  info "Pointing Vercel frontend at tunnel (VITE_API_PRIMARY_URL)…"
+  info "Writing Vercel API rewrites → tunnel (same-origin, no CORS)…"
   VERCEL_CWD="$ROOT"
-  if [[ ! -f "$ROOT/.vercel/project.json" ]]; then
-    warn "No .vercel/project.json at repo root — run: vercel link --yes"
-  fi
+  cat > "$ROOT/frontend/vercel.json" <<EOF
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "${TUNNEL_URL}/api/\$1" },
+    { "source": "/health", "destination": "${TUNNEL_URL}/health" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+EOF
+  ok "frontend/vercel.json rewrites → $TUNNEL_URL"
 
-  # Ensure frontend/.vercel mirrors root link (some vercel versions want cwd=frontend)
   mkdir -p "$ROOT/frontend/.vercel"
   if [[ -f "$ROOT/.vercel/project.json" ]]; then
     cp "$ROOT/.vercel/project.json" "$ROOT/frontend/.vercel/project.json"
@@ -290,30 +297,27 @@ elif [[ -n "$TUNNEL_URL" ]] && command -v vercel >/dev/null 2>&1; then
 
   vercel env rm VITE_API_PRIMARY_URL production --yes --cwd "$VERCEL_CWD" \
     >"$LOG_DIR/vercel-env.log" 2>&1 || true
-
-  if printf '%s\n' "$TUNNEL_URL" | vercel env add VITE_API_PRIMARY_URL production --cwd "$VERCEL_CWD" \
+  # same-origin → frontend calls /api on vercel.app (rewritten to tunnel)
+  if printf '%s\n' "same-origin" | vercel env add VITE_API_PRIMARY_URL production --cwd "$VERCEL_CWD" \
       >>"$LOG_DIR/vercel-env.log" 2>&1; then
-    ok "Vercel VITE_API_PRIMARY_URL = $TUNNEL_URL"
+    ok "Vercel VITE_API_PRIMARY_URL = same-origin"
 
     vercel env rm VITE_API_FALLBACK_URL production --yes --cwd "$VERCEL_CWD" \
       >>"$LOG_DIR/vercel-env.log" 2>&1 || true
     printf '%s\n' "$CLOUD_API_FALLBACK" | vercel env add VITE_API_FALLBACK_URL production --cwd "$VERCEL_CWD" \
       >>"$LOG_DIR/vercel-env.log" 2>&1 || true
 
-    info "Redeploying Vercel frontend so build picks up new API URL…"
+    info "Redeploying Vercel frontend (rewrites + same-origin API)…"
     if (cd "$ROOT" && vercel deploy --prod --yes) >"$LOG_DIR/vercel-deploy.log" 2>&1; then
       ok "Vercel frontend redeployed → $VERCEL_FRONTEND_URL"
     else
       warn "Vercel deploy failed — see logs/vercel-deploy.log"
-      warn "Manual: vercel env add VITE_API_PRIMARY_URL production && vercel deploy --prod"
     fi
   else
     warn "Could not set Vercel env — see logs/vercel-env.log"
-    warn "Manual: printf '%s' '$TUNNEL_URL' | vercel env add VITE_API_PRIMARY_URL production"
-    warn "Then: vercel deploy --prod"
   fi
 elif [[ -n "$TUNNEL_URL" ]]; then
-  warn "vercel CLI not found — set VITE_API_PRIMARY_URL=$TUNNEL_URL on Vercel dashboard, then redeploy"
+  warn "vercel CLI not found — write frontend/vercel.json rewrites to $TUNNEL_URL and redeploy"
 fi
 
 echo

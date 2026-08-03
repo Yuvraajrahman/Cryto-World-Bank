@@ -1,12 +1,15 @@
 /**
  * Heuristic optimizer for Phase 2B — keeps utilization under kink at large capital scales.
  *
- * Optimizes for:
- * - Expected loan deployment ≤ 65% utilization (under 80% kink)
- * - Reserve ratio ≥ minReserveRatio at each tier after randomized flows
- * - Depositor yield not starved (baseRate + slope1 capped)
+ * What it optimizes for:
+ * - Expected loan deployment ≤ ~65% utilization (under 80% kink at U*)
+ * - Reserve ratio ≥ minReserveRatio after randomized sample flows
+ * - Depositor yield not starved (baseRate + slope1 soft-capped as capital grows)
  *
- * Assumes: representative sample simulation matches aggregate stress; no LiquidationEngine.
+ * Assumptions / limits:
+ * - Sample simulation stress ≈ aggregate; not a full Monte Carlo of 27k clients
+ * - No LiquidationEngine — solvency not modeled beyond reserve floors
+ * - Closed-form scale heuristics (1/√scale, /scale), not a solver — transparent for thesis demos
  */
 import type { SimulationConfigSnapshot } from "./simulationConfig";
 

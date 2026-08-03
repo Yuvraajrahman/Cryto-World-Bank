@@ -1,3 +1,7 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://subbronchial-redolent-toya.ngrok-free.dev/api/$1" },
+    { "source": "/health", "destination": "https://subbronchial-redolent-toya.ngrok-free.dev/health" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

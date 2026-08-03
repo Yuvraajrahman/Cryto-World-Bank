@@ -1,6 +1,6 @@
 /**
  * Runtime simulation config — single source for Phase 2 runs and Phase 2B admin panel.
- * Persisted in Neon (SimulationConfig table).
+ * Persisted in Postgres (SimulationConfig table; Docker local or Neon).
  */
 import crypto from "node:crypto";
 import { requirePrisma } from "../db/prisma";

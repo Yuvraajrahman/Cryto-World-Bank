@@ -33,6 +33,10 @@ async function request<T>(path: string, init: RequestInit = {}, retried = false)
     headers.set("content-type", "application/json");
   }
   if (token) headers.set("authorization", `Bearer ${token}`);
+  // Free ngrok interstitial returns HTML without CORS; skip when hitting tunnel directly.
+  if (!headers.has("ngrok-skip-browser-warning")) {
+    headers.set("ngrok-skip-browser-warning", "1");
+  }
 
   const base = await resolveApiBaseUrl(retried);
   let res: Response;

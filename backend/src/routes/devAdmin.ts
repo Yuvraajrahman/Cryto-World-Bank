@@ -23,8 +23,16 @@ import {
   getSimulationConfigHistory,
   revertSimulationConfigField,
 } from "../services/simulationConfig";
-import { simulateEconomy, getLatestSimulationRun, getSimulationRun } from "../services/simulateEconomy";
+import {
+  simulateEconomy,
+  startSimulationAsync,
+  getLatestSimulationRun,
+  getSimulationRun,
+  listSimulationRuns,
+  runContrastSimulations,
+} from "../services/simulateEconomy";
 import { optimizeSimulationConfig } from "../services/optimizeSimulation";
+import { PASSPORT_TIERS } from "../lib/rates";
 
 export const devAdminRouter = Router();
 
@@ -717,9 +725,12 @@ const simulationRunSchema = z.object({
   seed: z.number().int().optional(),
   clientMultiplier: z.number().min(0.1).max(2).optional(),
   simulatedDays: z.number().int().min(30).max(3650).optional(),
-  sampleNationals: z.number().int().min(1).max(10).optional(),
-  sampleLocalsPerNational: z.number().int().min(1).max(8).optional(),
-  clientsPerLocal: z.number().int().min(1).max(10).optional(),
+  sampleNationals: z.number().int().min(1).max(15).optional(),
+  sampleLocalsPerNational: z.number().int().min(1).max(10).optional(),
+  clientsPerLocal: z.number().int().min(1).max(12).optional(),
+  resetSample: z.boolean().optional(),
+  /** When true, return { runId } immediately and finish in background (poll GET /runs/:id). */
+  async: z.boolean().optional(),
 });
 
 const simulationConfigSchema = z.object({
@@ -736,7 +747,17 @@ devAdminRouter.get("/simulation/config", async (_req, res, next) => {
   try {
     const config = await getSimulationConfig();
     const history = await getSimulationConfigHistory(20);
-    res.json({ config, history });
+    res.json({
+      config,
+      history,
+      passportTiers: PASSPORT_TIERS.map((t) => ({
+        name: t.name,
+        minScore: t.minScore,
+        maxScore: t.maxScore,
+        maxLoanUsdc: t.maxLoanUsdc,
+        rateModifierBps: t.rateModifierBps,
+      })),
+    });
   } catch (err) {
     next(err);
   }
@@ -788,8 +809,27 @@ devAdminRouter.post("/simulation/run", async (req, res, next) => {
   try {
     const actor = (req as AuthedRequest).user!;
     const body = simulationRunSchema.parse(req.body ?? {});
+    const { async: runAsync, ...simParams } = body;
+
+    if (runAsync) {
+      const { runId } = await startSimulationAsync({
+        ...simParams,
+        resetSample: simParams.resetSample ?? true,
+        triggeredBy: actor.id,
+      });
+      await writeAudit("SIMULATION_RUN", actor.id, {
+        runId,
+        async: true,
+        totalCapitalUsdc: simParams.totalCapitalUsdc ?? 100_000_000,
+        seed: simParams.seed ?? 42,
+      });
+      res.status(202).json({ runId, status: "RUNNING" });
+      return;
+    }
+
     const result = await simulateEconomy({
-      ...body,
+      ...simParams,
+      resetSample: simParams.resetSample ?? true,
       triggeredBy: actor.id,
     });
     await writeAudit("SIMULATION_RUN", actor.id, {
@@ -799,6 +839,38 @@ devAdminRouter.post("/simulation/run", async (req, res, next) => {
       pass: result.verification.pass,
     });
     res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.post("/simulation/contrast", async (req, res, next) => {
+  try {
+    const actor = (req as AuthedRequest).user!;
+    const body = z
+      .object({ randomSeed: z.number().int().optional() })
+      .parse(req.body ?? {});
+    const result = await runContrastSimulations({
+      triggeredBy: actor.id,
+      randomSeed: body.randomSeed,
+    });
+    await writeAudit("SIMULATION_CONTRAST", actor.id, {
+      random100M: result.random100M.summary.runId,
+      optimized1B: result.optimized1B.summary.runId,
+      randomPass: result.random100M.verification.pass,
+      optimizedPass: result.optimized1B.verification.pass,
+    } as Prisma.InputJsonValue);
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.get("/simulation/runs", async (req, res, next) => {
+  try {
+    const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 10));
+    const runs = await listSimulationRuns(limit);
+    res.json({ runs });
   } catch (err) {
     next(err);
   }

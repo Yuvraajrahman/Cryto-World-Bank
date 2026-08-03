@@ -23,8 +23,9 @@ export function verifySimulationRun(
   const checks: VerificationCheck[] = [];
   const tol = Math.max(1, summary.totalCapitalUsdc * 0.001);
 
-  const expectedTotal =
-    summary.totalCapitalUsdc + summary.netInterestUsdc - summary.totalRepaidUsdc;
+  // InstitutionCapital holds injected funds (reserve+allocated+lent). Accrued interest and
+  // installment "paid" flags are ledger metadata — they are not double-booked into capital rows.
+  const expectedTotal = summary.totalCapitalUsdc;
   const actualTotal = summary.aggregateBalancesUsdc;
   const conservationOk = Math.abs(actualTotal - expectedTotal) <= tol;
   checks.push({
@@ -32,8 +33,8 @@ export function verifySimulationRun(
     label: "Capital conservation",
     pass: conservationOk,
     detail: conservationOk
-      ? `Aggregate ${actualTotal.toLocaleString()} USDC ≈ injected + interest − repaid (${expectedTotal.toLocaleString()}).`
-      : `Mismatch: aggregate ${actualTotal.toLocaleString()} vs expected ${expectedTotal.toLocaleString()} (tol ${tol.toFixed(0)}).`,
+      ? `Aggregate ${actualTotal.toLocaleString()} USDC ≈ injected ${expectedTotal.toLocaleString()} (interest ${summary.netInterestUsdc.toLocaleString()} tracked off capital rows).`
+      : `Mismatch: aggregate ${actualTotal.toLocaleString()} vs injected ${expectedTotal.toLocaleString()} (tol ${tol.toFixed(0)}).`,
   });
 
   const negatives = summary.tierSnapshots.filter(

@@ -42,6 +42,29 @@ export function borrowAprFromUtilization(
   );
 }
 
+/** Apply passport / SimulationConfig tier rate modifier (bps). Floor at 50 bps. */
+export function applyTierModifier(aprBps: number, rateModifierBps: number): number {
+  return Math.max(50, aprBps + rateModifierBps);
+}
+
+/**
+ * Paper-aligned NetInterest split after accrued interest (off-chain ledger).
+ * 70% depositors / 20% InsuranceFund / 10% protocol — documented assumption for thesis demo.
+ */
+export const INTEREST_SPLIT = {
+  depositors: 0.7,
+  insurance: 0.2,
+  protocol: 0.1,
+} as const;
+
+export function splitNetInterest(netInterestUsdc: number) {
+  return {
+    interestToDepositors: netInterestUsdc * INTEREST_SPLIT.depositors,
+    interestToInsurance: netInterestUsdc * INTEREST_SPLIT.insurance,
+    interestToProtocol: netInterestUsdc * INTEREST_SPLIT.protocol,
+  };
+}
+
 export function tierForScore(score: number): (typeof PASSPORT_TIERS)[number] {
   const s = Math.min(Math.max(Math.floor(score), 0), 1000);
   for (let i = PASSPORT_TIERS.length - 1; i >= 0; i--) {

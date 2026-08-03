@@ -2,13 +2,20 @@
  * API base URL resolution with Mac-first / cloud-fallback.
  *
  * Env (production):
- *   VITE_API_PRIMARY_URL   — HTTPS tunnel to your Mac (e.g. ngrok / Cloudflare)
- *   VITE_API_FALLBACK_URL  — Cloud API when Mac is off (default: cryto-world-bank-api.vercel.app)
+ *   VITE_API_PRIMARY_URL=same-origin
+ *     → browser calls /api and /health on cryto-world-bank.vercel.app
+ *     → Vercel rewrites those to your Mac tunnel (no CORS / no ngrok interstitial)
+ *   VITE_API_PRIMARY_URL=https://….ngrok-free.dev
+ *     → direct tunnel (fragile on free ngrok — CORS interstitial)
+ *   VITE_API_FALLBACK_URL
+ *     → Cloud API when Mac/tunnel is down (default: cryto-world-bank-api.vercel.app)
  *
  * Dev: empty string → Vite proxy to localhost:4000.
  */
 
-const PRIMARY = normalizeBase(import.meta.env.VITE_API_PRIMARY_URL);
+const SAME_ORIGIN_TOKEN = "same-origin";
+
+const PRIMARY_RAW = normalizeBase(import.meta.env.VITE_API_PRIMARY_URL);
 const FALLBACK =
   normalizeBase(import.meta.env.VITE_API_FALLBACK_URL) ||
   normalizeBase(import.meta.env.VITE_API_BASE_URL) ||
@@ -24,7 +31,14 @@ export type ApiBackendKind = "dev" | "local" | "cloud";
 
 function normalizeBase(v: unknown): string {
   if (typeof v !== "string" || !v.trim()) return "";
-  return v.trim().replace(/\/$/, "");
+  const t = v.trim().replace(/\/$/, "");
+  if (t === SAME_ORIGIN_TOKEN || t === "/") return SAME_ORIGIN_TOKEN;
+  return t;
+}
+
+/** Value used in fetch(`${base}${path}`) — same-origin → "". */
+function toFetchBase(stored: string): string {
+  return stored === SAME_ORIGIN_TOKEN ? "" : stored;
 }
 
 function readCache(): { base: string; label: ApiBackendKind; at: number } | null {
@@ -67,22 +81,29 @@ export function getApiBackendLabel(): ApiBackendKind {
   if (import.meta.env.DEV) return "dev";
   const cached = readCache();
   if (cached?.label) return cached.label;
-  return PRIMARY ? "local" : "cloud";
+  return PRIMARY_RAW ? "local" : "cloud";
 }
 
 /** Sync read — cached or best guess (use resolveApiBaseUrl before first API call). */
 export function getApiBaseUrl(): string {
   if (import.meta.env.DEV) return "";
   const cached = readCache();
-  if (cached) return cached.base;
-  return PRIMARY || FALLBACK;
+  if (cached) return toFetchBase(cached.base);
+  if (PRIMARY_RAW === SAME_ORIGIN_TOKEN) return "";
+  return PRIMARY_RAW || FALLBACK;
 }
 
-async function pingHealth(base: string): Promise<boolean> {
+async function pingHealth(storedBase: string): Promise<boolean> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), HEALTH_TIMEOUT_MS);
   try {
-    const res = await fetch(`${base}/health`, { signal: ctrl.signal, cache: "no-store" });
+    const base = toFetchBase(storedBase);
+    const res = await fetch(`${base}/health`, {
+      signal: ctrl.signal,
+      cache: "no-store",
+      // Free ngrok interstitial: skip when (rarely) hitting the tunnel directly
+      headers: { "ngrok-skip-browser-warning": "1" },
+    });
     return res.ok;
   } catch {
     return false;
@@ -91,18 +112,21 @@ async function pingHealth(base: string): Promise<boolean> {
   }
 }
 
-/** Pick Mac tunnel when healthy, else cloud (Neon) API. */
+/**
+ * Prefer Mac (same-origin Vercel→tunnel rewrite, or direct tunnel) when healthy;
+ * else cloud (Neon) API.
+ */
 export async function resolveApiBaseUrl(force = false): Promise<string> {
   if (import.meta.env.DEV) return "";
 
   if (!force) {
     const cached = readCache();
-    if (cached) return cached.base;
+    if (cached) return toFetchBase(cached.base);
   }
 
-  if (PRIMARY && (await pingHealth(PRIMARY))) {
-    writeCache(PRIMARY, "local");
-    return PRIMARY;
+  if (PRIMARY_RAW && (await pingHealth(PRIMARY_RAW))) {
+    writeCache(PRIMARY_RAW, "local");
+    return toFetchBase(PRIMARY_RAW);
   }
 
   writeCache(FALLBACK, "cloud");
@@ -110,5 +134,5 @@ export async function resolveApiBaseUrl(force = false): Promise<string> {
 }
 
 export function getConfiguredApiEndpoints(): { primary: string; fallback: string } {
-  return { primary: PRIMARY, fallback: FALLBACK };
+  return { primary: PRIMARY_RAW, fallback: FALLBACK };
 }

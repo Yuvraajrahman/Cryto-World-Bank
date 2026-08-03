@@ -8,5 +8,5 @@ export function getApiBaseUrl() {
         return "";
     if (typeof fromEnv === "string" && fromEnv.length > 0)
         return fromEnv;
-    return import.meta.env.DEV ? "" : "http://localhost:4000";
+    return "";
 }

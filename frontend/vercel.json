@@ -1,4 +1,8 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://cryto-world-bank-api.vercel.app/api/:path*" },
+    { "source": "/health", "destination": "https://cryto-world-bank-api.vercel.app/health" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
 

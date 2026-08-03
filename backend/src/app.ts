@@ -54,6 +54,16 @@ export function createApp(): Express {
             callback(null, true);
             return;
           }
+          // Allow Vercel production + preview deployments
+          try {
+            const u = new URL(origin);
+            if (u.hostname.endsWith(".vercel.app")) {
+              callback(null, true);
+              return;
+            }
+          } catch {
+            /* fall through */
+          }
           callback(new Error("Not allowed by CORS"));
           return;
         }

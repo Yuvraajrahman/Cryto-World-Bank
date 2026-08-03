@@ -6,5 +6,6 @@ export function getApiBaseUrl(): string {
   const fromEnv = import.meta.env.VITE_API_BASE_URL;
   if (fromEnv === "") return "";
   if (typeof fromEnv === "string" && fromEnv.length > 0) return fromEnv;
-  return import.meta.env.DEV ? "" : "http://localhost:4000";
+  // Dev: Vite proxy. Production: same-origin (Vercel rewrites /api → backend).
+  return "";
 }

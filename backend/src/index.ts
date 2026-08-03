@@ -4,8 +4,7 @@ import { config } from "./config";
 import { createApp } from "./app";
 import { startIndexer } from "./chain/indexer";
 import { startOverdueJob } from "./jobs/overdue";
-import { requirePrisma } from "./db/prisma";
-import { syncBanksFromPrisma } from "./db/banksSync";
+import { bootstrapApi } from "./bootstrap";
 
 const logger = pino({
   transport: { target: "pino-pretty", options: { colorize: true } },
@@ -13,8 +12,7 @@ const logger = pino({
 
 async function main() {
   try {
-    const prisma = requirePrisma();
-    await prisma.$queryRaw`SELECT 1`;
+    await bootstrapApi();
     logger.info("PostgreSQL connected");
   } catch (err) {
     logger.error(
@@ -24,24 +22,17 @@ async function main() {
     process.exit(1);
   }
 
-  try {
-    const synced = await syncBanksFromPrisma();
-    if (synced.count > 0) {
-      logger.info({ banks: synced.count }, "Synced allocation banks from Prisma");
-    }
-  } catch (err) {
-    logger.warn({ err }, "Bank sync from Prisma skipped");
-  }
-
   const app = createApp();
   app.listen(config.port, () => {
     logger.info(`Crypto World Bank API listening on :${config.port}`);
-    startIndexer(logger).catch((e) => {
-      logger.warn({ err: e }, "indexer failed to start");
-    });
-    const stopOverdue = startOverdueJob(logger);
-    process.on("SIGTERM", () => stopOverdue());
-    process.on("SIGINT", () => stopOverdue());
+    if (process.env.VERCEL !== "1") {
+      startIndexer(logger).catch((e) => {
+        logger.warn({ err: e }, "indexer failed to start");
+      });
+      const stopOverdue = startOverdueJob(logger);
+      process.on("SIGTERM", () => stopOverdue());
+      process.on("SIGINT", () => stopOverdue());
+    }
   });
 }
 

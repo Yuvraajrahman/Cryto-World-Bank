@@ -28,6 +28,9 @@ contract GroupLendingPool is AccessControl, ReentrancyGuard {
     bool active;
   }
 
+  uint8 public constant MIN_MEMBERS = 3;
+  uint8 public constant MAX_MEMBERS = 20;
+
   uint256 public nextGroupId = 1;
   mapping(uint256 => Group) public groups;
   mapping(uint256 => mapping(address => Member)) public members;
@@ -59,6 +62,7 @@ contract GroupLendingPool is AccessControl, ReentrancyGuard {
   function addMember(uint256 groupId, address member) external onlyRole(ORGANIZER_ROLE) {
     Group storage g = groups[groupId];
     require(g.status == GroupStatus.Forming, "not forming");
+    require(g.memberCount < MAX_MEMBERS, "group full");
     require(!members[groupId][member].active, "exists");
     members[groupId][member] = Member({ wallet: member, consented: false, active: true });
     groupMembers[groupId].push(member);
@@ -73,7 +77,10 @@ contract GroupLendingPool is AccessControl, ReentrancyGuard {
     m.consented = true;
     groups[groupId].consentCount += 1;
     emit ConsentRecorded(groupId, msg.sender);
-    if (groups[groupId].consentCount == groups[groupId].memberCount && groups[groupId].memberCount >= 2) {
+    if (
+      groups[groupId].consentCount == groups[groupId].memberCount &&
+      groups[groupId].memberCount >= MIN_MEMBERS
+    ) {
       groups[groupId].status = GroupStatus.Active;
       emit GroupActivated(groupId);
     }

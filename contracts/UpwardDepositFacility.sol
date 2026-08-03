@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {IDownwardRateSource} from "./interfaces/IDownwardRateSource.sol";
 
 /**
  * @title UpwardDepositFacility
@@ -13,6 +14,21 @@ contract UpwardDepositFacility is AccessControl, ReentrancyGuard {
 
   uint256 public constant MAX_UPWARD_BPS = 3000; // 30% of depositor assets
   uint256 public constant DAILY_WITHDRAW_BPS = 2000; // 20% per day
+
+  /// @notice delta (bps) the thesis requires the upward-deposit yield to stay
+  ///         strictly below the parent's downward lending rate by:
+  ///         r_up < r_down(U) - delta.
+  uint256 public constant RATE_DELTA_BPS = 100; // 1%
+
+  /// @notice Admin-configurable base yield paid to depositors, annualized bps.
+  uint256 public depositRateBps = 150; // 1.5% base
+
+  /// @notice Optional NationalBank/LocalBank contract representing the
+  ///         parent's downward lending rate (implements IDownwardRateSource).
+  address public downwardRateSource;
+
+  event DepositRateUpdated(uint256 oldBps, uint256 newBps);
+  event DownwardRateSourceSet(address indexed source);
 
   struct Deposit {
     uint256 id;
@@ -37,8 +53,44 @@ contract UpwardDepositFacility is AccessControl, ReentrancyGuard {
     _grantRole(DEFAULT_ADMIN_ROLE, admin);
   }
 
+  /// @notice Lets the parent tier (or governance) top up this facility so it
+  ///         can actually pay out principal + accrued yield on withdrawal —
+  ///         depositUpward() forwards principal straight to the parent, so
+  ///         without this the contract would hold no funds to repay from.
+  receive() external payable {}
+
   function registerDepositor(address depositor) external onlyRole(DEFAULT_ADMIN_ROLE) {
     _grantRole(DEPOSITOR_ROLE, depositor);
+  }
+
+  /// @notice Wires this facility to the parent tier's downward-lending rate
+  ///         source (a NationalBank or LocalBank instance) so deposit yield
+  ///         can enforce r_up < r_down(U) - delta.
+  function setDownwardRateSource(address source) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    downwardRateSource = source;
+    emit DownwardRateSourceSet(source);
+  }
+
+  /// @notice Admin-configurable target yield. The rate actually paid is
+  ///         min(depositRateBps, downwardRateBps() - delta - 1) — see
+  ///         effectiveDepositRateBps().
+  function setDepositRate(uint256 newBps) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    require(newBps <= 2000, "rate too high"); // safety cap 20%
+    uint256 prev = depositRateBps;
+    depositRateBps = newBps;
+    emit DepositRateUpdated(prev, newBps);
+  }
+
+  /// @notice The yield actually paid on upward deposits, capped so it stays
+  ///         strictly below the parent's downward lending rate: thesis
+  ///         constraint r_up < r_down(U) - delta (RATE_DELTA_BPS). Falls back
+  ///         to the admin-set depositRateBps when no source is wired.
+  function effectiveDepositRateBps() public view returns (uint256) {
+    if (downwardRateSource == address(0)) return depositRateBps;
+    uint256 downward = IDownwardRateSource(downwardRateSource).downwardRateBps();
+    if (downward <= RATE_DELTA_BPS + 1) return 0;
+    uint256 cap = downward - RATE_DELTA_BPS - 1; // strictly less than (r_down - delta)
+    return depositRateBps < cap ? depositRateBps : cap;
   }
 
   function depositUpward(address parentInstitution) external payable onlyRole(DEPOSITOR_ROLE) nonReentrant {
@@ -82,16 +134,23 @@ contract UpwardDepositFacility is AccessControl, ReentrancyGuard {
     uint256 dailyCap = d.principal * DAILY_WITHDRAW_BPS / 10000;
     require(d.withdrawnToday + amount <= dailyCap, "daily cap");
 
-    require(address(d.parent).balance >= amount, "parent illiquid");
+    // Simple interest on the withdrawn slice — the yield side of
+    // r_up < r_down(U) - delta. Paid from this contract's own balance (see
+    // receive() above); the parent must keep the facility funded to honor it.
+    uint256 daysHeld = (block.timestamp - d.depositedAt) / 1 days;
+    uint256 interest = (amount * effectiveDepositRateBps() * daysHeld) / (10000 * 365);
+    uint256 payout = amount + interest;
+
+    require(address(this).balance >= payout, "facility illiquid");
 
     d.withdrawn += amount;
     d.withdrawnToday += amount;
     totalUpwardByDepositor[msg.sender] -= amount;
 
-    (bool ok, ) = payable(msg.sender).call{value: amount}("");
+    (bool ok, ) = payable(msg.sender).call{value: payout}("");
     require(ok, "withdraw failed");
 
-    emit UpwardWithdrawn(msg.sender, d.parent, amount, depositId);
+    emit UpwardWithdrawn(msg.sender, d.parent, payout, depositId);
   }
 
   function getDepositHistory(address institution) external view returns (uint256[] memory) {

@@ -125,10 +125,11 @@ contract CreditPassport is AccessControl, ICreditPassport {
   }
 
   function _maxLoanForTier(RiskTier tier) internal pure returns (uint256) {
-    if (tier == RiskTier.Diamond) return 25 ether;
-    if (tier == RiskTier.Platinum) return 5 ether;
-    if (tier == RiskTier.Gold) return 1 ether;
-    if (tier == RiskTier.Silver) return 0.25 ether;
-    return 0.05 ether;
+    // Limits in MockUSDC base units (6 decimals) — aligned with PHASE 2 simulator.
+    if (tier == RiskTier.Diamond) return 25 * 1e6;
+    if (tier == RiskTier.Platinum) return 5 * 1e6;
+    if (tier == RiskTier.Gold) return 1 * 1e6;
+    if (tier == RiskTier.Silver) return 250_000; // 0.25 USDC
+    return 50_000; // 0.05 USDC (Bronze)
   }
 }

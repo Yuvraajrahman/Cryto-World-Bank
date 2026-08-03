@@ -32,7 +32,10 @@ type DepositsState = {
   ledger: DepositLedgerEntry[];
 };
 
-const DATA_DIR = path.join(process.cwd(), ".data");
+const DATA_DIR =
+  process.env.VERCEL === "1"
+    ? path.join("/tmp", ".data")
+    : path.join(process.cwd(), ".data");
 const FILE = path.join(DATA_DIR, "deposits.json");
 
 function uid(prefix: string) {

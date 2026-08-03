@@ -13,5 +13,11 @@ export async function bootstrapApi(): Promise<void> {
   } catch {
     /* non-fatal */
   }
+  try {
+    const { ensureSimulationConfig } = await import("./services/simulationConfig");
+    await ensureSimulationConfig();
+  } catch {
+    /* non-fatal until migration applied */
+  }
   booted = true;
 }

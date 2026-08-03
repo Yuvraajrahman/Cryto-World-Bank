@@ -485,11 +485,11 @@ async function main() {
   await prisma.interestRateTier.deleteMany();
   await prisma.interestRateTier.createMany({
     data: [
-      { tierName: "BRONZE", minScore: 0, maxScore: 399, aprBps: 1200 },
-      { tierName: "SILVER", minScore: 400, maxScore: 549, aprBps: 1000 },
-      { tierName: "GOLD", minScore: 550, maxScore: 699, aprBps: 800 },
-      { tierName: "PLATINUM", minScore: 700, maxScore: 799, aprBps: 600 },
-      { tierName: "DIAMOND", minScore: 800, maxScore: 850, aprBps: 500 },
+      { tierName: "BRONZE", minScore: 0, maxScore: 299, aprBps: 1200 },
+      { tierName: "SILVER", minScore: 300, maxScore: 549, aprBps: 1000 },
+      { tierName: "GOLD", minScore: 550, maxScore: 749, aprBps: 800 },
+      { tierName: "PLATINUM", minScore: 750, maxScore: 899, aprBps: 600 },
+      { tierName: "DIAMOND", minScore: 900, maxScore: 1000, aprBps: 500 },
     ],
   });
 

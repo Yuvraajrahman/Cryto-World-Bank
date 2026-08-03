@@ -24,6 +24,7 @@ export type LoanKind = "BORROWER" | "LOCAL_FROM_NATIONAL" | "NATIONAL_FROM_WORLD
 
 export type LoanStatus =
   | "PENDING"
+  | "INFO_REQUESTED"
   | "APPROVED"
   | "ACTIVE"
   | "REPAID"
@@ -59,6 +60,8 @@ export interface User {
   accountType?: AccountIntent;
   role: UserRole;
   bankId?: string; // Present for bank staff
+  /** Set when SAR resolution freezes the account (Phase 1 #96). */
+  frozen?: boolean;
   consecutivePaidLoans: number;
   totalBorrowedLifetime: number; // ETH
   isFirstTime: boolean;
@@ -149,6 +152,11 @@ export interface Loan {
   notes?: string;
   txHash?: string;
   deadline?: string;
+  /** Group lending (Section 3.7 / GroupLendingPool parity): links this
+   *  per-member retail loan back to the GroupLoanRequest it was disbursed
+   *  from. Each group member gets their own Loan record for their share
+   *  (totalAmountEth / memberCount), not one loan for the full amount. */
+  groupRequestId?: string;
   createdAt: string;
   approvedAt?: string;
   rejectedAt?: string;

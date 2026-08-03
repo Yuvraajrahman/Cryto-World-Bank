@@ -4,22 +4,37 @@ pragma solidity ^0.8.24;
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ICreditPassport} from "./interfaces/ICreditPassport.sol";
 
 /**
  * @title LoanController
- * @notice Retail loan state machine owned by a LocalBank instance (Phase II functional).
+ * @notice Retail loan state machine owned by a LocalBank instance. All
+ *         principal flows use MockUSDC (6 decimals).
  */
 contract LoanController is AccessControl, ReentrancyGuard, Pausable {
+    using SafeERC20 for IERC20;
+
     bytes32 public constant APPROVER_ROLE = keccak256("APPROVER_ROLE");
     bytes32 public constant LOCAL_BANK_ROLE = keccak256("LOCAL_BANK_ROLE");
     bytes32 public constant ORACLE_ROLE = keccak256("ORACLE_ROLE");
 
     address public immutable localBank;
+    IERC20 public immutable usdc;
     address public creditPassport;
 
-    uint256 public borrowAprBps = 800;
-    uint256 public installmentThreshold = 100 ether;
+    uint256 public baseRateBps = 300;
+    uint256 public slope1Bps = 500;
+    uint256 public slope2Bps = 7500;
+    uint256 public kinkBps = 8000;
+    uint256 public totalOutstandingPrincipal;
+    uint256 public maxLtvBps = 5000;
+
+    mapping(uint256 => uint256) public loanCollateralUsdc;
+
+    /// @notice 100 mUSDC (6 decimals) — loans at/above this split into installments.
+    uint256 public installmentThreshold = 100 * 1e6;
     uint8 public defaultInstallments = 12;
     uint32 public installmentPeriodDays = 30;
 
@@ -48,7 +63,6 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
     mapping(address => uint256[]) public loansByBorrower;
     uint256[] private _allLoanIds;
 
-    // Phase III commit–reveal risk oracle (MVT path; Chainlink is Future Work).
     mapping(uint256 => bytes32) public riskCommitments;
     mapping(uint256 => uint16) public revealedRiskBps;
     mapping(uint256 => bool) public riskScoreRevealed;
@@ -63,13 +77,16 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
     event ApproverAdded(address indexed approver);
     event ApproverRemoved(address indexed approver);
     event BorrowAprUpdated(uint256 oldBps, uint256 newBps);
+    event RateModelUpdated(uint256 baseRateBps, uint256 slope1Bps, uint256 slope2Bps, uint256 kinkBps);
     event CreditPassportSet(address indexed passport);
     event RiskScoreCommitted(uint256 indexed loanId, bytes32 commitHash, address indexed oracle);
     event RiskScoreRevealed(uint256 indexed loanId, uint16 scoreBps, address indexed oracle);
 
-    constructor(address localBankAddress, address governor) {
+    constructor(address localBankAddress, address governor, address usdcAddress) {
         require(localBankAddress != address(0), "zero local bank");
+        require(usdcAddress != address(0), "zero usdc");
         localBank = localBankAddress;
+        usdc = IERC20(usdcAddress);
 
         _grantRole(DEFAULT_ADMIN_ROLE, localBankAddress);
         _grantRole(LOCAL_BANK_ROLE, localBankAddress);
@@ -106,16 +123,10 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         return riskScoreRevealed[id];
     }
 
-    receive() external payable {}
-
     function setCreditPassport(address passport) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(passport != address(0), "zero passport");
         creditPassport = passport;
         emit CreditPassportSet(passport);
-    }
-
-    function fundFromLocalBank() external payable onlyRole(LOCAL_BANK_ROLE) {
-        require(msg.value > 0, "zero value");
     }
 
     function addApprover(address approver) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -133,11 +144,16 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         uint256 principal,
         uint32 termMonths,
         bytes32 docHash,
-        string calldata purpose
+        string calldata purpose,
+        uint256 collateralUsdc
     ) external onlyRole(LOCAL_BANK_ROLE) whenNotPaused returns (uint256 id) {
         require(borrower != address(0), "zero borrower");
         require(principal > 0, "zero principal");
         require(termMonths > 0 && termMonths <= 60, "invalid term");
+
+        if (collateralUsdc > 0) {
+            require(principal * 10_000 <= collateralUsdc * maxLtvBps, "exceeds ltv");
+        }
 
         if (creditPassport != address(0)) {
             require(ICreditPassport(creditPassport).canBorrow(borrower, principal), "limit exceeded");
@@ -148,7 +164,7 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
             id: id,
             borrower: borrower,
             principal: principal,
-            aprBps: borrowAprBps,
+            aprBps: borrowAprBps(),
             termMonths: termMonths,
             totalOwed: 0,
             totalPaid: 0,
@@ -161,6 +177,9 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
             purpose: purpose,
             nextDueAt: 0
         });
+        if (collateralUsdc > 0) {
+            loanCollateralUsdc[id] = collateralUsdc;
+        }
         loansByBorrower[borrower].push(id);
         _allLoanIds.push(id);
 
@@ -177,7 +196,7 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         Loan storage l = loans[id];
         require(l.status == LoanStatus.Pending, "not pending");
         require(riskScoreRevealed[id], "risk not revealed");
-        require(address(this).balance >= l.principal, "insufficient funds");
+        require(usdc.balanceOf(address(this)) >= l.principal, "insufficient funds");
 
         if (creditPassport != address(0)) {
             require(ICreditPassport(creditPassport).canBorrow(l.borrower, l.principal), "limit exceeded");
@@ -190,9 +209,9 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         l.installmentCount = l.principal >= installmentThreshold ? defaultInstallments : 1;
         l.status = LoanStatus.Active;
         l.nextDueAt = block.timestamp + installmentPeriodDays * 1 days;
+        totalOutstandingPrincipal += l.principal;
 
-        (bool ok, ) = payable(l.borrower).call{value: l.principal}("");
-        require(ok, "disburse failed");
+        usdc.safeTransfer(l.borrower, l.principal);
 
         emit LoanApproved(id, approver, l.totalOwed, l.installmentCount);
         emit LoanDisbursed(id, l.borrower, l.principal);
@@ -209,9 +228,8 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         emit LoanRejected(id, approver, reason);
     }
 
-    function payInstallmentFor(address payer, uint256 id)
+    function payInstallmentFor(address payer, uint256 id, uint256 amount)
         external
-        payable
         onlyRole(LOCAL_BANK_ROLE)
         whenNotPaused
         nonReentrant
@@ -222,15 +240,18 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         require(l.installmentsPaid < l.installmentCount, "already repaid");
 
         uint256 expected = _installmentAmount(l);
-        require(msg.value >= expected, "amount too low");
+        require(amount >= expected, "amount too low");
+
+        usdc.safeTransferFrom(payer, address(this), amount);
 
         l.installmentsPaid += 1;
-        l.totalPaid += msg.value;
+        l.totalPaid += amount;
 
-        emit InstallmentPaid(id, payer, l.installmentsPaid, msg.value);
+        emit InstallmentPaid(id, payer, l.installmentsPaid, amount);
 
         if (l.installmentsPaid >= l.installmentCount) {
             l.status = LoanStatus.Repaid;
+            _reduceOutstanding(l.principal);
             if (creditPassport != address(0)) {
                 ICreditPassport(creditPassport).onLoanRepaid(l.borrower);
             }
@@ -245,10 +266,17 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         require(l.status == LoanStatus.Active, "not active");
         require(block.timestamp > l.nextDueAt, "not overdue");
         l.status = LoanStatus.Defaulted;
+        _reduceOutstanding(l.principal);
         if (creditPassport != address(0)) {
             ICreditPassport(creditPassport).onLoanDefaulted(l.borrower);
         }
         emit LoanDefaulted(id, l.borrower);
+    }
+
+    function _reduceOutstanding(uint256 principal) internal {
+        totalOutstandingPrincipal = totalOutstandingPrincipal > principal
+            ? totalOutstandingPrincipal - principal
+            : 0;
     }
 
     function approveLoan(uint256 id)
@@ -260,7 +288,7 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         Loan storage l = loans[id];
         require(l.status == LoanStatus.Pending, "not pending");
         require(riskScoreRevealed[id], "risk not revealed");
-        require(address(this).balance >= l.principal, "insufficient funds");
+        require(usdc.balanceOf(address(this)) >= l.principal, "insufficient funds");
 
         if (creditPassport != address(0)) {
             require(ICreditPassport(creditPassport).canBorrow(l.borrower, l.principal), "limit exceeded");
@@ -273,9 +301,9 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         l.installmentCount = l.principal >= installmentThreshold ? defaultInstallments : 1;
         l.status = LoanStatus.Active;
         l.nextDueAt = block.timestamp + installmentPeriodDays * 1 days;
+        totalOutstandingPrincipal += l.principal;
 
-        (bool ok, ) = payable(l.borrower).call{value: l.principal}("");
-        require(ok, "disburse failed");
+        usdc.safeTransfer(l.borrower, l.principal);
 
         emit LoanApproved(id, msg.sender, l.totalOwed, l.installmentCount);
         emit LoanDisbursed(id, l.borrower, l.principal);
@@ -288,22 +316,25 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         emit LoanRejected(id, msg.sender, reason);
     }
 
-    function payInstallment(uint256 id) external payable whenNotPaused nonReentrant {
+    function payInstallment(uint256 id, uint256 amount) external whenNotPaused nonReentrant {
         Loan storage l = loans[id];
         require(l.status == LoanStatus.Active, "not active");
         require(msg.sender == l.borrower, "not borrower");
         require(l.installmentsPaid < l.installmentCount, "already repaid");
 
         uint256 expected = _installmentAmount(l);
-        require(msg.value >= expected, "amount too low");
+        require(amount >= expected, "amount too low");
+
+        usdc.safeTransferFrom(msg.sender, address(this), amount);
 
         l.installmentsPaid += 1;
-        l.totalPaid += msg.value;
+        l.totalPaid += amount;
 
-        emit InstallmentPaid(id, msg.sender, l.installmentsPaid, msg.value);
+        emit InstallmentPaid(id, msg.sender, l.installmentsPaid, amount);
 
         if (l.installmentsPaid >= l.installmentCount) {
             l.status = LoanStatus.Repaid;
+            _reduceOutstanding(l.principal);
             if (creditPassport != address(0)) {
                 ICreditPassport(creditPassport).onLoanRepaid(l.borrower);
             }
@@ -349,6 +380,10 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
         return ids;
     }
 
+    function poolBalance() public view returns (uint256) {
+        return usdc.balanceOf(address(this));
+    }
+
     function bankStats()
         external
         view
@@ -363,14 +398,51 @@ contract LoanController is AccessControl, ReentrancyGuard, Pausable {
             else if (s == LoanStatus.Active) a++;
             else if (s == LoanStatus.Repaid) r++;
         }
-        return (address(this).balance, _allLoanIds.length, p, a, r);
+        return (poolBalance(), _allLoanIds.length, p, a, r);
+    }
+
+    function utilizationBps() public view returns (uint256) {
+        uint256 capacity = totalOutstandingPrincipal + poolBalance();
+        if (capacity == 0) return 0;
+        return (totalOutstandingPrincipal * 10_000) / capacity;
+    }
+
+    function borrowAprBps() public view returns (uint256) {
+        uint256 u = utilizationBps();
+        if (u <= kinkBps) {
+            return baseRateBps + (slope1Bps * u) / kinkBps;
+        }
+        uint256 excess = u - kinkBps;
+        uint256 maxExcess = 10_000 - kinkBps;
+        return baseRateBps + slope1Bps + (slope2Bps * excess) / maxExcess;
     }
 
     function setBorrowApr(uint256 newBps) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(newBps <= 5000, "apr too high");
-        uint256 prev = borrowAprBps;
-        borrowAprBps = newBps;
+        uint256 prev = baseRateBps;
+        baseRateBps = newBps;
         emit BorrowAprUpdated(prev, newBps);
+    }
+
+    function setRateModel(
+        uint256 newBaseRateBps,
+        uint256 newSlope1Bps,
+        uint256 newSlope2Bps,
+        uint256 newKinkBps
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(newBaseRateBps <= 5000, "base too high");
+        require(newKinkBps > 0 && newKinkBps < 10_000, "bad kink");
+        require(newBaseRateBps + newSlope1Bps + newSlope2Bps <= 10_000, "max rate too high");
+        baseRateBps = newBaseRateBps;
+        slope1Bps = newSlope1Bps;
+        slope2Bps = newSlope2Bps;
+        kinkBps = newKinkBps;
+        emit RateModelUpdated(newBaseRateBps, newSlope1Bps, newSlope2Bps, newKinkBps);
+    }
+
+    function setMaxLtvBps(uint256 newMaxLtvBps) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(newMaxLtvBps > 0 && newMaxLtvBps <= 10_000, "bad ltv");
+        maxLtvBps = newMaxLtvBps;
     }
 
     function setInstallmentPolicy(uint256 threshold, uint8 installments)

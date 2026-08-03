@@ -15,6 +15,7 @@ import {
   RESERVE_MIN_BPS,
   type FixedDeposit,
 } from "../store/deposits";
+import { findUserByWallet } from "../store/db";
 
 export const depositsRouter = Router();
 depositsRouter.use(requireAuth, requireRoles("BORROWER"));
@@ -256,6 +257,10 @@ const sendSchema = z.object({
 depositsRouter.post("/checking/send", (req, res) => {
   const user = (req as AuthedRequest).user!;
   const body = sendSchema.parse(req.body);
+  if (user.frozen) {
+    res.status(403).json({ error: "account_frozen" });
+    return;
+  }
   ensureBalances(user.id);
   const checking = depositsDb.state.checkingBalances[user.id] ?? 0;
   if (body.amount > checking + 1e-9) {
@@ -267,17 +272,35 @@ depositsRouter.post("/checking/send", (req, res) => {
     return;
   }
   depositsDb.state.checkingBalances[user.id] = checking - body.amount;
-  const entry = pushLedger({
+  const sendEntry = pushLedger({
     userId: user.id,
     kind: "CHECK_SEND",
     amount: body.amount,
     counterparty: body.toAddress.toLowerCase(),
     note: "Checking transfer out",
   });
+
+  const recipient = findUserByWallet(body.toAddress);
+  let recvEntry = null;
+  if (recipient && !recipient.frozen) {
+    ensureBalances(recipient.id);
+    depositsDb.state.checkingBalances[recipient.id] =
+      (depositsDb.state.checkingBalances[recipient.id] ?? 0) + body.amount;
+    recvEntry = pushLedger({
+      userId: recipient.id,
+      kind: "CHECK_RECV",
+      amount: body.amount,
+      counterparty: user.wallet.toLowerCase(),
+      note: "Checking transfer in",
+    });
+  }
+
   depositsDb.save();
   res.status(201).json({
     ok: true,
     checkingEth: depositsDb.state.checkingBalances[user.id],
-    entry,
+    entry: sendEntry,
+    recipientCredited: Boolean(recipient && !recipient.frozen),
+    recvEntry,
   });
 });

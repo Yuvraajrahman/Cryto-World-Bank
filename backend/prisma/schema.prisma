@@ -567,3 +567,53 @@ model ChatMessage {
   body       String
   createdAt  DateTime   @default(now())
 }
+
+// ---- Phase 2 economy simulation (Neon — survives Vercel cold starts) ----
+
+model SimulationConfig {
+  id                String   @id @default("default")
+  baseRateBps       Int      @default(300)
+  slope1Bps         Int      @default(500)
+  slope2Bps         Int      @default(7500)
+  kinkBps           Int      @default(8000)
+  minReserveRatio   Float    @default(0.15)
+  tierModifiersJson Json?
+  updatedBy         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  history           SimulationConfigHistory[]
+}
+
+model SimulationConfigHistory {
+  id        String           @id @default(cuid())
+  configId  String           @default("default")
+  config    SimulationConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  field     String
+  fromValue Json
+  toValue   Json
+  changedBy String?
+  note      String?
+  createdAt DateTime         @default(now())
+
+  @@index([configId, createdAt])
+}
+
+model SimulationRun {
+  id                      String    @id @default(cuid())
+  seed                    Int
+  totalCapitalUsdc        Float
+  clientMultiplier        Float     @default(1)
+  simulatedDays           Int       @default(365)
+  sampleNationals         Int
+  sampleLocalsPerNational Int
+  clientsPerLocal           Int
+  status                  String    @default("COMPLETED")
+  summaryJson             Json?
+  verificationJson        Json?
+  configSnapshotJson      Json?
+  triggeredBy             String?
+  startedAt               DateTime  @default(now())
+  completedAt             DateTime?
+
+  @@index([startedAt])
+}

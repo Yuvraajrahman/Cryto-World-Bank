@@ -114,6 +114,7 @@ async function main() {
   const worldBank = await WorldBank.connect(worldGov).deploy(worldGov.address);
   await worldBank.waitForDeployment();
   const worldBankAddr = await worldBank.getAddress();
+  await (await worldBank.connect(worldGov).setUsdc(mockUsdcAddr)).wait();
   console.log(`  ✓ WorldBankReserve      → ${worldBankAddr}`);
 
   const GOVERNOR_ROLE = await worldBank.GOVERNOR_ROLE();
@@ -128,12 +129,14 @@ async function main() {
   );
   await national.waitForDeployment();
   const nationalAddr = await national.getAddress();
+  await (await national.connect(nationalGov).setUsdc(mockUsdcAddr)).wait();
   console.log(`  ✓ NationalBank          → ${nationalAddr}`);
 
   const Local = await ethers.getContractFactory("LocalBank");
   const local = await tx(Local, localGov).deploy(
     localGov.address,
     nationalAddr,
+    mockUsdcAddr,
     "Dhaka Local Bank",
     "Dhaka Metropolitan",
   );
@@ -162,6 +165,10 @@ async function main() {
   await (await upward.connect(worldGov).registerDepositor(localAddr)).wait();
   await (await upward.connect(worldGov).registerDepositor(nationalGov.address)).wait();
   await (await upward.connect(worldGov).registerDepositor(localGov.address)).wait();
+  // Wire the rate-spread constraint (r_up < r_down - delta) to the National
+  // Bank's downward lending rate — this demo instance is shared across the
+  // National→World deposit path, which is the primary flow exercised here.
+  await (await upward.connect(worldGov).setDownwardRateSource(nationalAddr)).wait();
   console.log(`  ✓ UpwardDepositFacility → ${upwardAddr}`);
 
   const Savings = await ethers.getContractFactory("SavingsVault");
@@ -183,6 +190,9 @@ async function main() {
   await ensureFunded(nationalGov, "National Gov");
   await (await iblp.connect(nationalGov).registerBorrower(nationalAddr)).wait();
   await (await iblp.connect(nationalGov).registerBorrower(localAddr)).wait();
+  // Wire the rate-spread constraint (r_IB <= r_downward - delta) to the
+  // National Bank's downward lending rate, since this pool is tagged IBLP_NB.
+  await (await iblp.connect(nationalGov).setDownwardRateSource(nationalAddr)).wait();
   console.log(`  ✓ InterBankLendingPool  → ${iblpAddr}`);
 
   await (
@@ -211,18 +221,13 @@ async function main() {
   await (await mockUsdc.connect(worldGov).mint(worldGov.address, 100_000n * 1_000_000n)).wait();
   console.log("  ✓ Minted 100,000 mUSDC to world governor");
 
-  const seedEth = process.env.SEED_RESERVE_ETH ?? (isLocal ? "2" : "0.5");
-  const seedDeposit = ethers.parseEther(seedEth);
+  const seedUsdc = process.env.SEED_RESERVE_USDC ?? (isLocal ? "2000000" : "500000"); // 2M / 0.5M mUSDC
+  const seedDeposit = BigInt(seedUsdc);
   if (seedDeposit > 0n) {
-    const bal = await ethers.provider.getBalance(worldGov.address);
-    if (bal < seedDeposit + ethers.parseEther("0.05")) {
-      console.warn(
-        `  ⚠ World governor balance ${ethers.formatEther(bal)} ETH — fund ${worldGov.address} before seeding reserve`,
-      );
-    } else {
-      await (await worldBank.connect(worldGov).deposit({ value: seedDeposit })).wait();
-      console.log(`  ✓ Seeded World Bank reserve with ${ethers.formatEther(seedDeposit)} ETH`);
-    }
+    await (await mockUsdc.connect(worldGov).mint(worldGov.address, seedDeposit)).wait();
+    await (await mockUsdc.connect(worldGov).approve(worldBankAddr, seedDeposit)).wait();
+    await (await worldBank.connect(worldGov).deposit(seedDeposit)).wait();
+    console.log(`  ✓ Seeded World Bank reserve with ${seedDeposit.toString()} mUSDC units`);
   }
 
   const manifest: DeploymentManifest = {

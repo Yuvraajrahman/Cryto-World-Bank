@@ -54,15 +54,26 @@ export default function SarReviewPage() {
     if (!detail?.alert || reason.trim().length < 3) return;
     setBusy(true);
     try {
-      const path =
-        action === "resolve"
-          ? `/api/national-bank/sar/${detail.alert.id}/resolve`
-          : `/api/national-bank/sar/${detail.alert.id}/escalate-world`;
-      const r = await api.post(path, { reason: reason.trim() });
+      let path;
+      let body = { reason: reason.trim() };
+      if (action === "resolve") {
+        path = `/api/national-bank/sar/${detail.alert.id}/resolve`;
+      } else if (action === "freeze") {
+        path = `/api/national-bank/sar/${detail.alert.id}/resolve`;
+        body = { reason: reason.trim(), action: "freeze" };
+      } else {
+        path = `/api/national-bank/sar/${detail.alert.id}/escalate-world`;
+      }
+      const r = await api.post(path, body);
       setAuditNote(r.auditId || r.worldRef || "recorded");
-      toast.show(action === "resolve" ? "SAR closed" : "Escalated to World Bank", {
-        variant: "success",
-      });
+      toast.show(
+        action === "resolve"
+          ? "SAR closed"
+          : action === "freeze"
+            ? "SAR closed and account frozen"
+            : "Escalated to World Bank",
+        { variant: "success" },
+      );
       setSheet(null);
       setReason("");
       setDetail(null);
@@ -196,6 +207,15 @@ export default function SarReviewPage() {
                     type="button"
                     variant="ghost"
                     showArrow={false}
+                    onClick={() => setSheet("freeze")}
+                    disabled={busy}
+                  >
+                    Close &amp; freeze account
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    showArrow={false}
                     onClick={() => setSheet("world")}
                     disabled={busy}
                   >
@@ -235,6 +255,31 @@ export default function SarReviewPage() {
             disabled={busy || reason.trim().length < 3}
           >
             Confirm close
+          </Button>
+          <Button type="button" variant="ghost" showArrow={false} onClick={() => setSheet(null)} disabled={busy}>
+            Cancel
+          </Button>
+        </div>
+      </Sheet>
+
+      <Sheet open={sheet === "freeze"} onClose={() => !busy && setSheet(null)} title="Close SAR and freeze account">
+        <p className="client-lede">
+          Closes the SAR and marks the client account frozen (off-chain + on-chain when configured).
+        </p>
+        <Input
+          label="Resolution note"
+          as="textarea"
+          rows={3}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+        <div className="quick-actions" style={{ marginTop: 12 }}>
+          <Button
+            type="button"
+            onClick={() => void act("freeze")}
+            disabled={busy || reason.trim().length < 3}
+          >
+            Confirm freeze
           </Button>
           <Button type="button" variant="ghost" showArrow={false} onClick={() => setSheet(null)} disabled={busy}>
             Cancel

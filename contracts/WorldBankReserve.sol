@@ -4,32 +4,32 @@ pragma solidity ^0.8.24;
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title WorldBankReserve (Tier 1)
- * @notice Custodian of the global crypto reserve. Holds deposits and lends
- *         capital to registered National Banks at a configurable APR.
- *         Emits events so the off-chain indexer keeps the database in sync.
- *
- * @dev The contract intentionally keeps the lending logic minimal in this
- *      phase: it tracks per-National-Bank principal outstanding and exposes
- *      hooks (`accrueInterest`, `recordRepayment`) that can be extended with
- *      automated interest accrual + installment enforcement in a later sprint.
+ * @notice Custodian of the global crypto reserve in MockUSDC (6 decimals).
+ *         Holds deposits and lends capital to registered National Banks.
  */
 contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
+    using SafeERC20 for IERC20;
+
     bytes32 public constant GOVERNOR_ROLE = keccak256("GOVERNOR_ROLE");
     bytes32 public constant NATIONAL_BANK_ROLE = keccak256("NATIONAL_BANK_ROLE");
 
-    /// @notice APR expressed in basis points (e.g. 300 = 3.00%).
+    IERC20 public usdc;
+
     uint256 public lendingAprBps = 300;
+    uint256 public minReserveRatioBps = 1500;
 
     struct NationalBankAccount {
         bool registered;
         string name;
         string jurisdiction;
-        uint256 allocated;   // total ever allocated to the bank
-        uint256 outstanding; // principal currently owed to the reserve
-        uint256 repaid;      // cumulative principal returned
+        uint256 allocated;
+        uint256 outstanding;
+        uint256 repaid;
     }
 
     mapping(address => NationalBankAccount) public nationalBanks;
@@ -48,6 +48,7 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
     uint256 public totalAllocated;
     uint256 public totalRepaid;
 
+    event UsdcTokenSet(address indexed token);
     event DepositReceived(address indexed from, uint256 amount);
     event NationalBankRegistered(address indexed bank, string name, string jurisdiction);
     event NationalBankRevoked(address indexed bank);
@@ -55,6 +56,7 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
     event CapitalRequested(address indexed bank, uint256 amount, uint256 indexed requestId);
     event RepaymentRecorded(address indexed bank, uint256 principal, uint256 interest);
     event LendingAprUpdated(uint256 oldBps, uint256 newBps);
+    event MinReserveRatioUpdated(uint256 oldBps, uint256 newBps);
     event EmergencyWithdrawal(address indexed to, uint256 amount);
 
     constructor(address governor) {
@@ -62,23 +64,19 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
         _grantRole(GOVERNOR_ROLE, governor);
     }
 
-    // -------- Deposits --------
-
-    receive() external payable {
-        _recordDeposit(msg.sender, msg.value);
+    function setUsdc(address token) external onlyRole(GOVERNOR_ROLE) {
+        require(token != address(0), "zero token");
+        usdc = IERC20(token);
+        emit UsdcTokenSet(token);
     }
 
-    function deposit() external payable {
-        _recordDeposit(msg.sender, msg.value);
-    }
-
-    function _recordDeposit(address from, uint256 amount) internal {
+    function deposit(uint256 amount) external whenNotPaused nonReentrant {
+        require(address(usdc) != address(0), "usdc not set");
         require(amount > 0, "zero deposit");
+        usdc.safeTransferFrom(msg.sender, address(this), amount);
         totalDeposits += amount;
-        emit DepositReceived(from, amount);
+        emit DepositReceived(msg.sender, amount);
     }
-
-    // -------- National bank registry --------
 
     function registerNationalBank(
         address bank,
@@ -114,26 +112,30 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
         return _nationalBankList;
     }
 
-    // -------- Allocation & repayment --------
-
     function allocate(address bank, uint256 amount)
         public
         onlyRole(GOVERNOR_ROLE)
         whenNotPaused
         nonReentrant
     {
+        require(address(usdc) != address(0), "usdc not set");
         require(nationalBanks[bank].registered, "not a national bank");
-        require(address(this).balance >= amount, "reserve insufficient");
         require(amount > 0, "zero amount");
+
+        uint256 balance = usdc.balanceOf(address(this));
+        require(balance >= amount, "reserve insufficient");
+
+        uint256 projectedAllocated = totalAllocated + amount;
+        uint256 projectedBalance = balance - amount;
+        uint256 requiredReserve = (projectedAllocated * minReserveRatioBps) / 10_000;
+        require(projectedBalance >= requiredReserve, "breaches reserve ratio");
 
         NationalBankAccount storage acc = nationalBanks[bank];
         acc.allocated += amount;
         acc.outstanding += amount;
-        totalAllocated += amount;
+        totalAllocated = projectedAllocated;
 
-        (bool ok, ) = payable(bank).call{value: amount}("");
-        require(ok, "transfer failed");
-
+        usdc.safeTransfer(bank, amount);
         emit CapitalAllocated(bank, amount);
     }
 
@@ -156,32 +158,43 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
         allocate(r.bank, r.amount);
     }
 
-    function recordRepayment(uint256 principal)
+    function recordRepayment(uint256 principal, uint256 totalPaid)
         external
-        payable
         onlyRole(NATIONAL_BANK_ROLE)
         whenNotPaused
         nonReentrant
     {
+        require(address(usdc) != address(0), "usdc not set");
         NationalBankAccount storage acc = nationalBanks[msg.sender];
         require(acc.outstanding >= principal, "principal too high");
-        require(msg.value >= principal, "insufficient value");
+        require(totalPaid >= principal, "insufficient payment");
+
+        usdc.safeTransferFrom(msg.sender, address(this), totalPaid);
 
         acc.outstanding -= principal;
         acc.repaid += principal;
         totalRepaid += principal;
 
-        uint256 interest = msg.value - principal;
+        uint256 interest = totalPaid - principal;
         emit RepaymentRecorded(msg.sender, principal, interest);
     }
 
-    // -------- Governance --------
-
     function setLendingApr(uint256 newBps) external onlyRole(GOVERNOR_ROLE) {
-        require(newBps <= 5000, "apr too high"); // safety cap 50%
+        require(newBps <= 5000, "apr too high");
         uint256 prev = lendingAprBps;
         lendingAprBps = newBps;
         emit LendingAprUpdated(prev, newBps);
+    }
+
+    function setMinReserveRatio(uint256 newBps) external onlyRole(GOVERNOR_ROLE) {
+        require(newBps <= 5000, "ratio too high");
+        uint256 prev = minReserveRatioBps;
+        minReserveRatioBps = newBps;
+        emit MinReserveRatioUpdated(prev, newBps);
+    }
+
+    function downwardRateBps() external view returns (uint256) {
+        return lendingAprBps;
     }
 
     function pause() external onlyRole(GOVERNOR_ROLE) {
@@ -192,22 +205,21 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
         _unpause();
     }
 
-    function emergencyWithdraw(address payable to, uint256 amount)
+    function emergencyWithdraw(address to, uint256 amount)
         external
         onlyRole(GOVERNOR_ROLE)
         whenPaused
         nonReentrant
     {
-        require(amount <= address(this).balance, "exceeds balance");
-        (bool ok, ) = to.call{value: amount}("");
-        require(ok, "withdraw failed");
+        require(address(usdc) != address(0), "usdc not set");
+        require(amount <= usdc.balanceOf(address(this)), "exceeds balance");
+        usdc.safeTransfer(to, amount);
         emit EmergencyWithdrawal(to, amount);
     }
 
-    // -------- Views --------
-
-    function reserveBalance() external view returns (uint256) {
-        return address(this).balance;
+    function reserveBalance() public view returns (uint256) {
+        if (address(usdc) == address(0)) return 0;
+        return usdc.balanceOf(address(this));
     }
 
     function systemStats()
@@ -222,7 +234,7 @@ contract WorldBankReserve is AccessControl, ReentrancyGuard, Pausable {
         )
     {
         return (
-            address(this).balance,
+            reserveBalance(),
             totalDeposits,
             totalAllocated,
             totalRepaid,

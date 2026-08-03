@@ -4,6 +4,8 @@ import { AuthedRequest, requireAuth, requireRoles } from "../middleware/auth";
 import { db, findBankById, type Bank } from "../store/db";
 import { localOpsDb } from "../store/localOps";
 import { nationalOpsDb } from "../store/nationalOps";
+import { applyAccountFreeze } from "../chain/freezeClient";
+import { borrowAprFromUtilization, KINK_BPS } from "../lib/rates";
 
 export const nationalBankRouter = Router();
 
@@ -405,9 +407,23 @@ nationalBankRouter.get("/settings", (req, res) => {
       ...params,
       aprBps: bank?.aprBps ?? params.aprBps,
     },
+    ratePreviews: {
+      at50UtilBps: borrowAprFromUtilization(5000, {
+        baseRateBps: bank?.aprBps ?? params.aprBps,
+        slope1Bps: 500,
+        slope2Bps: 7500,
+        kinkBps: params.kinkBps ?? KINK_BPS,
+      }),
+      atKinkBps: borrowAprFromUtilization(params.kinkBps ?? KINK_BPS, {
+        baseRateBps: bank?.aprBps ?? params.aprBps,
+        slope1Bps: 500,
+        slope2Bps: 7500,
+        kinkBps: params.kinkBps ?? KINK_BPS,
+      }),
+    },
     history,
     governanceNote:
-      "Demo applies parameters immediately off-chain. Production routes changes through multisig / timelock.",
+      "Demo applies parameters immediately off-chain. Production routes National/Local rate changes through multisig + timelock (World Bank governance for cross-tier policy).",
   });
 });
 
@@ -537,9 +553,10 @@ nationalBankRouter.get("/sar/:id", (req, res) => {
 
 const sarActionSchema = z.object({
   reason: z.string().min(3).max(500),
+  action: z.enum(["close", "freeze"]).optional().default("close"),
 });
 
-nationalBankRouter.post("/sar/:id/resolve", (req, res, next) => {
+nationalBankRouter.post("/sar/:id/resolve", async (req, res, next) => {
   try {
     const user = (req as AuthedRequest).user!;
     const nationalId = nationalIdFor(user);
@@ -550,12 +567,28 @@ nationalBankRouter.post("/sar/:id/resolve", (req, res, next) => {
       return;
     }
     const body = sarActionSchema.parse(req.body);
-    alert.status = "CLOSED";
+    alert.status = body.action === "freeze" ? "FROZEN" : "CLOSED";
     alert.resolvedAt = localOpsDb.nowIso();
     alert.resolvedBy = user.id;
-    alert.resolutionNote = `NB closed: ${body.reason}`;
+    alert.resolutionNote =
+      body.action === "freeze"
+        ? `NB closed + froze account: ${body.reason}`
+        : `NB closed: ${body.reason}`;
     localOpsDb.save();
-    res.json({ ok: true, alert, auditId: `SAR_CLOSE_${alert.id}` });
+
+    let accountFreeze = null;
+    if (body.action === "freeze") {
+      accountFreeze = await applyAccountFreeze(alert.clientUserId, alert.clientWallet);
+    }
+
+    res.json({
+      ok: true,
+      alert,
+      auditId: body.action === "freeze" ? `SAR_FREEZE_${alert.id}` : `SAR_CLOSE_${alert.id}`,
+      accountFreeze,
+      governanceNote:
+        "SAR resolution is logged for regulator audit. Account freeze sets user.frozen and calls LocalBank.freezeAccount when chain operator key is configured.",
+    });
   } catch (err) {
     next(err);
   }

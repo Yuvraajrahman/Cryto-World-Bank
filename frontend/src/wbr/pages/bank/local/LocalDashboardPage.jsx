@@ -233,6 +233,11 @@ export default function LocalDashboardPage() {
             Manage staff
           </Button>
         ) : null}
+        {isAdmin ? (
+          <Button as={Link} to="/bank/local/lending-settings" variant="ghost" showArrow={false}>
+            Lending settings
+          </Button>
+        ) : null}
         <Button as={Link} to="/reserve" variant="ghost" showArrow={false}>
           Reserve detail
         </Button>

@@ -272,7 +272,7 @@ async function activateGroupLoanRequest(requestId: string) {
   const prisma = requirePrisma();
   const request = await prisma.groupLoanRequest.findUnique({
     where: { id: requestId },
-    include: { group: true, consents: true },
+    include: { group: { include: { members: true } }, consents: true },
   });
   if (!request || request.status !== "AWAITING_CONSENT") return null;
 
@@ -298,46 +298,68 @@ async function activateGroupLoanRequest(requestId: string) {
   let retailLoanId: string | null = null;
 
   if (bank && requester && bank.tier === "LOCAL") {
-    const loan: Loan = {
-      id: db.uid("loan"),
-      kind: "BORROWER",
-      borrowerId: requester.id,
-      lenderBankId: bank.id,
-      amount: request.totalAmountEth,
-      purpose: `[Group ${request.groupId}] ${request.purpose}`,
-      category: "Group",
-      loanType: "credit",
-      aprBps: bank.aprBps,
-      termMonths: request.termMonths,
-      status: "ACTIVE",
-      isInstallment: true,
-      installments: buildInstallmentSchedule(request.totalAmountEth, request.termMonths),
-      gasCostEth: Number((0.002 + Math.random() * 0.003).toFixed(5)),
-      createdAt: db.nowIso(),
-      approvedAt: db.nowIso(),
-      approvedBy: "system_group_consent",
-      txHash: `0x${crypto.randomBytes(16).toString("hex")}`,
-      riskScore: 0.2,
-    };
-    loan.deadline = loan.installments[loan.installments.length - 1]?.dueDate;
-    bank.reserve = Math.max(0, bank.reserve - loan.amount);
-    bank.totalLent += loan.amount;
-    requester.totalBorrowedLifetime += loan.amount;
-    requester.isFirstTime = false;
-    db.state.loans.push(loan);
-    db.state.transactions.push({
-      id: db.uid("tx"),
-      type: "LOAN_DISBURSED",
-      userId: requester.id,
-      bankId: bank.id,
-      loanId: loan.id,
-      amount: loan.amount,
-      at: db.nowIso(),
-      txHash: loan.txHash,
-      note: "Group loan auto-activated after unanimous consent",
-    });
+    // Per thesis §"Group loan share": Share_i = LoanTotal / N_members. Every
+    // consenting member is jointly liable for — and receives — their own
+    // slice as a separate retail loan, instead of the full amount landing
+    // on whichever member happened to submit the application.
+    const memberIds = memberUserIds(request.group.members);
+    const n = Math.max(memberIds.length, 1);
+    const shareEth = request.totalAmountEth / n;
+
+    let disbursedTotal = 0;
+    for (const memberId of memberIds) {
+      const member = findUserById(memberId);
+      if (!member) continue;
+
+      const loan: Loan = {
+        id: db.uid("loan"),
+        kind: "BORROWER",
+        borrowerId: member.id,
+        lenderBankId: bank.id,
+        amount: shareEth,
+        purpose: `[Group ${request.groupId}] ${request.purpose} (share of ${request.totalAmountEth} ETH among ${n})`,
+        category: "Group",
+        loanType: "credit",
+        aprBps: bank.aprBps,
+        termMonths: request.termMonths,
+        status: "ACTIVE",
+        isInstallment: true,
+        installments: buildInstallmentSchedule(shareEth, request.termMonths),
+        gasCostEth: Number((0.002 + Math.random() * 0.003).toFixed(5)),
+        createdAt: db.nowIso(),
+        approvedAt: db.nowIso(),
+        approvedBy: "system_group_consent",
+        txHash: `0x${crypto.randomBytes(16).toString("hex")}`,
+        riskScore: 0.2,
+        groupRequestId: request.id,
+      };
+      loan.deadline = loan.installments[loan.installments.length - 1]?.dueDate;
+      member.totalBorrowedLifetime += loan.amount;
+      member.isFirstTime = false;
+      db.state.loans.push(loan);
+      db.state.transactions.push({
+        id: db.uid("tx"),
+        type: "LOAN_DISBURSED",
+        userId: member.id,
+        bankId: bank.id,
+        loanId: loan.id,
+        amount: loan.amount,
+        at: db.nowIso(),
+        txHash: loan.txHash,
+        note: `Group loan auto-activated after unanimous consent (share ${shareEth.toFixed(6)} ETH of ${n})`,
+      });
+      disbursedTotal += loan.amount;
+
+      // Surface the requester's own loan id for backward-compatible links
+      // (e.g. the group dashboard's "View installment loan" shortcut).
+      if (member.id === requester.id) {
+        retailLoanId = loan.id;
+      }
+    }
+
+    bank.reserve = Math.max(0, bank.reserve - disbursedTotal);
+    bank.totalLent += disbursedTotal;
     db.save();
-    retailLoanId = loan.id;
   }
 
   const updated = await prisma.groupLoanRequest.update({
@@ -647,11 +669,18 @@ groupsRouter.get("/:id", requireAuth, async (req, res, next) => {
     const activeReq = group.loanRequests.find((r) => r.status === "ACTIVE");
     const n = Math.max(group.members.length, 1);
     const shareEth = activeReq ? activeReq.totalAmountEth / n : null;
+    // Every member got their own per-share retail loan (see
+    // activateGroupLoanRequest); a group is delinquent if ANY member's slice
+    // has an overdue unpaid installment, not just the requester's.
+    const memberLoansByUserId = new Map<string, Loan>();
     let delinquent = false;
-    if (activeReq?.retailLoanId) {
-      const loan = db.state.loans.find((l) => l.id === activeReq.retailLoanId);
-      if (loan?.installments?.some((inst) => !inst.paid && new Date(inst.dueDate) < new Date())) {
-        delinquent = true;
+    if (activeReq) {
+      for (const loan of db.state.loans) {
+        if (loan.groupRequestId !== activeReq.id || !loan.borrowerId) continue;
+        memberLoansByUserId.set(loan.borrowerId, loan);
+        if (loan.installments?.some((inst) => !inst.paid && new Date(inst.dueDate) < new Date())) {
+          delinquent = true;
+        }
       }
     }
 
@@ -673,6 +702,7 @@ groupsRouter.get("/:id", requireAuth, async (req, res, next) => {
           ...serializeMember(m, nameById),
           shareEth,
           liabilityEth: shareEth,
+          retailLoanId: (m.userId && memberLoansByUserId.get(m.userId)?.id) ?? null,
         })),
         requests: group.loanRequests.map((r) => serializeRequest(r, nameById)),
         eligibility,

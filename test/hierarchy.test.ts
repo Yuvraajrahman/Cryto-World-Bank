@@ -1,84 +1,96 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { commitAndRevealRisk } from "./helpers/riskOracle";
+import { deployUsdcStack, fundLoanPool, usdc } from "./helpers/deployStack";
 
 describe("Crypto World Bank — four-tier hierarchy", () => {
   async function deployFixture() {
     const [governor, nationalGov, localGov, approver, borrower, depositor] =
       await ethers.getSigners();
 
-    const WorldBank = await ethers.getContractFactory("WorldBankReserve");
-    const worldBank = await WorldBank.deploy(governor.address);
+    const stack = await deployUsdcStack({
+      worldGov: governor,
+      nationalGov,
+      localGov,
+    });
 
-    const National = await ethers.getContractFactory("NationalBank");
-    const national = await National.deploy(
-      nationalGov.address,
-      await worldBank.getAddress(),
-      "NB",
-      "BD"
-    );
-
-    const Local = await ethers.getContractFactory("LocalBank");
-    const local = await Local.deploy(
-      localGov.address,
-      await national.getAddress(),
-      "LB",
-      "Dhaka"
-    );
-
-    return { worldBank, national, local, governor, nationalGov, localGov, approver, borrower, depositor };
+    return { ...stack, governor, nationalGov, localGov, approver, borrower, depositor };
   }
 
-  async function wireApprover(local: Awaited<ReturnType<typeof deployFixture>>["local"], localGov: Awaited<ReturnType<typeof deployFixture>>["localGov"], approver: Awaited<ReturnType<typeof deployFixture>>["approver"]) {
+  async function wireApprover(
+    local: Awaited<ReturnType<typeof deployFixture>>["local"],
+    localGov: Awaited<ReturnType<typeof deployFixture>>["localGov"],
+    approver: Awaited<ReturnType<typeof deployFixture>>["approver"],
+  ) {
     await local.connect(localGov).addApprover(approver.address);
     await local.connect(localGov).grantRiskOracle(approver.address);
   }
 
   it("accepts deposits into the reserve", async () => {
-    const { worldBank, depositor } = await deployFixture();
-    await depositor.sendTransaction({ to: await worldBank.getAddress(), value: ethers.parseEther("10") });
-    expect(await worldBank.reserveBalance()).to.equal(ethers.parseEther("10"));
-    expect(await worldBank.totalDeposits()).to.equal(ethers.parseEther("10"));
+    const { worldBank, mockUsdc, depositor } = await deployFixture();
+    const amt = usdc("10");
+    await mockUsdc.mint(depositor.address, amt);
+    await mockUsdc.connect(depositor).approve(await worldBank.getAddress(), amt);
+    await worldBank.connect(depositor).deposit(amt);
+    expect(await worldBank.reserveBalance()).to.equal(amt);
+    expect(await worldBank.totalDeposits()).to.equal(amt);
   });
 
   it("allocates capital down the hierarchy", async () => {
-    const { worldBank, national, local, governor, nationalGov, depositor } = await deployFixture();
+    const { worldBank, national, local, controller, mockUsdc, governor, nationalGov, depositor } =
+      await deployFixture();
 
-    await depositor.sendTransaction({ to: await worldBank.getAddress(), value: ethers.parseEther("100") });
+    await fundLoanPool(
+      { mockUsdc, worldBank, national, local, controller },
+      depositor,
+      governor,
+      nationalGov,
+      { deposit: "100", toNational: "50", toLocal: "25" },
+    );
 
-    await worldBank.connect(governor).registerNationalBank(await national.getAddress(), "NB", "BD");
-    await worldBank.connect(governor).allocate(await national.getAddress(), ethers.parseEther("50"));
-
-    await national.connect(nationalGov).registerLocalBank(await local.getAddress(), "LB", "Dhaka");
-    await national.connect(nationalGov).allocate(await local.getAddress(), ethers.parseEther("25"));
-
-    // ETH lands on LocalBank then forwards to LoanController via receive().
-    const loanController = await local.loanController();
-    expect(await ethers.provider.getBalance(loanController)).to.equal(ethers.parseEther("25"));
+    expect(await mockUsdc.balanceOf(await controller.getAddress())).to.equal(usdc("25"));
   });
 
   it("full loan lifecycle: request → approve → repay", async () => {
-    const { worldBank, national, local, governor, nationalGov, localGov, approver, borrower, depositor } =
-      await deployFixture();
+    const {
+      worldBank,
+      national,
+      local,
+      controller,
+      mockUsdc,
+      governor,
+      nationalGov,
+      localGov,
+      approver,
+      borrower,
+      depositor,
+    } = await deployFixture();
 
-    await depositor.sendTransaction({ to: await worldBank.getAddress(), value: ethers.parseEther("100") });
-    await worldBank.connect(governor).registerNationalBank(await national.getAddress(), "NB", "BD");
-    await worldBank.connect(governor).allocate(await national.getAddress(), ethers.parseEther("50"));
-    await national.connect(nationalGov).registerLocalBank(await local.getAddress(), "LB", "Dhaka");
-    await national.connect(nationalGov).allocate(await local.getAddress(), ethers.parseEther("25"));
+    await fundLoanPool(
+      { mockUsdc, worldBank, national, local, controller },
+      depositor,
+      governor,
+      nationalGov,
+      { deposit: "100", toNational: "50", toLocal: "25" },
+    );
 
     await wireApprover(local, localGov, approver);
-    await local.connect(borrower).requestLoan(ethers.parseEther("5"), 6, "working capital");
-    const ctrl = await ethers.getContractAt("LoanController", await local.loanController());
-    await commitAndRevealRisk(ctrl, approver, 1);
+    await local.connect(borrower).requestLoan(usdc("5"), 6, "working capital");
+    await commitAndRevealRisk(controller, approver, 1);
     await local.connect(approver).approveLoan(1);
 
     const loan = await local.loans(1);
-    expect(loan.status).to.equal(3); // Active
-    expect(loan.installmentCount).to.equal(1); // below threshold → single payment
+    expect(loan.status).to.equal(3);
+    expect(loan.installmentCount).to.equal(1);
 
-    await local.connect(borrower).payInstallment(1, { value: loan.totalOwed });
+    await mockUsdc.connect(borrower).approve(await controller.getAddress(), loan.totalOwed);
+    const interestDue = loan.totalOwed - loan.principal;
+    if (interestDue > 0n) {
+      await mockUsdc.mint(borrower.address, interestDue);
+    }
+    await local.connect(borrower).payInstallment(1, loan.totalOwed);
+
     const updated = await local.loans(1);
-    expect(updated.status).to.equal(4); // Repaid
+    expect(updated.status).to.equal(4);
   });
 });

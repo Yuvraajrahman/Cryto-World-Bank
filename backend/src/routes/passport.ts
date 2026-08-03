@@ -2,23 +2,29 @@ import { Router } from "express";
 import { AuthedRequest, requireAuth, requireRoles } from "../middleware/auth";
 import { db } from "../store/db";
 import { getPrisma } from "../db/prisma";
+import { PASSPORT_TIERS, tierForScore } from "../lib/rates";
 
 export const passportRouter = Router();
 passportRouter.use(requireAuth, requireRoles("BORROWER"));
 
-/** Plan G.26 — 0–1000 scale with Bronze→Diamond tiers. */
-export const PASSPORT_TIERS = [
-  { tier: "Bronze", min: 0, max: 399, maxLoan: "$50", modifier: "base" },
-  { tier: "Silver", min: 400, max: 549, maxLoan: "$500", modifier: "−0.25%" },
-  { tier: "Gold", min: 550, max: 699, maxLoan: "$2,500", modifier: "−0.50%" },
-  { tier: "Platinum", min: 700, max: 849, maxLoan: "$10,000", modifier: "−1.00%" },
-  { tier: "Diamond", min: 850, max: 1000, maxLoan: "$25,000", modifier: "−2.00%" },
-] as const;
+function formatTierRow(t: (typeof PASSPORT_TIERS)[number]) {
+  const maxLoanUsd = t.maxLoanUsdc / 1_000_000;
+  const modifier =
+    t.rateModifierBps === 0
+      ? "base"
+      : `${t.rateModifierBps > 0 ? "+" : ""}${(t.rateModifierBps / 100).toFixed(2)}%`;
+  return {
+    tier: t.name,
+    min: t.minScore,
+    max: t.maxScore,
+    maxLoan: maxLoanUsd >= 1 ? `$${maxLoanUsd.toLocaleString()}` : `$${maxLoanUsd.toFixed(2)}`,
+    modifier,
+    maxTermMonths: t.maxTermMonths,
+  };
+}
 
 function tierFromScore(score: number): string {
-  const s = Math.max(0, Math.min(1000, score));
-  const row = PASSPORT_TIERS.find((t) => s >= t.min && s <= t.max);
-  return row?.tier ?? "Bronze";
+  return tierForScore(score).name;
 }
 
 /** Map legacy 0–850 contract scores onto the plan’s 0–1000 scale. */
@@ -103,7 +109,7 @@ passportRouter.get("/me", async (req, res, next) => {
     series[series.length - 1].score = score;
 
     const tier = tierFromScore(score);
-    const qualifiesForCredit = score >= 400; // Silver+
+    const qualifiesForCredit = score >= 300; // Silver+ per CreditPassport.sol
 
     let groupHistory: Array<{ groupName: string; role: string; status: string }> = [];
     try {
@@ -132,7 +138,7 @@ passportRouter.get("/me", async (req, res, next) => {
       source,
       wallet: user.wallet,
       qualifiesForCredit,
-      tiers: PASSPORT_TIERS,
+      tiers: PASSPORT_TIERS.map(formatTierRow),
       repayment: {
         onTime: repaid.length,
         late: lateCount,

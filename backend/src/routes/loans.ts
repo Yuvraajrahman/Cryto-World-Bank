@@ -10,6 +10,7 @@ import {
   findUserById,
   Loan,
 } from "../store/db";
+import { DEFAULT_MAX_LTV_BPS } from "../lib/rates";
 
 export const loansRouter = Router();
 
@@ -113,6 +114,10 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
       res.status(403).json({ error: "not_a_borrower" });
       return;
     }
+    if (user.frozen) {
+      res.status(403).json({ error: "account_frozen" });
+      return;
+    }
     const body = loanCreateSchema.parse(req.body);
     const bank = findBankById(body.localBankId);
     if (!bank || bank.tier !== "LOCAL") {
@@ -126,7 +131,7 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
         res.status(400).json({ error: "collateral_required" });
         return;
       }
-      const ltvBps = body.ltvBps ?? 5000;
+      const ltvBps = body.ltvBps ?? DEFAULT_MAX_LTV_BPS;
       const maxBorrow = (collateral * ltvBps) / 10_000;
       if (body.amount > maxBorrow + 1e-9) {
         res.status(400).json({ error: "exceeds_ltv", maxBorrow, ltvBps });
@@ -266,7 +271,7 @@ loansRouter.post(
         res.status(404).json({ error: "not_found" });
         return;
       }
-      if (loan.status !== "PENDING") {
+      if (loan.status !== "PENDING" && loan.status !== "INFO_REQUESTED") {
         res.status(400).json({ error: "not_pending" });
         return;
       }
@@ -376,7 +381,7 @@ loansRouter.post(
         res.status(404).json({ error: "not_found" });
         return;
       }
-      if (loan.status !== "PENDING") {
+      if (loan.status !== "PENDING" && loan.status !== "INFO_REQUESTED") {
         res.status(400).json({ error: "not_pending" });
         return;
       }

@@ -125,6 +125,14 @@ export default function GroupDashboardPage() {
                       ? ` · ${m.walletAddress.slice(0, 6)}…${m.walletAddress.slice(-4)}`
                       : ""}
                   </span>
+                  {m.retailLoanId ? (
+                    <>
+                      {" "}
+                      <Link to={`/app/loans/${m.retailLoanId}`} className="text-link">
+                        view loan share
+                      </Link>
+                    </>
+                  ) : null}
                 </div>
                 <Badge>{m.role === "ORGANIZER" ? "org" : "member"}</Badge>
               </li>
@@ -137,16 +145,8 @@ export default function GroupDashboardPage() {
           <EligibilityChecklist eligibility={group.eligibility} dense />
           {active ? (
             <p className="client-lede" style={{ marginTop: 12 }}>
-              Active loan: {active.totalAmountEth} ETH
-              {active.retailLoanId ? (
-                <>
-                  {" "}
-                  ·{" "}
-                  <Link to={`/app/loans/${active.retailLoanId}`} className="text-link">
-                    View installment loan
-                  </Link>
-                </>
-              ) : null}
+              Active loan: {active.totalAmountEth} ETH total, split into one installment
+              loan per member (see "view loan share" next to each member above).
             </p>
           ) : null}
           {pending ? (

@@ -3,19 +3,24 @@ pragma solidity ^0.8.24;
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {LoanController} from "./LoanController.sol";
 import {CreditPassport} from "./CreditPassport.sol";
 import {INationalBank} from "./interfaces/INationalBank.sol";
 
 /**
  * @title LocalBank (Tier 3)
- * @notice Receives capital from a National Bank, owns a LoanController for retail loans,
- *         and exposes tier metadata plus governance hooks for approvers.
+ * @notice Receives MockUSDC from a National Bank, owns a LoanController for
+ *         retail loans, and exposes tier metadata plus governance hooks.
  */
 contract LocalBank is AccessControl, Pausable {
+    using SafeERC20 for IERC20;
+
     bytes32 public constant GOVERNOR_ROLE = keccak256("GOVERNOR_ROLE");
 
     address public immutable nationalBank;
+    IERC20 public immutable usdc;
     LoanController public immutable loanController;
     string public name;
     string public region;
@@ -42,34 +47,34 @@ contract LocalBank is AccessControl, Pausable {
     constructor(
         address governor,
         address nationalBankAddress,
+        address usdcAddress,
         string memory bankName,
         string memory bankRegion
     ) {
         require(nationalBankAddress != address(0), "zero national bank");
+        require(usdcAddress != address(0), "zero usdc");
         nationalBank = nationalBankAddress;
+        usdc = IERC20(usdcAddress);
         name = bankName;
         region = bankRegion;
 
         _grantRole(DEFAULT_ADMIN_ROLE, governor);
         _grantRole(GOVERNOR_ROLE, governor);
 
-        LoanController controller = new LoanController(address(this), governor);
+        LoanController controller = new LoanController(address(this), governor, usdcAddress);
         loanController = controller;
         emit LoanControllerDeployed(address(controller));
     }
 
-    receive() external payable {
-        _forwardToController();
-    }
-
-    function syncCapitalToLoanPool() external payable {
+    /// @notice Forwards all MockUSDC held by this bank into the loan pool.
+    function syncCapitalToLoanPool() external {
         _forwardToController();
     }
 
     function _forwardToController() internal {
-        if (address(this).balance == 0) return;
-        (bool ok, ) = payable(address(loanController)).call{value: address(this).balance}("");
-        require(ok, "forward failed");
+        uint256 bal = usdc.balanceOf(address(this));
+        if (bal == 0) return;
+        usdc.safeTransfer(address(loanController), bal);
     }
 
     function linkCreditPassport(address passport) external onlyRole(GOVERNOR_ROLE) {
@@ -117,10 +122,14 @@ contract LocalBank is AccessControl, Pausable {
     function grantRiskOracle(address account) external onlyRole(GOVERNOR_ROLE) {
         require(account != address(0), "zero oracle");
         loanController.grantRole(loanController.ORACLE_ROLE(), account);
-        emit ApproverAdded(account); // reuse event for demo wiring
+        emit ApproverAdded(account);
     }
 
     function borrowAprBps() external view returns (uint256) {
+        return loanController.borrowAprBps();
+    }
+
+    function downwardRateBps() external view returns (uint256) {
         return loanController.borrowAprBps();
     }
 
@@ -137,19 +146,37 @@ contract LocalBank is AccessControl, Pausable {
         whenNotPaused
         returns (uint256 id)
     {
-        return requestLoanWithDoc(principal, termMonths, purpose, bytes32(0));
+        return requestLoanWithDoc(principal, termMonths, purpose, bytes32(0), 0);
     }
 
     function requestLoanWithDoc(
         uint256 principal,
         uint32 termMonths,
         string calldata purpose,
-        bytes32 docHash
+        bytes32 docHash,
+        uint256 collateralUsdc
     ) public whenNotPaused returns (uint256 id) {
         require(!frozenAccounts[msg.sender], "account frozen");
-        id = loanController.requestLoanFor(msg.sender, principal, termMonths, docHash, purpose);
+        id = loanController.requestLoanFor(
+            msg.sender,
+            principal,
+            termMonths,
+            docHash,
+            purpose,
+            collateralUsdc
+        );
         emit LoanRequested(id, msg.sender, principal, docHash, purpose);
         return id;
+    }
+
+    function requestCollateralLoan(
+        uint256 principal,
+        uint32 termMonths,
+        string calldata purpose,
+        uint256 collateralUsdc
+    ) external whenNotPaused returns (uint256 id) {
+        require(collateralUsdc > 0, "collateral required");
+        return requestLoanWithDoc(principal, termMonths, purpose, bytes32(0), collateralUsdc);
     }
 
     function approveLoan(uint256 id) external whenNotPaused {
@@ -164,12 +191,12 @@ contract LocalBank is AccessControl, Pausable {
         emit LoanRejected(id, msg.sender, reason);
     }
 
-    function payInstallment(uint256 id) external payable whenNotPaused {
+    function payInstallment(uint256 id, uint256 amount) external whenNotPaused {
         require(!frozenAccounts[msg.sender], "account frozen");
         LoanController.Loan memory before = loanController.getLoan(id);
         uint8 prevPaid = before.installmentsPaid;
-        loanController.payInstallmentFor{value: msg.value}(msg.sender, id);
-        emit InstallmentPaid(id, msg.sender, prevPaid + 1, msg.value);
+        loanController.payInstallmentFor(msg.sender, id, amount);
+        emit InstallmentPaid(id, msg.sender, prevPaid + 1, amount);
         LoanController.Loan memory afterLoan = loanController.getLoan(id);
         if (afterLoan.status == LoanController.LoanStatus.Repaid) {
             emit LoanRepaid(id, msg.sender);
@@ -247,6 +274,23 @@ contract LocalBank is AccessControl, Pausable {
 
     function setBorrowApr(uint256 newBps) external onlyRole(GOVERNOR_ROLE) {
         loanController.setBorrowApr(newBps);
+    }
+
+    function setRateModel(
+        uint256 baseRateBps,
+        uint256 slope1Bps,
+        uint256 slope2Bps,
+        uint256 kinkBps
+    ) external onlyRole(GOVERNOR_ROLE) {
+        loanController.setRateModel(baseRateBps, slope1Bps, slope2Bps, kinkBps);
+    }
+
+    function setMaxLtvBps(uint256 newMaxLtvBps) external onlyRole(GOVERNOR_ROLE) {
+        loanController.setMaxLtvBps(newMaxLtvBps);
+    }
+
+    function utilizationBps() external view returns (uint256) {
+        return loanController.utilizationBps();
     }
 
     function setInstallmentPolicy(uint256 threshold, uint8 installments)

@@ -16,10 +16,12 @@ import Sheet from "../../components/ui/Sheet";
 import { ToastProvider, useToast } from "../../components/ui/Toast";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
+import SimulationTab from "./SimulationTab";
 import "../../global.css";
 
 const TABS = [
   { id: "overview", label: "Overview" },
+  { id: "simulation", label: "Simulation" },
   { id: "users", label: "Users" },
   { id: "banks", label: "Banks" },
   { id: "loans", label: "Loans" },
@@ -490,6 +492,8 @@ function DevAdminInner() {
             </Glass>
           </div>
         ) : null}
+
+        {tab === "simulation" ? <SimulationTab /> : null}
 
         {tab === "users" ? (
           <div className="client-section">

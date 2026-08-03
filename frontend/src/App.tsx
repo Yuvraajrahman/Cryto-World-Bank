@@ -52,6 +52,7 @@ import { LocalLoanDecision } from "@/pages/LocalLoanDecision";
 import { LocalKycReview } from "@/pages/LocalKycReview";
 import { LocalStaffUsers } from "@/pages/LocalStaffUsers";
 import { LocalAmlAlerts } from "@/pages/LocalAmlAlerts";
+import { LocalLendingSettings } from "@/pages/LocalLendingSettings";
 import { RequireNationalAdmin } from "@/pages/RequireNationalAdmin";
 import { NationalOperatorShell } from "@/pages/NationalOperatorShell";
 import { NationalBankDashboard } from "@/pages/NationalBankDashboard";
@@ -130,6 +131,7 @@ export function App() {
           <Route path="/bank/local/kyc-review" element={<LocalKycReview />} />
           <Route path="/bank/local/users" element={<LocalStaffUsers />} />
           <Route path="/bank/local/aml-alerts" element={<LocalAmlAlerts />} />
+          <Route path="/bank/local/lending-settings" element={<LocalLendingSettings />} />
         </Route>
       </Route>
 

@@ -4,7 +4,7 @@
  */
 import { Router } from "express";
 import { z } from "zod";
-import type { UserRole as PrismaUserRole } from "@prisma/client";
+import type { UserRole as PrismaUserRole, Prisma } from "@prisma/client";
 import { AuthedRequest, requireAuth, requireRoles } from "../middleware/auth";
 import { db, findBankById, type UserRole } from "../store/db";
 import { localOpsDb } from "../store/localOps";
@@ -17,6 +17,14 @@ import {
   writeAudit,
 } from "../db/users";
 import { persistBankCapital, syncBanksFromPrisma } from "../db/banksSync";
+import {
+  getSimulationConfig,
+  updateSimulationConfig,
+  getSimulationConfigHistory,
+  revertSimulationConfigField,
+} from "../services/simulationConfig";
+import { simulateEconomy, getLatestSimulationRun, getSimulationRun } from "../services/simulateEconomy";
+import { optimizeSimulationConfig } from "../services/optimizeSimulation";
 
 export const devAdminRouter = Router();
 
@@ -700,4 +708,165 @@ devAdminRouter.post("/aml/:id/dismiss", async (req, res, next) => {
 
 devAdminRouter.get("/staff", (_req, res) => {
   res.json({ staff: localOpsDb.state.staff });
+});
+
+// ---------- Phase 2 / 2B: Economy simulation ----------
+
+const simulationRunSchema = z.object({
+  totalCapitalUsdc: z.number().positive().max(1_000_000_000).optional(),
+  seed: z.number().int().optional(),
+  clientMultiplier: z.number().min(0.1).max(2).optional(),
+  simulatedDays: z.number().int().min(30).max(3650).optional(),
+  sampleNationals: z.number().int().min(1).max(10).optional(),
+  sampleLocalsPerNational: z.number().int().min(1).max(8).optional(),
+  clientsPerLocal: z.number().int().min(1).max(10).optional(),
+});
+
+const simulationConfigSchema = z.object({
+  baseRateBps: z.number().int().min(0).max(5000).optional(),
+  slope1Bps: z.number().int().min(0).max(5000).optional(),
+  slope2Bps: z.number().int().min(0).max(10_000).optional(),
+  kinkBps: z.number().int().min(1000).max(10_000).optional(),
+  minReserveRatio: z.number().min(0.05).max(0.5).optional(),
+  tierModifiers: z.record(z.string(), z.number()).optional(),
+  note: z.string().max(500).optional(),
+});
+
+devAdminRouter.get("/simulation/config", async (_req, res, next) => {
+  try {
+    const config = await getSimulationConfig();
+    const history = await getSimulationConfigHistory(20);
+    res.json({ config, history });
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.patch("/simulation/config", async (req, res, next) => {
+  try {
+    const actor = (req as AuthedRequest).user!;
+    const body = simulationConfigSchema.parse(req.body);
+    const patch: Record<string, unknown> = {};
+    if (body.baseRateBps != null) patch.baseRateBps = body.baseRateBps;
+    if (body.slope1Bps != null) patch.slope1Bps = body.slope1Bps;
+    if (body.slope2Bps != null) patch.slope2Bps = body.slope2Bps;
+    if (body.kinkBps != null) patch.kinkBps = body.kinkBps;
+    if (body.minReserveRatio != null) patch.minReserveRatio = body.minReserveRatio;
+    if (body.tierModifiers != null) patch.tierModifiers = body.tierModifiers;
+    const { config, changes } = await updateSimulationConfig(
+      patch as Partial<import("../services/simulationConfig").SimulationConfigSnapshot>,
+      {
+        changedBy: actor.id,
+        note: body.note,
+      },
+    );
+    await writeAudit("SIMULATION_CONFIG_UPDATE", actor.id, {
+      changes,
+    } as Prisma.InputJsonValue);
+    res.json({ ok: true, config, changes });
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.post("/simulation/config/revert/:historyId", async (req, res, next) => {
+  try {
+    const actor = (req as AuthedRequest).user!;
+    const config = await revertSimulationConfigField(req.params.historyId, actor.id);
+    if (!config) {
+      res.status(404).json({ error: "history_not_found" });
+      return;
+    }
+    await writeAudit("SIMULATION_CONFIG_REVERT", actor.id, { historyId: req.params.historyId });
+    res.json({ ok: true, config });
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.post("/simulation/run", async (req, res, next) => {
+  try {
+    const actor = (req as AuthedRequest).user!;
+    const body = simulationRunSchema.parse(req.body ?? {});
+    const result = await simulateEconomy({
+      ...body,
+      triggeredBy: actor.id,
+    });
+    await writeAudit("SIMULATION_RUN", actor.id, {
+      runId: result.summary.runId,
+      totalCapitalUsdc: result.summary.totalCapitalUsdc,
+      seed: result.summary.seed,
+      pass: result.verification.pass,
+    });
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.get("/simulation/runs/latest", async (_req, res, next) => {
+  try {
+    const run = await getLatestSimulationRun();
+    if (!run) {
+      res.status(404).json({ error: "no_runs" });
+      return;
+    }
+    res.json({ run });
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.get("/simulation/runs/:id", async (req, res, next) => {
+  try {
+    const run = await getSimulationRun(req.params.id);
+    if (!run) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+    res.json({ run });
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.post("/simulation/optimize", async (req, res, next) => {
+  try {
+    const body = z
+      .object({ targetCapitalUsdc: z.number().positive().max(1_000_000_000).default(1_000_000_000) })
+      .parse(req.body ?? {});
+    const current = await getSimulationConfig();
+    const result = optimizeSimulationConfig(current, body.targetCapitalUsdc);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+devAdminRouter.post("/simulation/optimize/apply", async (req, res, next) => {
+  try {
+    const actor = (req as AuthedRequest).user!;
+    const body = z
+      .object({
+        targetCapitalUsdc: z.number().positive().max(1_000_000_000).default(1_000_000_000),
+        note: z.string().max(500).optional(),
+      })
+      .parse(req.body ?? {});
+    const preview = optimizeSimulationConfig(await getSimulationConfig(), body.targetCapitalUsdc);
+    const { config, changes } = await updateSimulationConfig(preview.optimized, {
+      changedBy: actor.id,
+      note: body.note ?? `Optimized for ${body.targetCapitalUsdc} USDC`,
+    });
+    await writeAudit(
+      "SIMULATION_OPTIMIZE_APPLY",
+      actor.id,
+      {
+        targetCapitalUsdc: body.targetCapitalUsdc,
+        changes,
+      } as unknown as Prisma.InputJsonValue,
+    );
+    res.json({ ok: true, config, preview, changes });
+  } catch (err) {
+    next(err);
+  }
 });

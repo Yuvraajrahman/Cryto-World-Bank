@@ -11,8 +11,15 @@ import { localOpsDb, type AmlAlert, type BankStaffRecord } from "../store/localO
 import { nationalOpsDb } from "../store/nationalOps";
 import { getPrisma } from "../db/prisma";
 import { findUserByIdPg, updateUserPg, writeAudit } from "../db/users";
+import { applyAccountFreeze } from "../chain/freezeClient";
+import { borrowAprFromUtilization, KINK_BPS } from "../lib/rates";
+import { ethers } from "ethers";
+import { config } from "../config";
+import { getChainProvider } from "../chain/provider";
 
 export const localBankRouter = Router();
+
+const APPROVAL_QUEUE_STATUSES = new Set(["PENDING", "INFO_REQUESTED"]);
 
 const adminOnly = ["LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"] as const;
 
@@ -58,7 +65,7 @@ localBankRouter.get("/dashboard", async (req, res) => {
   const bank = findBankById(bankId);
   const book = db.state.loans.filter((l) => l.lenderBankId === bankId && l.kind === "BORROWER");
   const active = book.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
-  const pending = book.filter((l) => l.status === "PENDING");
+  const pending = book.filter((l) => APPROVAL_QUEUE_STATUSES.has(l.status));
   const delinquent = active.filter((l) =>
     (l.installments || []).some((i) => !i.paid && new Date(i.dueDate) < new Date()),
   );
@@ -133,7 +140,7 @@ localBankRouter.get("/approvals", (req, res) => {
     .filter(
       (l) =>
         l.kind === "BORROWER" &&
-        l.status === "PENDING" &&
+        APPROVAL_QUEUE_STATUSES.has(l.status) &&
         (user.role === "OWNER" || user.role === "NATIONAL_BANK_ADMIN" || l.lenderBankId === bankId),
     )
     .map(enrichLoan);
@@ -237,7 +244,9 @@ localBankRouter.post("/approvals/:loanId/request-info", (req, res) => {
     return;
   }
   const body = requestInfoSchema.parse(req.body);
+  loan.status = "INFO_REQUESTED";
   loan.notes = `${loan.notes || ""}\n[INFO REQUESTED ${localOpsDb.nowIso()} by ${user.id}] ${body.message}`.trim();
+  db.save();
   res.json({ ok: true, loan });
 });
 
@@ -556,25 +565,30 @@ localBankRouter.post("/aml/:id/escalate", (req, res) => {
   });
 });
 
-localBankRouter.post("/aml/:id/freeze", (req, res) => {
-  const user = (req as AuthedRequest).user!;
-  const body = amlActionSchema.parse(req.body);
-  const alert = localOpsDb.state.amlAlerts.find((a) => a.id === req.params.id);
-  if (!alert || alert.bankId !== bankIdFor(user)) {
-    res.status(404).json({ error: "not_found" });
-    return;
+localBankRouter.post("/aml/:id/freeze", async (req, res, next) => {
+  try {
+    const user = (req as AuthedRequest).user!;
+    const body = amlActionSchema.parse(req.body);
+    const alert = localOpsDb.state.amlAlerts.find((a) => a.id === req.params.id);
+    if (!alert || alert.bankId !== bankIdFor(user)) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+    alert.status = "FROZEN";
+    alert.resolvedAt = localOpsDb.nowIso();
+    alert.resolvedBy = user.id;
+    alert.resolutionNote = body.reason;
+    localOpsDb.save();
+    const freeze = await applyAccountFreeze(alert.clientUserId, alert.clientWallet);
+    res.json({
+      ok: true,
+      alert,
+      auditId: `AML_FREEZE_${alert.id}`,
+      accountFreeze: freeze,
+    });
+  } catch (err) {
+    next(err);
   }
-  alert.status = "FROZEN";
-  alert.resolvedAt = localOpsDb.nowIso();
-  alert.resolvedBy = user.id;
-  alert.resolutionNote = body.reason;
-  localOpsDb.save();
-  res.json({
-    ok: true,
-    alert,
-    auditId: `AML_FREEZE_${alert.id}`,
-    note: "Demo freeze recorded off-chain; wire LocalBank.freezeAccount for on-chain.",
-  });
 });
 
 /** Local → National capital request (feeds National capital-allocation queue) */
@@ -609,6 +623,150 @@ localBankRouter.post(
       nationalOpsDb.state.capitalRequests.unshift(row);
       nationalOpsDb.save();
       res.status(201).json({ ok: true, request: row });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+const LOAN_CTRL_READ_ABI = [
+  "function baseRateBps() view returns (uint256)",
+  "function slope1Bps() view returns (uint256)",
+  "function slope2Bps() view returns (uint256)",
+  "function kinkBps() view returns (uint256)",
+  "function maxLtvBps() view returns (uint256)",
+];
+
+const LOCAL_GOV_ABI = [
+  "function setRateModel(uint256,uint256,uint256,uint256) external",
+  "function setMaxLtvBps(uint256) external",
+];
+
+async function readLoanRateModel(): Promise<{
+  baseRateBps: number;
+  slope1Bps: number;
+  slope2Bps: number;
+  kinkBps: number;
+  maxLtvBps: number;
+}> {
+  const defaults = {
+    baseRateBps: 300,
+    slope1Bps: 500,
+    slope2Bps: 7500,
+    kinkBps: KINK_BPS,
+    maxLtvBps: 5000,
+  };
+  const provider = getChainProvider();
+  const controller = config.contracts.loanController;
+  if (!provider || !controller) return defaults;
+  try {
+    const c = new ethers.Contract(controller, LOAN_CTRL_READ_ABI, provider);
+    const [baseRateBps, slope1Bps, slope2Bps, kinkBps, maxLtvBps] = await Promise.all([
+      c.baseRateBps(),
+      c.slope1Bps(),
+      c.slope2Bps(),
+      c.kinkBps(),
+      c.maxLtvBps(),
+    ]);
+    return {
+      baseRateBps: Number(baseRateBps),
+      slope1Bps: Number(slope1Bps),
+      slope2Bps: Number(slope2Bps),
+      kinkBps: Number(kinkBps),
+      maxLtvBps: Number(maxLtvBps),
+    };
+  } catch {
+    return defaults;
+  }
+}
+
+/** Local Bank lending rate model (Tier 3 authority — plan I tier-authority UI). */
+localBankRouter.get(
+  "/lending-settings",
+  requireRoles("LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"),
+  async (req, res, next) => {
+    try {
+      const user = (req as AuthedRequest).user!;
+      const bankId = bankIdFor(user);
+      const bank = findBankById(bankId);
+      const rateModel = await readLoanRateModel();
+      res.json({
+        bank,
+        rateModel,
+        previews: {
+          at50UtilBps: borrowAprFromUtilization(5000, rateModel),
+          atKinkBps: borrowAprFromUtilization(rateModel.kinkBps, rateModel),
+          at100UtilBps: borrowAprFromUtilization(10_000, rateModel),
+        },
+        governanceNote:
+          "Demo: Local governor may adjust kinked borrow APR and max LTV. Production routes via multisig / timelock.",
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+const lendingSettingsSchema = z.object({
+  baseRateBps: z.number().int().min(0).max(5000),
+  slope1Bps: z.number().int().min(0).max(5000),
+  slope2Bps: z.number().int().min(0).max(5000),
+  kinkBps: z.number().int().min(1000).max(10_000).optional(),
+  maxLtvBps: z.number().int().min(1000).max(10_000).optional(),
+  note: z.string().max(500).optional(),
+});
+
+localBankRouter.post(
+  "/lending-settings",
+  requireRoles("LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"),
+  async (req, res, next) => {
+    try {
+      const user = (req as AuthedRequest).user!;
+      const body = lendingSettingsSchema.parse(req.body);
+      const bankId = bankIdFor(user);
+      const bank = findBankById(bankId);
+      if (!bank) {
+        res.status(404).json({ error: "bank_not_found" });
+        return;
+      }
+
+      const kink = body.kinkBps ?? KINK_BPS;
+      bank.aprBps = body.baseRateBps;
+      db.save();
+
+      let chainTxHash: string | null = null;
+      const pk = process.env.CHAIN_OPERATOR_PRIVATE_KEY;
+      const localAddr = config.contracts.localBank;
+      const provider = getChainProvider();
+      if (pk && localAddr && provider) {
+        const signer = new ethers.Wallet(pk, provider);
+        const lb = new ethers.Contract(localAddr, LOCAL_GOV_ABI, signer);
+        const tx = await lb.setRateModel(body.baseRateBps, body.slope1Bps, body.slope2Bps, kink);
+        await tx.wait();
+        if (body.maxLtvBps != null) {
+          const ltvTx = await lb.setMaxLtvBps(body.maxLtvBps);
+          await ltvTx.wait();
+        }
+        chainTxHash = tx.hash;
+      }
+
+      const rateModel = {
+        baseRateBps: body.baseRateBps,
+        slope1Bps: body.slope1Bps,
+        slope2Bps: body.slope2Bps,
+        kinkBps: kink,
+        maxLtvBps: body.maxLtvBps ?? 5000,
+      };
+
+      res.json({
+        ok: true,
+        rateModel,
+        chainTxHash,
+        note: body.note,
+        changedBy: user.id,
+        governanceNote:
+          "Parameter change recorded. On-chain update requires CHAIN_OPERATOR_PRIVATE_KEY in demo env.",
+      });
     } catch (err) {
       next(err);
     }

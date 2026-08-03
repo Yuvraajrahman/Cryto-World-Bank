@@ -8,14 +8,7 @@ import Icon from "../../../components/ui/Icon";
 import StateMessage from "../../../components/ui/StateMessage";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  const v = Number(n);
-  if (v >= 100) return `${v.toFixed(1)} ETH`;
-  if (v >= 1) return `${v.toFixed(2)} ETH`;
-  return `${v.toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -124,9 +117,9 @@ export default function NationalDashboardPage() {
       ) : null}
 
       <div className="client-snap-row">
-        <StatCard label="Allocated down" value={formatEth(data.bank?.totalAllocated)} />
-        <StatCard label="Reserve" value={formatEth(capital.reserveEth)} />
-        <StatCard label="Available to allocate" value={formatEth(capital.availableToAllocateEth)} />
+        <StatCard label="Allocated down" value={formatUsdc(data.bank?.totalAllocated)} />
+        <StatCard label="Reserve" value={formatUsdc(capital.reserveEth)} />
+        <StatCard label="Available to allocate" value={formatUsdc(capital.availableToAllocateEth)} />
         <StatCard label="Reserve ratio" value={pct(capital.reserveRatio)} />
       </div>
 
@@ -163,7 +156,7 @@ export default function NationalDashboardPage() {
           </div>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Active value</span>
-            <p style={{ margin: "4px 0 0", fontSize: 22 }}>{formatEth(j.activeLoanValueEth)}</p>
+            <p style={{ margin: "4px 0 0", fontSize: 22 }}>{formatUsdc(j.activeLoanValueEth)}</p>
           </div>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Default rate</span>
@@ -194,8 +187,8 @@ export default function NationalDashboardPage() {
                 </span>
               </div>
               <div className="ops-row-meta">
-                <code>{formatEth(lb.loanBook?.activeValueEth)} book</code>
-                <code>{formatEth(lb.reserve)} reserve</code>
+                <code>{formatUsdc(lb.loanBook?.activeValueEth)} book</code>
+                <code>{formatUsdc(lb.reserve)} reserve</code>
               </div>
             </li>
           ))}

@@ -3,11 +3,7 @@ import { Link } from "react-router-dom";
 import Badge from "../../../components/ui/Badge";
 import StateMessage from "../../../components/ui/StateMessage";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function riskTone(band) {
   if (band === "low") return "ops-risk-low";
@@ -119,7 +115,7 @@ export default function ApprovalsQueuePage() {
                     <span className={`ops-risk-pill ${riskTone(loan.riskBand)}`}>
                       {(loan.compositeRisk * 100).toFixed(0)} · {loan.riskBand}
                     </span>
-                    <code>{formatEth(loan.amount)}</code>
+                    <code>{formatUsdc(loan.amount)}</code>
                   </div>
                 </Link>
               </li>
@@ -144,7 +140,7 @@ export default function ApprovalsQueuePage() {
                   </div>
                   <div className="ops-row-meta">
                     <Badge icon="clock">Pending score</Badge>
-                    <code>{formatEth(loan.amount)}</code>
+                    <code>{formatUsdc(loan.amount)}</code>
                   </div>
                 </Link>
               </li>

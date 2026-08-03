@@ -59,12 +59,21 @@ export const TIER_APR_DISCOUNT_BPS = {
   DIAMOND: 200,
 };
 
-export function formatEth(n) {
+/** Testing-phase balances are USDC (legacy name formatEth kept for imports). */
+export function formatUsdc(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
   const v = Number(n);
-  if (v >= 100) return `${v.toFixed(1)} ETH`;
-  if (v >= 1) return `${v.toFixed(3)} ETH`;
-  return `${v.toFixed(4)} ETH`;
+  const abs = Math.abs(v);
+  if (abs >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}M USDC`;
+  if (abs >= 1_000) return `${(v / 1_000).toFixed(1)}K USDC`;
+  if (abs >= 1) return `${v.toLocaleString(undefined, { maximumFractionDigits: 2 })} USDC`;
+  if (abs === 0) return "0 USDC";
+  return `${v.toFixed(4)} USDC`;
+}
+
+/** @deprecated Prefer formatUsdc — app loan/deposit units are USDC. */
+export function formatEth(n) {
+  return formatUsdc(n);
 }
 
 export function loanLifecycleLabel(status) {

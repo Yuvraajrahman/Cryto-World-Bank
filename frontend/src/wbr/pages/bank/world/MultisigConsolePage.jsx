@@ -8,11 +8,7 @@ import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function short(w) {
   if (!w) return "—";
@@ -56,7 +52,7 @@ export default function MultisigConsolePage() {
     setBusy(true);
     try {
       await api.post("/api/world-bank/multisig/propose", {
-        title: form.title || `Allocate ${form.amount} ETH`,
+        title: form.title || `Allocate ${form.amount} USDC`,
         description: form.description || "World → National capital allocation",
         action: "ALLOCATE_CAPITAL",
         payload: { toBankId: form.toBankId, amount: Number(form.amount) },
@@ -141,9 +137,9 @@ export default function MultisigConsolePage() {
 
       <Glass className="client-panel" level={3}>
         <Badge icon="wallet">Global reserve</Badge>
-        <h2 className="client-panel-title">{formatEth(data.reserve?.availableEth)}</h2>
+        <h2 className="client-panel-title">{formatUsdc(data.reserve?.availableEth)}</h2>
         <p className="client-lede">
-          Allocatable after minimum: {formatEth(data.reserve?.availableToAllocateEth)}
+          Allocatable after minimum: {formatUsdc(data.reserve?.availableToAllocateEth)}
         </p>
       </Glass>
 
@@ -246,9 +242,9 @@ export default function MultisigConsolePage() {
             <li key={nb.id} className="ops-row glass">
               <div>
                 <strong>{nb.name}</strong>
-                <span>Allocated {formatEth(nb.allocatedEth)}</span>
+                <span>Allocated {formatUsdc(nb.allocatedEth)}</span>
               </div>
-              <code>{formatEth(nb.reserveEth)}</code>
+              <code>{formatUsdc(nb.reserveEth)}</code>
             </li>
           ))}
         </ul>
@@ -281,7 +277,7 @@ export default function MultisigConsolePage() {
             ))}
           </Input>
           <Input
-            label="Amount (ETH)"
+            label="Amount (USDC)"
             type="number"
             value={form.amount}
             onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}

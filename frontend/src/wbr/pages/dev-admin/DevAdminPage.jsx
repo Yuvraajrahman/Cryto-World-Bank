@@ -17,11 +17,13 @@ import { ToastProvider, useToast } from "../../components/ui/Toast";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
 import SimulationTab from "./SimulationTab";
+import ReservesSurplusTab from "./ReservesSurplusTab";
 import "../../global.css";
 
 const TABS = [
   { id: "overview", label: "Overview" },
   { id: "simulation", label: "Simulation" },
+  { id: "reserves", label: "Reserve & surplus" },
   { id: "users", label: "Users" },
   { id: "banks", label: "Banks" },
   { id: "loans", label: "Loans" },
@@ -88,6 +90,13 @@ function DevAdminInner() {
     amount: "1000000",
     note: "",
   });
+  /** Country desk: pick a national bank (country) → fund + approve its loans */
+  const [countryNbId, setCountryNbId] = useState("");
+  const [countryFundTarget, setCountryFundTarget] = useState("NATIONAL"); // NATIONAL | local bank id
+  const [countryAmount, setCountryAmount] = useState("1000000");
+  const [countryNote, setCountryNote] = useState("");
+  const [countryLoans, setCountryLoans] = useState([]);
+  const [countrySearch, setCountrySearch] = useState("");
 
   const loadOverview = useCallback(async () => {
     const r = await api.get("/api/dev-admin/overview");
@@ -131,10 +140,15 @@ function DevAdminInner() {
   useEffect(() => {
     void (async () => {
       try {
-        if (tab === "overview") await loadOverview();
+        if (tab === "overview") {
+          await Promise.all([loadOverview(), loadBanks()]);
+        }
         if (tab === "users") await loadUsers();
         if (tab === "banks") await loadBanks();
-        if (tab === "loans") await loadLoans();
+        if (tab === "loans") {
+          await loadBanks();
+          await loadLoans();
+        }
         if (tab === "ops") await loadOps();
       } catch (err) {
         toast.show(err?.message || "Load failed", { variant: "error" });
@@ -234,6 +248,78 @@ function DevAdminInner() {
       await loadBanks();
     } catch (err) {
       toast.show(err?.message || "Allocate failed", { variant: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const loadCountryLoans = useCallback(async (nbId) => {
+    if (!nbId) {
+      setCountryLoans([]);
+      return;
+    }
+    const params = new URLSearchParams({
+      nationalBankId: nbId,
+      status: "PENDING",
+    });
+    const r = await api.get(`/api/dev-admin/loans?${params}`);
+    setCountryLoans(r.loans || []);
+  }, []);
+
+  async function fundCountry() {
+    if (!countryNbId) return;
+    const amount = Number(countryAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.show("Enter a positive USDC amount", { variant: "error" });
+      return;
+    }
+    setBusy(true);
+    try {
+      const toLocal = countryFundTarget !== "NATIONAL";
+      await api.post("/api/dev-admin/allocate", {
+        toType: toLocal ? "LOCAL" : "NATIONAL",
+        toId: toLocal ? countryFundTarget : countryNbId,
+        amount,
+        note:
+          countryNote ||
+          `Super Admin country desk → ${toLocal ? countryFundTarget : countryNbId}`,
+      });
+      toast.show(`Funded ${formatUsdc(amount)}`, { variant: "success" });
+      await loadOverview();
+      await loadBanks();
+      await loadCountryLoans(countryNbId);
+    } catch (err) {
+      toast.show(err?.message || "Fund failed", { variant: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function approveCountryLoan(id) {
+    setBusy(true);
+    try {
+      await api.post(`/api/dev-admin/loans/${id}/approve`, {});
+      toast.show("Loan approved", { variant: "success" });
+      await loadCountryLoans(countryNbId);
+      await loadLoans();
+      await loadOverview();
+    } catch (err) {
+      toast.show(err?.message || "Approve failed", { variant: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function rejectCountryLoan(id) {
+    setBusy(true);
+    try {
+      await api.post(`/api/dev-admin/loans/${id}/reject`, { reason: "Rejected by DEV_ADMIN (country desk)" });
+      toast.show("Loan rejected", { variant: "success" });
+      await loadCountryLoans(countryNbId);
+      await loadLoans();
+      await loadOverview();
+    } catch (err) {
+      toast.show(err?.message || "Reject failed", { variant: "error" });
     } finally {
       setBusy(false);
     }
@@ -354,6 +440,44 @@ function DevAdminInner() {
     return list;
   }, [banks]);
 
+  const countriesSorted = useMemo(() => {
+    const list = [...(banks.nationalBanks || [])];
+    list.sort((a, b) =>
+      String(a.jurisdiction || a.name || a.id).localeCompare(
+        String(b.jurisdiction || b.name || b.id),
+        undefined,
+        { sensitivity: "base" },
+      ),
+    );
+    const q = countrySearch.trim().toLowerCase();
+    if (!q) return list;
+    return list.filter((n) => {
+      const hay = `${n.jurisdiction || ""} ${n.name || ""} ${n.id || ""}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [banks.nationalBanks, countrySearch]);
+
+  const selectedNational = useMemo(
+    () => (banks.nationalBanks || []).find((n) => n.id === countryNbId) || null,
+    [banks.nationalBanks, countryNbId],
+  );
+
+  const countryLocals = useMemo(() => {
+    if (!countryNbId) return [];
+    return (banks.localBanks || [])
+      .filter((l) => l.parentBankId === countryNbId)
+      .sort((a, b) => String(a.name || a.id).localeCompare(String(b.name || b.id)));
+  }, [banks.localBanks, countryNbId]);
+
+  useEffect(() => {
+    if (countryNbId) {
+      setCountryFundTarget("NATIONAL");
+      void loadCountryLoans(countryNbId);
+    } else {
+      setCountryLoans([]);
+    }
+  }, [countryNbId, loadCountryLoans]);
+
   return (
     <div className="wbr-root">
       <div className="bg-orbs" aria-hidden>
@@ -426,6 +550,140 @@ function DevAdminInner() {
               <StatCard label="AML open" value={String(overview.queues?.amlOpen ?? 0)} />
             </div>
             <Glass className="client-panel">
+              <p className="eyebrow">Country desk</p>
+              <p className="client-lede">
+                Pick a country (national bank), fund it from World reserve, optionally a city local
+                bank, and approve pending loans under that country.
+              </p>
+              <div className="client-grid-2" style={{ marginTop: 12 }}>
+                <Input
+                  label="Search countries"
+                  value={countrySearch}
+                  onChange={(e) => setCountrySearch(e.target.value)}
+                  placeholder="Bangladesh, Nigeria…"
+                />
+                <label className="field">
+                  <span className="field-label">Country (national bank)</span>
+                  <select
+                    className="field-input"
+                    value={countryNbId}
+                    onChange={(e) => setCountryNbId(e.target.value)}
+                  >
+                    <option value="">Select country…</option>
+                    {countriesSorted.map((n) => (
+                      <option key={n.id} value={n.id}>
+                        {n.jurisdiction || n.name} ({n.id})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {selectedNational ? (
+                <div style={{ marginTop: 16 }}>
+                  <div className="stats-row" style={{ marginBottom: 12 }}>
+                    <StatCard label="National" value={selectedNational.jurisdiction || selectedNational.name} />
+                    <StatCard label="Reserve" value={formatUsdc(selectedNational.reserve)} />
+                    <StatCard label="Local banks" value={String(countryLocals.length)} />
+                    <StatCard label="Pending loans" value={String(countryLoans.length)} />
+                  </div>
+
+                  <div className="client-grid-2">
+                    <label className="field">
+                      <span className="field-label">Fund target</span>
+                      <select
+                        className="field-input"
+                        value={countryFundTarget}
+                        onChange={(e) => setCountryFundTarget(e.target.value)}
+                      >
+                        <option value="NATIONAL">
+                          National — {selectedNational.jurisdiction || selectedNational.name}
+                        </option>
+                        {countryLocals.map((l) => (
+                          <option key={l.id} value={l.id}>
+                            Local — {l.name || l.jurisdiction || l.id} (reserve {formatUsdc(l.reserve)})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <Input
+                      label="Amount (USDC)"
+                      value={countryAmount}
+                      onChange={(e) => setCountryAmount(e.target.value)}
+                    />
+                    <Input
+                      label="Note"
+                      value={countryNote}
+                      onChange={(e) => setCountryNote(e.target.value)}
+                      placeholder="Optional"
+                    />
+                  </div>
+                  <div className="quick-actions" style={{ marginTop: 12 }}>
+                    <Button type="button" disabled={busy} onClick={() => void fundCountry()}>
+                      Fund from World reserve
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      showArrow={false}
+                      disabled={busy}
+                      onClick={() => void loadCountryLoans(countryNbId)}
+                    >
+                      Refresh loans
+                    </Button>
+                  </div>
+
+                  <p className="eyebrow" style={{ marginTop: 20 }}>
+                    Pending loans in this country
+                  </p>
+                  {countryLoans.length === 0 ? (
+                    <p className="client-lede">No pending loans for this country’s banks.</p>
+                  ) : (
+                    <div className="ops-list" style={{ marginTop: 8 }}>
+                      {countryLoans.map((l) => (
+                        <div key={l.id} className="ops-row">
+                          <div>
+                            <strong>
+                              {l.id} · {formatUsdc(l.amount)} · {l.status}
+                            </strong>
+                            <span>
+                              lender {l.lenderBankId} · borrower {l.borrowerId || "—"}
+                            </span>
+                            <span>{l.purpose}</span>
+                          </div>
+                          <div className="ops-row-meta">
+                            <Button
+                              type="button"
+                              showArrow={false}
+                              disabled={busy}
+                              onClick={() => void approveCountryLoan(l.id)}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              showArrow={false}
+                              disabled={busy}
+                              onClick={() => void rejectCountryLoan(l.id)}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="client-lede" style={{ marginTop: 12 }}>
+                  Select a country to fund and manage its loans. If the list is empty, click{" "}
+                  <strong>Sync banks from DB</strong> below.
+                </p>
+              )}
+            </Glass>
+
+            <Glass className="client-panel">
               <p className="eyebrow">Distribute World reserve (USDC)</p>
               <p className="client-lede">
                 Super Admin can allocate to any national bank, local bank, or client User ID.
@@ -494,6 +752,8 @@ function DevAdminInner() {
         ) : null}
 
         {tab === "simulation" ? <SimulationTab /> : null}
+
+        {tab === "reserves" ? <ReservesSurplusTab /> : null}
 
         {tab === "users" ? (
           <div className="client-section">
@@ -685,22 +945,55 @@ function DevAdminInner() {
         {tab === "loans" ? (
           <div className="client-section">
             <Glass className="client-panel">
-              <label className="field">
-                <span className="field-label">Status filter</span>
-                <select
-                  className="field-input"
-                  value={loanStatus}
-                  onChange={(e) => setLoanStatus(e.target.value)}
-                >
-                  <option value="">All</option>
-                  {["PENDING", "ACTIVE", "APPROVED", "REPAID", "REJECTED", "DEFAULTED"].map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <Button type="button" style={{ marginTop: 10 }} onClick={() => void loadLoans()}>
+              <div className="client-grid-2">
+                <label className="field">
+                  <span className="field-label">Status filter</span>
+                  <select
+                    className="field-input"
+                    value={loanStatus}
+                    onChange={(e) => setLoanStatus(e.target.value)}
+                  >
+                    <option value="">All</option>
+                    {["PENDING", "ACTIVE", "APPROVED", "REPAID", "REJECTED", "DEFAULTED", "INFO_REQUESTED"].map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field">
+                  <span className="field-label">Country (national bank)</span>
+                  <select
+                    className="field-input"
+                    value={countryNbId}
+                    onChange={(e) => setCountryNbId(e.target.value)}
+                  >
+                    <option value="">All countries</option>
+                    {countriesSorted.map((n) => (
+                      <option key={n.id} value={n.id}>
+                        {n.jurisdiction || n.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <Button
+                type="button"
+                style={{ marginTop: 10 }}
+                onClick={() => {
+                  void (async () => {
+                    if (countryNbId) {
+                      const params = new URLSearchParams();
+                      if (loanStatus) params.set("status", loanStatus);
+                      params.set("nationalBankId", countryNbId);
+                      const r = await api.get(`/api/dev-admin/loans?${params}`);
+                      setLoans(r.loans || []);
+                    } else {
+                      await loadLoans();
+                    }
+                  })();
+                }}
+              >
                 Refresh
               </Button>
             </Glass>

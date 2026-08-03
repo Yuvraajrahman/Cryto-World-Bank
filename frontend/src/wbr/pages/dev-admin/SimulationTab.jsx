@@ -11,6 +11,8 @@ import StatCard from "../../components/ui/StatCard";
 import StateMessage from "../../components/ui/StateMessage";
 import { useToast } from "../../components/ui/Toast";
 import { api } from "@/lib/api";
+import VisualStressLab from "./VisualStressLab";
+import FundBanksPanel from "./FundBanksPanel";
 
 const TIER_KEYS = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"];
 
@@ -267,6 +269,13 @@ export default function SimulationTab() {
         <code>./scripts/start-everything.sh</code>. Does not broadcast on-chain allocateCapital for
         every bank.
       </p>
+
+      <VisualStressLab
+        config={config}
+        onApplyToRunForm={(patch) => setRunForm((f) => ({ ...f, ...patch }))}
+      />
+
+      <FundBanksPanel />
 
       {runStatus ? (
         <Badge icon="activity">Status: {runStatus}</Badge>

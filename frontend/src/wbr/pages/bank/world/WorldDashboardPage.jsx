@@ -10,14 +10,7 @@ import Sheet from "../../../components/ui/Sheet";
 import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  const v = Number(n);
-  if (v >= 100) return `${v.toFixed(1)} ETH`;
-  if (v >= 1) return `${v.toFixed(2)} ETH`;
-  return `${v.toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -134,9 +127,9 @@ export default function WorldDashboardPage() {
       ) : null}
 
       <div className="client-snap-row">
-        <StatCard label="TVL" value={formatEth(s.tvlEth)} />
-        <StatCard label="Reserve" value={formatEth(capital.reserveEth)} />
-        <StatCard label="Available to allocate" value={formatEth(capital.availableToAllocateEth)} />
+        <StatCard label="TVL" value={formatUsdc(s.tvlEth)} />
+        <StatCard label="Reserve" value={formatUsdc(capital.reserveEth)} />
+        <StatCard label="Available to allocate" value={formatUsdc(capital.availableToAllocateEth)} />
         <StatCard label="Reserve ratio" value={pct(capital.reserveRatio)} />
       </div>
 
@@ -175,7 +168,7 @@ export default function WorldDashboardPage() {
           </div>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Active value</span>
-            <p style={{ margin: "4px 0 0", fontSize: 22 }}>{formatEth(s.activeLoanValueEth)}</p>
+            <p style={{ margin: "4px 0 0", fontSize: 22 }}>{formatUsdc(s.activeLoanValueEth)}</p>
           </div>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Default rate</span>
@@ -211,7 +204,7 @@ export default function WorldDashboardPage() {
                 </div>
                 <div className="ops-row-meta">
                   <code>{pct(nb.capital?.reserveRatio)}</code>
-                  <code>{formatEth(nb.totalAllocated)} alloc</code>
+                  <code>{formatUsdc(nb.totalAllocated)} alloc</code>
                 </div>
               </Link>
             </li>
@@ -264,7 +257,7 @@ export default function WorldDashboardPage() {
 
       <Sheet open={allocSheet} onClose={() => !busy && setAllocSheet(false)} title="Allocate to National Bank">
         <p className="client-lede">
-          Available after {pct(capital.minReserveRatio)} floor: {formatEth(available)}
+          Available after {pct(capital.minReserveRatio)} floor: {formatUsdc(available)}
         </p>
         <div className="settings-fields" style={{ marginTop: 8 }}>
           <Input
@@ -281,13 +274,13 @@ export default function WorldDashboardPage() {
             ))}
           </Input>
           <Input
-            label="Amount (ETH)"
+            label="Amount (USDC)"
             type="number"
             value={allocAmt}
             onChange={(e) => setAllocAmt(e.target.value)}
             error={
               allocAmt && !validAlloc
-                ? `Must be ≤ ${available.toFixed(4)} ETH`
+                ? `Must be ≤ ${available.toFixed(4)} USDC`
                 : undefined
             }
           />

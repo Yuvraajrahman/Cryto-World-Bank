@@ -6,6 +6,7 @@ import { localOpsDb } from "../store/localOps";
 import { nationalOpsDb } from "../store/nationalOps";
 import { applyAccountFreeze } from "../chain/freezeClient";
 import { borrowAprFromUtilization, KINK_BPS } from "../lib/rates";
+import { hydrateBankCapitalFromPrisma } from "../db/banksSync";
 
 export const nationalBankRouter = Router();
 
@@ -58,60 +59,68 @@ function enrichLocal(lb: Bank, minRatio: number) {
 }
 
 /** 35 — National Bank Dashboard */
-nationalBankRouter.get("/dashboard", (req, res) => {
-  const user = (req as AuthedRequest).user!;
-  const nationalId = nationalIdFor(user);
-  const bank = findBankById(nationalId);
-  if (!bank || bank.tier !== "NATIONAL") {
-    res.status(404).json({ error: "national_bank_not_found" });
-    return;
+nationalBankRouter.get("/dashboard", async (req, res, next) => {
+  try {
+    const user = (req as AuthedRequest).user!;
+    const nationalId = nationalIdFor(user);
+    await hydrateBankCapitalFromPrisma(nationalId).catch(() => null);
+    const bank = findBankById(nationalId);
+    if (!bank || bank.tier !== "NATIONAL") {
+      res.status(404).json({ error: "national_bank_not_found" });
+      return;
+    }
+    const params = nationalOpsDb.paramsFor(nationalId);
+    const capital = capitalMetrics(bank, params.minReserveRatio);
+    const locals = childLocals(nationalId).map((lb) => enrichLocal(lb, params.minReserveRatio));
+    const childIds = new Set(locals.map((l) => l.id));
+
+    const loans = db.state.loans.filter(
+      (l) => l.kind === "BORROWER" && l.lenderBankId && childIds.has(l.lenderBankId),
+    );
+    const active = loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
+    const defaulted = loans.filter((l) => l.status === "DEFAULTED");
+    const pendingUpstream = db.state.loans.filter(
+      (l) =>
+        l.kind === "LOCAL_FROM_NATIONAL" &&
+        l.status === "PENDING" &&
+        l.lenderBankId === nationalId,
+    );
+    const capitalOpen = nationalOpsDb.state.capitalRequests.filter(
+      (r) => r.toBankId === nationalId && r.status === "OPEN",
+    ).length;
+    const sarOpen = localOpsDb.state.amlAlerts.filter(
+      (a) => childIds.has(a.bankId) && a.status === "ESCALATED",
+    ).length;
+    const anyChildNearMin = locals.some((l) => l.capital.nearMinimum);
+
+    res.json({
+      bank,
+      params,
+      capital,
+      unit: "USDC",
+      localBanks: locals,
+      jurisdiction: {
+        localBankCount: locals.length,
+        activeLoanCount: active.length,
+        activeLoanValueEth: active.reduce((s, l) => s + l.amount, 0),
+        activeLoanValueUsdc: active.reduce((s, l) => s + l.amount, 0),
+        defaultRate: loans.length ? defaulted.length / loans.length : 0,
+        totalLentEth: locals.reduce((s, l) => s + (l.totalLent || 0), 0),
+        totalLentUsdc: locals.reduce((s, l) => s + (l.totalLent || 0), 0),
+      },
+      queues: {
+        capitalRequestsOpen: capitalOpen,
+        sarOpen,
+        localFromNationalPending: pendingUpstream.length,
+      },
+      warnings: {
+        nationalNearMinimum: capital.nearMinimum,
+        childNearMinimum: anyChildNearMin,
+      },
+    });
+  } catch (err) {
+    next(err);
   }
-  const params = nationalOpsDb.paramsFor(nationalId);
-  const capital = capitalMetrics(bank, params.minReserveRatio);
-  const locals = childLocals(nationalId).map((lb) => enrichLocal(lb, params.minReserveRatio));
-  const childIds = new Set(locals.map((l) => l.id));
-
-  const loans = db.state.loans.filter(
-    (l) => l.kind === "BORROWER" && l.lenderBankId && childIds.has(l.lenderBankId),
-  );
-  const active = loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
-  const defaulted = loans.filter((l) => l.status === "DEFAULTED");
-  const pendingUpstream = db.state.loans.filter(
-    (l) =>
-      l.kind === "LOCAL_FROM_NATIONAL" &&
-      l.status === "PENDING" &&
-      l.lenderBankId === nationalId,
-  );
-  const capitalOpen = nationalOpsDb.state.capitalRequests.filter(
-    (r) => r.toBankId === nationalId && r.status === "OPEN",
-  ).length;
-  const sarOpen = localOpsDb.state.amlAlerts.filter(
-    (a) => childIds.has(a.bankId) && a.status === "ESCALATED",
-  ).length;
-  const anyChildNearMin = locals.some((l) => l.capital.nearMinimum);
-
-  res.json({
-    bank,
-    params,
-    capital,
-    localBanks: locals,
-    jurisdiction: {
-      localBankCount: locals.length,
-      activeLoanCount: active.length,
-      activeLoanValueEth: active.reduce((s, l) => s + l.amount, 0),
-      defaultRate: loans.length ? defaulted.length / loans.length : 0,
-      totalLentEth: locals.reduce((s, l) => s + (l.totalLent || 0), 0),
-    },
-    queues: {
-      capitalRequestsOpen: capitalOpen,
-      sarOpen,
-      localFromNationalPending: pendingUpstream.length,
-    },
-    warnings: {
-      nationalNearMinimum: capital.nearMinimum,
-      childNearMinimum: anyChildNearMin,
-    },
-  });
 });
 
 /** 36 — Local Bank roster */
@@ -225,21 +234,26 @@ nationalBankRouter.post("/local-banks/:id/params", (req, res, next) => {
 });
 
 /** 37 — Capital allocation */
-nationalBankRouter.get("/capital", (req, res) => {
-  const user = (req as AuthedRequest).user!;
-  const nationalId = nationalIdFor(user);
-  const bank = findBankById(nationalId);
-  if (!bank) {
-    res.status(404).json({ error: "national_bank_not_found" });
-    return;
+nationalBankRouter.get("/capital", async (req, res, next) => {
+  try {
+    const user = (req as AuthedRequest).user!;
+    const nationalId = nationalIdFor(user);
+    await hydrateBankCapitalFromPrisma(nationalId).catch(() => null);
+    const bank = findBankById(nationalId);
+    if (!bank) {
+      res.status(404).json({ error: "national_bank_not_found" });
+      return;
+    }
+    const params = nationalOpsDb.paramsFor(nationalId);
+    const capital = capitalMetrics(bank, params.minReserveRatio);
+    const locals = childLocals(nationalId).map((lb) => enrichLocal(lb, params.minReserveRatio));
+    const requests = nationalOpsDb.state.capitalRequests
+      .filter((r) => r.toBankId === nationalId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    res.json({ bank, capital, params, localBanks: locals, requests, unit: "USDC" });
+  } catch (err) {
+    next(err);
   }
-  const params = nationalOpsDb.paramsFor(nationalId);
-  const capital = capitalMetrics(bank, params.minReserveRatio);
-  const locals = childLocals(nationalId).map((lb) => enrichLocal(lb, params.minReserveRatio));
-  const requests = nationalOpsDb.state.capitalRequests
-    .filter((r) => r.toBankId === nationalId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  res.json({ bank, capital, params, localBanks: locals, requests });
 });
 
 const allocateSchema = z.object({

@@ -9,11 +9,7 @@ import StatusStepper from "../../../components/ui/StatusStepper";
 import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(4)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function daysLeft(maturesAt) {
   const ms = new Date(maturesAt).getTime() - Date.now();
@@ -69,7 +65,7 @@ export default function FixedDepositPage() {
       return;
     }
     if (checking != null && amt > checking + 1e-9) {
-      setFieldError(`Insufficient checking (${formatEth(checking)}).`);
+      setFieldError(`Insufficient checking (${formatUsdc(checking)}).`);
       return;
     }
     setTxState("idle");
@@ -110,7 +106,7 @@ export default function FixedDepositPage() {
       const r = await api.post(`/api/deposits/fixed/${sheet.fd.id}/withdraw`, { early });
       setTxState("success");
       toast.show(
-        early ? `Early withdrawal · payout ${formatEth(r.payout)}` : "Matured payout received",
+        early ? `Early withdrawal · payout ${formatUsdc(r.payout)}` : "Matured payout received",
         { variant: "success" },
       );
       setSheet(null);
@@ -154,7 +150,7 @@ export default function FixedDepositPage() {
         </div>
       </header>
 
-      <p className="client-lede">Checking available: {formatEth(checking)}</p>
+      <p className="client-lede">Checking available: {formatUsdc(checking)}</p>
 
       <div className="client-grid-2">
         {(data?.terms || []).map((t) => (
@@ -174,7 +170,7 @@ export default function FixedDepositPage() {
       <Glass className="client-panel">
         <form className="stack-form" onSubmit={openNewSheet}>
           <Input
-            label="Amount (ETH from checking)"
+            label="Amount (USDC from checking)"
             type="number"
             step="0.01"
             min="0"
@@ -213,7 +209,7 @@ export default function FixedDepositPage() {
                 <li key={fd.id} className="activity-row glass">
                   <div>
                     <strong>
-                      {formatEth(fd.principal)} · {fd.termDays}d
+                      {formatUsdc(fd.principal)} · {fd.termDays}d
                     </strong>
                     <span>
                       Matures {new Date(fd.maturesAt).toLocaleDateString()}
@@ -221,7 +217,7 @@ export default function FixedDepositPage() {
                         ? ` · ${left} day${left === 1 ? "" : "s"} left`
                         : ""}
                       {" · payout ~"}
-                      {formatEth(fd.projectedPayout)}
+                      {formatUsdc(fd.projectedPayout)}
                     </span>
                   </div>
                   <div className="quick-actions">
@@ -266,7 +262,7 @@ export default function FixedDepositPage() {
         title="Confirm fixed deposit"
       >
         <p className="client-lede">
-          Lock {formatEth(amt)} for {termDays} days
+          Lock {formatUsdc(amt)} for {termDays} days
           {selectedTerm ? ` at ${(selectedTerm.aprBps / 100).toFixed(2)}% APR` : ""}. Funds leave
           checking until maturity (or early withdrawal with penalty).
         </p>
@@ -296,14 +292,14 @@ export default function FixedDepositPage() {
           <div className="notice warn" role="alert">
             Early withdrawal deducts a {(penaltyBps / 100).toFixed(0)}% penalty on principal. You
             forfeit accrued term interest. Estimated payout ≈{" "}
-            {formatEth(
+            {formatUsdc(
               Math.max(0, (sheet.fd?.principal ?? 0) * (1 - penaltyBps / 10_000)),
             )}
             .
           </div>
         ) : (
           <p className="client-lede">
-            Receive principal plus term interest (~{formatEth(sheet?.fd?.projectedPayout)}) into
+            Receive principal plus term interest (~{formatUsdc(sheet?.fd?.projectedPayout)}) into
             checking.
           </p>
         )}

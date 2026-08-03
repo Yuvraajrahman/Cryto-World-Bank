@@ -11,12 +11,8 @@ import StatCard from "../../../components/ui/StatCard";
 import ExplorerLink from "../../../components/ui/ExplorerLink";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
+import { formatUsdc } from "@/lib/formatMoney";
 import { useSession } from "@/lib/store";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(4)} ETH`;
-}
 
 const ADDR_RE = /^0x[a-fA-F0-9]{40}$/;
 
@@ -71,7 +67,7 @@ export default function CheckingPage() {
       return;
     }
     if (summary && amt > summary.checkingEth + 1e-9) {
-      setFieldError(`Insufficient balance (${formatEth(summary.checkingEth)}).`);
+      setFieldError(`Insufficient balance (${formatUsdc(summary.checkingEth)}).`);
       return;
     }
     setTxState("idle");
@@ -135,9 +131,9 @@ export default function CheckingPage() {
       </header>
 
       <div className="stats-row snap-row">
-        <StatCard label="Balance" value={formatEth(summary?.checkingEth)} />
-        <StatCard label="In vault" value={formatEth(summary?.vaultEth)} />
-        <StatCard label="Fixed deposits" value={formatEth(summary?.fixedEth)} />
+        <StatCard label="Balance" value={formatUsdc(summary?.checkingEth)} />
+        <StatCard label="In vault" value={formatUsdc(summary?.vaultEth)} />
+        <StatCard label="Fixed deposits" value={formatUsdc(summary?.fixedEth)} />
       </div>
 
       <div className="client-grid-2">
@@ -156,7 +152,7 @@ export default function CheckingPage() {
               error={fieldError || undefined}
             />
             <Input
-              label="Amount (ETH)"
+              label="Amount (USDC)"
               type="number"
               step="0.01"
               min="0"
@@ -230,7 +226,7 @@ export default function CheckingPage() {
                     ) : null}
                   </span>
                 </div>
-                <code>{formatEth(e.amount)}</code>
+                <code>{formatUsdc(e.amount)}</code>
               </li>
             ))
           )}
@@ -243,7 +239,7 @@ export default function CheckingPage() {
         title="Confirm transfer"
       >
         <p className="client-lede">
-          Send {formatEth(amt)} to{" "}
+          Send {formatUsdc(amt)} to{" "}
           <code className="mono">{toAddress.trim().slice(0, 10)}…{toAddress.trim().slice(-6)}</code>
         </p>
         <StatusStepper state={txState} />

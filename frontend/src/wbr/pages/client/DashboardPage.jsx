@@ -11,14 +11,7 @@ import { useClientHome } from "../../hooks/useClientHome";
 import { useMyGroups } from "../../hooks/useGroups";
 import { useSession } from "@/lib/store";
 import { contractAddresses } from "@/lib/contracts";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  const v = Number(n);
-  if (v >= 100) return `${v.toFixed(1)} ETH`;
-  if (v >= 1) return `${v.toFixed(2)} ETH`;
-  return `${v.toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function OperatorHome({ user }) {
   const isLocal =
@@ -308,7 +301,7 @@ function RetailHome() {
         />
         <StatCard
           label="Outstanding"
-          value={formatEth(data.loans?.outstandingEth)}
+          value={formatUsdc(data.loans?.outstandingEth)}
           delay={180}
         />
       </div>
@@ -317,11 +310,11 @@ function RetailHome() {
         <Glass className="client-panel">
           <p className="eyebrow">Borrowing limit</p>
           <h2 className="client-panel-title">
-            {formatEth(used6)} <span className="muted">/ {formatEth(cap6)}</span>
+            {formatUsdc(used6)} <span className="muted">/ {formatUsdc(cap6)}</span>
           </h2>
           <p className="client-lede" style={{ margin: "0 0 12px" }}>
             Six-month rolling cap · {limitPct}% used
-            {limits?.oneYear ? ` · 1y remaining ${formatEth(limits.oneYear.remaining)}` : ""}
+            {limits?.oneYear ? ` · 1y remaining ${formatUsdc(limits.oneYear.remaining)}` : ""}
           </p>
           <div className="limit-bar" aria-hidden>
             <div className="limit-bar-fill" style={{ width: `${limitPct}%` }} />
@@ -351,7 +344,7 @@ function RetailHome() {
 
         <Glass className="client-panel">
           <p className="eyebrow">Savings</p>
-          <h2 className="client-panel-title">{formatEth(data.savings?.vaultEth ?? 0)}</h2>
+          <h2 className="client-panel-title">{formatUsdc(data.savings?.vaultEth ?? 0)}</h2>
           <p className="client-lede" style={{ margin: "0 0 12px" }}>
             Variable vault, fixed deposits, and checking.
           </p>
@@ -390,7 +383,7 @@ function RetailHome() {
           <p className="eyebrow">Next payment</p>
           {next ? (
             <>
-              <h2 className="client-panel-title">{formatEth(next.amount)}</h2>
+              <h2 className="client-panel-title">{formatUsdc(next.amount)}</h2>
               <p className="client-lede" style={{ margin: "0 0 12px" }}>
                 Due {new Date(next.dueDate).toLocaleDateString()}
               </p>
@@ -453,7 +446,7 @@ function RetailHome() {
                   <strong>{tx.type?.replaceAll("_", " ")}</strong>
                   <span>{new Date(tx.at).toLocaleString()}</span>
                 </div>
-                <code>{formatEth(tx.amount)}</code>
+                <code>{formatUsdc(tx.amount)}</code>
               </li>
             ))}
           </ul>

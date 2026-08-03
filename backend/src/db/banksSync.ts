@@ -78,6 +78,15 @@ export async function persistBankCapital(bankId: string): Promise<void> {
   const bank = db.state.banks.find((b) => b.id === bankId);
   if (!bank) return;
   const prisma = requirePrisma();
+  const exists = await prisma.institution.findUnique({
+    where: { id: bankId },
+    select: { id: true },
+  });
+  if (!exists) {
+    throw new Error(
+      `Cannot persist capital: institution ${bankId} is missing in Postgres. Re-sync banks or re-seed.`,
+    );
+  }
   await prisma.institutionCapital.upsert({
     where: { institutionId: bankId },
     update: {
@@ -96,4 +105,21 @@ export async function persistBankCapital(bankId: string): Promise<void> {
       syncedAt: new Date(),
     },
   });
+}
+
+/** Pull one bank's capital from Postgres into memory (dashboard source of truth). */
+export async function hydrateBankCapitalFromPrisma(bankId: string): Promise<Bank | null> {
+  const bank = db.state.banks.find((b) => b.id === bankId);
+  if (!bank) return null;
+  const prisma = requirePrisma();
+  const cap = await prisma.institutionCapital.findUnique({
+    where: { institutionId: bankId },
+  });
+  if (!cap) return bank;
+  bank.reserve = cap.reserveEth ?? 0;
+  bank.totalAllocated = cap.allocatedEth ?? 0;
+  bank.totalLent = cap.lentEth ?? 0;
+  bank.totalRepaid = cap.repaidEth ?? 0;
+  db.save();
+  return bank;
 }

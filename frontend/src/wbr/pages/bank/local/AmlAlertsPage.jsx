@@ -170,7 +170,7 @@ export default function AmlAlertsPage() {
                         <strong>{h.id}</strong>
                         <span>{h.status}</span>
                       </div>
-                      <code>{Number(h.amount).toFixed(3)} ETH</code>
+                      <code>{Number(h.amount).toFixed(3)} USDC</code>
                     </li>
                   ))}
                 </ul>

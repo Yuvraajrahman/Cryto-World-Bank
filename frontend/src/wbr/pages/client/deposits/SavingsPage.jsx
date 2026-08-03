@@ -10,11 +10,7 @@ import StatCard from "../../../components/ui/StatCard";
 import ExplorerLink from "../../../components/ui/ExplorerLink";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(4)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 /**
  * Route: `/app/savings` — plan F.23 Savings Vault
@@ -70,7 +66,7 @@ export default function SavingsPage() {
       return;
     }
     if (action === "deposit" && summary && amt > summary.checkingEth + 1e-9) {
-      setFieldError(`Insufficient checking balance (${formatEth(summary.checkingEth)}).`);
+      setFieldError(`Insufficient checking balance (${formatUsdc(summary.checkingEth)}).`);
       return;
     }
     if (action === "withdraw") {
@@ -82,7 +78,7 @@ export default function SavingsPage() {
         return;
       }
       if (summary && amt > (summary.vaultEth ?? 0) + 1e-9) {
-        setFieldError(`Insufficient vault balance (${formatEth(summary.vaultEth)}).`);
+        setFieldError(`Insufficient vault balance (${formatUsdc(summary.vaultEth)}).`);
         return;
       }
     }
@@ -142,7 +138,7 @@ export default function SavingsPage() {
         <p className="eyebrow">Deposits</p>
         <h1 className="client-title">Savings vault</h1>
         <p className="client-lede">
-          Variable-yield ERC-4626-style vault. Deposit and withdraw stablecoin-denominated ETH
+          Variable-yield ERC-4626-style vault. Deposit and withdraw USDC
           balances (demo ledger until the live vault is wired).
         </p>
         <div className="quick-actions">
@@ -163,9 +159,9 @@ export default function SavingsPage() {
       ) : null}
 
       <div className="stats-row snap-row">
-        <StatCard label="Vault total" value={formatEth(summary?.vaultTotalEth ?? summary?.vaultEth)} />
-        <StatCard label="Principal" value={formatEth(summary?.vaultPrincipalEth ?? summary?.vaultEth)} />
-        <StatCard label="Accrued yield" value={formatEth(summary?.vaultAccruedEth ?? 0)} />
+        <StatCard label="Vault total" value={formatUsdc(summary?.vaultTotalEth ?? summary?.vaultEth)} />
+        <StatCard label="Principal" value={formatUsdc(summary?.vaultPrincipalEth ?? summary?.vaultEth)} />
+        <StatCard label="Accrued yield" value={formatUsdc(summary?.vaultAccruedEth ?? 0)} />
         <StatCard
           label="Variable APY"
           value={summary ? `${(summary.vaultApyBps / 100).toFixed(2)}%` : "—"}
@@ -213,7 +209,7 @@ export default function SavingsPage() {
       <Glass className="client-panel">
         <p className="eyebrow">Move funds</p>
         <p className="client-lede" style={{ marginTop: 0 }}>
-          Checking available: {formatEth(summary?.checkingEth)}
+          Checking available: {formatUsdc(summary?.checkingEth)}
         </p>
         <form
           className="stack-form"
@@ -223,7 +219,7 @@ export default function SavingsPage() {
           }}
         >
           <Input
-            label="Amount (ETH)"
+            label="Amount (USDC)"
             type="number"
             step="0.01"
             min="0"
@@ -278,7 +274,7 @@ export default function SavingsPage() {
                     ) : null}
                   </span>
                 </div>
-                <code>{formatEth(e.amount)}</code>
+                <code>{formatUsdc(e.amount)}</code>
               </li>
             ))
           )}
@@ -292,8 +288,8 @@ export default function SavingsPage() {
       >
         <p className="client-lede">
           {confirm === "deposit"
-            ? `Move ${formatEth(amt)} from checking into the savings vault.`
-            : `Move ${formatEth(amt)} from the vault back to checking.`}
+            ? `Move ${formatUsdc(amt)} from checking into the savings vault.`
+            : `Move ${formatUsdc(amt)} from the vault back to checking.`}
         </p>
         <StatusStepper state={txState} />
         <div className="quick-actions" style={{ marginTop: 16 }}>

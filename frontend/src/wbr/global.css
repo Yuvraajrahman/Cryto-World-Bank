@@ -1338,6 +1338,325 @@ code.mono{font-family:var(--font-mono); font-size:0.92em; color:var(--gold-brigh
   transition:width .35s ease;
 }
 
+/* —— Visual stress lab (Simulation tab) —— */
+.vis-lab{ display:flex; flex-direction:column; gap:16px; }
+.vis-layout{
+  display:grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap:20px;
+  align-items:start;
+}
+@media (max-width: 960px){
+  .vis-layout{ grid-template-columns: 1fr; }
+}
+.vis-controls{ display:flex; flex-direction:column; gap:10px; }
+.vis-slider{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; color:var(--text-2); }
+.vis-slider-head{ display:flex; justify-content:space-between; gap:8px; color:var(--text-1); }
+.vis-slider input[type=range]{
+  width:100%;
+  accent-color: var(--gold, #c4a35a);
+}
+.vis-slider-hint{ font-size:11.5px; color:var(--text-3); }
+.vis-live-stats{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:8px;
+  margin-top:8px;
+}
+.vis-live-stats > div{
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--glass-stroke);
+  background:var(--glass-fill);
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  font-size:11.5px;
+  color:var(--text-3);
+}
+.vis-live-stats strong{ color:var(--text-1); font-size:14px; }
+.vis-stage{ display:flex; flex-direction:column; gap:14px; }
+.vis-flow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  font-size:12px;
+  color:var(--text-3);
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+.vis-flow i{
+  width:28px;
+  height:1px;
+  background:var(--glass-stroke);
+  display:inline-block;
+}
+.vis-tiers{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:12px;
+}
+@media (max-width: 720px){
+  .vis-tiers{ grid-template-columns: 1fr; }
+}
+.vis-tier{
+  border-radius:14px;
+  border:1px solid var(--glass-stroke);
+  background:var(--glass-fill);
+  padding:14px;
+  transition: border-color .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.vis-tier.risk-stable{
+  border-color: color-mix(in srgb, #2f9e6b 55%, var(--glass-stroke));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #2f9e6b 25%, transparent);
+  background: color-mix(in srgb, #2f9e6b 8%, var(--glass-fill));
+}
+.vis-tier.risk-watch{
+  border-color: color-mix(in srgb, #e8e4dc 70%, var(--glass-stroke));
+  background: color-mix(in srgb, #f5f2ea 14%, var(--glass-fill));
+}
+.vis-tier.risk-stress{
+  border-color: color-mix(in srgb, #c44536 60%, var(--glass-stroke));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #c44536 30%, transparent);
+  background: color-mix(in srgb, #c44536 10%, var(--glass-fill));
+}
+.vis-tier-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.vis-tier-top h3{ margin:0; font-size:15px; color:var(--text-1); }
+.vis-tier-top p{ margin:2px 0 0; font-size:12px; color:var(--text-3); }
+.vis-pill{
+  font-size:11px;
+  font-weight:600;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--glass-stroke);
+  white-space:nowrap;
+}
+.vis-pill.risk-stable{ color:#1f7a52; background:color-mix(in srgb, #2f9e6b 18%, transparent); }
+.vis-pill.risk-watch{ color:var(--text-2); background:color-mix(in srgb, #f5f2ea 35%, transparent); }
+.vis-pill.risk-stress{ color:#9b2c20; background:color-mix(in srgb, #c44536 18%, transparent); }
+.vis-bar{
+  display:flex;
+  height:10px;
+  border-radius:999px;
+  overflow:hidden;
+  margin:12px 0 10px;
+  background: color-mix(in srgb, var(--text-1) 8%, transparent);
+}
+.vis-bar .seg{ display:block; height:100%; }
+.vis-bar .seg.reserve{ background:#5b8def; }
+.vis-bar .seg.alloc{ background:#c4a35a; }
+.vis-bar .seg.lent{ background:#2f9e6b; }
+.vis-metrics{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:6px 10px;
+  font-size:11.5px;
+  color:var(--text-3);
+}
+.vis-metrics strong{ display:block; color:var(--text-1); font-size:13px; }
+.vis-notes{
+  margin:10px 0 0;
+  padding-left:16px;
+  font-size:12px;
+  color:var(--text-2);
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.vis-alerts{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.vis-alerts li{
+  font-size:12.5px;
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid var(--glass-stroke);
+}
+.vis-alerts li.risk-stable{
+  background: color-mix(in srgb, #2f9e6b 10%, var(--glass-fill));
+  color: var(--text-1);
+}
+.vis-alerts li.risk-watch{
+  background: color-mix(in srgb, #f5f2ea 20%, var(--glass-fill));
+}
+.vis-alerts li.risk-stress{
+  background: color-mix(in srgb, #c44536 12%, var(--glass-fill));
+  color: var(--text-1);
+}
+.vis-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px 16px;
+  font-size:11.5px;
+  color:var(--text-3);
+}
+.vis-legend span{ display:inline-flex; align-items:center; gap:6px; }
+.vis-legend .swatch{
+  width:10px; height:10px; border-radius:3px; display:inline-block;
+}
+.vis-legend .swatch.reserve{ background:#5b8def; }
+.vis-legend .swatch.alloc{ background:#c4a35a; }
+.vis-legend .swatch.lent{ background:#2f9e6b; }
+.vis-legend .swatch.stable{ background:#2f9e6b; }
+.vis-legend .swatch.watch{ background:#e8e4dc; border:1px solid #bbb; }
+.vis-legend .swatch.stress{ background:#c44536; }
+.vis-lab.risk-system-stress{
+  box-shadow: 0 0 0 1px color-mix(in srgb, #c44536 35%, transparent);
+}
+.vis-lab.risk-system-stable{
+  box-shadow: 0 0 0 1px color-mix(in srgb, #2f9e6b 25%, transparent);
+}
+
+/* —— Fund banks panel —— */
+.fund-panel-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 16px;
+  align-items:center;
+  margin-top:12px;
+}
+.fund-panel-hint{ font-size:12.5px; color:var(--text-3); max-width:52ch; }
+.fund-sheet{ padding-bottom:8px; max-height:min(70vh, 640px); overflow:auto; }
+.fund-type-tabs{ display:flex; flex-wrap:wrap; gap:8px; }
+.fund-mode-row{ display:flex; gap:16px; flex-wrap:wrap; }
+.fund-mode{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  color:var(--text-2);
+  cursor:pointer;
+}
+.fund-mode.on{ color:var(--text-1); font-weight:600; }
+.fund-all-check{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--glass-stroke);
+  background:var(--glass-fill);
+  cursor:pointer;
+  font-size:13.5px;
+  color:var(--text-2);
+  line-height:1.35;
+}
+.fund-all-check.on{
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--glass-stroke));
+  background: color-mix(in srgb, var(--gold) 12%, var(--glass-fill));
+  color:var(--text-1);
+}
+.fund-all-check input{
+  width:18px;
+  height:18px;
+  margin-top:2px;
+  accent-color: var(--gold, #c4a35a);
+  flex-shrink:0;
+}
+.fund-bank-list{
+  max-height:220px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  border:1px solid var(--glass-stroke);
+  border-radius:12px;
+  padding:6px;
+  background:var(--glass-fill);
+}
+.fund-bank-row{
+  text-align:left;
+  border:0;
+  background:transparent;
+  color:var(--text-1);
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  display:block;
+  width:100%;
+}
+.fund-bank-row.check{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin:0;
+}
+.fund-bank-row.check input{
+  width:16px;
+  height:16px;
+  margin-top:3px;
+  accent-color: var(--gold, #c4a35a);
+  flex-shrink:0;
+}
+.fund-bank-row small{
+  display:block;
+  color:var(--text-3);
+  font-size:11.5px;
+  margin-top:2px;
+}
+.fund-bank-row:hover{ background:color-mix(in srgb, var(--gold) 10%, transparent); }
+.fund-bank-row.selected{
+  background:color-mix(in srgb, var(--gold) 18%, transparent);
+  outline:1px solid color-mix(in srgb, var(--gold) 50%, transparent);
+}
+.fund-bank-more{
+  margin:4px 10px 8px;
+  font-size:12px;
+  color:var(--text-3);
+}
+.fund-bank-preview ul{
+  margin:0;
+  padding-left:18px;
+  font-size:12.5px;
+  color:var(--text-2);
+}
+.fund-cost{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+  margin-top:4px;
+}
+.fund-cost > div{
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--glass-stroke);
+  background:var(--glass-fill);
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  font-size:11.5px;
+  color:var(--text-3);
+}
+.fund-cost strong{ color:var(--text-1); font-size:13px; }
+.fund-cost.over > div{ border-color:color-mix(in srgb, #c44536 50%, var(--glass-stroke)); }
+.fund-warn{ color:#9b2c20; font-size:12.5px; margin:0; }
+.fund-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
+
+/* —— Reserve & surplus tab —— */
+.client-grid-4{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:12px;
+}
+@media (min-width:960px){
+  .client-grid-4{ grid-template-columns:repeat(4, minmax(0, 1fr)); }
+}
+.reserve-surplus-table{ margin-top:0; }
+.reserve-surplus-table .muted-cell{
+  font-size:11.5px;
+  color:var(--text-3);
+  font-weight:400;
+  margin-top:2px;
+}
+.reserve-surplus-table td.surplus-pos{ color:#1f7a52; font-weight:600; }
+
 @media (prefers-reduced-motion:reduce){
   *{animation:none !important; transition:none !important;}
 }

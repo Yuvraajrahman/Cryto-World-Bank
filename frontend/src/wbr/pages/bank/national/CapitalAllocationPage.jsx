@@ -8,11 +8,7 @@ import Sheet from "../../../components/ui/Sheet";
 import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -137,9 +133,9 @@ export default function CapitalAllocationPage() {
 
       <Glass className="client-panel" level={3}>
         <Badge icon="wallet">Available to allocate</Badge>
-        <h2 className="client-panel-title">{formatEth(available)}</h2>
+        <h2 className="client-panel-title">{formatUsdc(available)}</h2>
         <p className="client-lede">
-          Reserve {formatEth(data.capital?.reserveEth)} · ratio {pct(data.capital?.reserveRatio)}
+          Reserve {formatUsdc(data.capital?.reserveEth)} · ratio {pct(data.capital?.reserveRatio)}
         </p>
       </Glass>
 
@@ -162,19 +158,19 @@ export default function CapitalAllocationPage() {
             ))}
           </Input>
           <Input
-            label="Amount (ETH)"
+            label="Amount (USDC)"
             type="number"
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             hint={
               selected
-                ? `Utilization ${pct(selected.utilization)} · reserve ${formatEth(selected.reserve)}`
+                ? `Utilization ${pct(selected.utilization)} · reserve ${formatUsdc(selected.reserve)}`
                 : undefined
             }
             error={
               amount && !validAmount
-                ? `Must be ≤ ${available.toFixed(4)} ETH (reserve-ratio guard)`
+                ? `Must be ≤ ${available.toFixed(4)} USDC (reserve-ratio guard)`
                 : undefined
             }
           />
@@ -197,7 +193,7 @@ export default function CapitalAllocationPage() {
               <div>
                 <strong>{lb.name}</strong>
                 <span>
-                  Lent {formatEth(lb.totalLent)} · reserve {formatEth(lb.reserve)} ·{" "}
+                  Lent {formatUsdc(lb.totalLent)} · reserve {formatUsdc(lb.reserve)} ·{" "}
                   {lb.status || "ACTIVE"}
                 </span>
               </div>
@@ -227,7 +223,7 @@ export default function CapitalAllocationPage() {
                   <span>{r.reason}</span>
                 </div>
                 <div className="ops-row-meta">
-                  <code>{formatEth(r.amount)}</code>
+                  <code>{formatUsdc(r.amount)}</code>
                   <Button
                     type="button"
                     size="sm"
@@ -260,7 +256,7 @@ export default function CapitalAllocationPage() {
 
       <Sheet open={sheet === "approve"} onClose={() => !busy && setSheet(null)} title="Fulfill request">
         <p className="client-lede">
-          Allocate {formatEth(request?.amount)} to {request?.fromBankName}? Checked against the{" "}
+          Allocate {formatUsdc(request?.amount)} to {request?.fromBankName}? Checked against the{" "}
           {pct(data.params?.minReserveRatio)} reserve floor.
         </p>
         <div className="quick-actions" style={{ marginTop: 12 }}>

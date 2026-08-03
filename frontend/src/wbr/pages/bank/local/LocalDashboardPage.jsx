@@ -11,14 +11,7 @@ import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  const v = Number(n);
-  if (v >= 100) return `${v.toFixed(1)} ETH`;
-  if (v >= 1) return `${v.toFixed(2)} ETH`;
-  return `${v.toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -154,9 +147,9 @@ export default function LocalDashboardPage() {
       ) : null}
 
       <div className="client-snap-row">
-        <StatCard label="Allocated" value={formatEth(capital.allocatedEth)} />
-        <StatCard label="Reserve" value={formatEth(capital.reserveEth)} />
-        <StatCard label="Available" value={formatEth(capital.availableEth)} />
+        <StatCard label="Allocated" value={formatUsdc(capital.allocatedEth)} />
+        <StatCard label="Reserve" value={formatUsdc(capital.reserveEth)} />
+        <StatCard label="Available" value={formatUsdc(capital.availableEth)} />
         <StatCard label="Reserve ratio" value={pct(capital.reserveRatio)} />
       </div>
 
@@ -193,7 +186,7 @@ export default function LocalDashboardPage() {
           </div>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Active value</span>
-            <p style={{ margin: "4px 0 0", fontSize: 22 }}>{formatEth(book.activeValueEth)}</p>
+            <p style={{ margin: "4px 0 0", fontSize: 22 }}>{formatUsdc(book.activeValueEth)}</p>
           </div>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Delinquency</span>
@@ -212,7 +205,7 @@ export default function LocalDashboardPage() {
                   <strong>{m.id}</strong>
                   <span>Due {m.deadline ? new Date(m.deadline).toLocaleDateString() : "—"}</span>
                 </div>
-                <code>{formatEth(m.amount)}</code>
+                <code>{formatUsdc(m.amount)}</code>
               </li>
             ))}
           </ul>
@@ -245,7 +238,7 @@ export default function LocalDashboardPage() {
 
       <Sheet open={capSheet} onClose={() => !capBusy && setCapSheet(false)} title="Request capital from National">
         <Input
-          label="Amount (ETH)"
+          label="Amount (USDC)"
           type="number"
           value={capAmount}
           onChange={(e) => setCapAmount(e.target.value)}

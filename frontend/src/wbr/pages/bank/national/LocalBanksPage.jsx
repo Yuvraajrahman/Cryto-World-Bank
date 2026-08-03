@@ -6,11 +6,7 @@ import Sheet from "../../../components/ui/Sheet";
 import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -150,7 +146,7 @@ export default function LocalBanksPage() {
               <strong>{lb.name}</strong>
               <span>
                 {lb.city} · ratio {pct(lb.capital?.reserveRatio)} · book{" "}
-                {formatEth(lb.loanBook?.activeValueEth)}
+                {formatUsdc(lb.loanBook?.activeValueEth)}
               </span>
               <code style={{ display: "block", fontSize: 11, marginTop: 4 }}>{lb.walletAddress}</code>
             </div>
@@ -204,7 +200,7 @@ export default function LocalBanksPage() {
             onChange={(e) => setForm((f) => ({ ...f, jurisdiction: e.target.value }))}
           />
           <Input
-            label="Initial reserve (ETH)"
+            label="Initial reserve (USDC)"
             type="number"
             value={form.reserve}
             onChange={(e) => setForm((f) => ({ ...f, reserve: e.target.value }))}

@@ -8,11 +8,7 @@ import Sheet from "../../../components/ui/Sheet";
 import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 /**
  * Route: `/bank/local/approvals/:loanId` — Authority Brief (plan I.31)
@@ -124,7 +120,7 @@ export default function LoanDecisionPage() {
         <p className="eyebrow">Authority Brief</p>
         <h1 className="client-title">{borrower?.displayName || "Applicant"}</h1>
         <p className="client-lede">
-          {formatEth(loan.amount)} · {loan.termMonths} mo · {String(loan.loanType || "loan")} ·{" "}
+          {formatUsdc(loan.amount)} · {loan.termMonths} mo · {String(loan.loanType || "loan")} ·{" "}
           {loan.status}
         </p>
         <div className="client-hero-badges">
@@ -184,8 +180,8 @@ export default function LoanDecisionPage() {
           {limits ? (
             <>
               <p style={{ margin: 0, fontSize: 14 }}>
-                6-month used {formatEth(limits.sixMonth?.borrowed)} /{" "}
-                {formatEth(limits.sixMonth?.limit)}
+                6-month used {formatUsdc(limits.sixMonth?.borrowed)} /{" "}
+                {formatUsdc(limits.sixMonth?.limit)}
               </p>
               <p style={{ margin: "6px 0 0", fontSize: 14 }}>
                 Fits request:{" "}
@@ -210,7 +206,7 @@ export default function LoanDecisionPage() {
                   <strong>{h.id}</strong>
                   <span>{h.status}</span>
                 </div>
-                <code>{formatEth(h.amount)}</code>
+                <code>{formatUsdc(h.amount)}</code>
               </li>
             ))}
           </ul>
@@ -253,7 +249,7 @@ export default function LoanDecisionPage() {
 
       <Sheet open={sheet === "approve"} onClose={() => !busy && setSheet(null)} title="Confirm approve">
         <p className="client-lede">
-          Approve {formatEth(loan.amount)} for {borrower?.displayName || "applicant"}? This records
+          Approve {formatUsdc(loan.amount)} for {borrower?.displayName || "applicant"}? This records
           disbursement against branch reserve (demo off-chain write).
         </p>
         <div className="quick-actions" style={{ marginTop: 12 }}>

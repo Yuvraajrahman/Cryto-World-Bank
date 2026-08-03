@@ -16,6 +16,7 @@ import { borrowAprFromUtilization, KINK_BPS } from "../lib/rates";
 import { ethers } from "ethers";
 import { config } from "../config";
 import { getChainProvider } from "../chain/provider";
+import { hydrateBankCapitalFromPrisma } from "../db/banksSync";
 
 export const localBankRouter = Router();
 
@@ -59,75 +60,85 @@ function enrichLoan(loan: (typeof db.state.loans)[0]) {
 }
 
 /** 29 — Local Bank Dashboard */
-localBankRouter.get("/dashboard", async (req, res) => {
-  const user = (req as AuthedRequest).user!;
-  const bankId = bankIdFor(user);
-  const bank = findBankById(bankId);
-  const book = db.state.loans.filter((l) => l.lenderBankId === bankId && l.kind === "BORROWER");
-  const active = book.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
-  const pending = book.filter((l) => APPROVAL_QUEUE_STATUSES.has(l.status));
-  const delinquent = active.filter((l) =>
-    (l.installments || []).some((i) => !i.paid && new Date(i.dueDate) < new Date()),
-  );
-  const incomePending = db.state.incomeProofs.filter((p) => p.status === "PENDING").length;
-  const amlOpen = localOpsDb.state.amlAlerts.filter(
-    (a) => a.bankId === bankId && a.status === "OPEN",
-  ).length;
-
-  let kycPending = 0;
+localBankRouter.get("/dashboard", async (req, res, next) => {
   try {
-    const prisma = getPrisma();
-    if (prisma) {
-      kycPending = await prisma.user.count({
-        where: {
-          role: "BORROWER",
-          OR: [{ kyc1Status: "PENDING" }, { kyc2Status: "PENDING" }],
-        },
-      });
+    const user = (req as AuthedRequest).user!;
+    const bankId = bankIdFor(user);
+    await hydrateBankCapitalFromPrisma(bankId).catch(() => null);
+    const bank = findBankById(bankId);
+    const book = db.state.loans.filter((l) => l.lenderBankId === bankId && l.kind === "BORROWER");
+    const active = book.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
+    const pending = book.filter((l) => APPROVAL_QUEUE_STATUSES.has(l.status));
+    const delinquent = active.filter((l) =>
+      (l.installments || []).some((i) => !i.paid && new Date(i.dueDate) < new Date()),
+    );
+    const incomePending = db.state.incomeProofs.filter((p) => p.status === "PENDING").length;
+    const amlOpen = localOpsDb.state.amlAlerts.filter(
+      (a) => a.bankId === bankId && a.status === "OPEN",
+    ).length;
+
+    let kycPending = 0;
+    try {
+      const prisma = getPrisma();
+      if (prisma) {
+        kycPending = await prisma.user.count({
+          where: {
+            role: "BORROWER",
+            OR: [{ kyc1Status: "PENDING" }, { kyc2Status: "PENDING" }],
+          },
+        });
+      }
+    } catch {
+      /* optional */
     }
-  } catch {
-    /* optional */
+
+    const reserve = bank?.reserve ?? 0;
+    const allocated = Math.max(
+      bank?.totalAllocated || 0,
+      reserve + (bank?.totalLent ?? 0),
+      1,
+    );
+    const reserveRatio = allocated > 0 ? reserve / allocated : 1;
+
+    res.json({
+      bank,
+      unit: "USDC",
+      capital: {
+        allocatedEth: allocated,
+        reserveEth: reserve,
+        lentEth: bank?.totalLent ?? 0,
+        availableEth: Math.max(0, reserve),
+        reserveUsdc: reserve,
+        allocatedUsdc: allocated,
+        availableUsdc: Math.max(0, reserve),
+        reserveRatio,
+        minReserveRatio: 0.15,
+        nearMinimum: reserveRatio < 0.2,
+      },
+      loanBook: {
+        activeCount: active.length,
+        activeValueEth: active.reduce((s, l) => s + l.amount, 0),
+        activeValueUsdc: active.reduce((s, l) => s + l.amount, 0),
+        delinquencyRate: active.length ? delinquent.length / active.length : 0,
+        upcomingMaturities: active
+          .filter((l) => l.deadline)
+          .sort((a, b) => String(a.deadline).localeCompare(String(b.deadline)))
+          .slice(0, 5)
+          .map((l) => ({ id: l.id, amount: l.amount, deadline: l.deadline })),
+      },
+      queues: {
+        approvalsPending: pending.length,
+        incomePending,
+        amlOpen,
+        kycPending,
+      },
+      clients: {
+        activeCount: new Set(book.map((l) => l.borrowerId).filter(Boolean)).size,
+      },
+    });
+  } catch (err) {
+    next(err);
   }
-
-  const reserve = bank?.reserve ?? 0;
-  const allocated = Math.max(
-    bank?.totalAllocated || 0,
-    reserve + (bank?.totalLent ?? 0),
-    1,
-  );
-  const reserveRatio = allocated > 0 ? reserve / allocated : 1;
-
-  res.json({
-    bank,
-    capital: {
-      allocatedEth: allocated,
-      reserveEth: reserve,
-      lentEth: bank?.totalLent ?? 0,
-      availableEth: Math.max(0, reserve),
-      reserveRatio,
-      minReserveRatio: 0.15,
-      nearMinimum: reserveRatio < 0.2,
-    },
-    loanBook: {
-      activeCount: active.length,
-      activeValueEth: active.reduce((s, l) => s + l.amount, 0),
-      delinquencyRate: active.length ? delinquent.length / active.length : 0,
-      upcomingMaturities: active
-        .filter((l) => l.deadline)
-        .sort((a, b) => String(a.deadline).localeCompare(String(b.deadline)))
-        .slice(0, 5)
-        .map((l) => ({ id: l.id, amount: l.amount, deadline: l.deadline })),
-    },
-    queues: {
-      approvalsPending: pending.length,
-      incomePending,
-      amlOpen,
-      kycPending,
-    },
-    clients: {
-      activeCount: new Set(book.map((l) => l.borrowerId).filter(Boolean)).size,
-    },
-  });
 });
 
 /** 30 — Approval queue */

@@ -17,6 +17,7 @@ import {
   writeAudit,
 } from "../db/users";
 import { persistBankCapital, syncBanksFromPrisma } from "../db/banksSync";
+import { depositsDb, ensureBalances, pushLedger } from "../store/deposits";
 import {
   getSimulationConfig,
   updateSimulationConfig,
@@ -33,6 +34,18 @@ import {
 } from "../services/simulateEconomy";
 import { optimizeSimulationConfig } from "../services/optimizeSimulation";
 import { PASSPORT_TIERS } from "../lib/rates";
+
+function creditClientChecking(userId: string, amount: number, note: string) {
+  ensureBalances(userId);
+  depositsDb.state.checkingBalances[userId] =
+    (depositsDb.state.checkingBalances[userId] ?? 0) + amount;
+  pushLedger({
+    userId,
+    kind: "CHECK_RECV",
+    amount,
+    note,
+  });
+}
 
 export const devAdminRouter = Router();
 
@@ -185,13 +198,16 @@ devAdminRouter.post("/allocate", async (req, res, next) => {
       }
       world.reserve -= body.amount;
       world.totalAllocated += body.amount;
+      const note = body.note || `Super Admin allocation to client ${user.loginId || user.id}`;
+      creditClientChecking(user.id, body.amount, note);
+      depositsDb.save();
       db.state.transactions.push({
         id: db.uid("tx"),
         type: "DEPOSIT",
         userId: user.id,
         bankId: world.id,
         amount: body.amount,
-        note: body.note || `Super Admin allocation to client ${user.loginId || user.id}`,
+        note,
         at: db.nowIso(),
       });
       db.save();
@@ -207,6 +223,7 @@ devAdminRouter.post("/allocate", async (req, res, next) => {
         from: world,
         client: user,
         amount: body.amount,
+        checkingUsdc: depositsDb.state.checkingBalances[user.id],
       });
       return;
     }
@@ -236,6 +253,238 @@ devAdminRouter.post("/allocate", async (req, res, next) => {
       amountUsdc: body.amount,
     });
     res.json({ ok: true, unit: "USDC", from: world, to, amount: body.amount });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * Bulk fund: World reserve → all (or selected) nationals / locals / clients.
+ * amountPerTarget is applied to each target; total must not exceed World reserve.
+ */
+const allocateBulkSchema = z.object({
+  toType: z.enum(["NATIONAL", "LOCAL", "CLIENT"]),
+  amountPerTarget: z.number().positive().max(1_000_000_000),
+  /** When true (default), fund every bank/client of toType. Ignored if targetIds provided. */
+  all: z.boolean().optional().default(true),
+  targetIds: z.array(z.string().min(1)).max(50_000).optional(),
+  note: z.string().max(500).optional(),
+});
+
+devAdminRouter.post("/allocate/bulk", async (req, res, next) => {
+  try {
+    const actor = (req as AuthedRequest).user!;
+    const body = allocateBulkSchema.parse(req.body);
+    const world = db.state.banks.find((b) => b.tier === "WORLD");
+    if (!world) {
+      res.status(500).json({ error: "world_missing" });
+      return;
+    }
+
+    const amountEach = body.amountPerTarget;
+    let targets: Array<{ id: string; label: string }> = [];
+
+    if (body.toType === "CLIENT") {
+      const prisma = requirePrisma();
+      if (body.targetIds?.length) {
+        const ids = body.targetIds;
+        const rows = await prisma.user.findMany({
+          where: {
+            role: "BORROWER",
+            OR: [
+              { id: { in: ids } },
+              { loginId: { in: ids, mode: "insensitive" } },
+            ],
+          },
+          select: { id: true, loginId: true },
+        });
+        targets = rows.map((u) => ({ id: u.id, label: u.loginId || u.id }));
+      } else if (body.all !== false) {
+        const rows = await prisma.user.findMany({
+          where: { role: "BORROWER" },
+          select: { id: true, loginId: true },
+        });
+        targets = rows.map((u) => ({ id: u.id, label: u.loginId || u.id }));
+      }
+    } else {
+      const tierBanks = db.state.banks.filter((b) => b.tier === body.toType);
+      if (body.targetIds?.length) {
+        const want = new Set(body.targetIds);
+        targets = tierBanks
+          .filter((b) => want.has(b.id))
+          .map((b) => ({ id: b.id, label: b.name }));
+      } else if (body.all !== false) {
+        targets = tierBanks.map((b) => ({ id: b.id, label: b.name }));
+      }
+    }
+
+    if (targets.length === 0) {
+      res.status(400).json({ error: "no_targets", toType: body.toType });
+      return;
+    }
+
+    const totalCost = amountEach * targets.length;
+    if (totalCost > world.reserve + 1e-9) {
+      res.status(400).json({
+        error: "insufficient_reserve",
+        worldReserveUsdc: world.reserve,
+        requiredUsdc: totalCost,
+        targetCount: targets.length,
+        amountPerTarget: amountEach,
+        message: `Need ${totalCost} USDC for ${targets.length} × ${amountEach}, but World reserve is ${world.reserve}.`,
+      });
+      return;
+    }
+
+    const fundedIds: string[] = [];
+    const noteBase =
+      body.note ||
+      `Super Admin bulk fund → ${body.toType} (${targets.length} × ${amountEach} USDC)`;
+
+    world.reserve -= totalCost;
+    world.totalAllocated += totalCost;
+
+    if (body.toType === "CLIENT") {
+      for (const t of targets) {
+        creditClientChecking(t.id, amountEach, `${noteBase}: ${t.label}`);
+        fundedIds.push(t.id);
+      }
+      depositsDb.save();
+      db.state.transactions.push({
+        id: db.uid("tx"),
+        type: "DEPOSIT",
+        bankId: world.id,
+        amount: totalCost,
+        note: noteBase,
+        at: db.nowIso(),
+      });
+      db.save();
+      await persistBankCapital(world.id);
+    } else {
+      for (const t of targets) {
+        const bank = findBankById(t.id);
+        if (!bank || bank.tier !== body.toType) continue;
+        bank.reserve += amountEach;
+        fundedIds.push(bank.id);
+      }
+      db.state.transactions.push({
+        id: db.uid("tx"),
+        type: "ALLOCATION",
+        bankId: world.id,
+        amount: totalCost,
+        note: noteBase,
+        at: db.nowIso(),
+      });
+      db.save();
+      await persistBankCapital(world.id);
+      // Persist in chunks so large local-bank sets stay responsive
+      const chunk = 40;
+      for (let i = 0; i < fundedIds.length; i += chunk) {
+        await Promise.all(fundedIds.slice(i, i + chunk).map((id) => persistBankCapital(id)));
+      }
+    }
+
+    await writeAudit("DEV_ADMIN_ALLOCATE_BULK", actor.id, {
+      toType: body.toType,
+      amountPerTarget: amountEach,
+      targetCount: fundedIds.length,
+      totalUsdc: amountEach * fundedIds.length,
+      all: body.all !== false && !body.targetIds?.length,
+    });
+
+    res.json({
+      ok: true,
+      unit: "USDC",
+      toType: body.toType,
+      amountPerTarget: amountEach,
+      fundedCount: fundedIds.length,
+      totalUsdc: amountEach * fundedIds.length,
+      worldReserveUsdc: world.reserve,
+      fundedIds: fundedIds.length <= 200 ? fundedIds : fundedIds.slice(0, 200),
+      fundedIdsTruncated: fundedIds.length > 200,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * National banks by country: reserve + derived idle surplus + upward deposits received.
+ */
+devAdminRouter.get("/reserves-surplus", async (_req, res, next) => {
+  try {
+    const cfg = await getSimulationConfig();
+    const minR = cfg.minReserveRatio;
+    const world = db.state.banks.find((b) => b.tier === "WORLD");
+    const nationals = db.state.banks.filter((b) => b.tier === "NATIONAL");
+    const locals = db.state.banks.filter((b) => b.tier === "LOCAL");
+
+    const prisma = requirePrisma();
+    const upwardRows = await prisma.upwardDepositRecord.findMany({
+      select: { parentId: true, amountWei: true },
+    });
+    const upwardByParent = new Map<string, number>();
+    for (const row of upwardRows) {
+      const amt = Number(row.amountWei) || 0;
+      upwardByParent.set(row.parentId, (upwardByParent.get(row.parentId) || 0) + amt);
+    }
+
+    const institutions = await prisma.institution.findMany({
+      where: { institutionType: "NATIONAL" },
+      select: { id: true, countryCode: true, name: true },
+    });
+    const countryById = new Map(institutions.map((i) => [i.id, i.countryCode]));
+
+    function idleSurplus(reserve: number, allocated: number, lent: number) {
+      const book = Math.max(allocated, reserve + lent, 1);
+      const minReserve = book * minR;
+      return Math.max(0, reserve - minReserve);
+    }
+
+    const rows = nationals
+      .map((nb) => {
+        const childLocals = locals.filter((lb) => lb.parentBankId === nb.id);
+        const localReserveUsdc = childLocals.reduce((s, lb) => s + lb.reserve, 0);
+        const localIdleSurplusUsdc = childLocals.reduce(
+          (s, lb) => s + idleSurplus(lb.reserve, lb.totalAllocated, lb.totalLent),
+          0,
+        );
+        const upwardReceivedUsdc = upwardByParent.get(nb.id) || 0;
+        const idleSurplusUsdc = idleSurplus(nb.reserve, nb.totalAllocated, nb.totalLent);
+        return {
+          id: nb.id,
+          name: nb.name,
+          countryCode: countryById.get(nb.id) || null,
+          jurisdiction: nb.jurisdiction || null,
+          reserveUsdc: nb.reserve,
+          allocatedUsdc: nb.totalAllocated,
+          lentUsdc: nb.totalLent,
+          minReserveRatio: minR,
+          idleSurplusUsdc,
+          upwardReceivedUsdc,
+          surplusGeneratedUsdc: idleSurplusUsdc + upwardReceivedUsdc,
+          localCount: childLocals.length,
+          localReserveUsdc,
+          localIdleSurplusUsdc,
+        };
+      })
+      .sort((a, b) => (a.jurisdiction || a.name).localeCompare(b.jurisdiction || b.name));
+
+    res.json({
+      unit: "USDC",
+      worldReserveUsdc: world?.reserve ?? 0,
+      worldAllocatedUsdc: world?.totalAllocated ?? 0,
+      minReserveRatio: minR,
+      nationals: rows,
+      totals: {
+        nationalCount: rows.length,
+        reserveUsdc: rows.reduce((s, r) => s + r.reserveUsdc, 0),
+        idleSurplusUsdc: rows.reduce((s, r) => s + r.idleSurplusUsdc, 0),
+        upwardReceivedUsdc: rows.reduce((s, r) => s + r.upwardReceivedUsdc, 0),
+        surplusGeneratedUsdc: rows.reduce((s, r) => s + r.surplusGeneratedUsdc, 0),
+        localReserveUsdc: rows.reduce((s, r) => s + r.localReserveUsdc, 0),
+      },
+    });
   } catch (err) {
     next(err);
   }
@@ -560,10 +809,21 @@ devAdminRouter.get("/loans", (req, res) => {
   const status = String(req.query.status || "").trim();
   const bankId = String(req.query.bankId || "").trim();
   const borrowerId = String(req.query.borrowerId || "").trim();
+  const nationalBankId = String(req.query.nationalBankId || "").trim();
   let loans = [...db.state.loans];
   if (status) loans = loans.filter((l) => l.status === status);
   if (bankId) loans = loans.filter((l) => l.lenderBankId === bankId);
   if (borrowerId) loans = loans.filter((l) => l.borrowerId === borrowerId);
+  if (nationalBankId) {
+    const localIds = new Set(
+      db.state.banks
+        .filter((b) => b.tier === "LOCAL" && b.parentBankId === nationalBankId)
+        .map((b) => b.id),
+    );
+    loans = loans.filter(
+      (l) => l.lenderBankId === nationalBankId || localIds.has(l.lenderBankId),
+    );
+  }
   loans.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   res.json({ loans });
 });

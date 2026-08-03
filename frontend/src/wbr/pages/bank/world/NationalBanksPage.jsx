@@ -7,11 +7,7 @@ import Sheet from "../../../components/ui/Sheet";
 import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
-
-function formatEth(n) {
-  if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(3)} ETH`;
-}
+import { formatUsdc } from "@/lib/formatMoney";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -162,7 +158,7 @@ export default function NationalBanksPage() {
               <Badge icon={(nb.status || "ACTIVE") === "PAUSED" ? "alert" : "check"}>
                 {nb.status || "ACTIVE"}
               </Badge>
-              <code>{formatEth(nb.totalAllocated)} alloc</code>
+              <code>{formatUsdc(nb.totalAllocated)} alloc</code>
               <Button
                 type="button"
                 size="sm"
@@ -211,7 +207,7 @@ export default function NationalBanksPage() {
             onChange={(e) => setForm((f) => ({ ...f, jurisdiction: e.target.value }))}
           />
           <Input
-            label="Initial reserve (ETH)"
+            label="Initial reserve (USDC)"
             type="number"
             value={form.reserve}
             onChange={(e) => setForm((f) => ({ ...f, reserve: e.target.value }))}

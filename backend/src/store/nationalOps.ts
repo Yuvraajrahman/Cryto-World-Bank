@@ -42,7 +42,10 @@ type NationalOpsState = {
   params: NationalParams[];
 };
 
-const DATA_DIR = path.join(process.cwd(), ".data");
+const DATA_DIR =
+  process.env.VERCEL === "1"
+    ? path.join("/tmp", ".data")
+    : path.join(process.cwd(), ".data");
 const FILE = path.join(DATA_DIR, "national-ops.json");
 
 function uid(prefix: string) {
@@ -135,8 +138,12 @@ function load(): NationalOpsState {
 }
 
 function save(state: NationalOpsState) {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(state, null, 2));
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(FILE, JSON.stringify(state, null, 2));
+  } catch {
+    // Best-effort: never block boot/requests on a snapshot failure.
+  }
 }
 
 let state = load();

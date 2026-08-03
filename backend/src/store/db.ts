@@ -589,7 +589,9 @@ function seed(): DB {
 
 const DATA_FILE =
   process.env.CWB_DATA_FILE ??
-  path.resolve(process.cwd(), ".data", "state.json");
+  (process.env.VERCEL === "1"
+    ? path.resolve("/tmp", ".data", "state.json")
+    : path.resolve(process.cwd(), ".data", "state.json"));
 
 const PERSIST_DISABLED =
   process.env.CWB_PERSIST === "0" || process.env.NODE_ENV === "test";

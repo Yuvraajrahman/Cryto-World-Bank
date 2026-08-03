@@ -58,7 +58,10 @@ type WorldOpsState = {
   };
 };
 
-const DATA_DIR = path.join(process.cwd(), ".data");
+const DATA_DIR =
+  process.env.VERCEL === "1"
+    ? path.join("/tmp", ".data")
+    : path.join(process.cwd(), ".data");
 const FILE = path.join(DATA_DIR, "world-ops.json");
 
 function uid(prefix: string) {
@@ -184,8 +187,12 @@ function load(): WorldOpsState {
 }
 
 function save(state: WorldOpsState) {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(state, null, 2));
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(FILE, JSON.stringify(state, null, 2));
+  } catch {
+    // Best-effort: never block boot/requests on a snapshot failure.
+  }
 }
 
 let state = load();

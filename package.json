@@ -4,7 +4,7 @@
   "private": true,
   "description": "Decentralized Crypto World Bank — a four-tier blockchain lending platform",
   "scripts": {
-    "postinstall": "sh scripts/install-git-hooks.sh",
+    "postinstall": "test -f scripts/install-git-hooks.sh && sh scripts/install-git-hooks.sh || true",
     "setup:hooks": "sh scripts/install-git-hooks.sh",
     "compile": "hardhat compile",
     "test:contracts": "hardhat test",

@@ -1,10 +1,11 @@
 # Keep Vercel uploads/clones lean. Do NOT ignore `shared/` — frontend imports `@shared/*`.
+# Do NOT ignore `backend/` — the API project's Root Directory is `backend/`, and this
+# .vercelignore applies to both projects during git-based clones.
 Documentation/
 Datasets/
 Coursework files/
 All current frontend designs/
 Examples/
-backend/
 contracts/
 scripts/
 test/

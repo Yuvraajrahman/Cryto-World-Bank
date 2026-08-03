@@ -40,7 +40,7 @@ update_env() {
   local name="$1" value="$2"
   for env in production preview development; do
     vercel env rm "$name" "$env" -y 2>/dev/null || true
-    printf '%s' "$value" | vercel env add "$name" "$env"
+    vercel env add "$name" "$env" --value "$value" --yes
   done
 }
 
@@ -57,7 +57,7 @@ update_env POSTGRES_PASSWORD "$PASS"
 NEW_JWT="${JWT_SECRET:-$(openssl rand -hex 32)}"
 for env in production development; do
   vercel env rm JWT_SECRET "$env" -y 2>/dev/null || true
-  printf '%s' "$NEW_JWT" | vercel env add JWT_SECRET "$env"
+  vercel env add JWT_SECRET "$env" --value "$NEW_JWT" --yes
 done
 
 if grep -q '^NEON_SYNC_URL=' .env 2>/dev/null; then

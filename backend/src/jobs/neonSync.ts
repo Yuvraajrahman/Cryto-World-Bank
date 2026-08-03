@@ -6,11 +6,10 @@ let syncRunning = false;
 let intervalTimer: ReturnType<typeof setInterval> | null = null;
 
 function backendRoot(): string {
-  return path.resolve(__dirname, "..");
+  return process.cwd();
 }
 
 function runNeonSync(logger: Logger): void {
-  if (process.env.VERCEL === "1") return;
   if (syncRunning) {
     logger.info("neon-sync: already running, skip");
     return;
@@ -64,9 +63,7 @@ export function startNeonSyncJob(logger: Logger): () => void {
     return () => undefined;
   }
 
-  // Delay slightly so API is listening before heavy I/O
-  const bootTimer = setTimeout(() => runNeonSync(logger), 5_000);
-  bootTimer.unref();
+  runNeonSync(logger);
 
   const intervalMs = Number(process.env.SYNC_NEON_INTERVAL_MS || 0);
   if (Number.isFinite(intervalMs) && intervalMs >= 60_000) {
@@ -76,7 +73,6 @@ export function startNeonSyncJob(logger: Logger): () => void {
   }
 
   return () => {
-    clearTimeout(bootTimer);
     if (intervalTimer) clearInterval(intervalTimer);
   };
 }

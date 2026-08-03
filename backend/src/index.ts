@@ -5,6 +5,7 @@ import { createApp } from "./app";
 import { startIndexer } from "./chain/indexer";
 import { startOverdueJob } from "./jobs/overdue";
 import { bootstrapApi } from "./bootstrap";
+import { startNeonSyncJob } from "./jobs/neonSync";
 
 const logger = pino({
   transport: { target: "pino-pretty", options: { colorize: true } },
@@ -25,13 +26,20 @@ async function main() {
   const app = createApp();
   app.listen(config.port, () => {
     logger.info(`Crypto World Bank API listening on :${config.port}`);
+    const stopNeonSync = startNeonSyncJob(logger);
     if (process.env.VERCEL !== "1") {
       startIndexer(logger).catch((e) => {
         logger.warn({ err: e }, "indexer failed to start");
       });
       const stopOverdue = startOverdueJob(logger);
-      process.on("SIGTERM", () => stopOverdue());
-      process.on("SIGINT", () => stopOverdue());
+      process.on("SIGTERM", () => {
+        stopOverdue();
+        stopNeonSync();
+      });
+      process.on("SIGINT", () => {
+        stopOverdue();
+        stopNeonSync();
+      });
     }
   });
 }

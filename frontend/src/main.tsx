@@ -6,12 +6,15 @@ import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowki
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { wagmiConfig } from "@/lib/wagmi";
+import { resolveApiBaseUrl } from "@/lib/apiBase";
 import { App } from "@/App";
 import { ThemeProvider, useTheme } from "@/wbr/theme/ThemeProvider";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import "@/wbr/tokens.css";
 import "@/styles/globals.css";
+
+void resolveApiBaseUrl();
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },

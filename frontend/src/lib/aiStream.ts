@@ -1,5 +1,5 @@
 import type { Role } from "@/lib/store";
-import { getApiBaseUrl } from "@/lib/apiBase";
+import { resolveApiBaseUrl } from "@/lib/apiBase";
 
 function getToken(): string | null {
   try {
@@ -29,7 +29,8 @@ export async function streamChat(opts: {
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (token) headers.authorization = `Bearer ${token}`;
 
-  const res = await fetch(`${getApiBaseUrl()}/api/ai/chat/stream`, {
+  const base = await resolveApiBaseUrl();
+  const res = await fetch(`${base}/api/ai/chat/stream`, {
     method: "POST",
     headers,
     body: JSON.stringify({

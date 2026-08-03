@@ -1,6 +1,4 @@
-import { getApiBaseUrl } from "@/lib/apiBase";
-
-const BASE = getApiBaseUrl();
+import { resolveApiBaseUrl, clearApiBaseCache } from "@/lib/apiBase";
 
 export class ApiError extends Error {
   status: number;
@@ -28,7 +26,7 @@ function getToken(): string | null {
   }
 }
 
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function request<T>(path: string, init: RequestInit = {}, retried = false): Promise<T> {
   const token = getToken();
   const headers = new Headers(init.headers);
   if (!(init.body instanceof FormData)) {
@@ -36,7 +34,17 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
   if (token) headers.set("authorization", `Bearer ${token}`);
 
-  const res = await fetch(`${BASE}${path}`, { ...init, headers });
+  const base = await resolveApiBaseUrl(retried);
+  let res: Response;
+  try {
+    res = await fetch(`${base}${path}`, { ...init, headers });
+  } catch (err) {
+    if (!retried && !import.meta.env.DEV) {
+      clearApiBaseCache();
+      return request<T>(path, init, true);
+    }
+    throw err;
+  }
   if (!res.ok) {
     let code: string | undefined;
     let message = res.statusText;

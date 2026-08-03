@@ -14,6 +14,7 @@
     "db:seed": "prisma db seed",
     "db:seed:testing": "tsx scripts/seed-testing-world.ts",
     "db:verify:testing": "tsx scripts/verify-testing-seed.ts",
+    "db:sync:neon": "bash scripts/sync-local-to-neon.sh",
     "geo:build": "node scripts/build-geo-pack.mjs",
     "db:setup": "prisma migrate deploy && prisma db seed",
     "lint": "tsc --noEmit",

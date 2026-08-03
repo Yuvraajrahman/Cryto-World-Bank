@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-# Stop the backend/frontend/ML/Ollama processes started by start-everything.sh.
-# The live Vercel + Neon site is unaffected by this — it doesn't depend on
-# anything running on this laptop. Local Postgres (docker-compose) is legacy
-# and is not started by start-everything.sh anymore; `--all` still stops it
-# via `docker compose down` in case you've re-enabled that mode.
+# Stop processes started by start-everything.sh (backend, frontend, ML, Ollama, tunnel).
+# By default keeps Docker Postgres running.
+# Use --all to also stop Postgres (docker compose down).
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -21,13 +19,18 @@ if [[ -f "$PID_FILE" ]]; then
   rm -f "$PID_FILE"
 fi
 
-for p in 4000 5173 5174 8000 11434; do
+for p in 4000 5173 5174 8000 11434 4040; do
   lsof -ti ":$p" | xargs kill -9 2>/dev/null || true
 done
 
-echo "Backend, frontend, ML service, and Ollama stopped."
+pkill -f "ngrok http 4000" 2>/dev/null || true
+pkill -f "cloudflared tunnel --url http://127.0.0.1:4000" 2>/dev/null || true
+
+echo "Backend, frontend, ML service, Ollama, and tunnel stopped."
 
 if [[ "${1:-}" == "--all" ]]; then
-  echo "Stopping Postgres (docker compose down) — only relevant if you re-enabled local-Postgres-primary mode…"
+  echo "Stopping Postgres (docker compose down)…"
   docker compose down
+else
+  echo "Postgres left running (cwb-postgres). Use --all to stop it too."
 fi

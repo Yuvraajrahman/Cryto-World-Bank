@@ -1,48 +1,47 @@
 #!/usr/bin/env bash
-# One command to bring up the local pieces of the stack.
+# Local-primary stack: Docker Postgres + backend + frontend + tunnel for Vercel UI.
 #
-# ============================================================================
-# ARCHITECTURE NOTE FOR FUTURE AI AGENTS / FUTURE YOU (as of 2026-08-03)
-# ============================================================================
-# The transactional workload (users, banks, loans, deposits, groups, ... —
-# everything Prisma/Postgres touches) now runs ENTIRELY on Vercel + Neon.
-# There is no "local Postgres is primary, Neon is backup" mode anymore — the
-# live website must keep working with this laptop completely OFF.
-#
-# The only things that are genuinely local-only (not deployed anywhere) are:
-#   1. The AI agent/chatbot's LLM (Ollama, see LLM_BASE_URL) — routes in
-#      backend/src/routes/agent.ts, chatbot.ts, ai.ts.
-#   2. The ML fraud/credit scoring service (ml-service/, FastAPI on :8000).
-# Those only work while this script (or the equivalent manual commands) is
-# running on this machine. Everything else — DB, API, frontend — is already
-# live on Vercel/Neon 24/7 regardless of this laptop's power state.
-#
-# The old local-Docker-Postgres-primary + Neon-sync architecture is DISABLED
-# below, not deleted, via `: <<'LEGACY' ... LEGACY` no-op blocks so it can be
-# restored later without rewriting it. To restore it:
-#   1. Delete the `: <<'LEGACY_DOCKER_POSTGRES'` / `LEGACY_DOCKER_POSTGRES`
-#      marker lines around Section 1 below (and the matching pair around
-#      Section 2) to re-enable that code.
-#   2. Follow the restore instructions at the top of backend/.env (switch
-#      DATABASE_URL back to the local one, re-enable SYNC_NEON_*).
-#   3. `docker compose up -d` (see docker-compose.yml, also marked legacy).
-# See also: Documentation/hybrid-vercel-local-backend.md
+# Architecture:
+#   Browser → cryto-world-bank.vercel.app (or local :5173)
+#          → HTTPS tunnel (ngrok/cloudflared)
+#          → Mac :4000 (Express) → Docker Postgres :5432
+#          → ml-service :8000, Ollama :11434 (optional)
 #
 # Usage:
-#   ./scripts/start-everything.sh
+#   ./scripts/start-everything.sh          # from Terminal.app / iTerm (recommended)
 #   npm run start:all
 #
-# Logs are written to logs/*.log (repo root). Stop with: ./scripts/stop-everything.sh
-# ============================================================================
+# Important: run this in your own terminal (not only via an agent). Background
+# servers use nohup/disown so they keep running after the script exits.
+#
+# Flags:
+#   --skip-vercel   start local stack + tunnel, but do not update/redeploy Vercel
+#   --skip-ml       skip Ollama + ml-service
+#
+# Logs: logs/*.log   Stop: ./scripts/stop-everything.sh
+# Guide: Documentation/hybrid-vercel-local-backend.md
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+SKIP_VERCEL=0
+SKIP_ML=0
+for arg in "$@"; do
+  case "$arg" in
+    --skip-vercel) SKIP_VERCEL=1 ;;
+    --skip-ml)     SKIP_ML=1 ;;
+  esac
+done
+
 LOG_DIR="$ROOT/logs"
 mkdir -p "$LOG_DIR"
 PID_FILE="$ROOT/.dev-pids"
 : > "$PID_FILE"
+
+LOCAL_DB_URL="postgresql://cwb:cwb@localhost:5432/crypto_world_bank"
+VERCEL_FRONTEND_URL="https://cryto-world-bank.vercel.app"
+CLOUD_API_FALLBACK="https://cryto-world-bank-api.vercel.app"
 
 info()  { printf '\033[1;34m▸ %s\033[0m\n' "$1"; }
 ok()    { printf '\033[1;32m✓ %s\033[0m\n' "$1"; }
@@ -50,12 +49,8 @@ warn()  { printf '\033[1;33m! %s\033[0m\n' "$1"; }
 fail()  { printf '\033[1;31m✗ %s\033[0m\n' "$1"; }
 
 # ---------------------------------------------------------------------------
-# 1. [LEGACY/DISABLED] Docker + local Postgres
-#    Neon is primary now — the backend connects straight to Neon via
-#    backend/.env, so no local database container is needed. Block kept
-#    intact below for easy revert (see architecture note above).
+# 1. Docker + local Postgres
 # ---------------------------------------------------------------------------
-: <<'LEGACY_DOCKER_POSTGRES'
 info "Checking Docker…"
 if ! docker info >/dev/null 2>&1; then
   if [[ "$(uname)" == "Darwin" ]]; then
@@ -69,7 +64,7 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 if ! docker info >/dev/null 2>&1; then
-  fail "Docker still isn't ready. Start Docker Desktop manually and re-run this script."
+  fail "Docker still isn't ready. Start Docker Desktop manually and re-run."
   exit 1
 fi
 ok "Docker is running"
@@ -77,114 +72,125 @@ ok "Docker is running"
 info "Starting Postgres (docker compose up -d)…"
 docker compose up -d
 
-for _ in $(seq 1 30); do
+status="starting"
+for _ in $(seq 1 45); do
   status="$(docker inspect -f '{{.State.Health.Status}}' cwb-postgres 2>/dev/null || echo "starting")"
   [[ "$status" == "healthy" ]] && break
   sleep 1
 done
-if [[ "${status:-}" == "healthy" ]]; then
-  ok "Postgres is healthy (cwb-postgres)"
+if [[ "$status" == "healthy" ]]; then
+  ok "Postgres is healthy (cwb-postgres @ localhost:5432)"
 else
   warn "Postgres did not report healthy in time — continuing anyway"
 fi
-LEGACY_DOCKER_POSTGRES
 
-# ---------------------------------------------------------------------------
-# 2. [LEGACY/DISABLED] Reverse sync: Neon → local
-#    Not needed — there's only one database (Neon) now, nothing to catch up.
-# ---------------------------------------------------------------------------
-: <<'LEGACY_REVERSE_SYNC'
-NEON_URL=""
-if [[ -f "$ROOT/backend/.env" ]]; then
-  NEON_URL="$(grep -E '^(NEON_SYNC_URL|DATABASE_URL_UNPOOLED)=' "$ROOT/backend/.env" | head -1 | cut -d= -f2-)"
-fi
-
-if [[ -n "$NEON_URL" ]]; then
-  info "Pulling latest data from Neon → local (in case Neon was live while Mac was off)…"
-  if NEON_SYNC_URL="$NEON_URL" bash "$ROOT/backend/scripts/sync-neon-to-local.sh"; then
-    ok "Local Postgres caught up with Neon"
-  else
-    warn "Neon → local pull failed or timed out — continuing with existing local data"
-  fi
+info "Applying Prisma migrations to local Postgres…"
+if (cd "$ROOT/backend" && DATABASE_URL="$LOCAL_DB_URL" npx prisma migrate deploy) >"$LOG_DIR/prisma-migrate.log" 2>&1; then
+  ok "Migrations up to date (logs/prisma-migrate.log)"
 else
-  warn "No NEON_SYNC_URL/DATABASE_URL_UNPOOLED set in backend/.env — skipping reverse sync"
+  warn "migrate deploy failed — check logs/prisma-migrate.log"
 fi
-LEGACY_REVERSE_SYNC
+
+info "Checking local seed data…"
+INST_COUNT="$(cd "$ROOT/backend" && DATABASE_URL="$LOCAL_DB_URL" npx tsx -e "
+(async () => {
+  const { PrismaClient } = await import('@prisma/client');
+  const p = new PrismaClient();
+  const n = await p.institution.count();
+  console.log(n);
+  await p.\$disconnect();
+})().catch(() => { console.log('0'); process.exit(0); });
+" 2>/dev/null | tail -1)"
+if [[ "${INST_COUNT:-0}" -lt 1 ]]; then
+  warn "Local DB has no institutions — run: cd backend && npm run db:seed:testing"
+else
+  ok "Local DB has ${INST_COUNT} institutions (Docker Postgres)"
+fi
 
 # ---------------------------------------------------------------------------
-# 3. Local-only services: ML scoring (:8000) + Ollama LLM for the AI agent
-#    These are never deployed — they only run here, on this machine.
+# 2. Local-only: Ollama + ML scoring
 # ---------------------------------------------------------------------------
-info "Starting Ollama (AI agent LLM)…"
-if command -v ollama >/dev/null 2>&1; then
-  if curl -sf http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
-    ok "Ollama already running"
+if [[ "$SKIP_ML" -eq 0 ]]; then
+  info "Starting Ollama (AI agent LLM)…"
+  if command -v ollama >/dev/null 2>&1; then
+    if curl -sf http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
+      ok "Ollama already running"
+    else
+      nohup ollama serve >"$LOG_DIR/ollama.log" 2>&1 &
+      OLLAMA_PID=$!
+      disown "$OLLAMA_PID" 2>/dev/null || true
+      echo "ollama:$OLLAMA_PID" >> "$PID_FILE"
+      for _ in $(seq 1 15); do
+        curl -sf http://127.0.0.1:11434/api/tags >/dev/null 2>&1 && break
+        sleep 1
+      done
+      curl -sf http://127.0.0.1:11434/api/tags >/dev/null 2>&1 \
+        && ok "Ollama ready at http://127.0.0.1:11434" \
+        || warn "Ollama not responding yet — check logs/ollama.log"
+    fi
   else
-    nohup ollama serve >"$LOG_DIR/ollama.log" 2>&1 &
-    OLLAMA_PID=$!
-    disown "$OLLAMA_PID" 2>/dev/null || true
-    echo "ollama:$OLLAMA_PID" >> "$PID_FILE"
-    for _ in $(seq 1 15); do
-      curl -sf http://127.0.0.1:11434/api/tags >/dev/null 2>&1 && break
+    warn "ollama not installed — AI agent chat unavailable (brew install ollama)"
+  fi
+
+  info "Starting ML scoring service (:8000)…"
+  if [[ -d "$ROOT/ml-service" ]]; then
+    lsof -ti ":8000" | xargs kill -9 2>/dev/null || true
+    (
+      cd "$ROOT/ml-service"
+      if [[ -d ".venv" ]]; then source .venv/bin/activate; fi
+      uvicorn app.main:app --port 8000
+    ) >"$LOG_DIR/ml-service.log" 2>&1 &
+    ML_PID=$!
+    disown "$ML_PID" 2>/dev/null || true
+    echo "ml-service:$ML_PID" >> "$PID_FILE"
+    for _ in $(seq 1 30); do
+      curl -sf http://127.0.0.1:8000/health >/dev/null 2>&1 && break
       sleep 1
     done
-    curl -sf http://127.0.0.1:11434/api/tags >/dev/null 2>&1 \
-      && ok "Ollama ready at http://127.0.0.1:11434" \
-      || warn "Ollama not responding yet — check logs/ollama.log"
+    curl -sf http://127.0.0.1:8000/health >/dev/null 2>&1 \
+      && ok "ML service ready at http://127.0.0.1:8000" \
+      || warn "ML service not responding — check logs/ml-service.log"
+  else
+    warn "ml-service/ not found — skipping"
   fi
 else
-  warn "ollama not installed — AI agent chat will be unavailable locally (brew install ollama)"
-fi
-
-info "Starting ML scoring service (:8000)…"
-if [[ -d "$ROOT/ml-service" ]]; then
-  lsof -ti ":8000" | xargs kill -9 2>/dev/null || true
-  (
-    cd "$ROOT/ml-service"
-    if [[ -d ".venv" ]]; then source .venv/bin/activate; fi
-    uvicorn app.main:app --port 8000
-  ) >"$LOG_DIR/ml-service.log" 2>&1 &
-  ML_PID=$!
-  disown "$ML_PID" 2>/dev/null || true
-  echo "ml-service:$ML_PID" >> "$PID_FILE"
-  for _ in $(seq 1 30); do
-    curl -sf http://127.0.0.1:8000/health >/dev/null 2>&1 && break
-    sleep 1
-  done
-  curl -sf http://127.0.0.1:8000/health >/dev/null 2>&1 \
-    && ok "ML service ready at http://127.0.0.1:8000" \
-    || warn "ML service not responding yet — check logs/ml-service.log (run 'pip install -r ml-service/requirements.txt' if it's a fresh checkout)"
-else
-  warn "ml-service/ directory not found — skipping"
+  warn "Skipping Ollama + ML (--skip-ml)"
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Backend (:4000) + frontend (:5173) dev servers — optional, for local
-#    development only. They talk straight to Neon via backend/.env; nothing
-#    here is required for the live Vercel site to work.
+# 3. Backend (:4000) + frontend (:5173) — forced onto local Postgres
 # ---------------------------------------------------------------------------
 info "Freeing ports 4000/5173/5174 if in use…"
 for p in 4000 5173 5174; do
   lsof -ti ":$p" | xargs kill -9 2>/dev/null || true
 done
+sleep 1
 
 info "Regenerating Prisma client…"
-(cd "$ROOT/backend" && npx prisma generate) >"$LOG_DIR/prisma-generate.log" 2>&1 || warn "prisma generate failed — check logs/prisma-generate.log"
+(cd "$ROOT/backend" && DATABASE_URL="$LOCAL_DB_URL" npx prisma generate) >"$LOG_DIR/prisma-generate.log" 2>&1 \
+  || warn "prisma generate failed — check logs/prisma-generate.log"
 
-info "Starting backend (:4000)…"
-nohup env -u VERCEL \
-    npm --prefix "$ROOT/backend" run dev \
-    >"$LOG_DIR/backend.log" 2>&1 &
+info "Starting backend (:4000 → Docker Postgres)…"
+# backend `npm run dev` does `env -u DATABASE_URL` so Prisma loads backend/.env (local Docker).
+# Launch via a detached subshell so the process survives after this script exits.
+(
+  cd "$ROOT/backend"
+  # Unset empty JWT_SECRET/DATABASE_URL so dotenv can load backend/.env
+  # (Vercel env pull can leave blank JWT_SECRET in the shell).
+  exec env -u VERCEL -u JWT_SECRET -u DATABASE_URL SYNC_NEON_ON_START=0 \
+    CORS_ORIGIN="http://localhost:5173,http://127.0.0.1:5173,${VERCEL_FRONTEND_URL}" \
+    npm run dev
+) >"$LOG_DIR/backend.log" 2>&1 &
 BACKEND_PID=$!
 disown "$BACKEND_PID" 2>/dev/null || true
 echo "backend:$BACKEND_PID" >> "$PID_FILE"
 
-for _ in $(seq 1 30); do
+for _ in $(seq 1 45); do
   curl -sf http://127.0.0.1:4000/health >/dev/null 2>&1 && break
   sleep 1
 done
 if curl -sf http://127.0.0.1:4000/health >/dev/null 2>&1; then
-  ok "Backend healthy at http://127.0.0.1:4000 (Neon-backed)"
+  ok "Backend healthy at http://127.0.0.1:4000 (local Postgres)"
 else
   warn "Backend not responding yet — check logs/backend.log"
 fi
@@ -192,12 +198,13 @@ fi
 info "Starting frontend (:5173)…"
 (
   cd "$ROOT/frontend"
-  npm run dev -- --host 127.0.0.1 --port 5173
+  npm run dev -- --host 127.0.0.1 --port 5173 --strictPort
 ) >"$LOG_DIR/frontend.log" 2>&1 &
 FRONTEND_PID=$!
+disown "$FRONTEND_PID" 2>/dev/null || true
 echo "frontend:$FRONTEND_PID" >> "$PID_FILE"
 
-for _ in $(seq 1 30); do
+for _ in $(seq 1 45); do
   curl -sf http://127.0.0.1:5173 >/dev/null 2>&1 && break
   sleep 1
 done
@@ -207,11 +214,121 @@ else
   warn "Frontend not responding yet — check logs/frontend.log"
 fi
 
+# ---------------------------------------------------------------------------
+# 4. HTTPS tunnel so Vercel frontend can reach local API
+# ---------------------------------------------------------------------------
+TUNNEL_URL=""
+TUNNEL_FILE="$LOG_DIR/tunnel.url"
+: > "$LOG_DIR/tunnel.log"
+
+info "Starting HTTPS tunnel (:4000) for Vercel…"
+pkill -f "ngrok http 4000" 2>/dev/null || true
+pkill -f "cloudflared tunnel --url http://127.0.0.1:4000" 2>/dev/null || true
+sleep 1
+
+if command -v cloudflared >/dev/null 2>&1; then
+  nohup cloudflared tunnel --url "http://127.0.0.1:4000" --no-autoupdate \
+    >"$LOG_DIR/tunnel.log" 2>&1 &
+  TUNNEL_PID=$!
+  disown "$TUNNEL_PID" 2>/dev/null || true
+  echo "tunnel:$TUNNEL_PID" >> "$PID_FILE"
+  for _ in $(seq 1 40); do
+    TUNNEL_URL="$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$LOG_DIR/tunnel.log" 2>/dev/null | head -1 || true)"
+    [[ -n "$TUNNEL_URL" ]] && break
+    sleep 1
+  done
+elif command -v ngrok >/dev/null 2>&1; then
+  nohup ngrok http 4000 --log=stdout >"$LOG_DIR/tunnel.log" 2>&1 &
+  TUNNEL_PID=$!
+  disown "$TUNNEL_PID" 2>/dev/null || true
+  echo "tunnel:$TUNNEL_PID" >> "$PID_FILE"
+  for _ in $(seq 1 40); do
+    TUNNEL_URL="$(curl -sf http://127.0.0.1:4040/api/tunnels 2>/dev/null \
+      | python3 -c "import sys,json; d=json.load(sys.stdin); print(next((t['public_url'] for t in d.get('tunnels',[]) if t.get('public_url','').startswith('https')), ''))" 2>/dev/null || true)"
+    [[ -n "$TUNNEL_URL" ]] && break
+    sleep 1
+  done
+else
+  warn "Install a tunnel: brew install ngrok   OR   brew install cloudflared"
+fi
+
+if [[ -n "$TUNNEL_URL" ]]; then
+  echo "$TUNNEL_URL" > "$TUNNEL_FILE"
+  ok "Tunnel ready: $TUNNEL_URL"
+  # ngrok free tier may need a Host header / browser interstitial; health may 404 briefly
+  if curl -sf -o /dev/null -w "%{http_code}" "$TUNNEL_URL/health" 2>/dev/null | grep -qE '200|301|302'; then
+    ok "Tunnel → local API health check passed"
+  else
+    # retry once after brief delay (tunnel warm-up)
+    sleep 2
+    if curl -sf "$TUNNEL_URL/health" >/dev/null 2>&1; then
+      ok "Tunnel → local API health check passed"
+    else
+      warn "Tunnel up but /health not reachable yet — open $TUNNEL_URL/health in a browser once (ngrok interstitial)"
+    fi
+  fi
+else
+  warn "Could not detect tunnel URL — check logs/tunnel.log"
+fi
+
+# Push tunnel URL to Vercel frontend (VITE_* is baked at build time → redeploy)
+# Project link lives at repo root (.vercel → cryto-world-bank).
+if [[ "$SKIP_VERCEL" -eq 1 ]]; then
+  warn "Skipping Vercel env/redeploy (--skip-vercel)"
+elif [[ -n "$TUNNEL_URL" ]] && command -v vercel >/dev/null 2>&1; then
+  info "Pointing Vercel frontend at tunnel (VITE_API_PRIMARY_URL)…"
+  VERCEL_CWD="$ROOT"
+  if [[ ! -f "$ROOT/.vercel/project.json" ]]; then
+    warn "No .vercel/project.json at repo root — run: vercel link --yes"
+  fi
+
+  # Ensure frontend/.vercel mirrors root link (some vercel versions want cwd=frontend)
+  mkdir -p "$ROOT/frontend/.vercel"
+  if [[ -f "$ROOT/.vercel/project.json" ]]; then
+    cp "$ROOT/.vercel/project.json" "$ROOT/frontend/.vercel/project.json"
+  fi
+
+  vercel env rm VITE_API_PRIMARY_URL production --yes --cwd "$VERCEL_CWD" \
+    >"$LOG_DIR/vercel-env.log" 2>&1 || true
+
+  if printf '%s\n' "$TUNNEL_URL" | vercel env add VITE_API_PRIMARY_URL production --cwd "$VERCEL_CWD" \
+      >>"$LOG_DIR/vercel-env.log" 2>&1; then
+    ok "Vercel VITE_API_PRIMARY_URL = $TUNNEL_URL"
+
+    vercel env rm VITE_API_FALLBACK_URL production --yes --cwd "$VERCEL_CWD" \
+      >>"$LOG_DIR/vercel-env.log" 2>&1 || true
+    printf '%s\n' "$CLOUD_API_FALLBACK" | vercel env add VITE_API_FALLBACK_URL production --cwd "$VERCEL_CWD" \
+      >>"$LOG_DIR/vercel-env.log" 2>&1 || true
+
+    info "Redeploying Vercel frontend so build picks up new API URL…"
+    if (cd "$ROOT" && vercel deploy --prod --yes) >"$LOG_DIR/vercel-deploy.log" 2>&1; then
+      ok "Vercel frontend redeployed → $VERCEL_FRONTEND_URL"
+    else
+      warn "Vercel deploy failed — see logs/vercel-deploy.log"
+      warn "Manual: vercel env add VITE_API_PRIMARY_URL production && vercel deploy --prod"
+    fi
+  else
+    warn "Could not set Vercel env — see logs/vercel-env.log"
+    warn "Manual: printf '%s' '$TUNNEL_URL' | vercel env add VITE_API_PRIMARY_URL production"
+    warn "Then: vercel deploy --prod"
+  fi
+elif [[ -n "$TUNNEL_URL" ]]; then
+  warn "vercel CLI not found — set VITE_API_PRIMARY_URL=$TUNNEL_URL on Vercel dashboard, then redeploy"
+fi
+
 echo
-ok "All done."
-echo "  Frontend (local dev): http://127.0.0.1:5173  (log: logs/frontend.log, pid $FRONTEND_PID)"
-echo "  Backend  (local dev): http://127.0.0.1:4000 → Neon  (log: logs/backend.log, pid $BACKEND_PID)"
-echo "  ML service:            http://127.0.0.1:8000  (log: logs/ml-service.log)"
-echo "  Ollama (agent LLM):     http://127.0.0.1:11434  (log: logs/ollama.log)"
-echo "  Live site (always on, Neon-backed): https://cryto-world-bank.vercel.app"
-echo "  Stop everything: ./scripts/stop-everything.sh"
+ok "All done — local-primary mode (Neon deferred)."
+echo "  Local frontend:  http://127.0.0.1:5173  (log: logs/frontend.log)"
+echo "  Local backend:   http://127.0.0.1:4000  → Docker Postgres  (log: logs/backend.log)"
+echo "  Postgres:        localhost:5432 / crypto_world_bank"
+echo "  ML service:      http://127.0.0.1:8000"
+echo "  Ollama:          http://127.0.0.1:11434"
+if [[ -n "$TUNNEL_URL" ]]; then
+  echo "  Tunnel (Vercel): $TUNNEL_URL  (saved: logs/tunnel.url)"
+  echo "  Live site:       $VERCEL_FRONTEND_URL  → tunnel → local API → Docker Postgres"
+  echo "  Login:           admin@gmail.com / i_am_admin"
+else
+  echo "  Live site:       $VERCEL_FRONTEND_URL  (tunnel not running — start ngrok manually)"
+fi
+echo "  Stop:            ./scripts/stop-everything.sh"
+echo "  Stop + Postgres: ./scripts/stop-everything.sh --all"

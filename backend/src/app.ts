@@ -68,10 +68,14 @@ export function createApp(): Express {
           return;
         }
 
-        // Dev: allow Vite on any localhost port (5173, 5174, etc.)
+        // Dev: localhost + Vercel (hybrid demo: Vercel UI → ngrok → local API)
         try {
           const u = new URL(origin);
           if (u.hostname === "localhost" || u.hostname === "127.0.0.1") {
+            callback(null, true);
+            return;
+          }
+          if (u.hostname.endsWith(".vercel.app")) {
             callback(null, true);
             return;
           }

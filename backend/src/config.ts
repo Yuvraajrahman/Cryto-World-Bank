@@ -3,7 +3,7 @@ import "dotenv/config";
 export const config = {
   port: Number(process.env.PORT ?? 4000),
   corsOrigin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
-  jwtSecret: process.env.JWT_SECRET ?? "dev-secret-change-me",
+  jwtSecret: process.env.JWT_SECRET?.trim() || "dev-secret-change-me",
   chainRpcUrl: process.env.CHAIN_RPC_URL ?? "",
   contracts: {
     worldBank: process.env.WORLD_BANK_ADDRESS ?? "",

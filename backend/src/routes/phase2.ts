@@ -9,8 +9,17 @@ import { registerPhase2FacilityRoutes } from "./phase2-facilities";
 
 export const phase2Router = Router();
 
-const uploadDir = path.join(process.cwd(), "uploads", "documents");
-if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true });
+const uploadDir =
+  process.env.VERCEL === "1"
+    ? path.join("/tmp", "uploads", "documents")
+    : path.join(process.cwd(), "uploads", "documents");
+try {
+  if (!existsSync(uploadDir)) mkdirSync(uploadDir, { recursive: true });
+} catch (err) {
+  // Non-fatal at import time (e.g. read-only serverless filesystem); document
+  // uploads will fail with a clear error at request time instead of crashing boot.
+  console.warn("phase2: failed to prepare uploadDir", uploadDir, err);
+}
 
 phase2Router.get("/status", async (_req, res) => {
   res.json({
@@ -49,13 +58,18 @@ phase2Router.post("/documents/upload", async (req, res) => {
 
   const requestId = randomUUID();
   const dir = path.join(uploadDir, requestId);
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(path.join(dir, "nid.bin"), nidBuf);
-  writeFileSync(path.join(dir, "photo.bin"), photoBuf);
-  writeFileSync(
-    path.join(dir, "meta.json"),
-    JSON.stringify({ wallet, nidHash, photoHash, docHash, purpose }, null, 2),
-  );
+  try {
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, "nid.bin"), nidBuf);
+    writeFileSync(path.join(dir, "photo.bin"), photoBuf);
+    writeFileSync(
+      path.join(dir, "meta.json"),
+      JSON.stringify({ wallet, nidHash, photoHash, docHash, purpose }, null, 2),
+    );
+  } catch (err) {
+    res.status(500).json({ error: "document_storage_unavailable", message: String(err) });
+    return;
+  }
 
   const prisma = getPrisma();
   if (prisma) {

@@ -54,7 +54,11 @@ function runNeonSync(logger: Logger): void {
 }
 
 /**
- * When Mac backend starts, optionally push local DB to Neon so cloud fallback stays current.
+ * [LEGACY/DISABLED by default as of 2026-08-03] When the local backend
+ * starts, optionally push local DB → Neon so a local-Postgres-primary setup
+ * stays mirrored to Neon. Neon is the primary database now (see
+ * backend/.env), so SYNC_NEON_ON_START is unset by default and this is a
+ * no-op. Kept for reverting to local-Postgres-primary mode later.
  * Enable: SYNC_NEON_ON_START=1 and NEON_SYNC_URL=<Neon direct/unpooled URL>
  * Optional: SYNC_NEON_INTERVAL_MS=1800000 (repeat every 30 min while Mac is on)
  */

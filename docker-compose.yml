@@ -1,3 +1,15 @@
+# ============================================================================
+# LEGACY / OPTIONAL (disabled by default as of 2026-08-03)
+# ============================================================================
+# Neon is now the PRIMARY database for the whole app (see backend/.env). This
+# container is kept only so the old "local Postgres is primary" mode can be
+# restored later without rewriting config from scratch — see the restore
+# instructions in backend/.env and backend/.env.local.
+#
+# `scripts/start-everything.sh` no longer runs `docker compose up -d`
+# automatically. Nothing needs this container to be running for the app
+# (website, backend API, transactions) to work normally.
+# ============================================================================
 services:
   postgres:
     image: postgres:16-alpine

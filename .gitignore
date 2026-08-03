@@ -51,6 +51,10 @@ backend/.data/
 # Temp
 *.tsbuildinfo
 
+# start-everything.sh / stop-everything.sh runtime artifacts
+/logs/
+.dev-pids
+
 # Documentation (archived / previous plans)
 Documentation/Previou\ plans/
 

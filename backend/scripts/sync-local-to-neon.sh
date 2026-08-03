@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Push local Docker Postgres → Neon (one-way). Used when Mac server comes back online.
+# [LEGACY/DISABLED by default as of 2026-08-03] Push local Docker Postgres →
+# Neon (one-way). This was used when local Postgres was primary; Neon is
+# primary now (see backend/.env), so nothing calls this script automatically
+# anymore (SYNC_NEON_ON_START is commented out in backend/.env). Kept for
+# manual use if you ever re-enable local-Postgres-primary mode.
 #
 # Requires:
 #   - cwb-postgres container running

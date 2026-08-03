@@ -1,8 +1,55 @@
-# Vercel frontend + local backend (laptop-only stack)
+# Deployment architecture (current, as of 2026-08-03)
+
+**Transactional workload = 100% remote, always on:**
+
+```
+Browser → https://cryto-world-bank.vercel.app        (Vercel — frontend)
+       → https://cryto-world-bank-api.vercel.app/api  (Vercel — backend)
+       → Neon Postgres                                (primary DB)
+```
+
+Frontend and backend both auto-deploy on `git push` to `main` (Vercel Git
+integration). Users, banks, loans, deposits, groups — everything in Prisma —
+lives in Neon and is reachable 24/7. **This laptop can be completely off and
+the live site keeps working.** The frontend's `VITE_API_PRIMARY_URL` /
+`VITE_API_FALLBACK_URL` mechanism in `frontend/src/lib/apiBase.ts` still
+exists but `VITE_API_PRIMARY_URL` is intentionally **unset** on Vercel, so it
+always falls through to the Neon-backed `cryto-world-bank-api.vercel.app`.
+
+**Local-only (this Mac must be on for these two features specifically):**
+
+| Feature | Why it's local-only |
+|---|---|
+| AI agent / chatbot replies | Uses Ollama (`LLM_BASE_URL=http://127.0.0.1:11434`) — not deployed anywhere |
+| ML fraud/credit scoring | `ml-service/` (FastAPI on `:8000`) — not deployed anywhere |
+
+Run `./scripts/start-everything.sh` to bring up Ollama + `ml-service` (plus
+optional local backend/frontend dev servers) on this Mac. See that script's
+header comment for full details and for how to revert to the older
+local-Postgres-primary architecture described below, which is disabled but
+kept intact for reference.
+
+**Rotate the Neon password if it's ever pasted somewhere like chat/Slack:**
+Neon console → your project → Branches → connection details → reset
+password, then update `backend/.env` (local) and the Vercel env vars on the
+`cryto-world-bank-api` project (`vercel env rm/add DATABASE_URL production`,
+same for `DATABASE_URL_UNPOOLED`, `PGPASSWORD`, `POSTGRES_PASSWORD`, ...).
+
+---
+
+## [LEGACY — disabled, kept for reference] Mac-primary / Neon-backup mode
+
+Everything below this line describes the **old** architecture, where
+Postgres/API/ML/LLM ran on this Mac and Neon was only a cold-standby backup
+database synced one-way. It has been superseded by the "Neon is always
+primary" setup described above, but is kept here (not deleted) in case you
+ever want to go back to a laptop-first demo setup. See the restore
+instructions in `backend/.env`, `backend/.env.local`, and
+`scripts/start-everything.sh`.
 
 Use the **hosted UI** at https://cryto-world-bank.vercel.app while **Postgres, API, ML, and LLM/agent** run on your Mac when it is on. When the Mac is off, the app **automatically falls back** to the cloud API + Neon.
 
-## Failover (Mac primary → Neon backup)
+### Failover (Mac primary → Neon backup)
 
 The frontend checks your Mac tunnel with `GET /health` on load. If it responds, all API calls go to your laptop. If not, they go to `https://cryto-world-bank-api.vercel.app` (Neon).
 

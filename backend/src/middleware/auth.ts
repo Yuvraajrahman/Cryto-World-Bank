@@ -63,10 +63,20 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
 export function requireRoles(...roles: UserRole[]): RequestHandler {
   return (req, res, next) => {
     const u = (req as AuthedRequest).user;
-    if (!u || !roles.includes(u.role)) {
+    if (!u) {
       res.status(403).json({ error: "forbidden", required: roles });
       return;
     }
-    next();
+    // Super Admin bypasses all role gates
+    if (u.role === "DEV_ADMIN" || roles.includes(u.role)) {
+      next();
+      return;
+    }
+    res.status(403).json({ error: "forbidden", required: roles });
   };
+}
+
+/** Permanent Super Admin (DEV_ADMIN) — full platform access. */
+export function isSuperAdmin(role: string | null | undefined): boolean {
+  return role === "DEV_ADMIN";
 }

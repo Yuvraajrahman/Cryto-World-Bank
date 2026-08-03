@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAccount, useChainId, useDisconnect } from "wagmi";
+import { useAccount, useChainId, useDisconnect, useSignMessage } from "wagmi";
 import Glass from "../../components/ui/Glass";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
@@ -10,6 +10,19 @@ import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
 import { useNavigate } from "react-router-dom";
 import { networkLabel } from "../../lib/explorer";
+
+function buildSiweMessage({ address, chainId, nonce, domain, uri }) {
+  return `${domain} wants you to sign in with your Ethereum account:
+${address}
+
+Link wallet to Crypto World Bank account.
+
+URI: ${uri}
+Version: 1
+Chain ID: ${chainId}
+Nonce: ${nonce}
+Issued At: ${new Date().toISOString()}`;
+}
 
 const DEFAULT_PREFS = {
   email: true,
@@ -33,10 +46,13 @@ export default function SettingsPage() {
   const navigate = useNavigate();
   const sessionUser = useSession((s) => s.user);
   const setUser = useSession((s) => s.setUser);
+  const setSession = useSession((s) => s.setSession);
   const reset = useSession((s) => s.reset);
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const { signMessageAsync } = useSignMessage();
   const chainId = useChainId();
+  const [walletBusy, setWalletBusy] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -46,7 +62,12 @@ export default function SettingsPage() {
     email: "",
     phone: "",
     country: "",
+    loginId: "",
+    emailConfirmed: false,
+    pendingEmail: "",
   });
+  const [confirmToken, setConfirmToken] = useState("");
+  const [emailBusy, setEmailBusy] = useState(false);
   const [prefs, setPrefs] = useState(DEFAULT_PREFS);
   const [baseline, setBaseline] = useState(null);
   const [errors, setErrors] = useState({});
@@ -66,6 +87,9 @@ export default function SettingsPage() {
           email: u.email || "",
           phone: u.phone || "",
           country: u.country || "",
+          loginId: u.loginId || "",
+          emailConfirmed: Boolean(u.emailConfirmed),
+          pendingEmail: u.pendingEmail || "",
         };
         const nextPrefs = { ...DEFAULT_PREFS, ...(u.notificationPrefs || {}) };
         if (u.notificationPrefs?.categories) {
@@ -116,7 +140,7 @@ export default function SettingsPage() {
     e.preventDefault();
     const nextErr = {};
     if (!form.displayName.trim()) nextErr.displayName = "Name is required";
-    if (!form.email.trim()) nextErr.email = "Email is required";
+    // Personal email is optional until confirmed via request-confirm flow
     setErrors(nextErr);
     if (Object.keys(nextErr).length) return;
 
@@ -124,7 +148,6 @@ export default function SettingsPage() {
     try {
       const r = await api.put("/api/profile", {
         displayName: form.displayName.trim(),
-        email: form.email.trim(),
         phone: form.phone.trim() || undefined,
         country: form.country.trim() || undefined,
         notificationPrefs: prefs,
@@ -171,6 +194,11 @@ export default function SettingsPage() {
         <Glass className="client-panel">
           <p className="eyebrow">Profile</p>
           <div className="settings-fields">
+            {form.loginId ? (
+              <p className="client-lede">
+                User ID: <code>{form.loginId}</code>
+              </p>
+            ) : null}
             <Input
               label="Full name"
               value={form.displayName}
@@ -178,12 +206,72 @@ export default function SettingsPage() {
               error={errors.displayName}
             />
             <Input
-              label="Email"
+              label="Personal email (optional)"
               type="email"
               value={form.email}
               onChange={(e) => setField("email", e.target.value)}
               error={errors.email}
+              hint={
+                form.emailConfirmed
+                  ? "Confirmed — you can sign in with this email and your User ID password."
+                  : form.pendingEmail
+                    ? `Pending confirmation: ${form.pendingEmail}`
+                    : "Add and confirm to also sign in with email."
+              }
             />
+            <div className="settings-row-actions">
+              <Button
+                type="button"
+                variant="ghost"
+                showArrow={false}
+                disabled={emailBusy || !form.email.trim()}
+                onClick={async () => {
+                  try {
+                    setEmailBusy(true);
+                    const r = await api.post("/api/auth/email/request-confirm", {
+                      email: form.email.trim(),
+                    });
+                    setConfirmToken(r.confirmToken || "");
+                    setForm((f) => ({ ...f, pendingEmail: form.email.trim() }));
+                    toast.show("Confirmation token ready — click Confirm email", {
+                      variant: "success",
+                    });
+                  } catch (err) {
+                    toast.show(err.message || "Email request failed", { variant: "error" });
+                  } finally {
+                    setEmailBusy(false);
+                  }
+                }}
+              >
+                Request email confirm
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                showArrow={false}
+                disabled={emailBusy || !confirmToken}
+                onClick={async () => {
+                  try {
+                    setEmailBusy(true);
+                    const r = await api.post("/api/auth/email/confirm", { token: confirmToken });
+                    setUser(r.user);
+                    setForm((f) => ({
+                      ...f,
+                      email: r.user.email || f.email,
+                      emailConfirmed: true,
+                      pendingEmail: "",
+                    }));
+                    toast.show("Email confirmed", { variant: "success" });
+                  } catch (err) {
+                    toast.show(err.message || "Confirm failed", { variant: "error" });
+                  } finally {
+                    setEmailBusy(false);
+                  }
+                }}
+              >
+                Confirm email
+              </Button>
+            </div>
             <Input
               label="Phone"
               value={form.phone}
@@ -225,14 +313,47 @@ export default function SettingsPage() {
         <Glass className="client-panel">
           <p className="eyebrow">Wallet & session</p>
           <p className="client-lede">
-            Connected wallet (read-only): <code>{wallet || "—"}</code>
+            Account wallet: <code>{sessionUser?.wallet || "—"}</code>
+          </p>
+          <p className="client-lede">
+            Connected MetaMask: <code>{wallet || "—"}</code>
           </p>
           <p className="client-lede">Network: {networkLabel(chainId)}</p>
           <p className="client-lede">
-            This device session: JWT present for {wallet || "—"}. Multi-device session lists are not
-            stored yet — “Log out all” clears this browser and disconnects the wallet.
+            MetaMask is optional — link it after you create your account. Password / User ID login
+            still works.
           </p>
           <div className="settings-row-actions">
+            <Button
+              type="button"
+              showArrow={false}
+              disabled={walletBusy || !isConnected || !address}
+              onClick={async () => {
+                try {
+                  setWalletBusy(true);
+                  const { nonce } = await api.get("/api/auth/nonce");
+                  const domain = window.location.host;
+                  const message = buildSiweMessage({
+                    address,
+                    chainId,
+                    nonce,
+                    domain,
+                    uri: window.location.origin,
+                  });
+                  const signature = await signMessageAsync({ message });
+                  const r = await api.post("/api/auth/link-wallet", { message, signature });
+                  if (r.token && r.user) setSession({ token: r.token, user: r.user });
+                  else if (r.user) setUser(r.user);
+                  toast.show("MetaMask linked to your account", { variant: "success" });
+                } catch (err) {
+                  toast.show(err.message || "Link wallet failed", { variant: "error" });
+                } finally {
+                  setWalletBusy(false);
+                }
+              }}
+            >
+              Link MetaMask
+            </Button>
             <Button
               type="button"
               variant="ghost"

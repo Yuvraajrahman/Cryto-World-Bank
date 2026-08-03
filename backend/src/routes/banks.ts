@@ -163,7 +163,7 @@ banksRouter.post(
   "/allocate",
   requireAuth,
   requireRoles("OWNER", "NATIONAL_BANK_ADMIN"),
-  (req, res, next) => {
+  async (req, res, next) => {
     try {
       const body = allocateSchema.parse(req.body);
       const from = findBankById(body.fromBankId);
@@ -189,8 +189,9 @@ banksRouter.post(
         if (body.amount > available + 1e-9) {
           res.status(400).json({
             error: "breaches_reserve_ratio",
-            message: `Allocation would leave national reserve below ${minRatio * 100}% minimum. Available: ${available.toFixed(4)} ETH.`,
+            message: `Allocation would leave national reserve below ${minRatio * 100}% minimum. Available: ${available.toFixed(4)} USDC.`,
             availableToAllocateEth: available,
+            unit: "USDC",
           });
           return;
         }
@@ -206,7 +207,15 @@ banksRouter.post(
         note: `Allocation to ${to.name}`,
         at: db.nowIso(),
       });
-      res.json({ ok: true, from, to });
+      db.save();
+      try {
+        const { persistBankCapital } = await import("../db/banksSync");
+        await persistBankCapital(from.id);
+        await persistBankCapital(to.id);
+      } catch {
+        /* best-effort */
+      }
+      res.json({ ok: true, unit: "USDC", from, to });
     } catch (err) {
       next(err);
     }

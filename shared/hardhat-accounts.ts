@@ -82,8 +82,8 @@ export const HARDHAT_ACCOUNTS: HardhatAccount[] = [
     index: 8,
     address: "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
     role: "DEV_ADMIN",
-    label: "Dev Admin (temporary)",
-    subtitle: "Global console · remove before production",
+    label: "Super Admin",
+    subtitle: "Full access · admin@gmail.com",
   },
 ];
 

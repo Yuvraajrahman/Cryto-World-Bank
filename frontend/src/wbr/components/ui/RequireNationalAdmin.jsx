@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { useSession } from "@/lib/store";
 import AccessDenied from "./AccessDenied";
 
-const NATIONAL_ROLES = new Set(["NATIONAL_BANK_ADMIN", "OWNER"]);
+const NATIONAL_ROLES = new Set(["NATIONAL_BANK_ADMIN", "OWNER", "DEV_ADMIN"]);
 
 /**
  * Guard for `/bank/national/*` — National Bank Admin (+ World Owner oversight).

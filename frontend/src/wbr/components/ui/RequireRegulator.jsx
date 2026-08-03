@@ -8,7 +8,7 @@ import AccessDenied from "./AccessDenied";
 export default function RequireRegulator() {
   const role = useSession((s) => s.role ?? s.user?.role);
 
-  if (role !== "REGULATOR") {
+  if (role !== "REGULATOR" && role !== "DEV_ADMIN") {
     return (
       <AccessDenied
         title="Regulatory Authority only"

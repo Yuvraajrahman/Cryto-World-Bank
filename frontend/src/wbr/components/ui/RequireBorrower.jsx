@@ -9,7 +9,7 @@ import AccessDenied from "./AccessDenied";
 export default function RequireBorrower() {
   const role = useSession((s) => s.role ?? s.user?.role);
 
-  if (role && role !== "BORROWER" && role !== "GUEST") {
+  if (role && role !== "BORROWER" && role !== "GUEST" && role !== "DEV_ADMIN") {
     return (
       <AccessDenied
         title="Retail clients only"

@@ -56,6 +56,13 @@ export const HARDHAT_ACCOUNTS = [
         label: "Regulatory Authority",
         subtitle: "A6 · read-only audit portal",
     },
+    {
+        index: 8,
+        address: "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
+        role: "DEV_ADMIN",
+        label: "Super Admin",
+        subtitle: "Full access · admin@gmail.com",
+    },
 ];
 export function findAccountByRole(role, occurrence = 0) {
     return HARDHAT_ACCOUNTS.filter((a) => a.role === role)[occurrence];

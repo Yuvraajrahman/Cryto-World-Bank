@@ -690,6 +690,8 @@ html{scroll-behavior:smooth;}
 .login-card{padding:28px 22px; display:flex; flex-direction:column; gap:18px;}
 @media (min-width:640px){.login-card{padding:36px 32px;}}
 .login-card h2{font-family:var(--font-display); font-size:22px; font-weight:500;}
+.admin-login-form{display:flex; flex-direction:column; gap:14px;}
+.admin-login-form .field{gap:6px;}
 .wallet-list{display:flex; flex-direction:column; gap:10px;}
 .wallet-option{
   display:flex; align-items:center; gap:14px; padding:14px 16px; min-height:var(--tap-min);

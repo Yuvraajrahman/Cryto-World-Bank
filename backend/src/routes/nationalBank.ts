@@ -242,11 +242,11 @@ nationalBankRouter.get("/capital", (req, res) => {
 
 const allocateSchema = z.object({
   toBankId: z.string().min(1),
-  amount: z.number().positive().max(10_000),
+  amount: z.number().positive().max(1_000_000_000),
   note: z.string().max(500).optional(),
 });
 
-nationalBankRouter.post("/capital/allocate", (req, res, next) => {
+nationalBankRouter.post("/capital/allocate", async (req, res, next) => {
   try {
     const user = (req as AuthedRequest).user!;
     const nationalId = nationalIdFor(user);
@@ -270,9 +270,10 @@ nationalBankRouter.post("/capital/allocate", (req, res, next) => {
     if (body.amount > metrics.availableToAllocateEth + 1e-9) {
       res.status(400).json({
         error: "breaches_reserve_ratio",
-        message: `Allocation would leave reserve below the ${params.minReserveRatio * 100}% minimum. Available: ${metrics.availableToAllocateEth.toFixed(4)} ETH.`,
+        message: `Allocation would leave reserve below the ${params.minReserveRatio * 100}% minimum. Available: ${metrics.availableToAllocateEth.toFixed(4)} USDC.`,
         availableToAllocateEth: metrics.availableToAllocateEth,
         minReserveRatio: params.minReserveRatio,
+        unit: "USDC",
       });
       return;
     }
@@ -292,8 +293,16 @@ nationalBankRouter.post("/capital/allocate", (req, res, next) => {
       at: db.nowIso(),
     });
     db.save();
+    try {
+      const { persistBankCapital } = await import("../db/banksSync");
+      await persistBankCapital(from.id);
+      await persistBankCapital(to.id);
+    } catch {
+      /* best-effort */
+    }
     res.json({
       ok: true,
+      unit: "USDC",
       from,
       to,
       capital: capitalMetrics(from, params.minReserveRatio),

@@ -160,7 +160,7 @@ export function App() {
         </Route>
       </Route>
 
-      {/* TEMPORARY — remove DEV_ADMIN /dev-admin before production */}
+      {/* Super Admin console */}
       <Route element={<RequireDevAdmin />}>
         <Route path="/dev-admin" element={<DevAdmin />} />
       </Route>

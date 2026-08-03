@@ -16,7 +16,7 @@ export type UserRole =
   | "APPROVER" // Loan approver at a local bank
   | "BORROWER"
   | "REGULATOR" // External regulatory authority (A6) — read-only
-  | "DEV_ADMIN"; // Temporary global developer admin — remove before production
+  | "DEV_ADMIN"; // Permanent Super Admin — full platform access
 
 export type BankTier = "WORLD" | "NATIONAL" | "LOCAL";
 
@@ -48,8 +48,11 @@ export type AccountIntent = "individual" | "group";
 export interface User {
   id: string;
   wallet: string;
+  loginId?: string;
   displayName: string;
   email?: string;
+  emailConfirmed?: boolean;
+  pendingEmail?: string;
   country?: string;
   phone?: string;
   dateOfBirth?: string;
@@ -445,12 +448,12 @@ function seed(): DB {
       isFirstTime: false,
       createdAt: nowIso(),
     },
-    // TEMPORARY — remove DEV_ADMIN before production
+    // Permanent Super Admin
     {
       id: "usr_dev_admin",
       wallet: "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
-      displayName: "Dev Admin (temporary)",
-      email: "devadmin@cwb.example",
+      displayName: "Super Admin",
+      email: "admin@gmail.com",
       role: "DEV_ADMIN",
       consecutivePaidLoans: 0,
       totalBorrowedLifetime: 0,

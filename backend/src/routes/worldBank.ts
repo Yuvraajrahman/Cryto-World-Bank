@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { AuthedRequest, requireAuth } from "../middleware/auth";
+import { AuthedRequest, requireAuth, isSuperAdmin } from "../middleware/auth";
 import { db, findBankById, type Bank } from "../store/db";
 import { localOpsDb } from "../store/localOps";
 import { nationalOpsDb } from "../store/nationalOps";
@@ -17,7 +17,7 @@ function isSigner(wallet: string) {
 
 function requireOwner(req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) {
   const user = (req as AuthedRequest).user;
-  if (!user || user.role !== "OWNER") {
+  if (!user || (user.role !== "OWNER" && !isSuperAdmin(user.role))) {
     res.status(403).json({ error: "forbidden", required: ["OWNER"] });
     return;
   }
@@ -34,7 +34,7 @@ function requireOwnerOrSigner(
     res.status(401).json({ error: "unauthorized" });
     return;
   }
-  if (user.role === "OWNER" || isSigner(user.wallet)) {
+  if (user.role === "OWNER" || isSuperAdmin(user.role) || isSigner(user.wallet)) {
     next();
     return;
   }
@@ -242,11 +242,11 @@ worldBankRouter.post("/national-banks/:id/params", requireOwner, (req, res, next
 /** Direct capital allocation World → National (also available via multisig execute) */
 const allocateSchema = z.object({
   toBankId: z.string().min(1),
-  amount: z.number().positive().max(50_000),
+  amount: z.number().positive().max(1_000_000_000),
   note: z.string().max(500).optional(),
 });
 
-worldBankRouter.post("/capital/allocate", requireOwner, (req, res, next) => {
+worldBankRouter.post("/capital/allocate", requireOwner, async (req, res, next) => {
   try {
     const body = allocateSchema.parse(req.body);
     const from = db.state.banks.find((b) => b.tier === "WORLD")!;
@@ -264,8 +264,9 @@ worldBankRouter.post("/capital/allocate", requireOwner, (req, res, next) => {
     if (body.amount > metrics.availableToAllocateEth + 1e-9) {
       res.status(400).json({
         error: "breaches_reserve_ratio",
-        message: `Would breach ${minRatio * 100}% global minimum. Available: ${metrics.availableToAllocateEth.toFixed(4)} ETH.`,
+        message: `Would breach ${minRatio * 100}% global minimum. Available: ${metrics.availableToAllocateEth.toFixed(4)} USDC.`,
         availableToAllocateEth: metrics.availableToAllocateEth,
+        unit: "USDC",
       });
       return;
     }
@@ -281,8 +282,16 @@ worldBankRouter.post("/capital/allocate", requireOwner, (req, res, next) => {
       at: db.nowIso(),
     });
     db.save();
+    try {
+      const { persistBankCapital } = await import("../db/banksSync");
+      await persistBankCapital(from.id);
+      await persistBankCapital(to.id);
+    } catch {
+      /* best-effort Prisma mirror */
+    }
     res.json({
       ok: true,
+      unit: "USDC",
       from,
       to,
       capital: capitalMetrics(from, minRatio),

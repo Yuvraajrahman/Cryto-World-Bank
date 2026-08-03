@@ -1,6 +1,6 @@
 /**
- * TEMPORARY developer admin API — remove before production.
- * Mounted at /api/dev-admin. Requires DEV_ADMIN and non-production NODE_ENV.
+ * Super Admin console API — permanent platform administrator (DEV_ADMIN).
+ * Mounted at /api/dev-admin. Requires DEV_ADMIN (or Super Admin bypass in requireRoles).
  */
 import { Router } from "express";
 import { z } from "zod";
@@ -16,18 +16,10 @@ import {
   upsertUserByWalletPg,
   writeAudit,
 } from "../db/users";
+import { persistBankCapital, syncBanksFromPrisma } from "../db/banksSync";
 
 export const devAdminRouter = Router();
 
-function blockProduction(_req: unknown, res: import("express").Response, next: import("express").NextFunction) {
-  if (process.env.NODE_ENV === "production") {
-    res.status(404).end();
-    return;
-  }
-  next();
-}
-
-devAdminRouter.use(blockProduction);
 devAdminRouter.use(requireAuth);
 devAdminRouter.use(requireRoles("DEV_ADMIN"));
 
@@ -60,27 +52,33 @@ function buildInstallmentSchedule(amount: number, termMonths: number) {
 devAdminRouter.get("/overview", async (_req, res, next) => {
   try {
     const prisma = requirePrisma();
-    const users = await prisma.user.findMany({ orderBy: { createdAt: "desc" } });
     const banks = db.state.banks;
     const loans = db.state.loans;
     const amlOpen = localOpsDb.state.amlAlerts.filter((a) => a.status === "OPEN").length;
-    const kycPending = users.filter(
-      (u) => u.kyc1Status === "PENDING" || u.kyc2Status === "PENDING",
-    ).length;
+    const [userTotal, roleGroups, kyc1Pending, kyc2Pending] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.groupBy({ by: ["role"], _count: { _all: true } }),
+      prisma.user.count({ where: { kyc1Status: "PENDING" } }),
+      prisma.user.count({ where: { kyc2Status: "PENDING" } }),
+    ]);
+    const byRole = ROLES.reduce(
+      (acc, r) => {
+        acc[r] = 0;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+    for (const g of roleGroups) {
+      byRole[g.role] = g._count._all;
+    }
     const pendingLoans = loans.filter((l) => l.status === "PENDING").length;
     const world = banks.find((b) => b.tier === "WORLD");
     const activeLoans = loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
 
     res.json({
       users: {
-        total: users.length,
-        byRole: ROLES.reduce(
-          (acc, r) => {
-            acc[r] = users.filter((u) => u.role === r).length;
-            return acc;
-          },
-          {} as Record<string, number>,
-        ),
+        total: userTotal,
+        byRole,
       },
       banks: {
         world: banks.filter((b) => b.tier === "WORLD").length,
@@ -94,7 +92,7 @@ devAdminRouter.get("/overview", async (_req, res, next) => {
         outstandingEth: activeLoans.reduce((s, l) => s + l.amount, 0),
       },
       queues: {
-        kycPending,
+        kycPending: kyc1Pending + kyc2Pending,
         amlOpen,
         pendingLoans,
         staff: localOpsDb.state.staff.length,
@@ -103,8 +101,125 @@ devAdminRouter.get("/overview", async (_req, res, next) => {
         worldReserveEth: world?.reserve ?? 0,
         worldAllocatedEth: world?.totalAllocated ?? 0,
         totalLentEth: banks.reduce((s, b) => s + b.totalLent, 0),
+        unit: "USDC",
+        worldReserveUsdc: world?.reserve ?? 0,
+        worldAllocatedUsdc: world?.totalAllocated ?? 0,
       },
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Sync memory banks from Prisma (after testing seed). */
+devAdminRouter.post("/banks/sync", async (_req, res, next) => {
+  try {
+    const result = await syncBanksFromPrisma();
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * Super Admin: allocate World reserve to any National / Local / Client.
+ * Amounts are USDC units (testing phase).
+ */
+const allocateAnyoneSchema = z.object({
+  toType: z.enum(["NATIONAL", "LOCAL", "CLIENT"]),
+  toId: z.string().min(1),
+  amount: z.number().positive().max(1_000_000_000),
+  note: z.string().max(500).optional(),
+});
+
+devAdminRouter.post("/allocate", async (req, res, next) => {
+  try {
+    const actor = (req as AuthedRequest).user!;
+    const body = allocateAnyoneSchema.parse(req.body);
+    const world = db.state.banks.find((b) => b.tier === "WORLD");
+    if (!world) {
+      res.status(500).json({ error: "world_missing" });
+      return;
+    }
+    if (world.reserve < body.amount) {
+      res.status(400).json({
+        error: "insufficient_reserve",
+        worldReserveUsdc: world.reserve,
+      });
+      return;
+    }
+
+    if (body.toType === "CLIENT") {
+      const prisma = requirePrisma();
+      let user = await findUserByIdPg(body.toId);
+      if (!user) {
+        const row = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { loginId: { equals: body.toId, mode: "insensitive" } },
+              { id: body.toId },
+            ],
+          },
+        });
+        user = row ? toAppUser(row) : null;
+      }
+      if (!user || user.role !== "BORROWER") {
+        res.status(404).json({ error: "client_not_found" });
+        return;
+      }
+      world.reserve -= body.amount;
+      world.totalAllocated += body.amount;
+      db.state.transactions.push({
+        id: db.uid("tx"),
+        type: "DEPOSIT",
+        userId: user.id,
+        bankId: world.id,
+        amount: body.amount,
+        note: body.note || `Super Admin allocation to client ${user.loginId || user.id}`,
+        at: db.nowIso(),
+      });
+      db.save();
+      await persistBankCapital(world.id);
+      await writeAudit("DEV_ADMIN_ALLOCATE", actor.id, {
+        toType: "CLIENT",
+        toId: user.id,
+        amountUsdc: body.amount,
+      });
+      res.json({
+        ok: true,
+        unit: "USDC",
+        from: world,
+        client: user,
+        amount: body.amount,
+      });
+      return;
+    }
+
+    const to = findBankById(body.toId);
+    if (!to || to.tier !== body.toType) {
+      res.status(404).json({ error: "bank_not_found" });
+      return;
+    }
+    world.reserve -= body.amount;
+    world.totalAllocated += body.amount;
+    to.reserve += body.amount;
+    db.state.transactions.push({
+      id: db.uid("tx"),
+      type: "ALLOCATION",
+      bankId: world.id,
+      amount: body.amount,
+      note: body.note || `Super Admin allocation to ${to.name}`,
+      at: db.nowIso(),
+    });
+    db.save();
+    await persistBankCapital(world.id);
+    await persistBankCapital(to.id);
+    await writeAudit("DEV_ADMIN_ALLOCATE", actor.id, {
+      toType: body.toType,
+      toId: to.id,
+      amountUsdc: body.amount,
+    });
+    res.json({ ok: true, unit: "USDC", from: world, to, amount: body.amount });
   } catch (err) {
     next(err);
   }
@@ -117,20 +232,26 @@ devAdminRouter.get("/users", async (req, res, next) => {
     const prisma = requirePrisma();
     const q = String(req.query.q || "").trim().toLowerCase();
     const role = String(req.query.role || "").trim();
-    let rows = await prisma.user.findMany({ orderBy: { createdAt: "desc" } });
+    const take = Math.min(Number(req.query.limit) || 100, 500);
+    const where: Record<string, unknown> = {};
     if (role && ROLES.includes(role as (typeof ROLES)[number])) {
-      rows = rows.filter((u) => u.role === role);
+      where.role = role;
     }
     if (q) {
-      rows = rows.filter(
-        (u) =>
-          u.wallet.toLowerCase().includes(q) ||
-          (u.displayName || "").toLowerCase().includes(q) ||
-          (u.email || "").toLowerCase().includes(q) ||
-          u.id.toLowerCase().includes(q),
-      );
+      where.OR = [
+        { wallet: { contains: q, mode: "insensitive" } },
+        { displayName: { contains: q, mode: "insensitive" } },
+        { email: { contains: q, mode: "insensitive" } },
+        { loginId: { contains: q, mode: "insensitive" } },
+        { id: { contains: q, mode: "insensitive" } },
+      ];
     }
-    res.json({ users: rows.map(toAppUser) });
+    const rows = await prisma.user.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take,
+    });
+    res.json({ users: rows.map(toAppUser), limit: take });
   } catch (err) {
     next(err);
   }

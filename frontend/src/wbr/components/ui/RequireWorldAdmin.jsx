@@ -8,7 +8,7 @@ import AccessDenied from "./AccessDenied";
 export default function RequireWorldAdmin() {
   const role = useSession((s) => s.role ?? s.user?.role);
 
-  if (role !== "OWNER") {
+  if (role !== "OWNER" && role !== "DEV_ADMIN") {
     return (
       <AccessDenied
         title="World Bank governor only"

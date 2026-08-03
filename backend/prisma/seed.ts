@@ -6,9 +6,14 @@ import {
   KycLevel,
   UserRole,
 } from "@prisma/client";
+import bcrypt from "bcrypt";
 import { HARDHAT_ACCOUNTS } from "../../shared/hardhat-accounts";
 
 const prisma = new PrismaClient();
+
+/** Permanent Super Admin credentials (email login). */
+const SUPER_ADMIN_EMAIL = "admin@gmail.com";
+const SUPER_ADMIN_PASSWORD = "i_am_admin";
 
 type CapitalSeed = {
   reserveEth: number;
@@ -392,15 +397,17 @@ async function main() {
       role: UserRole.REGULATOR,
       email: "regulator@cwb.example",
     },
-    // TEMPORARY — remove DEV_ADMIN before production
+    // Permanent Super Admin — email/password + Hardhat wallet #8
     {
       id: "usr_dev_admin",
       wallet: HARDHAT_ACCOUNTS[8]!.address.toLowerCase(),
-      displayName: "Dev Admin (temporary)",
+      displayName: "Super Admin",
       role: UserRole.DEV_ADMIN,
-      email: "devadmin@cwb.example",
+      email: SUPER_ADMIN_EMAIL,
     },
   ];
+
+  const superAdminPasswordHash = await bcrypt.hash(SUPER_ADMIN_PASSWORD, 10);
 
   for (const s of staff) {
     const profile = {
@@ -419,6 +426,13 @@ async function main() {
       consecutivePaidLoans: s.id === "usr_borrower_demo" ? 2 : 0,
       totalBorrowedLifetime: s.id === "usr_borrower_demo" ? 8.5 : 0,
       monthlyIncomeUsd: s.id === "usr_borrower_demo" ? 1400 : undefined,
+      ...(s.id === "usr_dev_admin"
+        ? {
+            passwordHash: superAdminPasswordHash,
+            loginId: "admin",
+            emailConfirmed: true,
+          }
+        : {}),
     };
 
     const byWallet = await prisma.user.findUnique({ where: { wallet: s.wallet } });

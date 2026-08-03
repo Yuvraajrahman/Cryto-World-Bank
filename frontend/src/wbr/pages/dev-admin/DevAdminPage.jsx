@@ -1,6 +1,6 @@
 /**
- * TEMPORARY — remove DevAdminPage + /dev-admin before production.
- * Single-page global developer console (tabs).
+ * Super Admin console — permanent DEV_ADMIN platform administrator.
+ * Single-page global administrator console (tabs).
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -36,9 +36,12 @@ const ROLES = [
   "DEV_ADMIN",
 ];
 
-function formatEth(n) {
+function formatUsdc(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
-  return `${Number(n).toFixed(3)} ETH`;
+  const v = Number(n);
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(2)}M USDC`;
+  if (v >= 1_000) return `${(v / 1_000).toFixed(2)}K USDC`;
+  return `${v.toLocaleString()} USDC`;
 }
 
 function short(w) {
@@ -76,6 +79,12 @@ function DevAdminInner() {
     city: "",
     parentBankId: "",
     reserve: "0",
+  });
+  const [alloc, setAlloc] = useState({
+    toType: "NATIONAL",
+    toId: "",
+    amount: "1000000",
+    note: "",
   });
 
   const loadOverview = useCallback(async () => {
@@ -209,6 +218,39 @@ function DevAdminInner() {
     }
   }
 
+  async function allocateAnyone() {
+    setBusy(true);
+    try {
+      await api.post("/api/dev-admin/allocate", {
+        toType: alloc.toType,
+        toId: alloc.toId.trim(),
+        amount: Number(alloc.amount),
+        note: alloc.note || undefined,
+      });
+      toast.show(`Allocated ${formatUsdc(Number(alloc.amount))}`, { variant: "success" });
+      await loadOverview();
+      await loadBanks();
+    } catch (err) {
+      toast.show(err?.message || "Allocate failed", { variant: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function syncBanksFromDb() {
+    setBusy(true);
+    try {
+      const r = await api.post("/api/dev-admin/banks/sync", {});
+      toast.show(`Synced ${r.count ?? 0} banks from DB`, { variant: "success" });
+      await loadBanks();
+      await loadOverview();
+    } catch (err) {
+      toast.show(err?.message || "Sync failed", { variant: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function patchBankStatus(bank, status) {
     setBusy(true);
     try {
@@ -320,12 +362,12 @@ function DevAdminInner() {
 
       <header className="app-topbar">
         <div className="app-topbar-inner">
-          <Link to="/dev-admin" className="app-brand" aria-label="Dev admin home">
+          <Link to="/dev-admin" className="app-brand" aria-label="Super Admin home">
             <LogoMark />
-            <span className="app-brand-name">Dev Admin</span>
+            <span className="app-brand-name">Super Admin</span>
           </Link>
           <div className="app-topbar-actions">
-            <Badge>DEV_ADMIN</Badge>
+            <Badge>SUPER ADMIN</Badge>
             <span className="app-net-pill">{short(user?.wallet)}</span>
             <ThemeToggle />
             <Button type="button" variant="ghost" showArrow={false} onClick={logout}>
@@ -373,11 +415,62 @@ function DevAdminInner() {
               <StatCard label="Pending loans" value={String(overview.queues?.pendingLoans ?? 0)} />
             </div>
             <div className="stats-row" style={{ marginTop: 0 }}>
-              <StatCard label="World reserve" value={formatEth(overview.capital?.worldReserveEth)} />
-              <StatCard label="Outstanding" value={formatEth(overview.loans?.outstandingEth)} />
+              <StatCard
+                label="World reserve"
+                value={formatUsdc(overview.capital?.worldReserveUsdc ?? overview.capital?.worldReserveEth)}
+              />
+              <StatCard label="Outstanding" value={formatUsdc(overview.loans?.outstandingEth)} />
               <StatCard label="KYC pending" value={String(overview.queues?.kycPending ?? 0)} />
               <StatCard label="AML open" value={String(overview.queues?.amlOpen ?? 0)} />
             </div>
+            <Glass className="client-panel">
+              <p className="eyebrow">Distribute World reserve (USDC)</p>
+              <p className="client-lede">
+                Super Admin can allocate to any national bank, local bank, or client User ID.
+              </p>
+              <div className="client-grid-2" style={{ marginTop: 12 }}>
+                <label className="field">
+                  <span className="field-label">Target type</span>
+                  <select
+                    className="field-input"
+                    value={alloc.toType}
+                    onChange={(e) => setAlloc({ ...alloc, toType: e.target.value })}
+                  >
+                    <option value="NATIONAL">National bank</option>
+                    <option value="LOCAL">Local bank</option>
+                    <option value="CLIENT">Client</option>
+                  </select>
+                </label>
+                <Input
+                  label={alloc.toType === "CLIENT" ? "Client User ID / loginId" : "Bank ID"}
+                  value={alloc.toId}
+                  onChange={(e) => setAlloc({ ...alloc, toId: e.target.value })}
+                  placeholder={
+                    alloc.toType === "CLIENT"
+                      ? "client_bangladesh_dhaka_00001"
+                      : "bank_nb_bangladesh"
+                  }
+                />
+                <Input
+                  label="Amount (USDC)"
+                  value={alloc.amount}
+                  onChange={(e) => setAlloc({ ...alloc, amount: e.target.value })}
+                />
+                <Input
+                  label="Note"
+                  value={alloc.note}
+                  onChange={(e) => setAlloc({ ...alloc, note: e.target.value })}
+                />
+              </div>
+              <div className="quick-actions" style={{ marginTop: 12 }}>
+                <Button type="button" disabled={busy || !alloc.toId.trim()} onClick={() => void allocateAnyone()}>
+                  Allocate
+                </Button>
+                <Button type="button" variant="ghost" showArrow={false} disabled={busy} onClick={() => void syncBanksFromDb()}>
+                  Sync banks from DB
+                </Button>
+              </div>
+            </Glass>
             <Glass className="client-panel">
               <p className="eyebrow">Quick links</p>
               <div className="quick-actions">
@@ -487,7 +580,7 @@ function DevAdminInner() {
                   onChange={(e) => setNewNb({ ...newNb, walletAddress: e.target.value })}
                 />
                 <Input
-                  label="Reserve (ETH)"
+                  label="Reserve (USDC)"
                   type="number"
                   value={newNb.reserve}
                   onChange={(e) => setNewNb({ ...newNb, reserve: e.target.value })}
@@ -528,7 +621,7 @@ function DevAdminInner() {
                   </select>
                 </label>
                 <Input
-                  label="Reserve (ETH)"
+                  label="Reserve (USDC)"
                   type="number"
                   value={newLb.reserve}
                   onChange={(e) => setNewLb({ ...newLb, reserve: e.target.value })}
@@ -547,7 +640,7 @@ function DevAdminInner() {
                       {b.name} · {b.tier}
                     </strong>
                     <span>
-                      {formatEth(b.reserve)} reserve · {b.status || "ACTIVE"} · {b.jurisdiction || b.city || "—"}
+                      {formatUsdc(b.reserve)} reserve · {b.status || "ACTIVE"} · {b.jurisdiction || b.city || "—"}
                     </span>
                     <code>{b.id}</code>
                   </div>
@@ -612,7 +705,7 @@ function DevAdminInner() {
                 <div key={l.id} className="ops-row">
                   <div>
                     <strong>
-                      {l.id} · {formatEth(l.amount)} · {l.status}
+                      {l.id} · {formatUsdc(l.amount)} · {l.status}
                     </strong>
                     <span>
                       {l.kind} · lender {l.lenderBankId} · borrower {l.borrowerId || "—"}

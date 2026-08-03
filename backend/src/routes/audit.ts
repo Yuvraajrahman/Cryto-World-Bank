@@ -6,7 +6,7 @@
 import { Router } from "express";
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
-import { AuthedRequest, requireAuth } from "../middleware/auth";
+import { AuthedRequest, requireAuth, isSuperAdmin } from "../middleware/auth";
 import { getPrisma } from "../db/prisma";
 import {
   buildReserveSummaryFromPg,
@@ -26,7 +26,7 @@ function requireRegulator(
   next: import("express").NextFunction,
 ) {
   const user = (req as AuthedRequest).user;
-  if (!user || user.role !== "REGULATOR") {
+  if (!user || (user.role !== "REGULATOR" && !isSuperAdmin(user.role))) {
     res.status(403).json({
       error: "forbidden",
       required: ["REGULATOR"],

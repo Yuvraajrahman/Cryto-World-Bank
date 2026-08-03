@@ -5,6 +5,7 @@ import { createApp } from "./app";
 import { startIndexer } from "./chain/indexer";
 import { startOverdueJob } from "./jobs/overdue";
 import { requirePrisma } from "./db/prisma";
+import { syncBanksFromPrisma } from "./db/banksSync";
 
 const logger = pino({
   transport: { target: "pino-pretty", options: { colorize: true } },
@@ -21,6 +22,15 @@ async function main() {
       "PostgreSQL unavailable — start with `docker compose up -d` then `cd backend && npx prisma migrate deploy && npx prisma db seed`",
     );
     process.exit(1);
+  }
+
+  try {
+    const synced = await syncBanksFromPrisma();
+    if (synced.count > 0) {
+      logger.info({ banks: synced.count }, "Synced allocation banks from Prisma");
+    }
+  } catch (err) {
+    logger.warn({ err }, "Bank sync from Prisma skipped");
   }
 
   const app = createApp();

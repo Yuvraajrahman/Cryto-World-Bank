@@ -42,8 +42,11 @@ export function toAppUser(row: PrismaUser): AppUser {
   return {
     id: row.id,
     wallet: row.wallet,
+    loginId: row.loginId ?? undefined,
     displayName: row.displayName ?? `${row.wallet.slice(0, 6)}…${row.wallet.slice(-4)}`,
     email: row.email ?? undefined,
+    emailConfirmed: Boolean(row.emailConfirmed),
+    pendingEmail: row.pendingEmail ?? undefined,
     phone: row.phone ?? undefined,
     country: row.country ?? undefined,
     dateOfBirth: dateOnly(row.dateOfBirth),
@@ -123,6 +126,54 @@ export async function findUserByWalletPg(wallet: string): Promise<AppUser | null
   const app = toAppUser(row);
   mirrorUserToMemory(app);
   return app;
+}
+
+/** Lookup by email (case-insensitive). Returns password hash for login verification. */
+export async function findUserByEmailPg(
+  email: string,
+): Promise<{ user: AppUser; passwordHash: string | null } | null> {
+  const prisma = requirePrisma();
+  const row = await prisma.user.findFirst({
+    where: { email: { equals: email.trim(), mode: "insensitive" } },
+  });
+  if (!row) return null;
+  const app = toAppUser(row);
+  mirrorUserToMemory(app);
+  return { user: app, passwordHash: row.passwordHash ?? null };
+}
+
+/** Lookup by loginId or email (case-insensitive). Only confirmed emails count for email login. */
+export async function findUserByLoginIdentifierPg(
+  identifier: string,
+): Promise<{ user: AppUser; passwordHash: string | null } | null> {
+  const prisma = requirePrisma();
+  const id = identifier.trim();
+  if (!id) return null;
+
+  let row = await prisma.user.findFirst({
+    where: { loginId: { equals: id, mode: "insensitive" } },
+  });
+  if (!row && id.includes("@")) {
+    row = await prisma.user.findFirst({
+      where: {
+        email: { equals: id, mode: "insensitive" },
+        emailConfirmed: true,
+      },
+    });
+    // Super Admin seed uses email as primary without forcing confirmed flag historically
+    if (!row) {
+      row = await prisma.user.findFirst({
+        where: {
+          email: { equals: id, mode: "insensitive" },
+          role: "DEV_ADMIN",
+        },
+      });
+    }
+  }
+  if (!row) return null;
+  const app = toAppUser(row);
+  mirrorUserToMemory(app);
+  return { user: app, passwordHash: row.passwordHash ?? null };
 }
 
 export async function upsertUserByWalletPg(

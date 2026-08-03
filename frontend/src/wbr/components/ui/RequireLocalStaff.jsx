@@ -7,6 +7,7 @@ const LOCAL_STAFF = new Set([
   "LOCAL_BANK_ADMIN",
   "NATIONAL_BANK_ADMIN",
   "OWNER",
+  "DEV_ADMIN",
 ]);
 
 /**

@@ -3,8 +3,7 @@ import { useSession } from "@/lib/store";
 import AccessDenied from "./AccessDenied";
 
 /**
- * TEMPORARY — remove RequireDevAdmin + /dev-admin before production.
- * Guard for `/dev-admin` — DEV_ADMIN role only.
+ * Guard for `/dev-admin` — permanent Super Admin (DEV_ADMIN).
  */
 export default function RequireDevAdmin() {
   const role = useSession((s) => s.role ?? s.user?.role);
@@ -12,11 +11,11 @@ export default function RequireDevAdmin() {
   if (role !== "DEV_ADMIN") {
     return (
       <AccessDenied
-        title="Developer admin only"
+        title="Super Admin only"
         description={
           role
-            ? `Your role (${String(role).replaceAll("_", " ")}) cannot open the temporary global admin console.`
-            : "Sign in with the Dev Admin (temporary) Hardhat persona."
+            ? `Your role (${String(role).replaceAll("_", " ")}) cannot open the Super Admin console.`
+            : "Sign in with the Super Admin account (admin@gmail.com) to continue."
         }
         homeTo="/login"
       />

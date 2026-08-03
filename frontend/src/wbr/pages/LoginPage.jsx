@@ -96,6 +96,9 @@ function LoginContent() {
   const [phase, setPhase] = useState("idle");
   const [error, setError] = useState(null);
   const [pendingPersona, setPendingPersona] = useState(null);
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [passwordBusy, setPasswordBusy] = useState(false);
 
   const requiredChain = isLocalDev ? hardhat : sepolia;
   const wrongNetwork = isConnected && chainId !== requiredChain.id;
@@ -188,6 +191,31 @@ function LoginContent() {
     }
   }
 
+  async function passwordLogin(e) {
+    e?.preventDefault?.();
+    try {
+      setPasswordBusy(true);
+      setError(null);
+      const r = await api.post("/api/auth/login", {
+        identifier: adminEmail.trim(),
+        password: adminPassword,
+      });
+      setSession({ token: r.token, user: r.user });
+      toast.show(`Signed in as ${r.user.displayName}`, { variant: "success" });
+      try {
+        await syncFromApi();
+      } catch {
+        /* ignore */
+      }
+      navigate(resolvePostLoginPath(r.user, returnTo, nextStepPath), { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid email or password");
+      toast.show("Login failed", { variant: "error" });
+    } finally {
+      setPasswordBusy(false);
+    }
+  }
+
   async function devPersonaLogin(persona) {
     try {
       setPendingPersona(persona.address);
@@ -219,7 +247,8 @@ function LoginContent() {
           Connect. Sign. <em>Enter</em> your tier.
         </h1>
         <p className="section-lede center">
-          Wallet signature login (SIWE) — no gas cost. We only use it to establish your session.
+          Sign in with your User ID or confirmed email. Link MetaMask later from Settings — wallet is
+          not required to create an account.
         </p>
       </header>
 
@@ -232,7 +261,44 @@ function LoginContent() {
 
       <div className="login-wrap">
         <Glass className="login-card">
-          <h2>Supported wallets</h2>
+          <h2>Account sign-in</h2>
+          <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.55, marginBottom: 14 }}>
+            Use your User ID (e.g. <code>bangladesh</code>, <code>local_bangladesh_dhaka</code>,{" "}
+            <code>client_brazil_rio_00001</code>) or a confirmed personal email. Super Admin:{" "}
+            <code>admin@gmail.com</code>.
+          </p>
+          <form onSubmit={(ev) => void passwordLogin(ev)} className="admin-login-form">
+            <label className="field">
+              <span className="field-label">Email or User ID</span>
+              <input
+                className="field-input"
+                type="text"
+                autoComplete="username"
+                value={adminEmail}
+                onChange={(ev) => setAdminEmail(ev.target.value)}
+                required
+              />
+            </label>
+            <label className="field">
+              <span className="field-label">Password</span>
+              <input
+                className="field-input"
+                type="password"
+                autoComplete="current-password"
+                value={adminPassword}
+                onChange={(ev) => setAdminPassword(ev.target.value)}
+                required
+              />
+            </label>
+            <Button variant="primary" block type="submit" disabled={passwordBusy}>
+              {passwordBusy ? "Signing in…" : "Sign in"}
+            </Button>
+          </form>
+
+          <p className="eyebrow" style={{ marginTop: 28 }}>
+            Optional wallet (SIWE)
+          </p>
+          <h2 style={{ marginTop: 8 }}>Supported wallets</h2>
           <div className="wallet-list">
             {WALLETS.map((w) => (
               <Glass

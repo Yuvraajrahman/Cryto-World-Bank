@@ -1,0 +1,4 @@
+# Overleaf / local: pdfLaTeX only — manual references, no Biber/BibTeX pass.
+$pdf_mode = 1;
+$bibtex_use = 0;
+$pdflatex = 'pdflatex -interaction=nonstopmode -file-line-error %O %S';

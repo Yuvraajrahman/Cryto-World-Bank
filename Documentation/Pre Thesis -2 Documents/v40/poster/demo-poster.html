@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Crypto World Bank — Pre-Thesis 2 Demonstration Poster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* A1 landscape: 841mm × 594mm — type sized for stand-off reading */
+  @page { size: 841mm 594mm; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 841mm;
+    height: 594mm;
+    overflow: hidden;
+    background: #e8ebe6;
+    font-family: "Source Sans 3", "Segoe UI", sans-serif;
+    color: #1c2320;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .poster {
+    width: 841mm;
+    height: 594mm;
+    display: grid;
+    grid-template-rows: 92mm 1fr 34mm;
+    background:
+      radial-gradient(ellipse 90% 60% at 12% -10%, rgba(176, 141, 87, 0.14), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 92% 110%, rgba(45, 90, 78, 0.10), transparent 50%),
+      linear-gradient(165deg, #f4f2ec 0%, #eceae3 45%, #e7ebe8 100%);
+    position: relative;
+  }
+
+  header {
+    display: grid;
+    grid-template-columns: 100mm 1fr 100mm;
+    align-items: center;
+    gap: 8mm;
+    padding: 7mm 11mm 7mm;
+    background: #15201c;
+    color: #f4f2ec;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 3.2mm;
+    background: linear-gradient(90deg, #b08d57, #d4b483 40%, #2d5a4e 100%);
+  }
+  .logo-plate {
+    background: #fff;
+    border-radius: 2mm;
+    padding: 3mm 4mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 58mm;
+  }
+  .logo-plate img { max-height: 52mm; max-width: 100%; object-fit: contain; }
+  .title-block { text-align: center; }
+  .title-block h1 {
+    font-family: Fraunces, Georgia, serif;
+    font-weight: 700;
+    font-size: 48pt;
+    line-height: 1.08;
+    letter-spacing: 0.01em;
+    color: #f7f3ea;
+  }
+  .title-block .subtitle {
+    margin-top: 2.2mm;
+    font-size: 16pt;
+    color: #c9d4ce;
+    max-width: 540mm;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.28;
+  }
+  .title-block .authors {
+    margin-top: 3mm;
+    font-size: 16pt;
+    font-weight: 600;
+    color: #f4f2ec;
+  }
+  .title-block .meta {
+    margin-top: 1.8mm;
+    font-size: 13.5pt;
+    color: #b08d57;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .side-card {
+    background: rgba(255,255,255,0.06);
+    border: 0.4mm solid rgba(176,141,87,0.45);
+    border-radius: 2mm;
+    padding: 3.5mm;
+    text-align: center;
+    height: 58mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2mm;
+  }
+  .side-card .kicker {
+    font-size: 11pt;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #b08d57;
+  }
+  .side-card .big {
+    font-family: Fraunces, Georgia, serif;
+    font-size: 24pt;
+    color: #fff;
+  }
+  .side-card .small { font-size: 11.5pt; color: #c9d4ce; line-height: 1.35; }
+
+  .body {
+    display: grid;
+    grid-template-columns: 1fr 1.12fr 1fr;
+    gap: 5mm;
+    padding: 4.5mm 11mm 3mm;
+    min-height: 0;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5mm;
+    min-height: 0;
+    height: 100%;
+    justify-content: space-between;
+  }
+
+  section {
+    background: rgba(255,255,255,0.78);
+    border: 0.35mm solid rgba(28,35,32,0.08);
+    border-radius: 2mm;
+    padding: 3.5mm 4mm 3.8mm;
+    flex: 1 1 auto;
+  }
+  section h2 {
+    font-family: Fraunces, Georgia, serif;
+    font-size: 20pt;
+    font-weight: 700;
+    color: #15201c;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: 2.2mm;
+    padding-bottom: 1.6mm;
+    border-bottom: 1.1mm solid #b08d57;
+  }
+  p, li {
+    font-size: 15.5pt;
+    line-height: 1.3;
+    color: #2a322e;
+  }
+  p + p { margin-top: 1.4mm; }
+  .keywords {
+    margin-top: 1.8mm;
+    font-size: 13.5pt;
+    color: #4a5a52;
+  }
+  .keywords strong { color: #15201c; }
+
+  ul.gaps, ol.objectives, ul.choices {
+    margin-left: 5mm;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8mm;
+  }
+  ol.objectives { list-style: none; margin-left: 0; }
+  ol.objectives li {
+    display: grid;
+    grid-template-columns: 14mm 1fr;
+    gap: 2.2mm;
+    align-items: start;
+  }
+  ol.objectives .tag {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #fff;
+    background: #2d5a4e;
+    border-radius: 1mm;
+    text-align: center;
+    padding: 1mm 0;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2mm;
+    margin-top: 2mm;
+  }
+  .stat {
+    background: #15201c;
+    color: #f4f2ec;
+    border-radius: 1.6mm;
+    padding: 2.4mm 2mm;
+    text-align: center;
+  }
+  .stat .n {
+    font-family: Fraunces, Georgia, serif;
+    font-size: 22pt;
+    color: #d4b483;
+    display: block;
+  }
+  .stat .l { font-size: 10pt; text-transform: uppercase; letter-spacing: 0.05em; color: #c9d4ce; }
+
+  .fig { margin-top: 1.5mm; }
+  .fig svg { width: 100%; height: auto; display: block; max-height: 110mm; }
+  .fig.tall svg { max-height: 145mm; }
+  .caption {
+    margin-top: 1.5mm;
+    font-size: 13.5pt;
+    font-style: italic;
+    color: #5a6660;
+    text-align: center;
+  }
+
+  .metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15.5pt;
+    margin: 1.5mm 0 2mm;
+  }
+  .metrics-table th {
+    background: #15201c;
+    color: #f4f2ec;
+    font-weight: 600;
+    padding: 2mm 2.2mm;
+    text-align: left;
+  }
+  .metrics-table td {
+    padding: 1.8mm 2.2mm;
+    border-bottom: 0.25mm solid #d5dbd6;
+  }
+  .metrics-table tr:nth-child(even) td { background: rgba(45,90,78,0.06); }
+  .metrics-table .hi { font-weight: 700; color: #2d5a4e; }
+
+  .phase-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5mm;
+    margin-top: 2mm;
+  }
+  .phase {
+    border-radius: 1.4mm;
+    padding: 2.2mm 1.6mm;
+    background: #fff;
+    border: 0.35mm solid rgba(45,90,78,0.25);
+    text-align: center;
+  }
+  .phase .p { font-size: 12.5pt; font-weight: 700; color: #2d5a4e; text-transform: uppercase; }
+  .phase .t { font-size: 13pt; margin-top: 0.8mm; color: #2a322e; line-height: 1.25; }
+
+  footer {
+    background: #15201c;
+    color: #f4f2ec;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12mm;
+    position: relative;
+  }
+  footer::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 2.2mm;
+    background: linear-gradient(90deg, #2d5a4e, #b08d57 55%, #d4b483);
+  }
+  footer .left { font-family: Fraunces, Georgia, serif; font-size: 18pt; font-weight: 600; }
+  footer .right { font-size: 14pt; color: #c9d4ce; text-align: right; line-height: 1.35; }
+  footer a { color: #d4b483; text-decoration: none; }
+  .refs li { font-size: 13.5pt !important; line-height: 1.3 !important; }
+  .note { font-size: 13.5pt; color: #5a6660; }
+
+  section.compact { flex: 0 1 auto; padding: 2.6mm 3.5mm 2.8mm; }
+  section.compact h2 { font-size: 16pt; margin-bottom: 1.4mm; padding-bottom: 1mm; }
+  section.compact p, section.compact li { font-size: 13pt; line-height: 1.25; }
+  section.compact .keywords { font-size: 11.5pt; margin-top: 1.2mm; }
+  section.compact .stat .n { font-size: 18pt; }
+  section.compact .stat .l { font-size: 8.5pt; }
+  ol.objectives.tight { gap: 1.1mm; }
+  ol.objectives.tight li { grid-template-columns: 12mm 1fr; }
+  ol.objectives.tight .tag { font-size: 10pt; padding: 0.5mm 0; }
+  ol.objectives.tight span:last-child { font-size: 12.5pt; }
+
+  ul.tech-list {
+    margin: 2.2mm 0 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4mm;
+  }
+  ul.tech-list li {
+    font-size: 12.5pt;
+    line-height: 1.28;
+    padding: 1.6mm 2.2mm;
+    background: rgba(45,90,78,0.07);
+    border-left: 1.2mm solid #2d5a4e;
+    border-radius: 0 1.2mm 1.2mm 0;
+  }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.92em;
+    background: rgba(21,32,28,0.08);
+    padding: 0.1em 0.28em;
+    border-radius: 0.3em;
+  }
+  .phase .t { font-size: 11pt; }
+</style>
+</head>
+<body>
+<div class="poster">
+
+<header>
+  <div class="logo-plate">
+    <img src="assets/bracu_logo-1.png" alt="BRAC University" />
+  </div>
+  <div class="title-block">
+    <h1>Decentralized Crypto World Bank</h1>
+    <p class="subtitle">A four-tier blockchain banking platform with programmable reserves, hierarchical capital flows, and explainable AI risk support</p>
+    <p class="authors">Md. Bokhtiar Rahman Juboraz (20301138) &nbsp;·&nbsp; Md. Mahir Ahnaf Ahmed (20301083)</p>
+    <p class="meta">Thesis ID P26101123 &nbsp;·&nbsp; Department of CSE &nbsp;·&nbsp; BRAC University</p>
+  </div>
+  <div class="side-card">
+    <div class="kicker">Demonstration focus</div>
+    <div class="big">Pre-Thesis 2</div>
+    <div class="small">Architecture · ML benchmarks · Testnet path<br/>Open source prototype</div>
+  </div>
+</header>
+
+<main class="body">
+
+  <!-- LEFT -->
+  <div class="col">
+    <section class="compact">
+      <h2>Abstract</h2>
+      <p>
+        <strong>Crypto World Bank</strong> maps World → National → Local → Client lending onto an EVM ledger
+        with programmable reserves, multi-entity products, and explainable ML risk support.
+      </p>
+      <p class="keywords"><strong>Keywords:</strong> Hierarchical DeFi · Smart contracts · XAI · Group lending</p>
+    </section>
+
+    <section class="compact">
+      <h2>Problem &amp; Motivation</h2>
+      <div class="stat-row">
+        <div class="stat"><span class="n">1.4B</span><span class="l">unbanked</span></div>
+        <div class="stat"><span class="n">$4.5T</span><span class="l">MSME gap</span></div>
+        <div class="stat"><span class="n">2–5d</span><span class="l">settle lag</span></div>
+      </div>
+      <p style="margin-top:2mm">Flat DeFi ignores institutional hierarchy; development corridors stay opaque and slow. CWB encodes tiered capital and audit trails on-chain.</p>
+    </section>
+
+    <section class="compact">
+      <h2>Objectives</h2>
+      <ol class="objectives tight">
+        <li><span class="tag">O1</span><span>Four-tier EVM lending (Ph. I–IV)</span></li>
+        <li><span class="tag">O2</span><span>Deposits · savings · group credit</span></li>
+        <li><span class="tag">O3</span><span>ML fraud analytics + MCP agent</span></li>
+        <li><span class="tag">O4</span><span>Limits · installments · RBAC</span></li>
+        <li><span class="tag">O5</span><span>Sepolia / Amoy / Cardona path</span></li>
+        <li><span class="tag">O6</span><span>Governance · security docs</span></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Methodology</h2>
+      <p>
+        Agile MVC (~16 weeks): <strong>Model</strong> = Solidity + PostgreSQL projections;
+        <strong>View</strong> = React/Vite; <strong>Controller</strong> = Express.js + FastAPI.
+        Hardhat tests gate merges (<code>npm run test:contracts</code>).
+      </p>
+      <div class="phase-strip">
+        <div class="phase"><div class="p">Phase I</div><div class="t">Arch · 3NF schema · Tier 1–3 shells · LoanController stub</div></div>
+        <div class="phase"><div class="p">Phase II</div><div class="t">Loan E2E · SavingsVault · GroupLending · interbank pools</div></div>
+        <div class="phase"><div class="p">Phase III</div><div class="t">Commit–reveal oracle · RF+IF+SHAP · FX / syndicate</div></div>
+        <div class="phase"><div class="p">Phase IV</div><div class="t">Gas / MVT metrics · Foundry suite · feasibility</div></div>
+      </div>
+      <ul class="tech-list">
+        <li><strong>On-chain:</strong> Solidity 0.8.20 · <code>WorldBankReserve</code> · <code>NationalBank</code> · <code>LocalBank</code> · <code>LoanController</code> · AccessControl roles</li>
+        <li><strong>Off-chain:</strong> Express API · Prisma/PostgreSQL (51-entity ERD; 16 core MVT) · FastAPI ML · Redis cache</li>
+        <li><strong>Frontend:</strong> React + wallet signing · approver dashboards · optional MCP agent (17 banking tools)</li>
+        <li><strong>Networks:</strong> Ethereum Sepolia (primary) · Polygon Amoy (fallback) · zkEVM Cardona (future)</li>
+        <li><strong>Oracle:</strong> off-chain score → <code>keccak256(s ‖ nonce)</code> commit → reveal on <code>LoanController</code> (human still gates)</li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- CENTER -->
+  <div class="col">
+    <section>
+      <h2>System Spine — Four Tiers</h2>
+      <div class="fig tall">
+        <svg viewBox="0 0 640 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Four-tier hierarchy">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2d5a4e"/><stop offset="100%" stop-color="#15201c"/>
+            </linearGradient>
+            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#b08d57"/>
+            </marker>
+          </defs>
+          <rect x="0" y="0" width="640" height="380" rx="12" fill="#f7f5f0"/>
+
+          <rect x="150" y="12" width="340" height="58" rx="10" fill="url(#g1)"/>
+          <text x="320" y="34" text-anchor="middle" fill="#f4f2ec" font-family="Fraunces, Georgia, serif" font-size="16" font-weight="700">Tier 1 · WorldBankReserve</text>
+          <text x="320" y="52" text-anchor="middle" fill="#d4b483" font-family="Source Sans 3, sans-serif" font-size="11">Global custody · national registration · downward allocateCapital()</text>
+
+          <rect x="70" y="88" width="230" height="58" rx="9" fill="#2d5a4e"/>
+          <rect x="340" y="88" width="230" height="58" rx="9" fill="#2d5a4e"/>
+          <text x="185" y="110" text-anchor="middle" fill="#fff" font-size="14" font-family="Fraunces, Georgia, serif" font-weight="700">Tier 2 · NationalBank</text>
+          <text x="185" y="128" text-anchor="middle" fill="#c9d4ce" font-size="10" font-family="Source Sans 3, sans-serif">registerLocal · upwardBorrow · allocate ↓</text>
+          <text x="455" y="110" text-anchor="middle" fill="#fff" font-size="14" font-family="Fraunces, Georgia, serif" font-weight="700">Tier 2 · NationalBank</text>
+          <text x="455" y="128" text-anchor="middle" fill="#c9d4ce" font-size="10" font-family="Source Sans 3, sans-serif">Peer pool · syndicate invite path</text>
+
+          <rect x="30" y="168" width="180" height="58" rx="9" fill="#3f6f60"/>
+          <rect x="230" y="168" width="180" height="58" rx="9" fill="#3f6f60"/>
+          <rect x="430" y="168" width="180" height="58" rx="9" fill="#3f6f60"/>
+          <text x="120" y="190" text-anchor="middle" fill="#fff" font-size="13" font-family="Fraunces, Georgia, serif" font-weight="700">Tier 3 · LocalBank</text>
+          <text x="120" y="208" text-anchor="middle" fill="#c9d4ce" font-size="10" font-family="Source Sans 3, sans-serif">Owns LoanController · approvers</text>
+          <text x="320" y="190" text-anchor="middle" fill="#fff" font-size="13" font-family="Fraunces, Georgia, serif" font-weight="700">Tier 3 · LocalBank</text>
+          <text x="320" y="208" text-anchor="middle" fill="#c9d4ce" font-size="10" font-family="Source Sans 3, sans-serif">Client KYC tier · freezeAccount</text>
+          <text x="520" y="190" text-anchor="middle" fill="#fff" font-size="13" font-family="Fraunces, Georgia, serif" font-weight="700">Tier 3 · LocalBank</text>
+          <text x="520" y="208" text-anchor="middle" fill="#c9d4ce" font-size="10" font-family="Source Sans 3, sans-serif">Retail loan originator</text>
+
+          <rect x="20" y="250" width="140" height="50" rx="8" fill="#b08d57"/>
+          <rect x="175" y="250" width="140" height="50" rx="8" fill="#b08d57"/>
+          <rect x="330" y="250" width="140" height="50" rx="8" fill="#b08d57"/>
+          <rect x="485" y="250" width="135" height="50" rx="8" fill="#b08d57"/>
+          <text x="90" y="272" text-anchor="middle" fill="#15201c" font-size="12" font-family="Source Sans 3, sans-serif" font-weight="700">Tier 4 Client</text>
+          <text x="90" y="288" text-anchor="middle" fill="#15201c" font-size="9" font-family="Source Sans 3, sans-serif">wallet · credit passport</text>
+          <text x="245" y="272" text-anchor="middle" fill="#15201c" font-size="12" font-family="Source Sans 3, sans-serif" font-weight="700">Tier 4 Client</text>
+          <text x="245" y="288" text-anchor="middle" fill="#15201c" font-size="9" font-family="Source Sans 3, sans-serif">installments · limits</text>
+          <text x="400" y="272" text-anchor="middle" fill="#15201c" font-size="12" font-family="Source Sans 3, sans-serif" font-weight="700">GroupLending</text>
+          <text x="400" y="288" text-anchor="middle" fill="#15201c" font-size="9" font-family="Source Sans 3, sans-serif">mutual liability pool</text>
+          <text x="552" y="272" text-anchor="middle" fill="#15201c" font-size="12" font-family="Source Sans 3, sans-serif" font-weight="700">MSME client</text>
+          <text x="552" y="288" text-anchor="middle" fill="#15201c" font-size="9" font-family="Source Sans 3, sans-serif">stablecoin-first path</text>
+
+          <line x1="320" y1="70" x2="185" y2="88" stroke="#b08d57" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="320" y1="70" x2="455" y2="88" stroke="#b08d57" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="185" y1="146" x2="120" y2="168" stroke="#b08d57" stroke-width="1.8" marker-end="url(#arr)"/>
+          <line x1="185" y1="146" x2="320" y2="168" stroke="#b08d57" stroke-width="1.8" marker-end="url(#arr)"/>
+          <line x1="455" y1="146" x2="520" y2="168" stroke="#b08d57" stroke-width="1.8" marker-end="url(#arr)"/>
+          <line x1="120" y1="226" x2="90" y2="250" stroke="#b08d57" stroke-width="1.6" marker-end="url(#arr)"/>
+          <line x1="320" y1="226" x2="245" y2="250" stroke="#b08d57" stroke-width="1.6" marker-end="url(#arr)"/>
+          <line x1="320" y1="226" x2="400" y2="250" stroke="#b08d57" stroke-width="1.6" marker-end="url(#arr)"/>
+          <line x1="520" y1="226" x2="552" y2="250" stroke="#b08d57" stroke-width="1.6" marker-end="url(#arr)"/>
+
+          <text x="20" y="330" fill="#2d5a4e" font-size="11" font-family="Source Sans 3, sans-serif" font-weight="700">LoanController state machine (at Local):</text>
+          <text x="20" y="348" fill="#2a322e" font-size="11" font-family="Source Sans 3, sans-serif">Request → Approve → Disburse → Installment schedule → Repay / Overdue / Liquidate (HF&lt;1)</text>
+          <text x="20" y="366" fill="#5a6660" font-size="10" font-family="Source Sans 3, sans-serif">RBAC: WORLD_ADMIN · NATIONAL_ADMIN · LOCAL_APPROVER · CLIENT · optional AGENT session keys</text>
+        </svg>
+      </div>
+      <p class="caption">Figure 1. Contract spine — reserve authority cascades; retail credit originates at LocalBank / GroupLendingPool.</p>
+    </section>
+
+    <section>
+      <h2>Capital Motion</h2>
+      <div class="fig">
+        <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Capital flows">
+          <rect width="640" height="250" rx="12" fill="#15201c"/>
+          <text x="24" y="26" fill="#d4b483" font-size="12" font-family="Source Sans 3, sans-serif" letter-spacing="1.2">FOUR ON-CHAIN MOTIONS · MULTI-ENTITY MODULES</text>
+          <g font-family="Source Sans 3, sans-serif">
+            <rect x="14" y="40" width="148" height="168" rx="10" fill="#1f2d28" stroke="#2d5a4e" stroke-width="1.5"/>
+            <text x="88" y="66" text-anchor="middle" fill="#d4b483" font-size="14" font-weight="700">Downward</text>
+            <text x="88" y="92" text-anchor="middle" fill="#f4f2ec" font-size="11">allocateCapital()</text>
+            <text x="88" y="112" text-anchor="middle" fill="#c9d4ce" font-size="10">Reserve → National</text>
+            <text x="88" y="128" text-anchor="middle" fill="#c9d4ce" font-size="10">→ Local → Client loan</text>
+            <text x="88" y="152" text-anchor="middle" fill="#9aabA3" font-size="10">Reserve-ratio gated</text>
+            <text x="88" y="168" text-anchor="middle" fill="#9aabA3" font-size="10">debit lender reserve</text>
+            <text x="88" y="190" text-anchor="middle" fill="#b08d57" font-size="10">LoanController</text>
+
+            <rect x="172" y="40" width="148" height="168" rx="10" fill="#1f2d28" stroke="#2d5a4e" stroke-width="1.5"/>
+            <text x="246" y="66" text-anchor="middle" fill="#d4b483" font-size="14" font-weight="700">Peer</text>
+            <text x="246" y="92" text-anchor="middle" fill="#f4f2ec" font-size="11">InterBankLendingPool</text>
+            <text x="246" y="112" text-anchor="middle" fill="#c9d4ce" font-size="10">Same-tier liquidity</text>
+            <text x="246" y="128" text-anchor="middle" fill="#c9d4ce" font-size="10">Local↔Local / Nat↔Nat</text>
+            <text x="246" y="152" text-anchor="middle" fill="#9aabA3" font-size="10">Pool utilisation U*</text>
+            <text x="246" y="168" text-anchor="middle" fill="#9aabA3" font-size="10">kinked rate @ 80%</text>
+            <text x="246" y="190" text-anchor="middle" fill="#b08d57" font-size="10">Phase II module</text>
+
+            <rect x="330" y="40" width="148" height="168" rx="10" fill="#1f2d28" stroke="#2d5a4e" stroke-width="1.5"/>
+            <text x="404" y="66" text-anchor="middle" fill="#d4b483" font-size="14" font-weight="700">Upward</text>
+            <text x="404" y="92" text-anchor="middle" fill="#f4f2ec" font-size="11">UpwardDepositFacility</text>
+            <text x="404" y="112" text-anchor="middle" fill="#c9d4ce" font-size="10">Park surplus at parent</text>
+            <text x="404" y="128" text-anchor="middle" fill="#c9d4ce" font-size="10">yield spread recorded</text>
+            <text x="404" y="152" text-anchor="middle" fill="#9aabA3" font-size="10">Repatriation path</text>
+            <text x="404" y="168" text-anchor="middle" fill="#9aabA3" font-size="10">vs nostro idle capital</text>
+            <text x="404" y="190" text-anchor="middle" fill="#b08d57" font-size="10">Phase II module</text>
+
+            <rect x="488" y="40" width="138" height="168" rx="10" fill="#1f2d28" stroke="#b08d57" stroke-width="1.8"/>
+            <text x="557" y="66" text-anchor="middle" fill="#d4b483" font-size="14" font-weight="700">Co-fund</text>
+            <text x="557" y="92" text-anchor="middle" fill="#f4f2ec" font-size="11">SyndicatedLoan</text>
+            <text x="557" y="112" text-anchor="middle" fill="#c9d4ce" font-size="10">+ TranchedPool</text>
+            <text x="557" y="128" text-anchor="middle" fill="#c9d4ce" font-size="10">multi-lender consent</text>
+            <text x="557" y="152" text-anchor="middle" fill="#9aabA3" font-size="10">Senior / junior</text>
+            <text x="557" y="168" text-anchor="middle" fill="#9aabA3" font-size="10">waterfall recovery</text>
+            <text x="557" y="190" text-anchor="middle" fill="#b08d57" font-size="10">Phase III planned</text>
+          </g>
+          <text x="24" y="232" fill="#9aabA3" font-size="11" font-family="Source Sans 3, sans-serif">Also: SavingsVault (reserve-gated withdraw) · GroupLendingPool (solidarity) · stablecoin-first retail path · ≈$0.011 L2 gas / loan lifecycle</text>
+        </svg>
+      </div>
+      <p class="caption">Figure 2. Cross-tier capital motions with named Solidity modules and phase targets.</p>
+    </section>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col">
+    <section>
+      <h2>Demonstration Results</h2>
+      <p>
+        BCCC-DeFiFraudTrans-2025 subsample (50k txs, ~8.7% fraud, 21 features, wallet-safe split).
+        Scores assist human approvers; disbursement stays gated on-chain.
+      </p>
+      <table class="metrics-table">
+        <thead>
+          <tr><th>Split</th><th>Prec.</th><th>Rec.</th><th>F1</th><th>AUC</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Held-out test</td>
+            <td>0.874</td>
+            <td>0.908</td>
+            <td class="hi">0.891</td>
+            <td>0.991</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">TN 4,621 · FP 60 · FN 42 · TP 417 &nbsp;(n<sub>test</sub> = 5,140) · RF + Isolation Forest</p>
+
+      <div class="fig" style="margin-top:2.5mm">
+        <svg viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg" aria-label="Metric bars">
+          <rect width="420" height="150" rx="10" fill="#f7f5f0"/>
+          <!-- axis -->
+          <line x1="48" y1="20" x2="48" y2="120" stroke="#9aabA3" stroke-width="1"/>
+          <line x1="48" y1="120" x2="390" y2="120" stroke="#9aabA3" stroke-width="1"/>
+          <!-- bars: P R F1 AUC heights proportional -->
+          <rect x="70" y="120" width="48" height="0" fill="#2d5a4e">
+            <animate attributeName="height" to="87" dur="0.01s" fill="freeze"/>
+          </rect>
+          <rect x="70" y="33" width="48" height="87" fill="#2d5a4e"/>
+          <rect x="145" y="29" width="48" height="91" fill="#3f6f60"/>
+          <rect x="220" y="31" width="48" height="89" fill="#b08d57"/>
+          <rect x="295" y="21" width="48" height="99" fill="#15201c"/>
+          <text x="94" y="138" text-anchor="middle" font-size="11" fill="#2a322e" font-family="Source Sans 3, sans-serif">Prec</text>
+          <text x="169" y="138" text-anchor="middle" font-size="11" fill="#2a322e" font-family="Source Sans 3, sans-serif">Rec</text>
+          <text x="244" y="138" text-anchor="middle" font-size="11" fill="#2a322e" font-family="Source Sans 3, sans-serif">F1</text>
+          <text x="319" y="138" text-anchor="middle" font-size="11" fill="#2a322e" font-family="Source Sans 3, sans-serif">AUC</text>
+          <text x="94" y="28" text-anchor="middle" font-size="11" fill="#15201c" font-family="Source Sans 3, sans-serif" font-weight="700">.874</text>
+          <text x="169" y="24" text-anchor="middle" font-size="11" fill="#15201c" font-family="Source Sans 3, sans-serif" font-weight="700">.908</text>
+          <text x="244" y="26" text-anchor="middle" font-size="11" fill="#15201c" font-family="Source Sans 3, sans-serif" font-weight="700">.891</text>
+          <text x="319" y="16" text-anchor="middle" font-size="11" fill="#15201c" font-family="Source Sans 3, sans-serif" font-weight="700">.991</text>
+        </svg>
+      </div>
+      <p class="caption">Figure 4. Held-out wallet metrics for the demonstration fraud pipeline.</p>
+    </section>
+
+    <section>
+      <h2>Key Design Choices</h2>
+      <ul class="choices">
+        <li>Stablecoin-first retail path (avoid ETH liability volatility)</li>
+        <li>L2 / testnet gas target ≈ $0.011 per loan lifecycle</li>
+        <li>Off-chain RF+IF+SHAP; humans approve; on-chain gates enforce</li>
+        <li>Single-chain settlement — multi-chain deferred (bridge risk)</li>
+        <li>Optional local MCP agent for demonstration UX</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Conclusion</h2>
+      <p>
+        Hierarchical development-finance flows can live as auditable smart-contract state, with explainable ML assisting — not replacing — credit judgment.
+        Next: Phase II–IV MVT loan E2E, oracle latency, and CWB-specific retrain.
+      </p>
+    </section>
+
+    <section>
+      <h2>Selected References</h2>
+      <ol class="refs" style="margin-left:4.5mm; display:flex; flex-direction:column; gap:1.4mm;">
+        <li>Werner et al. 2022. SoK: Decentralized Finance (DeFi). arXiv:2101.08778.</li>
+        <li>Palaiokrassas et al. 2024. ML for Multichain DeFi Fraud Detection. IEEE ICBC.</li>
+        <li>World Bank. 2021. Global Findex Database 2021.</li>
+        <li>Liu, Ting &amp; Zhou. 2008. Isolation Forest. IEEE ICDM.</li>
+      </ol>
+    </section>
+  </div>
+
+</main>
+
+<footer>
+  <div class="left">Pre-thesis 2 · Project Demonstration Poster</div>
+  <div class="right">
+    BRAC University · Computer Science and Engineering<br/>
+    <a href="https://github.com/Yuvraajrahman/Cryto-World-Bank">github.com/Yuvraajrahman/Cryto-World-Bank</a>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

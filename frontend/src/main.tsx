@@ -25,8 +25,8 @@ function RainbowWithTheme({ children }: { children: React.ReactNode }) {
   const theme =
     resolved === "light"
       ? lightTheme({
-          accentColor: "#b8924a",
-          accentColorForeground: "#1a1406",
+          accentColor: "#2563eb",
+          accentColorForeground: "#ffffff",
           borderRadius: "large",
           fontStack: "system",
           overlayBlur: "small",

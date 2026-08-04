@@ -1,0 +1,10 @@
+# SVG sources for v40/images PDF figures
+# Edit the .svg here, then run: ./export_to_images.sh
+# Or one file: ./export_to_images.sh architecture_diagram_fixed
+#
+# Naming: each STEM.svg maps to ../images/STEM.pdf
+# Sources originally copied from:
+#   V36 - v38/Diagrams/
+#   V36 - v38/test figures/
+#   V36 - v38/evidence/mac-m4/
+# Requires: rsvg-convert (brew install librsvg)

@@ -7,6 +7,10 @@
     color-scheme: dark;
   }
 
+  [data-theme="light"] {
+    color-scheme: light;
+  }
+
   html, body, #root {
     height: 100%;
   }
@@ -17,7 +21,11 @@
   }
 
   ::selection {
-    background: rgba(212, 175, 55, 0.35);
+    background: rgb(var(--gold-500) / 0.35);
+    color: #fff;
+  }
+
+  [data-theme="light"] ::selection {
     color: #fff;
   }
 
@@ -27,15 +35,15 @@
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #0a0a0b;
+    background: rgb(var(--ink-900));
   }
   ::-webkit-scrollbar-thumb {
-    background: #2a2b31;
+    background: rgb(var(--ink-500));
     border-radius: 8px;
-    border: 2px solid #0a0a0b;
+    border: 2px solid rgb(var(--ink-900));
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #3a3b42;
+    background: rgb(var(--ink-400));
   }
 }
 
@@ -62,6 +70,14 @@
 
   .btn-primary {
     @apply btn text-ink-900 bg-gradient-to-b from-gold-300 via-gold-500 to-gold-600 border border-gold-700/50 shadow-gold-soft hover:brightness-110 hover:shadow-gold-glow active:brightness-95;
+  }
+
+  [data-theme="light"] .btn-primary {
+    color: #ffffff;
+  }
+
+  [data-theme="light"] .card {
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 12px 28px -18px rgb(37 99 235 / 0.14);
   }
 
   .btn-ghost {

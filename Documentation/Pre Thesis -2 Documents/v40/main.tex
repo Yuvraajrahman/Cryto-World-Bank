@@ -34,9 +34,7 @@
 \usepackage{etoolbox}
 \usepackage{pdflscape}
 \usepackage{xcolor}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric,calc}
-\IfFileExists{pgfplots.sty}{\usepackage{pgfplots}\usepgfplotslibrary{statistics}\pgfplotsset{compat=1.18, minor tick num=0}}{}
+% TikZ/pgfplots omitted: figures are pre-exported PDF vectors (faster Overleaf compile).
 \usepackage{underscore}
 \usepackage{listings}
 \lstdefinelanguage{Solidity}{
@@ -76,8 +74,6 @@
   \newcommand{\tmarkPlanned}{\textcolor{black!55}{$\circ$}}%
 }
 
-\IfFileExists{tcolorbox.sty}{\usepackage[skins]{tcolorbox}}{}
-
 \IfFileExists{tocbibind.sty}{\usepackage[nottoc]{tocbibind}}{}
 \usepackage[normalem]{ulem}
 
@@ -93,14 +89,12 @@
 
 \setlength{\parindent}{0em}
 
-\IfFileExists{nomencl.sty}{\usepackage{nomencl}\renewcommand{\nompreamble}{The next list describes several symbols \& abbreviation that will be later used within the body of the document}\makenomenclature}{\newcommand{\printnomenclature}{}}
+% Abbreviations use core/list_of_abbreviations.tex (BracU front-matter slot).
+% Skip nomencl+makeindex: no \nomenclature entries, and makeindex costs Overleaf time.
+\newcommand{\printnomenclature}{}
 
-% Manual IEEE-style references from v39 (author text preserved).
-% BibLaTeX resource kept optional for future .bib use; not required to build.
-\IfFileExists{biblatex.sty}{%
-  \usepackage[backend=biber,style=ieee,sorting=ynt]{biblatex}%
-  \addbibresource{bibliography/references.bib}%
-}{}
+% IEEE-style references are authored in bibliography/references_manual.tex.
+% Do not load biblatex/biber here — it adds a tool pass and caused free-tier timeouts.
 
 \let\cleardoublepage=\clearpage
 
@@ -146,6 +140,7 @@
 \newcommand{\@thesismissingimg}[1]{%
   \fbox{\parbox{0.92\linewidth}{\scriptsize\centering\ttfamily Missing diagram: \detokenize{images/#1}}}%
 }
+% Prefer PDF vectors (academy checklist: SVG/EPS/PDF — not JPG/PNG screenshots).
 \newcommand{\@thesis@loadfig}[2]{%
   \IfFileExists{images/#2.pdf}{%
     \@thesis@doinclude{#1}{images/#2.pdf}}{%
@@ -153,10 +148,8 @@
     \@thesis@doinclude{#1}{images/#2.png}}{%
   \IfFileExists{images/#2.jpg}{%
     \@thesis@doinclude{#1}{images/#2.jpg}}{%
-  \IfFileExists{images/#2}{%
-    \@thesis@doinclude{#1}{images/#2}}{%
     \@thesismissingimg{#2}%
-  }}}}%
+  }}}%
 }
 \newcommand{\ThesisIncludeGraphics}[2][]{%
   \@thesis@loadfig{#1}{#2}%
@@ -274,9 +267,7 @@
 \phantomsection
 \addcontentsline{toc}{chapter}{List of Abbreviations}
 \input{core/list_of_abbreviations}
-
-\printnomenclature
-\addcontentsline{toc}{chapter}{Nomenclature}
+% Nomenclature chapter omitted: abbreviations already listed above (avoids empty makeindex pass).
 \cleardoublepage
 
 \pagenumbering{arabic}

@@ -242,7 +242,7 @@ export function MarketDataChart({
             />
             <RTooltip
               contentStyle={{
-                background: "#101013",
+                background: "var(--bg-deep-2, #101013)",
                 border: "1px solid rgba(212,175,55,0.35)",
                 borderRadius: 12,
                 fontSize: 12,

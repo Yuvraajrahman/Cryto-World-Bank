@@ -1,0 +1,322 @@
+%*******************************************************************
+%   BracU Thesis Template — Crypto World Bank (adapted from v39)
+%   Content source: V36 - v38/v39.tex (prose unchanged)
+%   Figures: images/ (from Diagrams/, test figures/, test/)
+%*******************************************************************
+
+\documentclass[Times,12pt,oneside,openany,print,index]{report}
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm,headheight=15pt]{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\IfFileExists{csquotes.sty}{\usepackage{csquotes}}{}
+\usepackage{amsmath,amssymb}
+\usepackage{setspace}
+\onehalfspacing
+\pagestyle{plain}
+
+\usepackage{graphicx}
+\graphicspath{{images/}{./images/}}
+\usepackage{caption}
+\captionsetup{
+    labelfont={bf,small},
+    textfont={small},
+    skip=6pt,
+    format=hang
+}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage{pdflscape}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,shapes.geometric,calc}
+\IfFileExists{pgfplots.sty}{\usepackage{pgfplots}\usepgfplotslibrary{statistics}\pgfplotsset{compat=1.18, minor tick num=0}}{}
+\usepackage{underscore}
+\usepackage{listings}
+\lstdefinelanguage{Solidity}{
+  keywords={pragma,solidity,contract,function,returns,external,internal,public,private,
+             view,pure,payable,mapping,address,uint256,uint,bool,bytes32,string,
+             event,emit,modifier,require,revert,import,is,memory,storage,indexed,
+             bytes,keccak256,struct,enum,constructor,fallback,receive},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+}
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\bfseries,
+  commentstyle=\color{black!55}\itshape,
+  stringstyle=\itshape,
+  breaklines=true,
+  frame=tb,
+  rulecolor=\color{black!55},
+  captionpos=b,
+  numbers=left,
+  numberstyle=\tiny\color{black!55},
+  xleftmargin=2em,
+}
+
+\IfFileExists{fontawesome5.sty}{%
+  \usepackage{fontawesome5}%
+  \newcommand{\tmarkDone}{\textbf{\faCheck}}%
+  \newcommand{\tmarkNo}{\textbf{\faTimes}}%
+  \newcommand{\tmarkPartial}{\faHourglassHalf}%
+  \newcommand{\tmarkPlanned}{\textcolor{black!55}{\faCircle}}%
+}{%
+  \newcommand{\tmarkDone}{\textbf{Y}}%
+  \newcommand{\tmarkNo}{\textbf{N}}%
+  \newcommand{\tmarkPartial}{\textbf{P}}%
+  \newcommand{\tmarkPlanned}{\textcolor{black!55}{$\circ$}}%
+}
+
+\IfFileExists{tcolorbox.sty}{\usepackage[skins]{tcolorbox}}{}
+
+\IfFileExists{tocbibind.sty}{\usepackage[nottoc]{tocbibind}}{}
+\usepackage[normalem]{ulem}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,
+    urlcolor=black,
+    citecolor=black,
+}
+\urlstyle{same}
+
+\setlength{\parindent}{0em}
+
+\IfFileExists{nomencl.sty}{\usepackage{nomencl}\renewcommand{\nompreamble}{The next list describes several symbols \& abbreviation that will be later used within the body of the document}\makenomenclature}{\newcommand{\printnomenclature}{}}
+
+% Manual IEEE-style references from v39 (author text preserved).
+% BibLaTeX resource kept optional for future .bib use; not required to build.
+\IfFileExists{biblatex.sty}{%
+  \usepackage[backend=biber,style=ieee,sorting=ynt]{biblatex}%
+  \addbibresource{bibliography/references.bib}%
+}{}
+
+\let\cleardoublepage=\clearpage
+
+% --- Colours used on title page / tables (from v39) ---
+\definecolor{PrimaryBlue}{HTML}{000000}
+\definecolor{AccentBlue}{gray}{0.55}
+\definecolor{LightBlue}{gray}{0.96}
+\definecolor{MidBlue}{gray}{0.90}
+\definecolor{DarkText}{HTML}{000000}
+\definecolor{GrayText}{gray}{0.45}
+\definecolor{RowShade}{gray}{0.965}
+\definecolor{RowShadeAlt}{gray}{0.92}
+\definecolor{TableHeadBg}{gray}{0.88}
+\definecolor{TableRule}{gray}{0.55}
+
+\newcommand{\tableheadcolor}{\rowcolor{TableHeadBg}}
+\newcommand{\tableheadfont}{\bfseries}
+\newcommand{\ThesisTableBodyFont}{\small}
+\newcommand{\ThesisTablePrep}{%
+  \ThesisTableBodyFont
+  \renewcommand{\arraystretch}{1.22}%
+  \setlength{\tabcolsep}{6pt}%
+  \arrayrulecolor{TableRule}%
+}
+\AtBeginEnvironment{table}{\ThesisTablePrep}
+
+\newenvironment{moderntable}[1][H]{%
+    \begin{table}[#1]\centering\ThesisTablePrep
+}{%
+    \end{table}%
+}
+
+% --- Figure helpers (paths → images/) ---
+\newcommand*{\ThesisDiagDir}{images/}
+\makeatletter
+\newcommand{\@thesis@doinclude}[2]{%
+  \if\relax\detokenize{#1}\relax
+    \includegraphics{#2}%
+  \else
+    \includegraphics[#1]{#2}%
+  \fi
+}
+\newcommand{\@thesismissingimg}[1]{%
+  \fbox{\parbox{0.92\linewidth}{\scriptsize\centering\ttfamily Missing diagram: \detokenize{images/#1}}}%
+}
+\newcommand{\@thesis@loadfig}[2]{%
+  \IfFileExists{images/#2.pdf}{%
+    \@thesis@doinclude{#1}{images/#2.pdf}}{%
+  \IfFileExists{images/#2.png}{%
+    \@thesis@doinclude{#1}{images/#2.png}}{%
+  \IfFileExists{images/#2.jpg}{%
+    \@thesis@doinclude{#1}{images/#2.jpg}}{%
+  \IfFileExists{images/#2}{%
+    \@thesis@doinclude{#1}{images/#2}}{%
+    \@thesismissingimg{#2}%
+  }}}}%
+}
+\newcommand{\ThesisIncludeGraphics}[2][]{%
+  \@thesis@loadfig{#1}{#2}%
+}
+\newcommand{\Diagram}[2][]{%
+  \if\relax\detokenize{#1}\relax
+    \ThesisIncludeGraphics{#2}%
+  \else
+    \ThesisIncludeGraphics[#1]{#2}%
+  \fi
+}
+\makeatother
+
+\newlength{\ThesisFigImgReserve}
+\setlength{\ThesisFigImgReserve}{\dimexpr2\intextsep+\abovecaptionskip+\belowcaptionskip+4\baselineskip\relax}
+\newcommand{\FigureImageMaxFit}[1]{%
+  \ThesisIncludeGraphics[width=\linewidth,height=\dimexpr\textheight-\ThesisFigImgReserve\relax,keepaspectratio]{#1}%
+}
+\newcommand{\TableImageMaxFit}[1]{%
+  \ThesisIncludeGraphics[width=0.7\linewidth,keepaspectratio]{#1}%
+}
+\newcommand{\OnePageDiagram}[2][]{%
+  \ThesisIncludeGraphics[width=\linewidth,height=\dimexpr\textheight-\ThesisFigImgReserve\relax,keepaspectratio]{#2}%
+}
+\newcommand{\HalfWidthDiagram}[1]{%
+  \ThesisIncludeGraphics[width=0.5\linewidth,keepaspectratio]{#1}%
+}
+\newcommand{\WideDiagram}[2][]{%
+  \ThesisIncludeGraphics[width=\linewidth,height=0.78\textheight,keepaspectratio]{#2}%
+}
+\newcommand{\TallDiagram}[2][]{%
+  \ThesisIncludeGraphics[width=\linewidth,height=0.96\textheight,keepaspectratio]{#2}%
+}
+\newcommand{\BalancedDiagram}[2][]{%
+  \if\relax\detokenize{#1}\relax
+    \ThesisIncludeGraphics[width=\linewidth,height=0.72\textheight,keepaspectratio]{#2}%
+  \else
+    \ThesisIncludeGraphics[#1]{#2}%
+  \fi
+}
+\newcommand{\CompactDiagram}[2][]{%
+  \ThesisIncludeGraphics[width=0.5\linewidth,height=0.36\textheight,keepaspectratio]{#2}%
+}
+\newcommand{\ActivityDiagram}[2][]{%
+  \ThesisIncludeGraphics[width=\linewidth,height=0.88\textheight,keepaspectratio]{#2}%
+}
+\newcommand{\LandscapeDiagram}[2][]{%
+  \begin{landscape}%
+  \begin{figure}[H]%
+  \centering%
+  \ThesisIncludeGraphics[width=\linewidth,height=0.88\textheight,keepaspectratio]{#2}%
+}
+\newcommand{\LandscapeDiagramEnd}{%
+  \end{figure}%
+  \end{landscape}%
+}
+\newcommand{\SequenceDiagram}[1]{%
+  \begin{landscape}%
+  \begin{figure}[H]%
+  \centering%
+  \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{#1}%
+}
+\newcommand{\SequenceDiagramEnd}{%
+  \end{figure}%
+  \end{landscape}%
+}
+
+\begin{document}
+
+\thispagestyle{empty}
+\input{core/titlepage}
+\cleardoublepage
+
+\pagenumbering{roman}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Declaration}
+\input{core/declaration}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Approval}
+\input{core/approval}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Ethics Statement}
+\input{core/ethics_statement}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
+\input{core/abstract}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Dedication}
+\input{core/dedication}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{Acknowledgment}
+\input{core/acknowledgement}
+
+\renewcommand{\contentsname}{Table of Contents}
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Table of Contents}
+\tableofcontents
+
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Formulas}
+\input{core/list_of_formulas}
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\input{core/list_of_abbreviations}
+
+\printnomenclature
+\addcontentsline{toc}{chapter}{Nomenclature}
+\cleardoublepage
+
+\pagenumbering{arabic}
+
+% Ch1 — Introduction (v39 Ch1)
+\chapter{Introduction}
+\input{chapters/chapter_1.tex}
+
+% Ch2 — Literature Review (v39 Ch2)
+\chapter{Literature Review}
+\input{chapters/chapter_2.tex}
+
+% Ch3 — Requirements / impacts (v39 Ch3: Specifications, Impact, Ethics, PM)
+\chapter{Requirements, Impacts and Constraints}
+\input{chapters/chapter_3.tex}
+
+% Ch4 — Proposed Methodology (v39 Ch4: Design Alternatives) → chapter_5.tex per template naming
+\chapter{Proposed Methodology}
+\input{chapters/chapter_5.tex}
+
+% Ch5 — Result Analysis (v39 Ch5: Evaluation, Analysis, and Final Design) → chapter_6.tex
+\chapter{Result Analysis}
+\input{chapters/chapter_6.tex}
+
+% Ch6 — Conclusion (v39 Ch6)
+\chapter{Conclusion}
+\input{chapters/chapter_9.tex}
+
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\input{bibliography/references_manual.tex}
+
+\appendix
+\setcounter{chapter}{1}% A
+\phantomsection
+\addcontentsline{toc}{chapter}{Appendix A}
+\chapter*{Appendix A}
+\label{app:combined}
+\renewcommand{\thesection}{\thechapter.\arabic{section}}
+\setcounter{section}{0}
+\input{appendix/appendix_1}
+
+\end{document}

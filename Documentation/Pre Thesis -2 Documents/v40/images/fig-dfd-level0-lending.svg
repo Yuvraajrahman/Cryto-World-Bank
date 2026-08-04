@@ -1,0 +1,67 @@
+<svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect x="1" y="1" width="998" height="598" fill="white" stroke="#cccccc" stroke-width="1"/>
+  <text x="500" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#111">DFD Level 0 — Core Lending Subsystem</text>
+
+  <!-- Client box -->
+  <rect x="380" y="55" width="240" height="62" rx="6" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.4"/>
+  <text x="500" y="80" text-anchor="middle" font-size="15" font-weight="bold" fill="#111">Client / Borrower</text>
+  <text x="500" y="100" text-anchor="middle" font-size="12" fill="#333">(Tier 4)</text>
+
+  <!-- Core process box (emphasized) -->
+  <rect x="315" y="210" width="370" height="92" rx="9" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.9"/>
+  <text x="500" y="236" text-anchor="middle" font-size="13" fill="#333">0</text>
+  <text x="500" y="260" text-anchor="middle" font-size="18" font-weight="bold" fill="#111">Core Lending Subsystem</text>
+  <text x="500" y="282" text-anchor="middle" font-size="11.5" fill="#333">(orchestrates all institutional tiers)</text>
+
+  <!-- Client <-> Core connector -->
+  <line x1="500" y1="117" x2="500" y2="208" stroke="#1a1a1a" stroke-width="1.5" marker-start="url(#a18)" marker-end="url(#a18)"/>
+  <text x="518" y="152" font-size="12" fill="#222">Loan application /</text>
+  <text x="518" y="167" font-size="12" fill="#222">installment payment</text>
+  <text x="518" y="187" font-size="12" fill="#222">Status, disbursement &amp;</text>
+  <text x="518" y="202" font-size="12" fill="#222">repayment confirmation</text>
+
+  <!-- Bottom row boxes -->
+  <rect x="25" y="430" width="220" height="80" rx="6" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="135" y="462" text-anchor="middle" font-size="14" font-weight="bold" fill="#111">Local Bank Approver</text>
+  <text x="135" y="480" text-anchor="middle" font-size="11.5" fill="#333">(Tier 3)</text>
+
+  <rect x="265" y="430" width="220" height="80" rx="6" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="375" y="462" text-anchor="middle" font-size="14" font-weight="bold" fill="#111">National Bank</text>
+  <text x="375" y="480" text-anchor="middle" font-size="11.5" fill="#333">(Tier 2)</text>
+
+  <rect x="505" y="430" width="220" height="80" rx="6" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="615" y="460" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#111">ML Risk Scoring</text>
+  <text x="615" y="476" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#111">Service</text>
+  <text x="615" y="494" text-anchor="middle" font-size="11" fill="#333">(FastAPI + Oracle)</text>
+
+  <rect x="745" y="430" width="230" height="80" rx="6" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="860" y="462" text-anchor="middle" font-size="14" font-weight="bold" fill="#111">Blockchain Ledger</text>
+  <text x="860" y="480" text-anchor="middle" font-size="11.5" fill="#333">(EVM Smart Contracts)</text>
+
+  <!-- Diagonal bidirectional connectors from Core to each entity -->
+  <line x1="460" y1="302" x2="150" y2="428" stroke="#1a1a1a" stroke-width="1.4" marker-start="url(#a18)" marker-end="url(#a18)"/>
+  <line x1="480" y1="302" x2="365" y2="428" stroke="#1a1a1a" stroke-width="1.4" marker-start="url(#a18)" marker-end="url(#a18)"/>
+  <line x1="520" y1="302" x2="605" y2="428" stroke="#1a1a1a" stroke-width="1.4" marker-start="url(#a18)" marker-end="url(#a18)"/>
+  <line x1="545" y1="302" x2="825" y2="428" stroke="#1a1a1a" stroke-width="1.4" marker-start="url(#a18)" marker-end="url(#a18)"/>
+
+  <!-- Labels above each bottom box -->
+  <text x="135" y="398" text-anchor="middle" font-size="11" fill="#222">Authority brief (risk, SHAP)</text>
+  <text x="135" y="412" text-anchor="middle" font-size="11" fill="#222">Approve / reject decision</text>
+
+  <text x="375" y="398" text-anchor="middle" font-size="11" fill="#222">Capital draw-down request</text>
+  <text x="375" y="412" text-anchor="middle" font-size="11" fill="#222">Capital allocation confirmation</text>
+
+  <text x="615" y="398" text-anchor="middle" font-size="11" fill="#222">Applicant feature vector</text>
+  <text x="615" y="412" text-anchor="middle" font-size="11" fill="#222">Committed hash / SHAP score</text>
+
+  <text x="860" y="398" text-anchor="middle" font-size="11" fill="#222">Loan state transaction</text>
+  <text x="860" y="412" text-anchor="middle" font-size="11" fill="#222">Confirmed receipt / events</text>
+
+  <text x="500" y="555" text-anchor="middle" font-size="12" fill="#222">The Core Lending Subsystem mediates every data flow between the borrower, the</text>
+  <text x="500" y="573" text-anchor="middle" font-size="12" fill="#222">institutional tiers, the ML scoring service, and the on-chain ledger.</text>
+</svg>

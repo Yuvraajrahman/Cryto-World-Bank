@@ -1,0 +1,106 @@
+\label{sec:intro}
+
+The \textit{Crypto World Bank} is a research-based project for exploring how blockchain technology can be shaped to fit into institutional financial systems with all the added benefits that come with a decentralized financing system. Based on our findings that had similar motivation to our study, existing DeFi protocols show isolated functionalities, such as Aave for lending, Uniswap for exchange, and MakerDAO for stablecoins. This project specifies a tier-based, hierarchically governed platform that includes a mixture of institutional financing with DeFi, accommodating deposit mobilization, credit allocation, interbank liquidity, installment repayment, FX facilitation, solidarity group lending, reserve enforcement, syndicated co-lending, and risk-based governance covering all four tiers that systematically mirrors real-world institutional financing. At the top, Tier~1 represents the World Bank reserve; the core banking hierarchy is specified in Solidity and being improved until final deployment. Another significant feature---the multi-entity contract suite---is fully specified in Chapter~\ref{ch:design-alternatives}, which is scheduled for practical development in Phases~II--III.
+
+The system is designed for three categories of participant: a programmable World Bank reserve as Tier~1, national and local development banks serving in Tiers~2--3, and retail clients in Tier~4. Retail clients get access to savings, group loans, and installment lending features. This hierarchical structure in this project was motivated by unbanked and MSME financing gaps~[9, 13]. The project is not built with any motivation to deploy only in regions with access to advanced technologies; rather, proper distribution of access to finance and fairness is the leading cause of this attempt to find suitable ground to adapt DeFi among the general population. The whole project is open source and available in our \href{https://github.com/Yuvraajrahman/Cryto-World-Bank}{GitHub repository}. The added benefits of blockchain: it provides state visibility, tamper-evident audit trails, and programmable rule enforcement among institutions having competition, as demonstrated by the renowned World Bank FundsChain programme~[25] and JPMorgan Kinexys~[26]. From the study of institutions, open ledger infrastructure and institutional hierarchy are not mutually exclusive.
+
+
+
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{architecture_diagram_fixed}
+\caption[System overview]{System overview.}
+\label{fig:intro-system-overview}
+\end{figure}
+
+\section{Background}
+\label{sec:background}
+
+Local lenders, or our target users, for this aspect of lending through layered institutions---supranational bodies that is provided by development finance channels have structural costs. Idle capital is usually locked by correspondent banking in pre-funded nostro/vostro accounts~[15], cross-border transactions that take around two to five days cost roughly \$45 per transaction~[101], charges for remittance corridors average 6.49\%, which is above the UN SDG target of 3\%~[17]. Due to unequal access to traditional banking systems, 1.4~billion adults remain unbanked~[9] and MSMEs face a \$4.5~trillion annual financing gap~[13].
+
+In decentralized financing, lending, collateral, and interest can be automated by enabling rules on-chain transparently. However, institutions like Aave~v3 that holds \$26.3~billion TVL~[18] and the broader DeFi lending market exceeds \$55~billion~[8], use flat pool design that ignore institutional hierarchy, inter-tier exchange, and accessing clients via local bank lend path which is more generalized for normal people with less knowledge about DeFi.
+
+\paragraph{Contribution of smart-contract and blockchain.}
+Smart-contracts can develop lending rules as immutable, atomic, with auditable on-chain logic. This technology replaces the bilateral ledger reconciliation with a system of shared record, when a local bank initiates a loan, the World Bank's reserve ratio updates on the same transaction status~[25]. DeFi extends this feature to financial services without licensed custodians. Here in The \textit{Crypto World Bank} adds three dimensional feature that is missing from the existing institutional protocols: institutional hierarchy (four-tier capital flows), multi-entity operations (solidarity groups, syndicated loans, tranched pools), and a connection to the evolving development finance framework identified as absent in the literature~[1].
+
+\paragraph{Optional conversational interface.}
+Every user interacts with this system primarily through the React UI and wallet credential signing. For development purposes and demonstration, a locally hosted agent (Qwen3-8B + MCP, 17 banking tools) provides an alternate path to get the essential tasks done, including all the customer services that require system interaction information guidance and assistance in acquiring a loan or exchange finances with the system. In the final build it is planned to be replaced with secured API-based services.
+
+\section{Rational of the Study or Motivation}
+\label{sec:rationale}
+
+Real development finance depends on layered institutions, yet settlement friction, opaque reserves, and correspondent-banking idle capital leave both intermediaries and unbanked clients underserved~[17, 90]. Flat DeFi protocols automate lending at scale but ignore institutional hierarchy, cross-tier flows, and the Local-Bank-to-client path that microfinance and development banks use in practice~[1]. This study is motivated by the opportunity to encode that hierarchy on a programmable ledger---with enforced reserves, role-based governance, and auditable capital movement---while supporting (not replacing) human credit judgment through lightweight analytics and an optional conversational interface. The thesis specifies a reusable architecture; it does not claim a particular national deployment target.
+
+\section{Problem Statement}
+
+Three primary forces of motivation for this study: development-finance has restricting transparency and settlement; the absence of multi-tiered banking functions in DeFi (deposits, solidarity and lending); the keen interest in combining blockchain auditability with ML computational analytics. There are six structural inefficiencies noticeable in development finance routes for individual borrowers from national and local banks:
+
+\begin{enumerate}[noitemsep]
+\item \textbf{Lack of transparency:} there is very little chance of the lower tier users to verify capital management, reserve levels or lending decisions are made by the higher tiers, very less transparency on how money flows through the different levels of systems. Only the top tiers get the information and records of reserves and audited at most quarterly.
+\item \textbf{Sluggish settlements and idle capital:} cross-border transactions are quite expensive, average \$45 per transaction~[101], and time consuming taking two to five days~[23].
+\item \textbf{Inconsistent risk evaluation:} fraud and credit assessment are completely relied on human judgement, borrowers are generally re-evaluated at each tier or institutions based on information available at that tier, no unified credit history.
+\item \textbf{Access and trust barriers:} the cost of inter-institutional trust is quite expensive for legal and audit process. It creates congestions in developing countries where investors earn returns roughly 3\% below compared to developed markets~[103].
+\item \textbf{No programmable savings:} depositors in developing economies have no real-time access to visibility into how savings are processed and deployed.
+\item \textbf{No on-chain group credit:} without individual collateral, borrowers cannot access programmable on-chain mutual group lending with shared responsibility. Real-world organizations like BRAC exist but does not function like DeFi.
+\end{enumerate}
+
+DeFi enabled automatic lending transparency at scale such as Aave~v3 with \$26.3~billion TVL, \$17.7~billion borrows~[18], Compound~v3 (\$1.4~billion)~[19], MakerDAO with \$10.5~billion stablecoin issuance~[20]. Despite large market coverage they exhibit four limitations for institutional development finance:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Flat lending models.} Aave/Compound uses one protocol for many asset pools (USDC, ETH, etc.). There is no cross-tier allocation, no institutional hierarchy, no difference in role-based governance. Here our CWB models institutional relationships that go deep into what kind of services to provide to what kind of roles/institutions to increase liquidity in overall lending and exchange situations.
+\item \textbf{No AI risk analytics.} DeFi relies on collateral ratio, utilization curves. There is no behavioral fraud detection or explainable credit support system.
+\item \textbf{No tiered governance.} DeFi protocol treats tokens as a measurement of voting, not based on what is the role of the client or user or institution in the bigger to smaller picture as it lacks relation to a deeper level like institutions.
+\item \textbf{Single-level institutional DeFi.} Maple \& Goldfinch~[21] with \$2.6--3.8~billion TVL and \$680~million originations in 18+ countries respectively serve institutions, but none models a full multi-tier banking system with interbank flows, lack hierarchical capital flows.
+\end{itemize}
+
+\section{Objective}
+
+The objectives of this project are:
+
+\begin{enumerate}[noitemsep]
+\item Design and specify all features and constraints of a four-tier lending architecture on an EVM-compatible blockchain and complete a full testnet deployment (World Bank $\to$ National Bank $\to$ Local Bank $\to$ Client). The whole development cycle is planned for Phases~I--IV.
+\item Design not only pool lending, but specify an extended banking product suite on the hierarchical system (deposits, savings, and solidarity group lending).
+\item Investigate a lightweight off-chain analytics layer using ML, training and testing the models in practical testnet for fraud detection, anomaly detection, explainable review, and an optional MCP-based conversational interactive agent for ease of use.
+\item Specify programmable on-chain lending with borrowing limits based on financial behaviour analysis, installments, and role-based access control and information via smart contracts.
+\item Plan and execute testnet deployment using Polygon zkEVM Cardona, Ethereum Sepolia, and evaluate hierarchical controls in the final thesis phase.
+\item Document governance for future improvements, security analysis and feature improvements, role-based regulatory considerations, and a controlled rollout toward sandbox piloting.
+\end{enumerate}
+
+\section{Proposed Solution}
+\label{sec:proposed-solution}
+
+The Crypto World Bank will implement a four-tier on-chain lending model: Tier~1 World Bank reserve custodian $\to$ Tier~2 National Banks $\to$ Tier~3 Local Banks processing retail loans $\to$ Tier~4 clients building on-chain credit history (Figure~\ref{fig:intro-system-overview}), with six standard banking functions enforced on-chain---deposit mobilization, credit allocation, payment and settlement, risk intermediation, liquidity management, and ancillary services---rather than discretionary audit alone.
+\label{sec:banking-functions}
+Banks also borrow from peers, park surplus with parent tiers, and syndicate large loans; the platform replicates four-tier downward flow, same-tier pools, upward deposits, and multi-bank co-funding on-chain (Figure~\ref{fig:cross-tier-lending}).
+\label{sec:cross-tier-lending}
+
+\begin{figure}[H]
+\centering
+\BalancedDiagram{fund_flow_diagram_v2}
+\caption[Cross-tier lending flows]{Cross-tier lending flows.}
+\label{fig:cross-tier-lending}
+\end{figure}
+
+\section{Methodology in Brief}
+
+There are four Agile phases to this methodology for this project. This report is designed with the architecture specification. The development phase will start from Phase~II after pre-thesis~1. In this report there is architecture, contracts, database, and ML pipeline. The Phase~II development phase will demonstrate the loan cycle. Phase~III will start the implementation of ML scoring and the Chainlink oracle (Section~\ref{sec:oracle-architecture}). Phase~IV will show the evaluation, metrics, and the overall feasibility of the project in the real world. Stack: Solidity, React, Express/FastAPI, scikit-learn on Polygon zkEVM Cardona. There is also an AI chat agent that will be built as an optional feature that will run alongside the project to help the clients navigate better with the system.
+
+\section{Scopes and Challenges}
+\label{sec:scopes-challenges}
+
+\textbf{In scope now.} In our development phases, we have calculated that we can implement a limited amount of our full vision: the four-tier lending architecture, loan lifecycle workflow, borrowing limits for the clients and the banks, the design of Oracle fraud analytics, and the training and the live demonstration of the AI/ML workflow. It can be shown to a limited amount on the prototype builds only.
+
+\textbf{Out of scope for now.} Mainnet deployment, live retail payments in the real world, production KYC/AML at the banking level and client interaction, stress testing the whole project, and providing an MVT checklist before the product is ready is not quite possible yet.
+
+\textbf{Main risks.} There are a couple of risks that we have noticed for our project, starting with the fraud labels may not be completely accurate based on the limited amount of data we have for our system architecture. We need more synthetic data that will be collected over time. If regulations have changed---mitigated by testnet-only builds---then we might have to change the architectural elements. The gas toll on micro-loans may not be sustainable. The ML layer with SHAP may keep borrowers in the loop in the system since it is not 100\% accurate and accuracy of the system depends on the training process. Rest of the economics and trade-offs are discussed in Section~\ref{sec:economic-analysis}.
+
+\paragraph{Economic sustainability.} On Cardona, 10--15 txs on a typical loan cost under \$0.15---small next to interest earned. Mainnet micro-loans would need tighter gas work.
+
+\paragraph{Institutional capture.} Another huge issue that needs to be addressed is that Tier~1 and the National Banks, which have huge reserves and influence over the rates, reserves, and who gets credit, might influence the overall system and cost-to-performance ratio. It might temper the trust and relationship with the retail customers and smaller banks.
+
+\paragraph{Stablecoin-first lending.}
+\label{sec:stablecoin-first}
+Retail clients are not to be carrying high-priced positions like ETH, since the prices of Ethereum might fluctuate. MiCA and the U.S. GENIUS Act support the idea that stablecoins should be more generalized for authorized cryptocurrency. There are many settlement projects like \textit{mBridge} and \textit{Agora}~[61, 62], moving the value of cryptocurrencies across borders, but it is not a replacement for our lending system. The architectural system for stablecoin pools and L2 deployment (Section~\ref{sec:bridge}) gives the liquidity move fluidly from the top tier to the bottom, and the surplus to go up from the bottom.
+
+%% CHAPTER 2: LITERATURE REVIEW

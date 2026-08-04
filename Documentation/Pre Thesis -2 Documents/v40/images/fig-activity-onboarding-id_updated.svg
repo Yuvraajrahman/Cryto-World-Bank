@@ -1,0 +1,89 @@
+<svg viewBox="0 0 1040 500" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a16" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect x="1" y="1" width="1038" height="498" fill="white" stroke="#cccccc" stroke-width="1"/>
+  <text x="520" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#111">Client Onboarding — Activity Diagram</text>
+
+  <g font-size="11.5">
+  <!-- top chain -->
+  <circle cx="45" cy="70" r="16" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.4"/>
+  <text x="45" y="74" text-anchor="middle" font-size="10.5">start</text>
+
+  <rect x="90" y="45" width="170" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="175" y="66" text-anchor="middle">Register (email /</text>
+  <text x="175" y="81" text-anchor="middle">Google via Firebase)</text>
+
+  <rect x="290" y="45" width="180" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="380" y="63" text-anchor="middle">Create ERC-4337</text>
+  <text x="380" y="78" text-anchor="middle" font-size="10">smart account (Paymaster gas)</text>
+
+  <rect x="500" y="45" width="180" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="590" y="63" text-anchor="middle">Submit KYC documents</text>
+  <text x="590" y="78" text-anchor="middle" font-size="10">(document hash stored)</text>
+
+  <polygon points="850,20 930,70 850,120 770,70" fill="#f0f0f0" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="850" y="66" text-anchor="middle">Target KYC</text>
+  <text x="850" y="80" text-anchor="middle">level?</text>
+
+  <line x1="61" y1="70" x2="86" y2="70" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a16)"/>
+  <line x1="260" y1="70" x2="286" y2="70" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a16)"/>
+  <line x1="470" y1="70" x2="496" y2="70" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a16)"/>
+  <line x1="680" y1="70" x2="766" y2="70" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a16)"/>
+
+  <!-- 3 parallel KYC level columns -->
+  <rect x="770" y="180" width="150" height="55" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="845" y="200" text-anchor="middle">L1: ID photo +</text>
+  <text x="845" y="214" text-anchor="middle">selfie liveness</text>
+  <text x="845" y="228" text-anchor="middle" font-size="10">(automated, 2-5 min)</text>
+
+  <rect x="590" y="180" width="150" height="55" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="665" y="200" text-anchor="middle">L2: + income +</text>
+  <text x="665" y="214" text-anchor="middle">bank statement</text>
+  <text x="665" y="228" text-anchor="middle" font-size="10">(human review, 24h)</text>
+
+  <rect x="410" y="180" width="150" height="55" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="485" y="200" text-anchor="middle">L3: + video</text>
+  <text x="485" y="214" text-anchor="middle">interview</text>
+  <text x="485" y="228" text-anchor="middle" font-size="10">(48-72h)</text>
+
+  <line x1="820" y1="115" x2="845" y2="176" stroke="#1a1a1a" stroke-width="1.3" marker-end="url(#a16)"/>
+  <text x="845" y="150" text-anchor="middle" font-size="10.5">L1</text>
+  <line x1="850" y1="120" x2="700" y2="176" stroke="#1a1a1a" stroke-width="1.3" marker-end="url(#a16)"/>
+  <text x="740" y="150" text-anchor="middle" font-size="10.5">L2</text>
+  <line x1="800" y1="112" x2="510" y2="176" stroke="#1a1a1a" stroke-width="1.3" marker-end="url(#a16)"/>
+  <text x="600" y="140" text-anchor="middle" font-size="10.5">L3</text>
+
+  <!-- verified diamond -->
+  <polygon points="650,270 720,315 650,360 580,315" fill="#f0f0f0" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="650" y="319" text-anchor="middle">Verified?</text>
+
+  <line x1="845" y1="235" x2="670" y2="285" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#a16)"/>
+  <line x1="665" y1="235" x2="650" y2="266" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#a16)"/>
+  <line x1="485" y1="235" x2="620" y2="285" stroke="#1a1a1a" stroke-width="1.2" marker-end="url(#a16)"/>
+
+  <!-- retry no -->
+  <rect x="90" y="294" width="160" height="42" rx="5" fill="#f6e3d8" stroke="#a0512e" stroke-width="1.2"/>
+  <text x="170" y="317" text-anchor="middle" font-size="11">Retry / resubmit</text>
+  <text x="170" y="352" text-anchor="middle" font-size="9.5" fill="#666">(returns to KYC document step)</text>
+
+  <line x1="580" y1="315" x2="254" y2="315" stroke="#555" stroke-width="1.2" marker-end="url(#a16)"/>
+  <text x="440" y="308" text-anchor="middle" font-size="10.5" fill="#333">no</text>
+
+  <!-- yes -> assign limit -->
+  <rect x="590" y="400" width="180" height="55" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="680" y="418" text-anchor="middle">Assign borrowing limit</text>
+  <text x="680" y="432" text-anchor="middle">by level; create profile</text>
+
+  <line x1="660" y1="360" x2="675" y2="396" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#a16)"/>
+  <text x="700" y="385" text-anchor="middle" font-size="10.5">yes</text>
+
+  <circle cx="900" cy="427" r="16" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.4"/>
+  <text x="900" y="431" text-anchor="middle" font-size="10.5">end</text>
+  <line x1="770" y1="427" x2="882" y2="427" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#a16)"/>
+  </g>
+
+  <text x="520" y="480" text-anchor="middle" font-size="10.5" fill="#222">Verification path is chosen once at KYC-document submission; a failed check loops back to resubmission, not to level selection.</text>
+</svg>

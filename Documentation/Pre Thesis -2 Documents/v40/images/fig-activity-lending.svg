@@ -1,0 +1,121 @@
+<svg viewBox="0 0 1040 600" xmlns="http://www.w3.org/2000/svg" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="a15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1a1a1a"/>
+    </marker>
+  </defs>
+  <rect x="1" y="1" width="1038" height="598" fill="white" stroke="#cccccc" stroke-width="1"/>
+  <text x="520" y="26" text-anchor="middle" font-size="18" font-weight="bold" fill="#111">Loan Lifecycle — Activity Diagram</text>
+
+  <g font-size="11.5">
+  <!-- ROW 1 -->
+  <circle cx="45" cy="110" r="16" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.4"/>
+  <text x="45" y="114" text-anchor="middle" font-size="10.5">start</text>
+
+  <rect x="90" y="85" width="150" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="165" y="106" text-anchor="middle">Client submits</text>
+  <text x="165" y="121" text-anchor="middle">loan application</text>
+
+  <polygon points="330,60 400,110 330,160 260,110" fill="#f0f0f0" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="330" y="106" text-anchor="middle">KYC level</text>
+  <text x="330" y="120" text-anchor="middle">sufficient?</text>
+
+  <rect x="450" y="85" width="160" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="530" y="103" text-anchor="middle">ML risk scoring</text>
+  <text x="530" y="118" text-anchor="middle" font-size="10">(RF + Isolation Forest + SHAP)</text>
+
+  <polygon points="750,60 825,110 750,160 675,110" fill="#f0f0f0" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="750" y="106" text-anchor="middle">Within borrowing</text>
+  <text x="750" y="120" text-anchor="middle">limit?</text>
+
+  <rect x="900" y="85" width="120" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="960" y="115" text-anchor="middle">Bank Admin</text>
+  <text x="960" y="130" text-anchor="middle">review</text>
+
+  <!-- ROW1 arrows -->
+  <line x1="61" y1="110" x2="86" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <line x1="240" y1="110" x2="258" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <line x1="400" y1="110" x2="446" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <text x="423" y="100" text-anchor="middle" font-size="10.5">yes</text>
+  <line x1="610" y1="110" x2="671" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <line x1="825" y1="110" x2="896" y2="110" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <text x="860" y="100" text-anchor="middle" font-size="10.5">yes</text>
+
+  <!-- connector down from row1 to row2 -->
+  <line x1="960" y1="135" x2="960" y2="250" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+
+  <!-- ROW 2 (right to left) -->
+  <polygon points="960,250 1030,300 960,350 890,300" fill="#f0f0f0" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="960" y="304" text-anchor="middle">Approved?</text>
+
+  <rect x="700" y="275" width="150" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="775" y="305" text-anchor="middle">Disburse USDC</text>
+  <text x="775" y="319" text-anchor="middle" font-size="10">on-chain</text>
+
+  <rect x="500" y="275" width="150" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="575" y="296" text-anchor="middle">Generate</text>
+  <text x="575" y="311" text-anchor="middle">installment schedule</text>
+
+  <rect x="290" y="275" width="160" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="370" y="296" text-anchor="middle">Client repays</text>
+  <text x="370" y="311" text-anchor="middle">installment</text>
+
+  <polygon points="150,250 220,300 150,350 80,300" fill="#f0f0f0" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="150" y="294" text-anchor="middle">All installments</text>
+  <text x="150" y="308" text-anchor="middle">paid?</text>
+
+  <!-- ROW2 arrows -->
+  <line x1="890" y1="300" x2="854" y2="300" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <text x="872" y="290" text-anchor="middle" font-size="10.5">yes</text>
+  <line x1="700" y1="300" x2="654" y2="300" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <line x1="500" y1="300" x2="454" y2="300" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <line x1="290" y1="300" x2="224" y2="300" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+
+  <!-- loop: no -> back to repay -->
+  <polyline points="150,250 150,220 370,220 370,271" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#a15)"/>
+  <text x="260" y="212" text-anchor="middle" font-size="10.5" fill="#333">no</text>
+
+  <!-- connector down from row2 to row3 -->
+  <line x1="150" y1="350" x2="150" y2="430" stroke="#1a1a1a" stroke-width="1.5" marker-end="url(#a15)"/>
+  <text x="120" y="395" text-anchor="middle" font-size="10.5">yes</text>
+
+  <!-- ROW 3: close loan -->
+  <rect x="75" y="440" width="150" height="50" rx="5" fill="#eef2fa" stroke="#2b2b2b" stroke-width="1.3"/>
+  <text x="150" y="461" text-anchor="middle">Close loan; update</text>
+  <text x="150" y="476" text-anchor="middle">Credit Passport</text>
+
+  <!-- REJECT boxes -->
+  <rect x="270" y="440" width="150" height="42" rx="5" fill="#f6e3d8" stroke="#a0512e" stroke-width="1.2"/>
+  <text x="345" y="466" text-anchor="middle" font-size="11">Prompt KYC upgrade</text>
+
+  <rect x="450" y="440" width="150" height="42" rx="5" fill="#f6e3d8" stroke="#a0512e" stroke-width="1.2"/>
+  <text x="525" y="466" text-anchor="middle" font-size="11">Reject: limit exceeded</text>
+
+  <rect x="630" y="440" width="160" height="42" rx="5" fill="#f6e3d8" stroke="#a0512e" stroke-width="1.2"/>
+  <text x="710" y="466" text-anchor="middle" font-size="11">Reject + notify reason</text>
+
+  <!-- reject sources (routed through clear corridors to avoid Row 2 boxes) -->
+  <polyline points="330,160 330,200 255,200 255,420 345,420 345,436" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#a15)"/>
+  <text x="270" y="215" text-anchor="middle" font-size="10.5" fill="#333">no</text>
+
+  <polyline points="750,160 750,200 675,200 675,420 525,420 525,436" fill="none" stroke="#555" stroke-width="1.2" marker-end="url(#a15)"/>
+  <text x="690" y="215" text-anchor="middle" font-size="10.5" fill="#333">no</text>
+
+  <line x1="960" y1="350" x2="710" y2="436" stroke="#555" stroke-width="1.2" marker-end="url(#a15)"/>
+  <text x="850" y="400" text-anchor="middle" font-size="10.5" fill="#333">no</text>
+
+  <!-- end node -->
+  <circle cx="960" cy="461" r="17" fill="#dbe4f7" stroke="#2b2b2b" stroke-width="1.4"/>
+  <text x="960" y="465" text-anchor="middle" font-size="10.5">end</text>
+
+  <line x1="150" y1="490" x2="150" y2="505" stroke="#1a1a1a" stroke-width="1.2"/>
+  <line x1="345" y1="482" x2="345" y2="505" stroke="#1a1a1a" stroke-width="1.2"/>
+  <line x1="525" y1="482" x2="525" y2="505" stroke="#1a1a1a" stroke-width="1.2"/>
+  <line x1="710" y1="482" x2="710" y2="505" stroke="#1a1a1a" stroke-width="1.2"/>
+  <line x1="150" y1="505" x2="960" y2="505" stroke="#1a1a1a" stroke-width="1.2"/>
+  <line x1="960" y1="505" x2="960" y2="480" stroke="#1a1a1a" stroke-width="1.4" marker-end="url(#a15)"/>
+  </g>
+
+  <text x="520" y="530" text-anchor="middle" font-size="11" fill="#222">Main path: application → KYC → ML scoring → limit check → admin review → disbursement → repayment loop → close.</text>
+  <text x="520" y="548" text-anchor="middle" font-size="11" fill="#222">Any failed gate (KYC, limit, admin approval) routes directly to end with a rejection notice.</text>
+</svg>

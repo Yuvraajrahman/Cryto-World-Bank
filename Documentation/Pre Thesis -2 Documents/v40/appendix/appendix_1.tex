@@ -1,0 +1,261 @@
+\section{Agent Harness Reference}
+\label{app:agent-harness}
+
+\subsection{Per-User Context and Prompt Assembly}
+
+The Express.js context injection layer:
+
+\begin{verbatim}
+{
+  "borrower_id": "550e8400-e29b-41d4-a716-446655440000",
+  "wallet_address": "0xABC...",
+  "language": "en",
+  "credit_tier": "Silver",
+  "credit_score": 512,
+  "active_loans": [
+    {
+      "loan_id": "L-4821",
+      "amount": 100,
+      "next_due": "2026-06-15",
+      "installment": 17.5
+    }
+  ],
+  "savings_balance": 250.0,
+  "pool_utilisation": 0.67,
+  "kyc_tier": 1,
+  "conversation_history": [ "...last 10 turns..." ]
+}
+\end{verbatim}
+
+\subsection{Session Lineage, Compression, and Toolset Scoping}
+
+\begin{table}[H]
+\centering
+\caption[MCP toolset scoping]{MCP toolset scoping.}
+\label{tab:agent-toolsets}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\toprule
+\tableheadcolor
+\textbf{Toolset} & \textbf{Tools visible} \\
+\midrule
+\texttt{read\_only} & Full-suite taxonomy (Future Work): all 9 read tools; the MVT deploys only the subset needed for the selected 3--5 tools. \\
+\texttt{loan\_actions} & \texttt{read\_only} $+$ loan, installment, and group write tools. \\
+\texttt{account\_management} & \texttt{read\_only} $+$ deposit, KYC, and reminder write tools. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% REMOVED per request (B.3 Lifecycle Hooks and Optional Capabilities):
+%
+% \section{Lifecycle Hooks and Optional Capabilities}
+%
+% \paragraph{Lifecycle hook middleware.}
+% Write-tool POST requests pass through a hook stack: (1)~confirmation audit hook (Phase~II) verifies a logged confirmation turn or returns HTTP~403; (2)~session-key scope pre-check (Phase~III); (3)~AML pre-check against \texttt{LOAN\_RISK\_ASSESSMENT} and \texttt{SECURITY\_EVENT\_LOG} (Phase~IV).
+%
+% \paragraph{Agent capabilities.}
+% \begin{itemize}[noitemsep]
+% \item \textbf{Proactive installment reminders} via \texttt{get\_installment\_schedule} and \texttt{pay\_installment}.
+% \item \textbf{Credit Passport coaching} via \texttt{get\_credit\_score} and Table~\ref{tab:credit-tiers}.
+% \item \textbf{Loan calculator} with live FX from \texttt{get\_market\_data}.
+% \item \textbf{Group lending coordination} and \textbf{KYC tier upgrade guidance} via write/read tools.
+% \item \textbf{Cross-session context retrieval} via \texttt{get\_session\_history}.
+% \end{itemize}
+
+\section{Smart Contract Capabilities}
+\label{app:smart-contract-capabilities}
+
+\begin{table}[H]
+\centering
+\caption[Smart contract capabilities]{Smart contract capabilities.}
+\label{tab:appendix-contract-capabilities}
+\footnotesize
+\setlength{\tabcolsep}{3.5pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{1.6cm}>{\centering\arraybackslash}p{0.9cm}>{\raggedright\arraybackslash}p{1.5cm}>{\raggedright\arraybackslash}p{6.2cm}@{}}
+\toprule
+\tableheadcolor
+\textbf{Contract} & \textbf{Module} & \textbf{Ph.} & \textbf{Status} & \textbf{Primary capability} \\
+\midrule
+WorldBankReserve & Tier~1 & I & Specified & Reserve custody, national-bank registration, downward allocation \\
+\rowcolor{RowShade}
+NationalBank & Tier~2 & I & Specified & Local-bank registration, borrow upward, allocate downward \\
+LocalBank & Tier~3 & I & Specified & Client onboarding, approvers, \texttt{LoanController}, \texttt{freezeAccount} \\
+\rowcolor{RowShade}
+LoanController & Lending & I--II & Shell / Ph.~II & Request, approve, disburse, installment state machine \\
+SavingsVault & Deposits & II & Specified & Variable-yield savings; reserve-gated withdrawals \\
+\rowcolor{RowShade}
+FixedDeposit & Deposits & II+ & Stub & Term deposits; early-withdrawal penalty \\
+GroupLendingPool & Group & II & Specified & Group consent, shared liability, per-member disbursement \\
+\rowcolor{RowShade}
+InsuranceFund & Risk & I--II & Should & 5\% interest capture; default coverage; PoR attestation \\
+CurrentAccount & Payments & II+ & Stub & Atomic transfers; recurring payments \\
+\rowcolor{RowShade}
+InterBankLendingPool & Multi-entity & II & Specified & Same-tier peer pools (1 / 7 / 30 day) \\
+UpwardDepositFacility & Multi-entity & II & Specified & Surplus repatriation to parent tier \\
+\rowcolor{RowShade}
+SyndicatedLoan & Multi-entity & III & Planned & Multi-bank co-funding and consent vote \\
+TranchedPool & Multi-entity & III & Planned & Senior / junior tranches; waterfall recovery \\
+\rowcolor{RowShade}
+TreasurySwap & Multi-entity & III & Planned & Institutional oracle-priced asset swap \\
+FXModule & Treasury / FX & III & Planned & Retail FX conversion and audit trail \\
+\rowcolor{RowShade}
+LiquidationEngine & Risk & III & Planned & Health-factor monitor; liquidator bonus \\
+NettingEngine & Multi-entity & --- & Future Work & Multilateral settlement netting (stub only) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{WorldBankReserve Contract Interface}
+\label{app:worldbank-reserve-interface}
+
+% REMOVED per request (intro paragraph):
+% The following Solidity interface documents the public API of the \texttt{WorldBankReserve} contract---the formally specified Tier~1 contract (Phase~I deployment target). Three design annotations follow the listing:
+
+\begin{lstlisting}[language=Solidity,basicstyle=\ttfamily\scriptsize,breaklines=true,
+    commentstyle=\color{GrayText},keywordstyle=\color{PrimaryBlue}\bfseries,
+    frame=single,rulecolor=\color{AccentBlue!40},captionpos=b,
+    caption={WorldBankReserve.sol -- Tier 1 public interface. Full implementation in project repository.}]
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+contract WorldBankReserve is ReentrancyGuard, AccessControl {
+
+    bytes32 public constant NATIONAL_BANK_ROLE = keccak256("NATIONAL_BANK_ROLE");
+    bytes32 public constant AUDITOR_ROLE       = keccak256("AUDITOR_ROLE");
+
+    uint256 public totalReserve;
+    uint256 public minimumReserveRatio;
+    mapping(address => uint256) public allocatedTo;
+
+    event CapitalAllocated(address indexed nationalBank, uint256 amount);
+    event RepaymentReceived(address indexed nationalBank, uint256 amount);
+    event ReserveRatioUpdated(uint256 newRatio);
+
+    function allocateCapital(address nationalBank, uint256 amount)
+        external onlyRole(DEFAULT_ADMIN_ROLE) nonReentrant;
+
+    function recordRepayment(uint256 amount)
+        external onlyRole(NATIONAL_BANK_ROLE) nonReentrant;
+
+    function utilizationRate() external view returns (uint256);
+
+    function isReserveAdequate() external view returns (bool);
+
+    function getReserveSummary() external view returns (
+        uint256 totalDeposited,
+        uint256 totalLoaned,
+        uint256 reserveRatio,
+        uint256 insuranceFundBalance
+    );
+}
+\end{lstlisting}
+
+% REMOVED per request (Appendix E: Internal Industry Research Notes):
+%
+% \chapter*{Appendix E: Internal Industry Research Notes}
+% \phantomsection
+% \addcontentsline{toc}{chapter}{Appendix E: Internal Industry Research Notes}
+% \label{app:internal-research}
+%
+% \noindent Repository: \href{https://github.com/Yuvraajrahman/Cryto-World-Bank}{github.com/Yuvraajrahman/Cryto-World-Bank}; path \texttt{Documentation/2nd Phase (Bokhtiar)/Improvements/}.
+%
+% \begin{table}[H]
+% \centering
+% \caption[Industry research corpus]{Industry research corpus.}
+% \label{tab:internal-research}
+% \begingroup
+% \footnotesize
+% \setlength{\tabcolsep}{4pt}
+% \renewcommand{\arraystretch}{1.15}
+% \begin{tabular}{@{}%
+%   >{\raggedright\arraybackslash}p{0.07\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.36\linewidth}%
+%   >{\raggedright\arraybackslash}p{0.53\linewidth}@{}}
+% \toprule
+% \tableheadcolor
+% \textbf{ID} & \textbf{Document} & \textbf{Thesis use} \\
+% \midrule
+% IR-1 & \texttt{Binance\_FTX\_Full\_Report.md} & CEX vs.\ CWB comparison; FTT/BNB token lesson; SAFU and Binance Earn analogues; PoR and commingling safeguards \\
+% IR-2 & \texttt{blockchain platforms research.csv} & Five-exchange matrix (Binance, Bybit, Coinbase, OKX, Kraken) \\
+% IR-3 & \texttt{Binance Business Analysis.md} & Exchange revenue taxonomy (fees, listing, OTC) \\
+% IR-4 & \texttt{binance\_software\_engineering\_architecture.md} & Nine-actor taxonomy (Section~\ref{sec:onboarding}); use-case and sequence-diagram conventions \\
+% IR-5 & \texttt{binance\_architecture\_research.md} & Off-chain PostgreSQL/Redis patterns (background; not cited in body text) \\
+% \bottomrule
+% \end{tabular}
+% \endgroup
+% \end{table}
+%
+% MOVED to Section 4.2.9 (User Interface Design, \label{sec:ui-design}) per request; content commented out here to avoid duplication and duplicate labels.
+% \chapter*{Appendix F: UI Prototype Wireframes (Figma)}
+% \phantomsection
+% \addcontentsline{toc}{chapter}{Appendix F: UI Prototype Wireframes (Figma)}
+% \label{app:ui-prototypes}
+%
+% \paragraph{Retail loan application flow.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-retail}
+% \caption[Retail loan wireframe]{Retail loan wireframe.}
+% \label{fig:ui-wireframe-retail}
+% \end{figure}
+%
+% \paragraph{Authority Brief approver dashboard.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-approver}
+% \caption[Approver dashboard wireframe]{Approver dashboard wireframe.}
+% \label{fig:ui-wireframe-approver}
+% \end{figure}
+%
+% \paragraph{Client onboarding funnel (KYC levels).}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-onboarding}
+% \caption[Onboarding wireframe]{Onboarding wireframe.}
+% \label{fig:ui-wireframe-onboarding}
+% \end{figure}
+%
+% \paragraph{Reserve transparency dashboard (Tier~1).}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-reserve}
+% \caption[Reserve dashboard wireframe]{Reserve dashboard wireframe.}
+% \label{fig:ui-wireframe-reserve}
+% \end{figure}
+%
+% \paragraph{Conversational banking agent (chat).}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-agent}
+% \caption[Banking agent wireframe]{Banking agent wireframe.}
+% \label{fig:ui-wireframe-agent}
+% \end{figure}
+%
+% \paragraph{Group solidarity lending application.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-group-lending}
+% \caption[Group lending wireframe]{Group lending wireframe.}
+% \label{fig:ui-wireframe-group-lending}
+% \end{figure}
+%
+% \paragraph{Compliance and AML alert review.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-compliance}
+% \caption[Compliance wireframe]{Compliance wireframe.}
+% \label{fig:ui-wireframe-compliance}
+% \end{figure}
+%
+% \paragraph{Mobile navigation and responsive layout.}
+% \begin{figure}[H]
+% \centering
+% \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{fig-ui-wireframe-mobile}
+% \caption[Mobile layout wireframe]{Mobile layout wireframe.}
+% \label{fig:ui-wireframe-mobile}
+% \end{figure}
+
+%% REFERENCES

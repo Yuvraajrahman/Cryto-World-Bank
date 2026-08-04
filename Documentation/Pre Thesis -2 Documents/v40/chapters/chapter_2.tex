@@ -1,0 +1,159 @@
+
+\section{Preliminaries}
+\label{sec:preliminaries}
+
+Important terms---XAI, PoS, CBDC, solidarity/group lending, DeFi, smart contracts, over-collateralization, ALM, flash loans, ZKP, and Health Factor---have been introduced in Glossary appendix. This section has been expanded in appendix~D that will be presented in the final versions of the complete project file.
+
+\subsection{Review Methodology (PRISMA-Style Frame)}
+\label{sec:lit-prisma}
+
+We did our research to find the appropriate papers and highly qualified papers that goes without project from ACM, IEEE, Elsevier, MDPI, arXiv, and BIS/World Bank (2017--2026) with PRISMA-style screening~[52]. Primary topics for this search: DeFi lending, fraud ML, tiered finance, and smart-contract security.
+
+
+
+\section{Review of Existing Research}
+\label{sec:review-existing}
+
+We explain our literature review, and our findings from the papers and the work of the authors, in the subsections shown below.
+
+\subsection{Decentralized Lending and DeFi Protocol Design}
+
+For a big picture, Werner et al.~[1] show that DeFi lenders use flat pools with no bank-style tiers; we have found a gap that can be filled by introducing our project. According to Bastankhah et al.~[2], adaptive borrow rates work better than Aave-style curves for financial flows, which we introduced in our kinked-rate module. Dao et al.~[39] show how on-chain limits can get off-chain credit scores that in general are applied at our Local Bank level.
+
+\subsection{Machine Learning, Explainable AI, and Extended AI Security}
+
+For fraud detection, Palaiokrassas et al.~[3] engineer behavioral features that do a really good job in DeFi transaction fraud detection, not just hashes. We plan to use Random Forest in Phase~III that will further strengthen the fraud detection level with the mixture of hash functions that is built into the DeFi protocol. Moreover, for the situations when the fraud detection level is scarce, we will use Liu et al.~[6] Isolation Forest. We also studied a very in-depth comparison of SHAP versus LIME by Adom et al.~[4], which shows a significant advantage by using SHAP for loan detection; approvers in bank and authority level will see SHAP screening results before signing.
+
+\subsection{Hierarchical Distribution, Cross-Tier Flows, and Group Lending}
+\label{sec:lit-cross-tier}
+
+Tan~[5] demonstrated how CBDC flows in bank-to-bank and bank-to-client financial transactions. We extended this idea in our project by showing tier-based reserve checks. For layered reserve contracts, \textit{Project Pine}~[107] has shown a prototype that is similar to our \texttt{InterBankLendingPool} and the syndicated-style loan flow. We also integrated the style of microcredit admin cost with smart contracts based on the study of Asaduzzaman et al.~[36]. The structure of \texttt{GroupLendingPool} function is the on-chain version, without claiming that we are trying to replace BRAC-style social microfinancing enforcement.
+
+\subsection{Smart Contract Security and Layer~2 Scalability}
+
+To improve the security system of the project, we are following Atzei et al.~[7], which lists the main Ethereum contract attacks. Since the tier-based system is very complex, many transactions on Cardona might be triggered. Gas prices can be cut to 30--50\% by transaction batching~[102], with further DeFi gas optimisation~[37].
+
+\subsection{Monetary Policy, Tokenization, and Institutional Landscape}
+\label{sec:lit-institutional}
+
+Very large institutions like World Bank FundsChain~[25] and similar institutions show that development finance is already moving on-chain for auditability; we are further improving this by encoding rules, not just managing disbursement logs.
+
+\subsection{Graph ML, Federated Learning, Regulation, and Identity Primitives}
+
+We noticed the usability and rise of stablecoin and went further deep into it and try to explore how stablecoin pools for retail clients can be strengthened by using MiCA and the U.S.\ GENIUS Act~[58, 60]. For our project, soulbound tokens will be used that fit into our Credit Passport idea, which was extended by the idea of Buterin et al.~[94]. This introduces a secured identity on-chain, a portable reputation, without the fear of exposing personal data.
+
+\subsection{Oracle-Mediated ML and Optional LLM Interfaces}
+\label{sec:lit-llm}
+
+Lastly, for an optional feature to our project, future studies can be made and features can be added to the system. Caldarelli~[96] describes how ML scores still have some issues that go beyond price oracles; we focus on this part and extend our commit-reveal or Chainlink path targets. We collected some reputable databases, and more to be added such as the BCCC fraud dataset~[99] that goes with our system. This section will be continued and extended after pre-thesis~2.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.08}
+\caption[Literature review summary (1/2)]{Literature review summary (1/2).}
+\label{tab:lit-summary}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{6.8cm}@{}}
+\toprule
+\tableheadcolor
+\tableheadfont Author \& Focus & \tableheadfont Methodology & \tableheadfont What they found \& how we use it \\
+\midrule
+Palaiokrassas et al.\ (2024) [3] · DeFi fraud & XGBoost, NN on 54M+ txs & We plan to use behavioural features in Phase~II for Random Forest, as it lifted F1 to 0.76--0.85 \\
+Adom et al.\ (2025) [4] · XAI lending & LIME / SHAP comparison & Approvers get a SHAP brief before signing, as it gives a clearer result than LIME on loan data \\
+Tan (2023) [5] · CBDC hierarchy & Developing-nation model & CBDC backs the four-tier layout and works as a bank-to-user tier \\
+Liu et al.\ (2008) [6] · Anomaly detection & Isolation Forest & Flags odd wallets without many labels; backup when fraud data is thin \\
+Atzei et al.\ (2017) [7] · SC security & SoK of Ethereum attacks & Lists re-entrancy and access-control risks; guides OpenZeppelin guards \\
+Werner et al.\ (2022) [1] · DeFi SoK & Survey of 12+ protocol types & Main gap CWB targets is DeFi lending having no bank hierarchy \\
+Bastankhah et al.\ (2024) [2] · Adaptive lending & Dual fast/slow control & Dynamic rates support our kinked-rate modules as it beats static curves \\
+Hartmann \& Hasan (2021) [33] · P2P lending & Smart-contract origination & Gas is cut in on-chain P2P, which is a minor input for loan-facing clients \\
+Pranto et al.\ (2022) [34] · Privacy-preserving fraud ML & Incentive-based fraud detection & Lack of raw-data sharing features by banks leaves future cross-bank options \\
+Wang et al.\ (2021) [105] · SC vulnerabilities & ML on bytecode & Common bytecode bugs spotting by ML helps provide extra security over manual audit \\
+Liao et al.\ (2019) [106] · Audit automation & Classification + fuzzing & Workflow idea for Phase~V is inspired from ML prioritizing fuzzing speed \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.08}
+\caption[Literature review summary (2/2)]{Literature review summary (2/2).}
+\label{tab:lit-summary-b}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{6.8cm}@{}}
+\toprule
+\tableheadcolor
+\tableheadfont Author \& Focus & \tableheadfont Methodology & \tableheadfont What they found \& how we use it \\
+\midrule
+BIS et al.\ (2020) [35] · CBDC design & Retail distribution analysis & Standard CBDC two-tier is extended to four-tier with on-chain reserves \\
+Kiff et al.\ (2020) [80] · CBDC models & IMF architecture survey & Matching National/Local roles; retail CBDC flow implemented through supervised banks \\
+Bindseil (2020) [79] · CBDC rates & ECB tiered remuneration & Upward deposit spread idea inspired from tiered rates that protect bank intermediation \\
+Dong et al.\ (2023) [78] · Supply-chain finance & Three-tier game model & Capital can move down a chain, parallel to World Bank $\to$ client allocation \\
+Project Pine (2025) [107] · Hierarchical SCs & NY Fed / BIS prototype & IBLP and syndicated loans used on-chain layered reserve contracts prototype \\
+CPMI/FSB [15, 23] · Cross-border settlement & Nostro/vostro cost analysis & Tiered on-chain flow is better than legacy settlement as it is slow and costly \\
+World Bank (2025) [25] · Dev.\ finance blockchain & 13-project pilot & Programmable lending rules added with dev-banks system \\
+Chen et al.\ (2024) [31] · Multi-chain lending & Cross-chain design & Scaling by splitting loads throughout chain is later option, not for Phase~I \\
+Yang \& Cui (2023) [32] · Protocol evaluation & Quantitative risk metrics & Gives utilisation and liquidation benchmarks for health checks tier \\
+Asaduzzaman et al.\ (2020) [36] · Smart micro-credit & Smart-contract MFI & Model for \texttt{GroupLendingPool} is smart contracts, which cuts the admin costs in Bangladesh \\
+Wang et al.\ (2021) [102] · Tx batching & iBatch middleware & Per call saved 15--59\% in gas price by which we deploy on Cardona L2 \\
+Kim \& Kim (2024) [37] · Gas optimisation & DeFi parameter tuning & $\sim$18\% gas cut on Ethereum pools helps our L2 deployment \\
+Yuan (2024) [38] · SHAP credit default & RF, GBM + SHAP & Deploying on Cardona L2 as batching saved 30--50\% gas; SHAP is also used for our decline path \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}p{3.4cm}*{6}{>{\centering\arraybackslash}p{1.35cm}}@{}}
+\toprule
+\tableheadcolor
+\tableheadfont Feature & \tableheadfont Aave & \tableheadfont Comp. & \tableheadfont Maker & \tableheadfont Maple & \tableheadfont Gfinch & \tableheadfont CWB \\
+\midrule
+Institutional hierarchy & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkPlanned{} \\
+\rowcolor{RowShade}
+Cross-tier capital flow & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkPartial{} \\
+Same-tier interbank lending & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkPartial{} \\
+\rowcolor{RowShade}
+Syndicated / co-lending & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & Part. & Part. & \tmarkPartial{} \\
+Upward capital repatriation & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkPartial{} \\
+\rowcolor{RowShade}
+Solidarity group lending & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & Part. & \tmarkPlanned{} \\
+AI/ML fraud detection & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & Man. & Man. & \tmarkPlanned{} \\
+\rowcolor{RowShade}
+SHAP explainability & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkPlanned{} \\
+ZKP KYC compliance & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkPlanned{} \\
+\rowcolor{RowShade}
+Kinked interest rate curve & \tmarkDone{} & \tmarkDone{} & Gov. & \tmarkDone{} & \tmarkNo{} & \tmarkPartial{} \\
+Role-based access control & Part. & Part. & Gov. & \tmarkDone{} & Part. & \tmarkPlanned{} \\
+\rowcolor{RowShade}
+Institutional / L2 focus & \tmarkNo{} & \tmarkNo{} & \tmarkNo{} & \tmarkDone{} & Part. & \tmarkPlanned{} \\
+TVL / Status (2026) & \$26B & \$1.4B & \$10B & \$2.6B & \$680M & Planning \\
+\bottomrule
+\end{tabular}%
+}
+\caption[Protocol comparison]{Protocol comparison.}
+\label{tab:protocol-comparison}
+\label{sec:comparative-protocol}
+\end{table}
+
+\section{Summary of Key Findings}
+\label{sec:lit-key-findings}
+
+Four points stand out after reviewing and Table~\ref{tab:protocol-comparison}:
+
+\begin{itemize}[noitemsep]
+\item \textbf{Flat DeFi vs.\ tiers.} Large pool lenders~[1, 8] have no hierarchical bank currently, and it opens a door to explore how a hierarchical system would behave with DeFi. CBDC and Project Pine work~[5, 107] prove that nobody combines a four reserve-enforced tier with group lending and cross-tier financial flows and an ML oracle in a singular architecture.
+\item \textbf{ML and security.} ML and security layers combined with behavioural fraud features and SHAP~[3, 4, 6] further extend the usability, feasibility, and adaptability of our project. Based on these literature reviews, we further improve our Phase~III pipeline; contract attack catalogues~[7] and L2 gas batching~[102, 37] justify OpenZeppelin guards to be added to our project.
+\item \textbf{Groups and institutions.} We explored smart-contract microcredit in Bangladesh~[36] and World Bank on-chain pilots~[25] that gave us the idea and improved the implementation of \texttt{GroupLendingPool} function and institutional lending system.
+\item \textbf{Regulation.} For regulation improvement and securities, MiCA and GENIUS~[58, 60] are accepted by stablecoin-first pools. Soulbound credit tokens~[94] fit the Credit Passport without putting KYC on-chain.
+\end{itemize}
+
+%% CHAPTER 3: SPECIFICATIONS, IMPACT, ETHICS, AND PROJECT MANAGEMENT

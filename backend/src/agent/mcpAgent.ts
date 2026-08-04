@@ -4,6 +4,7 @@
  */
 import { config } from "../config";
 import { AGENT_TOOLS, invokeAgentTool } from "./tools";
+import { resolveLlmModel } from "./resolveLlmModel";
 
 export type ChatMsg = {
   role: "system" | "user" | "assistant" | "tool";
@@ -48,15 +49,17 @@ export async function llmChatCompletions(body: Record<string, unknown>): Promise
     error?: { message?: string };
   };
   errorText?: string;
+  model?: string;
 }> {
   try {
+    const resolved = await resolveLlmModel();
     const res = await fetch(`${config.llmBaseUrl}/v1/chat/completions`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        model: config.llmModel,
         temperature: 0.3,
         ...body,
+        model: resolved.model,
       }),
       signal: AbortSignal.timeout(120_000),
     });
@@ -65,7 +68,7 @@ export async function llmChatCompletions(body: Record<string, unknown>): Promise
     try {
       json = JSON.parse(text) as typeof json;
     } catch {
-      return { ok: false, status: res.status, errorText: text.slice(0, 500) };
+      return { ok: false, status: res.status, errorText: text.slice(0, 500), model: resolved.model };
     }
     if (!res.ok) {
       return {
@@ -73,9 +76,10 @@ export async function llmChatCompletions(body: Record<string, unknown>): Promise
         status: res.status,
         json,
         errorText: json?.error?.message || text.slice(0, 500),
+        model: resolved.model,
       };
     }
-    return { ok: true, status: res.status, json };
+    return { ok: true, status: res.status, json, model: resolved.model };
   } catch (err) {
     return {
       ok: false,
@@ -115,7 +119,8 @@ export async function runMcpAgentTurn(opts: {
   history?: Array<{ role: "user" | "assistant"; content: string }>;
   user: { id: string; role: string; wallet?: string; displayName?: string };
 }): Promise<McpAgentResult> {
-  const model = config.llmModel;
+  const resolved = await resolveLlmModel();
+  const model = resolved.model;
   const system = [
     "You are the Crypto World Bank MCP banking agent for retail clients.",
     "Balances and loan amounts are in USDC (testing phase), not ETH — prefer USDC wording.",
@@ -231,18 +236,50 @@ export async function runMcpAgentTurn(opts: {
   };
 }
 
-export async function probeLlm(): Promise<{ ok: boolean; model: string; baseUrl: string; detail?: string }> {
-  const baseUrl = config.llmBaseUrl;
-  const model = config.llmModel;
+export async function probeLlm(): Promise<{
+  ok: boolean;
+  model: string;
+  baseUrl: string;
+  detail?: string;
+  source?: string;
+  loaded?: string[];
+  available?: string[];
+}> {
   try {
-    const res = await fetch(`${baseUrl}/v1/models`, { signal: AbortSignal.timeout(5_000) });
-    if (!res.ok) return { ok: false, model, baseUrl, detail: `HTTP ${res.status}` };
-    return { ok: true, model, baseUrl };
+    const resolved = await resolveLlmModel({ forceRefresh: true });
+    const res = await fetch(`${resolved.baseUrl}/v1/models`, {
+      signal: AbortSignal.timeout(5_000),
+    });
+    if (!res.ok) {
+      return {
+        ok: false,
+        model: resolved.model,
+        baseUrl: resolved.baseUrl,
+        detail: `HTTP ${res.status}`,
+        source: resolved.source,
+        loaded: resolved.loaded,
+        available: resolved.available,
+      };
+    }
+    return {
+      ok: true,
+      model: resolved.model,
+      baseUrl: resolved.baseUrl,
+      source: resolved.source,
+      loaded: resolved.loaded,
+      available: resolved.available,
+      detail:
+        resolved.source === "loaded"
+          ? `Using loaded LM Studio model (${resolved.loaded.length} instance(s))`
+          : resolved.source === "env"
+            ? "Pinned via LLM_MODEL"
+            : undefined,
+    };
   } catch (err) {
     return {
       ok: false,
-      model,
-      baseUrl,
+      model: config.llmModel,
+      baseUrl: config.llmBaseUrl,
       detail: err instanceof Error ? err.message : "unreachable",
     };
   }

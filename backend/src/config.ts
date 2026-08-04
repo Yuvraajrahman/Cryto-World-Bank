@@ -20,6 +20,7 @@ export const config = {
   },
   mlServiceUrl: process.env.ML_SERVICE_URL ?? "http://localhost:8000",
   llmBaseUrl: process.env.LLM_BASE_URL ?? "http://127.0.0.1:1234",
-  llmModel: process.env.LLM_MODEL ?? "qwen3.5-9b-uncensored-hauhaucs-aggressive",
+  /** `auto` = use whatever LLM is currently loaded in LM Studio. Pin a model id to override. */
+  llmModel: process.env.LLM_MODEL ?? "auto",
   oraclePrivateKey: process.env.ORACLE_PRIVATE_KEY ?? "",
 };

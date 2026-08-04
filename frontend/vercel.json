@@ -1,7 +1,13 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://subbronchial-redolent-toya.ngrok-free.dev/api/$1" },
-    { "source": "/health", "destination": "https://subbronchial-redolent-toya.ngrok-free.dev/health" },
+    {
+      "source": "/api/(.*)",
+      "destination": "https://cryto-world-bank-api.vercel.app/api/$1"
+    },
+    {
+      "source": "/health",
+      "destination": "https://cryto-world-bank-api.vercel.app/health"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

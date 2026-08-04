@@ -2,6 +2,7 @@ import { Router, type Response as ExpressResponse } from "express";
 import { z } from "zod";
 import { config } from "../config";
 import { AuthedRequest, optionalAuth } from "../middleware/auth";
+import { resolveLlmModel } from "../agent/resolveLlmModel";
 
 import { buildThreeTierPrompt } from "../prompt/threeTier";
 import { scanForInjection } from "../middleware/injectionScan";
@@ -63,16 +64,19 @@ aiRouter.post("/chat/stream", optionalAuth, async (req, res) => {
   (res as any).flushHeaders?.();
 
   let upstream: globalThis.Response | null = null;
+  let modelLabel = config.llmModel;
   try {
     const parsed = streamSchema.parse(req.body ?? {});
     const user = (req as AuthedRequest).user;
+    const resolved = await resolveLlmModel();
+    modelLabel = resolved.model;
 
     const lastUser = [...parsed.messages].reverse().find((m) => m.role === "user");
     if (lastUser) {
       const scan = scanForInjection(lastUser.content);
       if (scan.blocked) {
         sseWrite(res, "error", { message: scan.reason ?? "Prompt blocked" });
-        sseWrite(res, "done", { model: config.llmModel });
+        sseWrite(res, "done", { model: modelLabel });
         res.end();
         return;
       }
@@ -94,7 +98,7 @@ aiRouter.post("/chat/stream", optionalAuth, async (req, res) => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        model: config.llmModel,
+        model: modelLabel,
         stream: true,
         messages: finalMessages,
         temperature: 0.4,
@@ -109,13 +113,13 @@ aiRouter.post("/chat/stream", optionalAuth, async (req, res) => {
       sseWrite(res, "error", {
         message: `Upstream error (${upstream.status}). ${text}`.trim(),
       });
-      sseWrite(res, "done", { model: config.llmModel });
+      sseWrite(res, "done", { model: modelLabel });
       res.end();
       return;
     }
 
     // Tell client we're live.
-    sseWrite(res, "meta", { model: config.llmModel });
+    sseWrite(res, "meta", { model: modelLabel });
 
     const reader = upstream.body.getReader();
     const decoder = new TextDecoder("utf-8");
@@ -139,7 +143,7 @@ aiRouter.post("/chat/stream", optionalAuth, async (req, res) => {
           const data = line.slice("data:".length).trim();
           if (!data) continue;
           if (data === "[DONE]") {
-            sseWrite(res, "done", { model: config.llmModel });
+            sseWrite(res, "done", { model: modelLabel });
             res.end();
             return;
           }
@@ -158,13 +162,13 @@ aiRouter.post("/chat/stream", optionalAuth, async (req, res) => {
       }
     }
 
-    sseWrite(res, "done", { model: config.llmModel });
+    sseWrite(res, "done", { model: modelLabel });
     res.end();
   } catch (err: unknown) {
     sseWrite(res, "error", {
       message: err instanceof Error ? err.message : "Unknown error",
     });
-    sseWrite(res, "done", { model: config.llmModel });
+    sseWrite(res, "done", { model: modelLabel });
     res.end();
   } finally {
     // No-op: attempting to cancel a locked Web stream can throw asynchronously

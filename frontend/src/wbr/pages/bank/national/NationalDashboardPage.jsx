@@ -9,6 +9,7 @@ import StateMessage from "../../../components/ui/StateMessage";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
 import { formatUsdc } from "@/lib/formatMoney";
+import ActiveLoansPanel from "../../shared/ActiveLoansPanel";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -99,6 +100,14 @@ export default function NationalDashboardPage() {
         <div className="client-hero-badges">
           <Badge>{user?.role?.replaceAll("_", " ")}</Badge>
           {data.bank?.jurisdiction ? <Badge icon="node">{data.bank.jurisdiction}</Badge> : null}
+        </div>
+        <div className="quick-actions" style={{ marginTop: 12 }}>
+          <Button as={Link} to="/bank/national/request-loan">
+            Request loan from World
+          </Button>
+          <Button as={Link} to="/bank/national/capital-allocation" variant="ghost" showArrow={false}>
+            Capital allocation
+          </Button>
         </div>
       </header>
 
@@ -194,6 +203,10 @@ export default function NationalDashboardPage() {
           ))}
         </ul>
       </section>
+
+      {data.bank?.id ? (
+        <ActiveLoansPanel bankId={data.bank.id} title="Pending & active loans (this National)" />
+      ) : null}
 
       <div className="quick-actions">
         <Button as={Link} to="/bank/national/capital-allocation">

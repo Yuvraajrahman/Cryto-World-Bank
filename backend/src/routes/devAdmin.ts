@@ -6,7 +6,7 @@ import { Router } from "express";
 import { z } from "zod";
 import type { UserRole as PrismaUserRole, Prisma } from "@prisma/client";
 import { AuthedRequest, requireAuth, requireRoles } from "../middleware/auth";
-import { db, findBankById, type UserRole } from "../store/db";
+import { db, findBankById, findUserById, type UserRole } from "../store/db";
 import { localOpsDb } from "../store/localOps";
 import { requirePrisma } from "../db/prisma";
 import {
@@ -825,7 +825,49 @@ devAdminRouter.get("/loans", (req, res) => {
     );
   }
   loans.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
-  res.json({ loans });
+
+  const enriched = loans.map((l) => {
+    const lender = findBankById(l.lenderBankId);
+    const requester = l.bankRequesterId ? findBankById(l.bankRequesterId) : null;
+    const borrower = l.borrowerId ? findUserById(l.borrowerId) : null;
+    return {
+      ...l,
+      lenderName: lender?.name || l.lenderBankId,
+      lenderTier: lender?.tier || null,
+      lenderReserveUsdc: lender?.reserve ?? null,
+      requesterName: requester?.name || null,
+      requesterTier: requester?.tier || null,
+      borrowerName: borrower?.displayName || borrower?.loginId || null,
+      reserveImpactUsdc:
+        l.status === "ACTIVE" || l.status === "APPROVED" ? l.amount : 0,
+    };
+  });
+
+  const byLender: Record<
+    string,
+    { bankId: string; name: string; tier: string; reserveUsdc: number; activeLoans: number; activeValueUsdc: number }
+  > = {};
+  for (const b of db.state.banks) {
+    const active = db.state.loans.filter(
+      (l) => l.lenderBankId === b.id && (l.status === "ACTIVE" || l.status === "APPROVED"),
+    );
+    byLender[b.id] = {
+      bankId: b.id,
+      name: b.name,
+      tier: b.tier,
+      reserveUsdc: b.reserve,
+      activeLoans: active.length,
+      activeValueUsdc: active.reduce((s, l) => s + l.amount, 0),
+    };
+  }
+
+  res.json({
+    unit: "USDC",
+    loans: enriched,
+    lenderReserves: Object.values(byLender).filter(
+      (x) => x.activeLoans > 0 || x.tier === "WORLD" || x.tier === "NATIONAL",
+    ),
+  });
 });
 
 devAdminRouter.post("/loans/:id/approve", async (req, res, next) => {
@@ -836,7 +878,7 @@ devAdminRouter.post("/loans/:id/approve", async (req, res, next) => {
       res.status(404).json({ error: "not_found" });
       return;
     }
-    if (loan.status !== "PENDING") {
+    if (loan.status !== "PENDING" && loan.status !== "INFO_REQUESTED") {
       res.status(400).json({ error: "not_pending" });
       return;
     }
@@ -846,12 +888,18 @@ devAdminRouter.post("/loans/:id/approve", async (req, res, next) => {
       return;
     }
     if (loan.amount > lenderBank.reserve) {
-      res.status(400).json({ error: "insufficient_reserve" });
+      res.status(400).json({
+        error: "insufficient_reserve",
+        reserveUsdc: lenderBank.reserve,
+        requiredUsdc: loan.amount,
+      });
       return;
     }
+    const reserveBefore = lenderBank.reserve;
     const termMonths = loan.termMonths || 12;
     if (loan.isInstallment) {
-      loan.installments = buildInstallmentSchedule(loan.amount, termMonths);
+      const count = loan.installments?.length || termMonths;
+      loan.installments = buildInstallmentSchedule(loan.amount, count);
       loan.deadline = loan.installments[loan.installments.length - 1]?.dueDate;
     }
     loan.status = "ACTIVE";
@@ -859,9 +907,54 @@ devAdminRouter.post("/loans/:id/approve", async (req, res, next) => {
     loan.approvedAt = db.nowIso();
     lenderBank.reserve -= loan.amount;
     lenderBank.totalLent += loan.amount;
+
+    if (loan.kind === "BORROWER" && loan.borrowerId) {
+      const borrower = findUserById(loan.borrowerId);
+      if (borrower) {
+        borrower.totalBorrowedLifetime += loan.amount;
+        borrower.isFirstTime = false;
+      }
+    } else if (loan.bankRequesterId) {
+      const requester = findBankById(loan.bankRequesterId);
+      if (requester) {
+        requester.reserve += loan.amount;
+      }
+    }
+
+    db.state.transactions.push({
+      id: db.uid("tx"),
+      type: "LOAN_APPROVED",
+      userId: loan.borrowerId,
+      bankId: loan.lenderBankId,
+      loanId: loan.id,
+      amount: loan.amount,
+      at: db.nowIso(),
+      txHash: loan.txHash,
+      note: "Approved by DEV_ADMIN",
+    });
     db.save();
-    await writeAudit("DEV_ADMIN_LOAN_APPROVE", actor.id, { loanId: loan.id });
-    res.json({ loan });
+
+    try {
+      const { persistBankCapital } = await import("../db/banksSync");
+      await persistBankCapital(lenderBank.id);
+      if (loan.bankRequesterId) await persistBankCapital(loan.bankRequesterId);
+    } catch {
+      /* best-effort */
+    }
+
+    await writeAudit("DEV_ADMIN_LOAN_APPROVE", actor.id, {
+      loanId: loan.id,
+      amount: loan.amount,
+      reserveBefore,
+      reserveAfter: lenderBank.reserve,
+    });
+    res.json({
+      ok: true,
+      unit: "USDC",
+      loan,
+      lenderReserveBeforeUsdc: reserveBefore,
+      lenderReserveUsdc: lenderBank.reserve,
+    });
   } catch (err) {
     next(err);
   }

@@ -11,6 +11,7 @@ import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
+import ActiveLoansPanel from "../../shared/ActiveLoansPanel";
 import { formatUsdc } from "@/lib/formatMoney";
 
 function pct(n) {
@@ -134,6 +135,14 @@ export default function LocalDashboardPage() {
           <Badge>{user?.role?.replaceAll("_", " ")}</Badge>
           {data.bank?.id ? <Badge icon="node">{data.bank.id}</Badge> : null}
         </div>
+        <div className="quick-actions" style={{ marginTop: 12 }}>
+          <Button as={Link} to="/bank/local/request-loan">
+            Request loan from National
+          </Button>
+          <Button as={Link} to="/bank/local/approvals" variant="ghost" showArrow={false}>
+            Approvals queue
+          </Button>
+        </div>
       </header>
 
       {capital.nearMinimum ? (
@@ -178,7 +187,7 @@ export default function LocalDashboardPage() {
       </section>
 
       <Glass className="client-panel" level={2}>
-        <h2 className="client-panel-title">Loan book</h2>
+        <h2 className="client-panel-title">Loan book snapshot</h2>
         <div className="client-grid-2" style={{ marginTop: 8 }}>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Active loans</span>
@@ -211,6 +220,14 @@ export default function LocalDashboardPage() {
           </ul>
         ) : null}
       </Glass>
+
+      {data.bank?.id ? (
+        <ActiveLoansPanel
+          bankId={data.bank.id}
+          title="Pending & active loans"
+          decisionBasePath="/bank/local/approvals"
+        />
+      ) : null}
 
       <div className="quick-actions">
         <Button as={Link} to="/bank/local/approvals">

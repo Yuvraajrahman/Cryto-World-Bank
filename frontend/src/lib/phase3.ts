@@ -27,16 +27,40 @@ export async function commitRevealOracle(body: {
   }>("/api/oracle/commit-reveal", body);
 }
 
-export async function sendAgentMessage(message: string, sessionId?: string) {
+export async function sendAgentMessage(
+  message: string,
+  sessionId?: string,
+  opts?: {
+    mode?: "mcp" | "keywords" | "auto";
+    history?: Array<{ role: "user" | "assistant"; content: string }>;
+  },
+) {
   return api.post<{
     type: string;
+    mode?: string;
     sessionId?: string;
     confirmationId?: string;
     tool?: string;
     args?: Record<string, unknown>;
     message?: string;
     result?: unknown;
-  }>("/api/agent/message", { message, sessionId });
+    model?: string;
+    toolTrace?: string[];
+  }>("/api/agent/message", {
+    message,
+    sessionId,
+    mode: opts?.mode ?? "mcp",
+    history: opts?.history,
+  });
+}
+
+export async function fetchAgentStatus() {
+  return api.get<{
+    mode: string;
+    llm: { ok: boolean; model: string; baseUrl: string; detail?: string };
+    tools: Array<{ name: string; write: boolean }>;
+    confirmationGate: boolean;
+  }>("/api/agent/status");
 }
 
 export async function confirmAgentAction(confirmationId: string) {

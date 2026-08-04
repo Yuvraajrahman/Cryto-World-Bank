@@ -66,6 +66,7 @@ function DevAdminInner() {
   const [users, setUsers] = useState([]);
   const [banks, setBanks] = useState({ nationalBanks: [], localBanks: [], worldBank: null });
   const [loans, setLoans] = useState([]);
+  const [lenderReserves, setLenderReserves] = useState([]);
   const [kycQueue, setKycQueue] = useState([]);
   const [aml, setAml] = useState([]);
   const [staff, setStaff] = useState([]);
@@ -124,6 +125,7 @@ function DevAdminInner() {
     if (loanStatus) params.set("status", loanStatus);
     const r = await api.get(`/api/dev-admin/loans?${params}`);
     setLoans(r.loans || []);
+    setLenderReserves(r.lenderReserves || []);
   }, [loanStatus]);
 
   const loadOps = useCallback(async () => {
@@ -369,9 +371,13 @@ function DevAdminInner() {
   async function approveLoan(id) {
     setBusy(true);
     try {
-      await api.post(`/api/dev-admin/loans/${id}/approve`, {});
-      toast.show("Loan approved", { variant: "success" });
+      const r = await api.post(`/api/dev-admin/loans/${id}/approve`, {});
+      toast.show(
+        `Approved · lender reserve ${formatUsdc(r.lenderReserveBeforeUsdc)} → ${formatUsdc(r.lenderReserveUsdc)}`,
+        { variant: "success" },
+      );
       await loadLoans();
+      await loadOverview();
     } catch (err) {
       toast.show(err?.message || "Approve failed", { variant: "error" });
     } finally {
@@ -945,7 +951,22 @@ function DevAdminInner() {
         {tab === "loans" ? (
           <div className="client-section">
             <Glass className="client-panel">
-              <div className="client-grid-2">
+              <p className="eyebrow">Reserve impact monitor</p>
+              <p className="client-lede">
+                Approvals debit the lender bank’s reserve. Track pending → active and current
+                reserves below.
+              </p>
+              <div className="client-snap-row" style={{ marginTop: 12 }}>
+                {(lenderReserves || []).slice(0, 8).map((b) => (
+                  <StatCard
+                    key={b.bankId}
+                    label={`${b.tier} · ${b.name}`}
+                    value={formatUsdc(b.reserveUsdc)}
+                    hint={`${b.activeLoans} active · ${formatUsdc(b.activeValueUsdc)} lent`}
+                  />
+                ))}
+              </div>
+              <div className="client-grid-2" style={{ marginTop: 16 }}>
                 <label className="field">
                   <span className="field-label">Status filter</span>
                   <select
@@ -988,6 +1009,7 @@ function DevAdminInner() {
                       params.set("nationalBankId", countryNbId);
                       const r = await api.get(`/api/dev-admin/loans?${params}`);
                       setLoans(r.loans || []);
+                      setLenderReserves(r.lenderReserves || []);
                     } else {
                       await loadLoans();
                     }
@@ -1005,12 +1027,25 @@ function DevAdminInner() {
                       {l.id} · {formatUsdc(l.amount)} · {l.status}
                     </strong>
                     <span>
-                      {l.kind} · lender {l.lenderBankId} · borrower {l.borrowerId || "—"}
+                      {l.kind} · lender {l.lenderName || l.lenderBankId}
+                      {l.lenderTier ? ` (${l.lenderTier})` : ""}
+                      {l.lenderReserveUsdc != null
+                        ? ` · reserve now ${formatUsdc(l.lenderReserveUsdc)}`
+                        : ""}
+                    </span>
+                    <span>
+                      {l.borrowerName
+                        ? `Borrower ${l.borrowerName}`
+                        : l.requesterName
+                          ? `Requester bank ${l.requesterName}`
+                          : `borrower ${l.borrowerId || "—"}`}
+                      {l.termMonths ? ` · ${l.termMonths} mo` : ""}
+                      {l.installments?.length ? ` · ${l.installments.length} installments` : ""}
                     </span>
                     <span>{l.purpose}</span>
                   </div>
                   <div className="ops-row-meta">
-                    {l.status === "PENDING" ? (
+                    {l.status === "PENDING" || l.status === "INFO_REQUESTED" ? (
                       <>
                         <Button type="button" showArrow={false} disabled={busy} onClick={() => void approveLoan(l.id)}>
                           Approve

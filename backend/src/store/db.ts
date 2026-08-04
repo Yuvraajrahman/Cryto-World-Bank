@@ -774,24 +774,24 @@ export function computeBorrowingLimits(userId: string): BorrowingLimits {
   const borrowed6m = sumSince(sixMonthCutoff);
   const borrowed1y = sumSince(yearCutoff);
 
-  // Base caps per the spec: 5 ETH (6-month), 10 ETH (1-year)
-  let sixMonthCap = 5;
-  let oneYearCap = 10;
-  const baseCap = 5;
+  // Testing phase: USDC units (legacy comment said ETH)
+  let sixMonthCap = 50_000;
+  let oneYearCap = 100_000;
+  const baseCap = 50_000;
 
-  // Multiplier: 1.5x after 3 consecutive paid loans, 1.2x when lifetime > 10 ETH
+  // Multiplier: 1.5x after 3 consecutive paid loans, 1.2x when lifetime > 10k USDC
   if (u.consecutivePaidLoans >= 3) {
     sixMonthCap *= 1.5;
     oneYearCap *= 1.5;
   }
-  if (u.totalBorrowedLifetime > 10) {
+  if (u.totalBorrowedLifetime > 10_000) {
     sixMonthCap *= 1.2;
     oneYearCap *= 1.2;
   }
 
-  // Hard safety cap
-  sixMonthCap = Math.min(sixMonthCap, 50);
-  oneYearCap = Math.min(oneYearCap, 100);
+  // Hard safety cap (USDC testing units)
+  sixMonthCap = Math.min(sixMonthCap, 500_000);
+  oneYearCap = Math.min(oneYearCap, 1_000_000);
 
   const activeLoanCount = state.loans.filter(
     (l) =>
@@ -834,14 +834,21 @@ export function computeBorrowingLimits(userId: string): BorrowingLimits {
 
 // ---------- Installment schedule ----------
 
-export function buildInstallmentSchedule(amount: number, termMonths: number): Installment[] {
+export function buildInstallmentSchedule(
+  amount: number,
+  termMonths: number,
+  installmentCount?: number,
+): Installment[] {
+  const count = Math.max(1, Math.min(60, installmentCount ?? termMonths));
   const installments: Installment[] = [];
-  const perInstallment = amount / termMonths;
-  for (let i = 0; i < termMonths; i += 1) {
+  const perInstallment = amount / count;
+  const monthsPer = termMonths / count;
+  for (let i = 0; i < count; i += 1) {
+    const monthOffset = Math.max(1, Math.round((i + 1) * monthsPer));
     installments.push({
       index: i + 1,
       amount: Number(perInstallment.toFixed(6)),
-      dueDate: monthsFromNow(i + 1),
+      dueDate: monthsFromNow(monthOffset),
       paid: false,
     });
   }

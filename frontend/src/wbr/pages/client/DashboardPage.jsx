@@ -148,7 +148,7 @@ function OperatorHome({ user }) {
           { to: "/app/approvals", label: "Approvals", desc: "Loan queue & decisions", icon: "loan" },
           { to: "/app/banks", label: "Banks", desc: "Hierarchy & capital", icon: "node" },
           { to: "/app/loans", label: "Loans", desc: "Portfolio overview", icon: "eye" },
-          { to: "/app/assistant", label: "AI agent", desc: "Ops assistant", icon: "agent" },
+          { to: "/app/assistant", label: "MCP agent", desc: "LM Studio tools + confirm gate", icon: "agent" },
         ];
   return (
     <div className="client-page">
@@ -287,7 +287,7 @@ function RetailHome() {
           Borrowing limits
         </Button>
         <Button as={Link} to="/app/assistant" variant="ghost" showArrow={false}>
-          AI agent
+          MCP agent
         </Button>
       </div>
 
@@ -413,8 +413,8 @@ function RetailHome() {
             </Link>
             <Link to="/app/assistant" className="quick-card glass">
               <Icon name="agent" size={22} />
-              <strong>Ask the AI agent</strong>
-              <span>Limits, rates, and how the tiers work.</span>
+              <strong>MCP banking agent</strong>
+              <span>LM Studio tools — limits, passport, loan apply (with Approve).</span>
             </Link>
             <Link to="/app/settings" className="quick-card glass">
               <Icon name="settings" size={22} />

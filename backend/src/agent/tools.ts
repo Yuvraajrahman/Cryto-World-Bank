@@ -85,27 +85,42 @@ export async function invokeAgentTool(
       if (purpose.length < 3) {
         return { ok: false, error: "purpose must be at least 3 characters" };
       }
+      const u = db.state.users.find((x) => x.id === user.id);
+      const preferred =
+        (u?.bankId && db.state.banks.find((b) => b.id === u.bankId && b.tier === "LOCAL")) ||
+        db.state.banks.find((b) => b.tier === "LOCAL" && (b.status || "ACTIVE") === "ACTIVE");
       const loan = {
         id: `agent_${Date.now()}`,
         borrowerId: user.id,
-        lenderBankId: "local_demo",
+        lenderBankId: preferred?.id || "bank_lb_dhaka",
         amount: amountEth,
         termMonths,
         purpose,
         status: "PENDING" as const,
         category: "Agent",
         kind: "BORROWER" as const,
-        aprBps: 800,
-        isInstallment: false,
+        aprBps: preferred?.aprBps || 800,
+        isInstallment: true,
         createdAt: new Date().toISOString(),
-        installments: [],
+        installments: Array.from({ length: termMonths }, (_, i) => ({
+          index: i + 1,
+          amount: 0,
+          dueDate: "",
+          paid: false,
+        })),
       };
       db.state.loans.push(loan);
+      db.save();
       return {
         ok: true,
         data: {
           loanId: loan.id,
-          message: `Loan request for ${amountEth} ETH submitted — pending approver review.`,
+          amount: amountEth,
+          termMonths,
+          purpose,
+          status: loan.status,
+          lenderBankId: loan.lenderBankId,
+          message: `Loan request for ${amountEth} USDC submitted — pending bank approval.`,
         },
       };
     }

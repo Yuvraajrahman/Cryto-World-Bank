@@ -41,29 +41,137 @@ loansRouter.get("/queue", requireAuth, (req, res) => {
   } else if (user.role === "NATIONAL_BANK_ADMIN") {
     loans = db.state.loans.filter(
       (l) =>
-        l.kind === "LOCAL_FROM_NATIONAL" &&
         l.status === "PENDING" &&
-        l.lenderBankId === user.bankId,
+        l.lenderBankId === user.bankId &&
+        (l.kind === "LOCAL_FROM_NATIONAL" || l.kind === "BORROWER"),
     );
   } else if (user.role === "OWNER") {
     loans = db.state.loans.filter(
-      (l) => l.kind === "NATIONAL_FROM_WORLD" && l.status === "PENDING",
+      (l) =>
+        l.status === "PENDING" &&
+        (l.kind === "NATIONAL_FROM_WORLD" ||
+          (l.kind === "BORROWER" && findBankById(l.lenderBankId)?.tier === "WORLD")),
     );
   }
   res.json({ loans });
 });
 
-// Lists loans for a bank (lent/funded). Restricted to bank staff or owner.
 loansRouter.get("/bank/:bankId", requireAuth, (req, res) => {
   const bank = findBankById(String(req.params.bankId));
   if (!bank) {
     res.status(404).json({ error: "bank_not_found" });
     return;
   }
-  const loans = db.state.loans
-    .filter((l) => l.lenderBankId === bank.id)
-    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-  res.json({ loans });
+  const status = String(req.query.status || "").toUpperCase();
+  let loans = db.state.loans.filter((l) => l.lenderBankId === bank.id);
+  if (status) loans = loans.filter((l) => l.status === status);
+  loans = loans.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  res.json({
+    loans,
+    unit: "USDC",
+    summary: {
+      pending: loans.filter((l) => l.status === "PENDING" || l.status === "INFO_REQUESTED").length,
+      active: loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED").length,
+      activeValueUsdc: loans
+        .filter((l) => l.status === "ACTIVE" || l.status === "APPROVED")
+        .reduce((s, l) => s + l.amount, 0),
+    },
+  });
+});
+
+/**
+ * Lenders available for the signed-in role (categorized).
+ * Clients: LOCAL + NATIONAL only (never WORLD).
+ * Local staff: parent NATIONAL.
+ * National admin: WORLD.
+ */
+loansRouter.get("/lenders", requireAuth, (req, res) => {
+  const user = (req as AuthedRequest).user!;
+  const minR = 0.15;
+
+  function enrich(b: (typeof db.state.banks)[0]) {
+    const allocated = Math.max(b.totalAllocated || 0, b.reserve + (b.totalLent || 0), 1);
+    const availableToLend = Math.max(0, b.reserve - allocated * minR);
+    const activeLoans = db.state.loans.filter(
+      (l) => l.lenderBankId === b.id && (l.status === "ACTIVE" || l.status === "APPROVED"),
+    );
+    return {
+      id: b.id,
+      name: b.name,
+      tier: b.tier,
+      jurisdiction: b.jurisdiction,
+      city: b.city,
+      parentBankId: b.parentBankId,
+      reserveUsdc: b.reserve,
+      totalLentUsdc: b.totalLent,
+      availableToLendUsdc: availableToLend,
+      lendingPoolUsdc: b.reserve,
+      activeLoanCount: activeLoans.length,
+      activeLoanValueUsdc: activeLoans.reduce((s, l) => s + l.amount, 0),
+      aprBps: b.aprBps,
+      status: b.status || "ACTIVE",
+    };
+  }
+
+  if (user.role === "BORROWER") {
+    const locals = db.state.banks.filter((b) => b.tier === "LOCAL" && (b.status || "ACTIVE") === "ACTIVE");
+    const nationals = db.state.banks.filter(
+      (b) => b.tier === "NATIONAL" && (b.status || "ACTIVE") === "ACTIVE",
+    );
+    res.json({
+      unit: "USDC",
+      requesterRole: user.role,
+      allowedTiers: ["LOCAL", "NATIONAL"],
+      note: "Clients may only request from Local or National banks — not World Bank.",
+      categories: {
+        LOCAL: locals.map(enrich),
+        NATIONAL: nationals.map(enrich),
+        WORLD: [],
+      },
+    });
+    return;
+  }
+
+  if (user.role === "LOCAL_BANK_ADMIN" || user.role === "APPROVER") {
+    const lb = user.bankId ? findBankById(user.bankId) : null;
+    const parent = lb?.parentBankId ? findBankById(lb.parentBankId) : null;
+    res.json({
+      unit: "USDC",
+      requesterRole: user.role,
+      allowedTiers: ["NATIONAL"],
+      note: "Local banks request liquidity from their parent National bank.",
+      categories: {
+        LOCAL: [],
+        NATIONAL: parent ? [enrich(parent)] : [],
+        WORLD: [],
+      },
+      requesterBank: lb ? enrich(lb) : null,
+    });
+    return;
+  }
+
+  if (user.role === "NATIONAL_BANK_ADMIN") {
+    const world = db.state.banks.find((b) => b.tier === "WORLD");
+    const nb = user.bankId ? findBankById(user.bankId) : null;
+    res.json({
+      unit: "USDC",
+      requesterRole: user.role,
+      allowedTiers: ["WORLD"],
+      note: "National banks request liquidity from World Bank.",
+      categories: {
+        LOCAL: [],
+        NATIONAL: [],
+        WORLD: world ? [enrich(world)] : [],
+      },
+      requesterBank: nb ? enrich(nb) : null,
+    });
+    return;
+  }
+
+  res.status(403).json({
+    error: "forbidden",
+    message: "World Bank does not request loans downward; clients cannot borrow from World.",
+  });
 });
 
 loansRouter.get("/:id", requireAuth, (req, res) => {
@@ -95,16 +203,20 @@ loansRouter.get("/:id", requireAuth, (req, res) => {
 // ---------- Create: borrower loan request ----------
 
 const loanCreateSchema = z.object({
-  amount: z.number().positive().max(500),
+  amount: z.number().positive().max(1_000_000_000),
   termMonths: z.number().int().min(1).max(60),
+  installmentCount: z.number().int().min(1).max(60).optional(),
   purpose: z.string().min(5).max(500),
-  localBankId: z.string().min(1),
+  /** Preferred: lender bank id (LOCAL or NATIONAL for clients). */
+  lenderBankId: z.string().min(1).optional(),
+  /** Legacy alias — same as lenderBankId. */
+  localBankId: z.string().min(1).optional(),
   category: z.string().max(60).optional(),
   loanType: z.enum(["collateral", "credit"]).default("credit"),
   collateralEth: z.number().nonnegative().max(10_000).optional(),
   ltvBps: z.number().int().min(1).max(10_000).optional(),
-  /** Dev/demo: auto-activate so pay flow works without an approver */
-  autoActivate: z.boolean().optional(),
+  /** When true, skip approval (dev only). Default false for staged approval flow. */
+  autoActivate: z.boolean().optional().default(false),
 });
 
 loansRouter.post("/", requireAuth, async (req, res, next) => {
@@ -119,9 +231,22 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
       return;
     }
     const body = loanCreateSchema.parse(req.body);
-    const bank = findBankById(body.localBankId);
-    if (!bank || bank.tier !== "LOCAL") {
-      res.status(400).json({ error: "invalid_bank" });
+    const lenderId = body.lenderBankId || body.localBankId;
+    if (!lenderId) {
+      res.status(400).json({ error: "lender_required" });
+      return;
+    }
+    const bank = findBankById(lenderId);
+    // Clients may borrow from Local or National — never World
+    if (!bank || (bank.tier !== "LOCAL" && bank.tier !== "NATIONAL")) {
+      res.status(400).json({
+        error: "invalid_bank",
+        message: "Select a Local or National bank. Clients cannot borrow directly from World Bank.",
+      });
+      return;
+    }
+    if ((bank.status || "ACTIVE") === "PAUSED") {
+      res.status(400).json({ error: "bank_paused" });
       return;
     }
 
@@ -164,14 +289,13 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
       return;
     }
     if (body.amount > bank.reserve) {
-      res.status(400).json({ error: "insufficient_bank_reserve" });
+      res.status(400).json({ error: "insufficient_bank_reserve", reserveUsdc: bank.reserve });
       return;
     }
 
+    const installmentCount = body.installmentCount ?? body.termMonths;
     const gasCostEth = Number((0.002 + Math.random() * 0.003).toFixed(5));
-    const shouldActivate =
-      body.autoActivate === true ||
-      (body.autoActivate !== false && process.env.NODE_ENV !== "production");
+    const shouldActivate = body.autoActivate === true;
 
     const loan: Loan = {
       id: db.uid("loan"),
@@ -196,7 +320,7 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
     };
 
     if (shouldActivate) {
-      loan.installments = buildInstallmentSchedule(loan.amount, loan.termMonths);
+      loan.installments = buildInstallmentSchedule(loan.amount, loan.termMonths, installmentCount);
       loan.deadline = loan.installments[loan.installments.length - 1]?.dueDate;
       loan.status = "ACTIVE";
       loan.approvedAt = db.nowIso();
@@ -226,6 +350,12 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
         at: db.nowIso(),
         txHash: loan.txHash,
       });
+      try {
+        const { persistBankCapital } = await import("../db/banksSync");
+        await persistBankCapital(bank.id);
+      } catch {
+        /* best-effort */
+      }
     }
 
     db.state.loans.push(loan);
@@ -238,15 +368,15 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
         category: "loan",
         title: shouldActivate ? "Loan disbursed" : "Loan request submitted",
         body: shouldActivate
-          ? `Your ${loan.amount} ETH ${loan.loanType} loan is active.`
-          : `Your ${loan.amount} ETH request is pending review.`,
+          ? `Your ${loan.amount} USDC ${loan.loanType} loan is active.`
+          : `Your ${loan.amount} USDC request to ${bank.name} is pending review.`,
         href: `/app/loans/${loan.id}`,
       });
     } catch {
       /* notifications optional if DB down */
     }
 
-    res.status(201).json({ ok: true, loan });
+    res.status(201).json({ ok: true, loan, unit: "USDC", lender: { id: bank.id, tier: bank.tier, name: bank.name } });
   } catch (err) {
     next(err);
   }
@@ -262,8 +392,8 @@ const approveSchema = z.object({
 loansRouter.post(
   "/:id/approve",
   requireAuth,
-  requireRoles("APPROVER", "LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"),
-  (req, res, next) => {
+  requireRoles("APPROVER", "LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER", "DEV_ADMIN"),
+  async (req, res, next) => {
     try {
       const user = (req as AuthedRequest).user!;
       const loan = db.state.loans.find((l) => l.id === req.params.id);
@@ -277,46 +407,60 @@ loansRouter.post(
       }
       const body = approveSchema.parse(req.body ?? {});
 
-      // Role-vs-loan kind authorization
       const lenderBank = findBankById(loan.lenderBankId);
       if (!lenderBank) {
         res.status(500).json({ error: "lender_bank_missing" });
         return;
       }
+
+      const isSuper = user.role === "OWNER" || user.role === "DEV_ADMIN";
       if (loan.kind === "BORROWER") {
-        if (
-          !(
-            user.role === "APPROVER" ||
-            user.role === "LOCAL_BANK_ADMIN"
-          ) ||
-          user.bankId !== lenderBank.id
-        ) {
+        const okLocal =
+          (user.role === "APPROVER" || user.role === "LOCAL_BANK_ADMIN") &&
+          user.bankId === lenderBank.id &&
+          lenderBank.tier === "LOCAL";
+        const okNational =
+          user.role === "NATIONAL_BANK_ADMIN" &&
+          user.bankId === lenderBank.id &&
+          lenderBank.tier === "NATIONAL";
+        if (!okLocal && !okNational && !isSuper) {
           res.status(403).json({ error: "forbidden" });
           return;
         }
       }
       if (loan.kind === "LOCAL_FROM_NATIONAL") {
-        if (user.role !== "NATIONAL_BANK_ADMIN" || user.bankId !== lenderBank.id) {
+        if (
+          !(user.role === "NATIONAL_BANK_ADMIN" && user.bankId === lenderBank.id) &&
+          !isSuper
+        ) {
           res.status(403).json({ error: "forbidden" });
           return;
         }
       }
       if (loan.kind === "NATIONAL_FROM_WORLD") {
-        if (user.role !== "OWNER") {
+        if (user.role !== "OWNER" && user.role !== "DEV_ADMIN") {
           res.status(403).json({ error: "forbidden" });
           return;
         }
       }
 
       if (loan.amount > lenderBank.reserve) {
-        res.status(400).json({ error: "insufficient_reserve" });
+        res.status(400).json({
+          error: "insufficient_reserve",
+          reserveUsdc: lenderBank.reserve,
+          requiredUsdc: loan.amount,
+        });
         return;
       }
 
       const termMonths = body.termMonths ?? loan.termMonths;
       loan.termMonths = termMonths;
       if (loan.isInstallment) {
-        loan.installments = buildInstallmentSchedule(loan.amount, termMonths);
+        loan.installments = buildInstallmentSchedule(
+          loan.amount,
+          termMonths,
+          loan.installments?.length || termMonths,
+        );
         loan.deadline = loan.installments[loan.installments.length - 1].dueDate;
       } else {
         const d = new Date();
@@ -327,7 +471,6 @@ loansRouter.post(
       loan.approvedBy = user.id;
       loan.approvedAt = db.nowIso();
 
-      // Fund movement
       lenderBank.reserve -= loan.amount;
       lenderBank.totalLent += loan.amount;
 
@@ -355,8 +498,32 @@ loansRouter.post(
         txHash: loan.txHash,
         note: body.note,
       });
+      db.state.transactions.push({
+        id: db.uid("tx"),
+        type: "LOAN_DISBURSED",
+        userId: loan.borrowerId,
+        bankId: loan.lenderBankId,
+        loanId: loan.id,
+        amount: loan.amount,
+        at: db.nowIso(),
+        txHash: loan.txHash,
+      });
+      db.save();
 
-      res.json({ ok: true, loan });
+      try {
+        const { persistBankCapital } = await import("../db/banksSync");
+        await persistBankCapital(lenderBank.id);
+        if (loan.bankRequesterId) await persistBankCapital(loan.bankRequesterId);
+      } catch {
+        /* best-effort PG sync */
+      }
+
+      res.json({
+        ok: true,
+        unit: "USDC",
+        loan,
+        lenderReserveUsdc: lenderBank.reserve,
+      });
     } catch (err) {
       next(err);
     }
@@ -514,16 +681,18 @@ loansRouter.post("/:id/repay", requireAuth, (req, res) => {
 // ---------- Inter-bank hierarchical requests ----------
 
 const bankBorrowSchema = z.object({
-  amount: z.number().positive().max(5000),
+  amount: z.number().positive().max(1_000_000_000),
   purpose: z.string().min(5).max(500),
   termMonths: z.number().int().min(1).max(60),
+  installmentCount: z.number().int().min(1).max(60).optional(),
+  lenderBankId: z.string().min(1).optional(),
 });
 
 // LB → NB : a local bank admin borrows from its national bank
 loansRouter.post(
   "/bank-request/local-from-national",
   requireAuth,
-  requireRoles("LOCAL_BANK_ADMIN"),
+  requireRoles("LOCAL_BANK_ADMIN", "APPROVER"),
   (req, res, next) => {
     try {
       const user = (req as AuthedRequest).user!;
@@ -533,22 +702,39 @@ loansRouter.post(
         res.status(400).json({ error: "no_parent_bank" });
         return;
       }
+      const lenderId = body.lenderBankId || lb.parentBankId;
+      const lender = findBankById(lenderId);
+      if (!lender || lender.tier !== "NATIONAL" || lender.id !== lb.parentBankId) {
+        res.status(400).json({ error: "invalid_lender", message: "Must request from parent National bank." });
+        return;
+      }
+      if (body.amount > lender.reserve) {
+        res.status(400).json({ error: "insufficient_bank_reserve", reserveUsdc: lender.reserve });
+        return;
+      }
+      const count = body.installmentCount ?? body.termMonths;
       const loan: Loan = {
         id: db.uid("loan_lbnb"),
         kind: "LOCAL_FROM_NATIONAL",
         bankRequesterId: lb.id,
-        lenderBankId: lb.parentBankId,
+        lenderBankId: lender.id,
         amount: body.amount,
         purpose: body.purpose,
-        aprBps: 500,
+        aprBps: lender.aprBps || 500,
         termMonths: body.termMonths,
         status: "PENDING",
-        isInstallment: body.amount >= 100,
-        installments: [],
+        isInstallment: true,
+        installments: Array.from({ length: count }, (_, i) => ({
+          index: i + 1,
+          amount: 0,
+          dueDate: "",
+          paid: false,
+        })),
         createdAt: db.nowIso(),
       };
       db.state.loans.push(loan);
-      res.status(201).json({ ok: true, loan });
+      db.save();
+      res.status(201).json({ ok: true, loan, unit: "USDC" });
     } catch (err) {
       next(err);
     }
@@ -570,6 +756,15 @@ loansRouter.post(
         res.status(400).json({ error: "not_a_national_bank" });
         return;
       }
+      if (body.lenderBankId && body.lenderBankId !== world.id) {
+        res.status(400).json({ error: "invalid_lender", message: "National banks may only request from World Bank." });
+        return;
+      }
+      if (body.amount > world.reserve) {
+        res.status(400).json({ error: "insufficient_bank_reserve", reserveUsdc: world.reserve });
+        return;
+      }
+      const count = body.installmentCount ?? body.termMonths;
       const loan: Loan = {
         id: db.uid("loan_nbwb"),
         kind: "NATIONAL_FROM_WORLD",
@@ -577,15 +772,21 @@ loansRouter.post(
         lenderBankId: world.id,
         amount: body.amount,
         purpose: body.purpose,
-        aprBps: 300,
+        aprBps: world.aprBps || 300,
         termMonths: body.termMonths,
         status: "PENDING",
-        isInstallment: body.amount >= 100,
-        installments: [],
+        isInstallment: true,
+        installments: Array.from({ length: count }, (_, i) => ({
+          index: i + 1,
+          amount: 0,
+          dueDate: "",
+          paid: false,
+        })),
         createdAt: db.nowIso(),
       };
       db.state.loans.push(loan);
-      res.status(201).json({ ok: true, loan });
+      db.save();
+      res.status(201).json({ ok: true, loan, unit: "USDC" });
     } catch (err) {
       next(err);
     }

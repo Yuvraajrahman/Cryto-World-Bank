@@ -16,6 +16,9 @@ import { Notifications } from "@/pages/Notifications";
 import { LoanApplyHub } from "@/pages/LoanApplyHub";
 import { LoanApplyCollateral } from "@/pages/LoanApplyCollateral";
 import { LoanApplyCredit } from "@/pages/LoanApplyCredit";
+import ClientRequestLoan from "@/pages/ClientRequestLoan";
+import LocalRequestLoan from "@/pages/LocalRequestLoan";
+import NationalRequestLoan from "@/pages/NationalRequestLoan";
 import { LoanHistory } from "@/pages/LoanHistory";
 import { LoanDetail } from "@/pages/LoanDetail";
 import { LoanPay } from "@/pages/LoanPay";
@@ -103,6 +106,7 @@ export function App() {
           <Route path="/app/loans/apply" element={<LoanApplyHub />} />
           <Route path="/app/loans/apply/collateral" element={<LoanApplyCollateral />} />
           <Route path="/app/loans/apply/credit" element={<LoanApplyCredit />} />
+          <Route path="/app/loans/request" element={<ClientRequestLoan />} />
           <Route path="/app/loans/limits" element={<LoanLimits />} />
           <Route path="/app/loans/new" element={<Navigate to="/app/loans/apply" replace />} />
           <Route path="/app/loans/:loanId/pay" element={<LoanPay />} />
@@ -126,6 +130,7 @@ export function App() {
       <Route element={<BankOperatorShell />}>
         <Route element={<RequireLocalStaff />}>
           <Route path="/bank/local/dashboard" element={<LocalBankDashboard />} />
+          <Route path="/bank/local/request-loan" element={<LocalRequestLoan />} />
           <Route path="/bank/local/approvals" element={<LocalApprovals />} />
           <Route path="/bank/local/approvals/:loanId" element={<LocalLoanDecision />} />
           <Route path="/bank/local/kyc-review" element={<LocalKycReview />} />
@@ -138,6 +143,7 @@ export function App() {
       <Route element={<NationalOperatorShell />}>
         <Route element={<RequireNationalAdmin />}>
           <Route path="/bank/national/dashboard" element={<NationalBankDashboard />} />
+          <Route path="/bank/national/request-loan" element={<NationalRequestLoan />} />
           <Route path="/bank/national/local-banks" element={<NationalLocalBanks />} />
           <Route path="/bank/national/capital-allocation" element={<NationalCapitalAllocation />} />
           <Route path="/bank/national/settings" element={<NationalSettings />} />

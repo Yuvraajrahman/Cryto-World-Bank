@@ -11,6 +11,7 @@ import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 import { formatUsdc } from "@/lib/formatMoney";
+import ActiveLoansPanel from "../../shared/ActiveLoansPanel";
 
 function pct(n) {
   if (n == null || !Number.isFinite(Number(n))) return "—";
@@ -239,6 +240,10 @@ export default function WorldDashboardPage() {
           </ul>
         )}
       </section>
+
+      {data.bank?.id ? (
+        <ActiveLoansPanel bankId={data.bank.id} title="Pending & active loans (World Bank as lender)" />
+      ) : null}
 
       <div className="quick-actions">
         <Button type="button" onClick={() => setAllocSheet(true)}>

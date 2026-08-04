@@ -38,6 +38,18 @@ export default function ApplyHubPage() {
 
       <div className="quick-grid" style={{ gridTemplateColumns: "1fr" }}>
         <Glass className="client-panel loan-choice">
+          <Badge icon="loan">Bank select</Badge>
+          <h2 className="client-panel-title">Request from Local or National</h2>
+          <p className="client-lede">
+            Choose a lending bank (not World), set amount, duration, and installment count. The
+            bank approves; reserve is debited when funded.
+          </p>
+          <Button as={Link} to="/app/loans/request" disabled={kycPending}>
+            Request a loan
+          </Button>
+        </Glass>
+
+        <Glass className="client-panel loan-choice">
           <Badge icon="wallet">Collateral</Badge>
           <h2 className="client-panel-title">Collateral-based</h2>
           <p className="client-lede">

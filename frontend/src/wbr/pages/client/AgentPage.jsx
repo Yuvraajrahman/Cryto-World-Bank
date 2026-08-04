@@ -5,20 +5,90 @@ import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Badge from "../../components/ui/Badge";
 import StateMessage from "../../components/ui/StateMessage";
+import ChatMarkdown from "../../components/ui/ChatMarkdown";
 import { useToast } from "../../components/ui/Toast";
-import { streamChat } from "@/lib/aiStream";
-import { confirmAgentAction, sendAgentMessage } from "@/lib/phase3";
+import { confirmAgentAction, fetchAgentStatus, sendAgentMessage } from "@/lib/phase3";
 import { getFeatureKeyFromPath, getRecommendedPrompts } from "@/lib/assistantPrompts";
 import { useSession } from "@/lib/store";
 import { api } from "@/lib/api";
+import { formatUsdc } from "@/lib/formatMoney";
 
 function uid() {
   return Math.random().toString(36).slice(2, 11);
 }
 
+function formatToolLabel(name) {
+  return String(name || "action").replaceAll("_", " ");
+}
+
+function buildConfirmMarkdown(tool, args = {}) {
+  const rows = Object.entries(args).map(([k, v]) => {
+    let label = k;
+    let value = String(v ?? "—");
+    if (k === "amountEth" || k === "amount") {
+      label = "Amount";
+      value = `${Number(v)} USDC`;
+    } else if (k === "termMonths") {
+      label = "Term";
+      value = `${v} months`;
+    } else if (k === "purpose") {
+      label = "Purpose";
+    } else if (k === "lenderBankId") {
+      label = "Bank";
+    }
+    return `| ${label} | ${value} |`;
+  });
+  return [
+    `### Confirm ${formatToolLabel(tool)}`,
+    "",
+    "Review the details, then tap **Confirm** to run this write action.",
+    "",
+    "| Field | Value |",
+    "| --- | --- |",
+    ...rows,
+    "",
+    "_Nothing is submitted until you confirm._",
+  ].join("\n");
+}
+
+function formatToolResult(tool, result) {
+  const data = result?.data ?? result;
+  if (!data || typeof data !== "object") {
+    return `### Done — ${formatToolLabel(tool)}\n\n${String(result ?? "ok")}`;
+  }
+  if (data.loanId || data.message) {
+    const amount = data.amount != null ? formatUsdc(data.amount) : null;
+    return [
+      `### Loan request submitted`,
+      "",
+      data.message || "Your request was sent for bank approval.",
+      "",
+      "| Field | Value |",
+      "| --- | --- |",
+      data.loanId ? `| Loan ID | \`${data.loanId}\` |` : null,
+      amount ? `| Amount | ${amount} |` : null,
+      `| Status | Pending bank approval |`,
+      "",
+      "Funds are released only after the lending bank approves.",
+    ]
+      .filter(Boolean)
+      .join("\n");
+  }
+  const rows = Object.entries(data).map(([k, v]) => {
+    const val = typeof v === "object" ? JSON.stringify(v) : String(v);
+    return `| ${k} | ${val} |`;
+  });
+  return [
+    `### Done — ${formatToolLabel(tool)}`,
+    "",
+    "| Field | Value |",
+    "| --- | --- |",
+    ...rows,
+  ].join("\n");
+}
+
 /**
- * Route: `/app/assistant` — plan H.27 AI Banking Agent
- * Design: glass message bubbles (self vs other fill weights).
+ * Route: `/app/assistant` — MCP banking agent (LM Studio tool-calling + confirmation gate)
  */
 export default function AgentPage() {
   const toast = useToast();
@@ -33,6 +103,7 @@ export default function AgentPage() {
   const [actions, setActions] = useState([]);
   const [showLog, setShowLog] = useState(false);
   const [bootError, setBootError] = useState(null);
+  const [llmStatus, setLlmStatus] = useState(null);
   const scrollerRef = useRef(null);
 
   const featureKey = useMemo(() => getFeatureKeyFromPath(pathname), [pathname]);
@@ -48,7 +119,7 @@ export default function AgentPage() {
       {
         id: uid(),
         role: "assistant",
-        body: `Hi ${name}. Ask about limits, loans, or your passport. Write actions always need your Approve before they run.`,
+        body: `Hi ${name}. I'm the MCP banking agent (LM Studio). I can check limits, loans, and passport via tools.\n\n**Loan applications need your Confirm** before they run.`,
       },
     ]);
   }, [user?.displayName, messages.length]);
@@ -71,20 +142,37 @@ export default function AgentPage() {
     }
   }
 
+  async function refreshStatus() {
+    try {
+      const s = await fetchAgentStatus();
+      setLlmStatus(s);
+    } catch {
+      setLlmStatus(null);
+    }
+  }
+
   useEffect(() => {
     void refreshActions();
+    void refreshStatus();
   }, []);
 
   async function send(text) {
     const body = (text ?? draft).trim();
     if (!body || pending) return;
     if (agentConfirm) {
-      toast.show("Approve or cancel the pending action first.", { variant: "error" });
+      toast.show("Confirm or cancel the pending action first.", { variant: "error" });
       return;
     }
     setDraft("");
     const userId = uid();
     const botId = uid();
+    const history = messages
+      .filter((m) => m.body)
+      .slice(-8)
+      .map((m) => ({
+        role: m.role === "user" ? "user" : "assistant",
+        content: m.body,
+      }));
     setMessages((m) => [
       ...m,
       { id: userId, role: "user", body },
@@ -92,87 +180,66 @@ export default function AgentPage() {
     ]);
     setPending(true);
 
-    const writeIntent = /apply.*loan|loan.*apply|borrow\s+\d|loan status|borrowing limit|credit passport|credit tier/i.test(
-      body,
-    );
-
     try {
-      if (writeIntent || /apply for a/i.test(body)) {
-        const res = await sendAgentMessage(body, sessionId || undefined);
-        if (res.sessionId) setSessionId(res.sessionId);
-        if (res.type === "confirmation_required" && res.confirmationId) {
-          setAgentConfirm({
-            confirmationId: res.confirmationId,
-            message: res.message ?? "Confirm this write action?",
-            tool: res.tool ?? "tool",
-            args: res.args,
-          });
-          setMessages((prev) =>
-            prev.map((x) =>
-              x.id === botId
-                ? { ...x, body: res.message ?? "Please approve to continue." }
-                : x,
-            ),
-          );
-        } else {
-          setMessages((prev) =>
-            prev.map((x) =>
-              x.id === botId
-                ? {
-                    ...x,
-                    body: res.message ?? JSON.stringify(res.result ?? res, null, 2),
-                  }
-                : x,
-            ),
-          );
-        }
-        await refreshActions();
-        return;
-      }
+      const res = await sendAgentMessage(body, sessionId || undefined, {
+        mode: "mcp",
+        history,
+      });
+      if (res.sessionId) setSessionId(res.sessionId);
 
-      // General Q&A — stream when available, else agent guidance
-      try {
-        await streamChat({
-          messages: [
-            ...messages
-              .filter((m) => m.body)
-              .map((m) => ({
-                role: m.role === "user" ? "user" : "assistant",
-                content: m.body,
-              })),
-            { role: "user", content: body },
-          ],
-          featureKey,
-          route: pathname,
-          roleHint: role,
-          onToken: (tok) => {
-            setMessages((prev) =>
-              prev.map((x) => (x.id === botId ? { ...x, body: x.body + tok } : x)),
-            );
-          },
-          onError: async () => {
-            const res = await sendAgentMessage(body, sessionId || undefined);
-            if (res.sessionId) setSessionId(res.sessionId);
-            setMessages((prev) =>
-              prev.map((x) =>
-                x.id === botId
-                  ? { ...x, body: res.message || "I can help with limits, loans, and passport." }
-                  : x,
-              ),
-            );
-          },
+      if (res.type === "confirmation_required" && res.confirmationId) {
+        const tool = res.tool ?? "tool";
+        const args = res.args || {};
+        const confirmBody = buildConfirmMarkdown(tool, args);
+        setAgentConfirm({
+          confirmationId: res.confirmationId,
+          message: res.message ?? "Confirm this write action?",
+          tool,
+          args,
+          messageId: botId,
         });
-      } catch {
-        const res = await sendAgentMessage(body, sessionId || undefined);
-        if (res.sessionId) setSessionId(res.sessionId);
         setMessages((prev) =>
           prev.map((x) =>
             x.id === botId
-              ? { ...x, body: res.message || "Ask about borrowing limits or say “apply for a 0.05 ETH loan”." }
+              ? {
+                  ...x,
+                  body: confirmBody,
+                  kind: "confirm",
+                }
+              : x,
+          ),
+        );
+      } else if (res.type === "error") {
+        setMessages((prev) =>
+          prev.map((x) =>
+            x.id === botId
+              ? {
+                  ...x,
+                  body:
+                    res.message ||
+                    "LM Studio is not reachable. Keep the local server running on :1234.",
+                }
+              : x,
+          ),
+        );
+      } else {
+        const trace =
+          Array.isArray(res.toolTrace) && res.toolTrace.length
+            ? `\n\n_Tools used: ${res.toolTrace.join(", ")}_`
+            : "";
+        setMessages((prev) =>
+          prev.map((x) =>
+            x.id === botId
+              ? {
+                  ...x,
+                  body: `${res.message ?? JSON.stringify(res.result ?? res, null, 2)}${trace}`,
+                }
               : x,
           ),
         );
       }
+      await refreshActions();
+      await refreshStatus();
     } catch (err) {
       const blocked = err?.status === 403 || /blocked|injection/i.test(err?.message || "");
       setMessages((prev) =>
@@ -198,11 +265,13 @@ export default function AgentPage() {
     try {
       const res = await confirmAgentAction(agentConfirm.confirmationId);
       setMessages((m) => [
-        ...m,
+        ...m.map((x) =>
+          x.id === agentConfirm.messageId ? { ...x, kind: undefined } : x,
+        ),
         {
           id: uid(),
           role: "assistant",
-          body: `Done — ${agentConfirm.tool}. ${typeof res.result === "object" ? JSON.stringify(res.result?.data ?? res.result, null, 2) : String(res.result ?? "ok")}`,
+          body: formatToolResult(agentConfirm.tool, res.result),
         },
       ]);
       setAgentConfirm(null);
@@ -218,7 +287,7 @@ export default function AgentPage() {
   function onCancelConfirm() {
     setAgentConfirm(null);
     setMessages((m) => [
-      ...m,
+      ...m.map((x) => (x.kind === "confirm" ? { ...x, kind: undefined } : x)),
       { id: uid(), role: "assistant", body: "Cancelled. Nothing was submitted." },
     ]);
   }
@@ -230,18 +299,38 @@ export default function AgentPage() {
     setDraft("");
   }
 
+  const llmOk = llmStatus?.llm?.ok;
+  const modelLabel = llmStatus?.llm?.model || "LM Studio";
+
   return (
     <div className="client-page">
       <header className="client-hero">
-        <p className="eyebrow">Support</p>
-        <h1 className="client-title">AI banking agent</h1>
+        <p className="eyebrow">MCP agent</p>
+        <h1 className="client-title">Banking agent</h1>
         <p className="client-lede">
-          Ask questions or propose write actions. Approvals are required before any loan or payment
-          tool runs.
+          Tool-calling agent via your local LM Studio server. Read tools run live; write tools need
+          your Confirm.
         </p>
+        <div className="client-hero-badges">
+          <Badge icon={llmOk ? "check" : "alert"}>
+            {llmOk ? `MCP · ${modelLabel}` : "LM Studio offline (:1234)"}
+          </Badge>
+          <Badge icon="passport">{llmStatus?.tools?.length ?? 4} tools</Badge>
+        </div>
         <div className="quick-actions">
           <Button type="button" variant="ghost" showArrow={false} onClick={newSession}>
             New session
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            showArrow={false}
+            onClick={() => {
+              void refreshStatus();
+              void refreshActions();
+            }}
+          >
+            Refresh status
           </Button>
           <Button type="button" variant="ghost" showArrow={false} onClick={() => setShowLog((v) => !v)}>
             {showLog ? "Hide action log" : "Action log"}
@@ -258,6 +347,13 @@ export default function AgentPage() {
           description={bootError}
           action={{ label: "Retry", onClick: () => void refreshActions() }}
         />
+      ) : null}
+
+      {!llmOk && llmStatus ? (
+        <div className="notice warn" style={{ marginBottom: 16 }}>
+          LM Studio is not reachable at <code>{llmStatus.llm?.baseUrl}</code>. Keep Developer →
+          Local Server running with model loaded.
+        </div>
       ) : null}
 
       {showLog ? (
@@ -285,32 +381,64 @@ export default function AgentPage() {
 
       <Glass className="chat-shell client-panel">
         <div className="chat-stream" ref={scrollerRef}>
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={`chat-row${m.role === "user" ? " mine" : ""}`}
-            >
-              <div className={`chat-bubble glass${m.role === "user" ? " mine" : ""}`}>
-                {m.body || (pending && m.role === "assistant" ? "…" : "")}
+          {messages.map((m) => {
+            const isConfirmCard = m.kind === "confirm" && agentConfirm?.messageId === m.id;
+            return (
+              <div key={m.id} className={`chat-row${m.role === "user" ? " mine" : ""}`}>
+                <div
+                  className={`chat-bubble glass${m.role === "user" ? " mine" : ""}${
+                    isConfirmCard ? " confirm-bubble" : ""
+                  }`}
+                >
+                  {m.role === "user" ? (
+                    m.body || ""
+                  ) : m.body || (pending && m.role === "assistant" ? "…" : "") ? (
+                    <ChatMarkdown text={m.body || (pending ? "…" : "")} />
+                  ) : null}
+                  {isConfirmCard ? (
+                    <div className="chat-confirm-actions">
+                      <Button type="button" disabled={pending} onClick={() => void onApprove()}>
+                        Confirm
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        showArrow={false}
+                        disabled={pending}
+                        onClick={onCancelConfirm}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          ))}
-          {pending ? <p className="chat-thinking">Thinking…</p> : null}
+            );
+          })}
+          {pending ? <p className="chat-thinking">Thinking with LM Studio…</p> : null}
         </div>
 
         {agentConfirm ? (
           <div className="tool-confirm notice warn" role="alertdialog" aria-label="Confirm agent action">
-            <p className="eyebrow">Confirm write action</p>
-            <strong>{String(agentConfirm.tool).replaceAll("_", " ")}</strong>
-            <p className="client-lede">{agentConfirm.message}</p>
+            <p className="eyebrow">Action needs your confirmation</p>
+            <strong>{formatToolLabel(agentConfirm.tool)}</strong>
+            <p className="client-lede" style={{ margin: 0 }}>
+              This write will not run until you confirm.
+            </p>
             {agentConfirm.args ? (
               <pre className="tool-args">{JSON.stringify(agentConfirm.args, null, 2)}</pre>
             ) : null}
             <div className="quick-actions">
               <Button type="button" disabled={pending} onClick={() => void onApprove()}>
-                Approve
+                Confirm
               </Button>
-              <Button type="button" variant="ghost" showArrow={false} disabled={pending} onClick={onCancelConfirm}>
+              <Button
+                type="button"
+                variant="ghost"
+                showArrow={false}
+                disabled={pending}
+                onClick={onCancelConfirm}
+              >
                 Cancel
               </Button>
             </div>
@@ -318,8 +446,8 @@ export default function AgentPage() {
         ) : null}
 
         {suggestions.length > 0 && !agentConfirm ? (
-          <div className="chat-suggestions">
-            {suggestions.slice(0, 4).map((s) => (
+          <div className="chat-suggestions" role="group" aria-label="Suggested prompts">
+            {suggestions.slice(0, 6).map((s) => (
               <button key={s} type="button" className="chip" onClick={() => void send(s)} disabled={pending}>
                 {s}
               </button>
@@ -338,7 +466,7 @@ export default function AgentPage() {
             label="Message"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Ask about limits, or: apply for a 0.05 ETH loan"
+            placeholder="e.g. What is my borrowing limit? / apply for a 1000 USDC loan"
             disabled={pending && Boolean(agentConfirm)}
           />
           <Button type="submit" disabled={pending || !draft.trim() || Boolean(agentConfirm)}>

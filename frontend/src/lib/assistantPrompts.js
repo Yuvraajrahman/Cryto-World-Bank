@@ -102,6 +102,10 @@ export function getRecommendedPrompts(featureKey, role) {
         assistant: [
             "What can you help me with in this platform?",
             "Give me 3 useful things to try right now",
+            "Show my loan status",
+            "What is my borrowing limit right now?",
+            "How do I request a loan from a local bank?",
+            "Explain my Credit Passport in plain language",
         ],
         risk: [
             "Explain the risk features used in scoring",

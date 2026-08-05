@@ -20,7 +20,8 @@ function pct(n) {
 }
 
 /**
- * Route: `/bank/local/dashboard` — plan I.29
+ * Route: `/bank/local/dashboard`
+ * Shared ops skeleton (aligned with National): header → KPI → queues → liquidity/capital → loan book → links
  */
 export default function LocalDashboardPage() {
   const user = useSession((s) => s.user);
@@ -37,6 +38,7 @@ export default function LocalDashboardPage() {
     user?.role === "NATIONAL_BANK_ADMIN" ||
     user?.role === "OWNER" ||
     user?.role === "DEV_ADMIN";
+  const isLbAdmin = user?.role === "LOCAL_BANK_ADMIN";
 
   async function load() {
     setLoading(true);
@@ -78,8 +80,7 @@ export default function LocalDashboardPage() {
   const q = data.queues || {};
   const capital = data.capital || {};
   const book = data.loanBook || {};
-  const allCaughtUp =
-    !(q.approvalsPending || q.kycPending || q.incomePending || q.amlOpen);
+  const allCaughtUp = !(q.approvalsPending || q.kycPending || q.incomePending || q.amlOpen);
 
   const queues = [
     {
@@ -87,22 +88,23 @@ export default function LocalDashboardPage() {
       label: "Loan approvals",
       count: q.approvalsPending ?? 0,
       icon: "loan",
+      tone: "approvals",
     },
     {
       to: "/bank/local/kyc-review",
       label: "KYC / income",
       count: (q.kycPending ?? 0) + (q.incomePending ?? 0),
       icon: "passport",
+      tone: "compliance",
     },
     {
       to: "/bank/local/aml-alerts",
       label: "AML alerts",
       count: q.amlOpen ?? 0,
       icon: "alert",
+      tone: "compliance",
     },
   ];
-
-  const isLbAdmin = user?.role === "LOCAL_BANK_ADMIN";
 
   async function requestCapital() {
     if (Number(capAmount) <= 0 || capReason.trim().length < 5) return;
@@ -124,36 +126,30 @@ export default function LocalDashboardPage() {
 
   return (
     <div className="client-page">
+      {/* 1. Header */}
       <header className="client-hero">
         <p className="eyebrow">Local Bank</p>
-        <h1 className="client-title">
-          {data.bank?.name || "Branch"} operations
-        </h1>
+        <h1 className="client-title">{data.bank?.name || "Branch"} operations</h1>
         <p className="client-lede">
-          Capital position, loan book, and work queues for this branch.
+          Capital position, client loan approvals, KYC/AML, and branch liquidity.
         </p>
         <div className="client-hero-badges">
-          <Badge>{user?.role?.replaceAll("_", " ")}</Badge>
-          {data.bank?.id ? <Badge icon="node">{data.bank.id}</Badge> : null}
+          <Badge tone="tier">{user?.role?.replaceAll("_", " ")}</Badge>
+          {data.bank?.id ? <Badge icon="node" tone="info">{data.bank.id}</Badge> : null}
         </div>
         <div className="quick-actions" style={{ marginTop: 12 }}>
-          {isAdmin ? (
-            <Button as={Link} to="/bank/local/request-loan">
-              Request loan from National
-            </Button>
-          ) : null}
-          <Button as={Link} to="/bank/local/approvals" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/local/approvals">
             Approvals queue
           </Button>
           {isAdmin ? (
-            <>
-              <Button as={Link} to="/bank/local/facilities" variant="ghost" showArrow={false}>
-                Interbank & upward
-              </Button>
-              <Button as={Link} to="/bank/local/treasury" variant="ghost" showArrow={false}>
-                Treasury FX
-              </Button>
-            </>
+            <Button as={Link} to="/bank/local/request-loan" variant="ghost" showArrow={false}>
+              Request from National
+            </Button>
+          ) : null}
+          {isLbAdmin ? (
+            <Button type="button" variant="ghost" showArrow={false} onClick={() => setCapSheet(true)}>
+              Request capital
+            </Button>
           ) : null}
         </div>
       </header>
@@ -168,37 +164,84 @@ export default function LocalDashboardPage() {
         </div>
       ) : null}
 
-      <div className="client-snap-row">
+      {/* 2. KPI strip */}
+      <div className="client-snap-row ops-kpi">
         <StatCard label="Allocated" value={formatUsdc(capital.allocatedEth)} />
         <StatCard label="Reserve" value={formatUsdc(capital.reserveEth)} />
         <StatCard label="Available" value={formatUsdc(capital.availableEth)} />
         <StatCard label="Reserve ratio" value={pct(capital.reserveRatio)} />
       </div>
 
-      <section className="client-section">
-        <div className="client-section-head">
-          <h2 className="client-section-title">Work queues</h2>
-          {allCaughtUp ? <Badge icon="check">All caught up</Badge> : null}
-        </div>
-        {allCaughtUp ? (
-          <StateMessage
-            variant="empty"
-            title="All caught up"
-            description="No pending approvals, KYC reviews, or open AML alerts."
-          />
-        ) : (
-          <div className="ops-queue-grid">
-            {queues.map((item) => (
-              <Link key={item.to} to={item.to} className="ops-queue-card glass">
-                <Icon name={item.icon} size={22} />
-                <strong>{item.label}</strong>
-                <span className="ops-queue-count">{item.count}</span>
-              </Link>
-            ))}
+      <div className="ops-workspace">
+        {/* 3. Work queues */}
+        <section className="client-section ops-section tone-approvals">
+          <div className="client-section-head">
+            <h2 className="client-section-title">Work queues</h2>
+            {allCaughtUp ? <Badge icon="check" tone="success">All caught up</Badge> : null}
           </div>
-        )}
-      </section>
+          {allCaughtUp ? (
+            <StateMessage
+              variant="empty"
+              title="All caught up"
+              description="No pending approvals, KYC reviews, or open AML alerts."
+            />
+          ) : (
+            <div className="ops-queue-grid">
+              {queues.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`ops-queue-card glass tone-${item.tone || "approvals"}`}
+                >
+                  <Icon name={item.icon} size={22} />
+                  <strong>{item.label}</strong>
+                  <span className="ops-queue-count">{item.count}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
 
+        {/* 4. Capital / liquidity (admin) */}
+        <section className="client-section ops-section tone-liquidity">
+          <div className="client-section-head">
+            <h2 className="client-section-title">Liquidity & capital</h2>
+          </div>
+          <Glass className="client-panel" level={2}>
+            {isAdmin ? (
+              <>
+                <p className="client-lede" style={{ margin: "0 0 10px" }}>
+                  Interbank lending pool, upward deposits to National, treasury FX, and capital
+                  requests.
+                </p>
+                <div className="quick-actions">
+                  <Button as={Link} to="/bank/local/facilities" showArrow={false}>
+                    Facilities
+                  </Button>
+                  <Button as={Link} to="/bank/local/treasury" variant="ghost" showArrow={false}>
+                    Treasury FX
+                  </Button>
+                  <Button as={Link} to="/bank/local/request-loan" variant="ghost" showArrow={false}>
+                    Request from National
+                  </Button>
+                  {isLbAdmin ? (
+                    <Button type="button" variant="ghost" showArrow={false} onClick={() => setCapSheet(true)}>
+                      Request capital
+                    </Button>
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <p className="client-lede" style={{ margin: 0 }}>
+                Liquidity desks (facilities & treasury) are available to Local Bank Admin.
+                Approvers focus on loans, KYC, and AML.
+              </p>
+            )}
+          </Glass>
+        </section>
+      </div>
+
+      {/* 5. Loan book */}
       <Glass className="client-panel" level={2}>
         <h2 className="client-panel-title">Loan book snapshot</h2>
         <div className="client-grid-2" style={{ marginTop: 8 }}>
@@ -220,7 +263,7 @@ export default function LocalDashboardPage() {
           </div>
         </div>
         {(book.upcomingMaturities || []).length > 0 ? (
-          <ul className="ops-stack" style={{ marginTop: 14 }}>
+          <ul className="ops-stack ops-list" style={{ marginTop: 14 }}>
             {book.upcomingMaturities.map((m) => (
               <li key={m.id} className="ops-row glass">
                 <div>
@@ -242,15 +285,14 @@ export default function LocalDashboardPage() {
         />
       ) : null}
 
+      {/* 6. Secondary links */}
       <div className="quick-actions">
-        <Button as={Link} to="/bank/local/approvals">
-          Open approvals
+        <Button as={Link} to="/bank/local/kyc-review" variant="ghost" showArrow={false}>
+          KYC review
         </Button>
-        {isLbAdmin ? (
-          <Button type="button" variant="ghost" showArrow={false} onClick={() => setCapSheet(true)}>
-            Request capital
-          </Button>
-        ) : null}
+        <Button as={Link} to="/bank/local/aml-alerts" variant="ghost" showArrow={false}>
+          AML alerts
+        </Button>
         {isAdmin ? (
           <Button as={Link} to="/bank/local/users" variant="ghost" showArrow={false}>
             Manage staff

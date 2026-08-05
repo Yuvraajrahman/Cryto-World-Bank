@@ -25,16 +25,16 @@ function RainbowWithTheme({ children }: { children: React.ReactNode }) {
   const theme =
     resolved === "light"
       ? lightTheme({
-          accentColor: "#2563eb",
+          accentColor: "#0ea5e9",
           accentColorForeground: "#ffffff",
-          borderRadius: "large",
+          borderRadius: "medium",
           fontStack: "system",
           overlayBlur: "small",
         })
       : darkTheme({
           accentColor: "#c9a86a",
           accentColorForeground: "#1a1406",
-          borderRadius: "large",
+          borderRadius: "medium",
           fontStack: "system",
           overlayBlur: "small",
         });

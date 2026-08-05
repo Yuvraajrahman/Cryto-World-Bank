@@ -36,24 +36,54 @@ const ALL: Role[] = [
   "GUEST",
 ];
 
+const OPS: Role[] = [
+  "OWNER",
+  "NATIONAL_BANK_ADMIN",
+  "LOCAL_BANK_ADMIN",
+  "APPROVER",
+];
+
 const nav: NavItem[] = [
   { to: "/app/dashboard", label: "Overview", icon: LayoutDashboard, roles: ALL },
-  { to: "/app/reserve", label: "World Reserve", icon: Landmark, roles: ALL },
-  { to: "/app/banks", label: "Bank Network", icon: Network, roles: ALL },
-  { to: "/app/simulation", label: "Global simulation", icon: Globe2, roles: ALL },
-  { to: "/app/facilities", label: "Facilities", icon: PiggyBank, roles: ALL },
+  { to: "/app/reserve", label: "World Reserve", icon: Landmark, roles: OPS },
+  { to: "/app/banks", label: "Bank Network", icon: Network, roles: OPS },
+  { to: "/app/simulation", label: "Global simulation", icon: Globe2, roles: ["OWNER"] },
+  {
+    to: "/bank/world/facilities",
+    label: "World facilities",
+    icon: PiggyBank,
+    roles: ["OWNER"],
+  },
+  {
+    to: "/bank/national/facilities",
+    label: "National facilities",
+    icon: PiggyBank,
+    roles: ["NATIONAL_BANK_ADMIN"],
+  },
+  {
+    to: "/bank/local/facilities",
+    label: "Local facilities",
+    icon: PiggyBank,
+    roles: ["LOCAL_BANK_ADMIN"],
+  },
   {
     to: "/app/loans/history",
     label: "My Loans",
     icon: Coins,
-    roles: ["BORROWER", "OWNER", "NATIONAL_BANK_ADMIN", "LOCAL_BANK_ADMIN", "APPROVER"],
+    roles: ["BORROWER"],
   },
   { to: "/app/loans/apply", label: "Request Loan", icon: FilePlus2, roles: ["BORROWER"] },
   {
-    to: "/app/approvals",
+    to: "/bank/local/approvals",
     label: "Approvals Queue",
     icon: Inbox,
-    roles: ["APPROVER", "LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"],
+    roles: ["APPROVER", "LOCAL_BANK_ADMIN"],
+  },
+  {
+    to: "/bank/national/approvals",
+    label: "Approvals Queue",
+    icon: Inbox,
+    roles: ["NATIONAL_BANK_ADMIN"],
   },
   {
     to: "/app/installments",
@@ -62,27 +92,27 @@ const nav: NavItem[] = [
     roles: ["BORROWER"],
   },
   { to: "/app/loans/limits", label: "Borrowing limits", icon: Shield, roles: ["BORROWER"] },
-  { to: "/app/market", label: "Markets", icon: LineChart, roles: ALL },
-  { to: "/app/chat", label: "Messages", icon: MessageSquare, roles: ALL },
-  { to: "/app/assistant", label: "AI Assistant", icon: Bot, roles: ALL },
+  { to: "/app/market", label: "Markets", icon: LineChart, roles: OPS },
+  { to: "/app/chat", label: "Messages", icon: MessageSquare, roles: ["BORROWER"] },
+  { to: "/app/assistant", label: "AI Assistant", icon: Bot, roles: ["BORROWER"] },
   {
     to: "/app/risk",
     label: "Risk Console",
     icon: ShieldAlert,
-    roles: ["APPROVER", "LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"],
+    roles: ["OWNER", "NATIONAL_BANK_ADMIN", "LOCAL_BANK_ADMIN"],
   },
   { to: "/app/settings", label: "Profile", icon: UserRound, roles: ALL },
   {
     to: "/app/admin",
     label: "Admin",
     icon: Settings2,
-    roles: ["OWNER", "NATIONAL_BANK_ADMIN"],
+    roles: ["OWNER"],
   },
   {
-    to: "/app/multisig",
+    to: "/bank/world/multisig",
     label: "Multisig",
     icon: Shield,
-    roles: ["OWNER", "NATIONAL_BANK_ADMIN"],
+    roles: ["OWNER"],
   },
 ];
 

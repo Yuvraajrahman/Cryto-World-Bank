@@ -115,6 +115,17 @@ export default function WorldDashboardPage() {
         <p className="client-lede">
           Top-of-hierarchy custody, National Bank roster, and system-wide health.
         </p>
+        <div className="quick-actions" style={{ marginTop: 12 }}>
+          <Button type="button" onClick={() => setAllocSheet(true)}>
+            Allocate to National
+          </Button>
+          <Button as={Link} to="/bank/world/national-banks" variant="ghost" showArrow={false}>
+            Nationals registry
+          </Button>
+          <Button as={Link} to="/bank/world/facilities" variant="ghost" showArrow={false}>
+            Upward inbox
+          </Button>
+        </div>
       </header>
 
       {data.warnings?.cascadeNearMinimum ? (
@@ -137,28 +148,51 @@ export default function WorldDashboardPage() {
       <section className="client-section">
         <h2 className="client-section-title">Pending work</h2>
         <div className="ops-queue-grid">
-          <Link to="/bank/world/multisig" className="ops-queue-card glass">
+          <Link to="/bank/world/multisig" className="ops-queue-card glass tone-capital">
             <Icon name="wallet" size={22} />
             <strong>Multisig</strong>
             <span className="ops-queue-count">{q.multisigPending ?? 0}</span>
           </Link>
-          <Link to="/bank/world/governance" className="ops-queue-card glass">
+          <Link to="/bank/world/governance" className="ops-queue-card glass tone-approvals">
             <Icon name="settings" size={22} />
             <strong>Governance</strong>
             <span className="ops-queue-count">{q.governancePending ?? 0}</span>
           </Link>
-          <Link to="/bank/world/national-banks" className="ops-queue-card glass">
+          <Link to="/bank/world/national-banks" className="ops-queue-card glass tone-liquidity">
             <Icon name="node" size={22} />
             <strong>National Banks</strong>
             <span className="ops-queue-count">{s.nationalCount ?? 0}</span>
           </Link>
-          <div className="ops-queue-card glass">
+          <Link to="/bank/world/facilities" className="ops-queue-card glass tone-liquidity">
+            <Icon name="node" size={22} />
+            <strong>Upward inbox</strong>
+            <span className="ops-queue-count">{q.upwardPending ?? "—"}</span>
+          </Link>
+          <div className="ops-queue-card glass tone-compliance">
             <Icon name="alert" size={22} />
             <strong>World SARs</strong>
             <span className="ops-queue-count">{q.sarWorld ?? sars.length}</span>
           </div>
         </div>
       </section>
+
+      <Glass className="client-panel" level={2}>
+        <h2 className="client-panel-title">Liquidity & capital</h2>
+        <p className="client-lede" style={{ margin: "0 0 10px" }}>
+          Allocate to Nationals, review upward deposits, and run institutional treasury FX.
+        </p>
+        <div className="quick-actions">
+          <Button type="button" onClick={() => setAllocSheet(true)} showArrow={false}>
+            Allocate capital
+          </Button>
+          <Button as={Link} to="/bank/world/facilities" variant="ghost" showArrow={false}>
+            Facilities
+          </Button>
+          <Button as={Link} to="/bank/world/treasury" variant="ghost" showArrow={false}>
+            Treasury FX
+          </Button>
+        </div>
+      </Glass>
 
       <Glass className="client-panel" level={2}>
         <h2 className="client-panel-title">System lending</h2>
@@ -196,7 +230,7 @@ export default function WorldDashboardPage() {
         <ul className="ops-stack">
           {nationals.map((nb) => (
             <li key={nb.id}>
-              <Link to="/bank/national/dashboard" className="ops-row glass">
+              <Link to="/bank/world/national-banks" className="ops-row glass">
                 <div>
                   <strong>{nb.name}</strong>
                   <span>

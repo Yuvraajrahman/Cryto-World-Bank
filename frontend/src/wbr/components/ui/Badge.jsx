@@ -5,9 +5,10 @@ import Icon from './Icon';
  * and will double as the base for status chips on later pages (KYC level,
  * loan status, etc.) — keep generic rather than transparency-specific.
  */
-export default function Badge({ icon = 'check', children, className = '' }) {
+export default function Badge({ icon = 'check', children, className = '', tone }) {
+  const toneClass = tone ? `tone tone-${tone}` : '';
   return (
-    <span className={`badge ${className}`.trim()}>
+    <span className={`badge ${toneClass} ${className}`.trim()}>
       <Icon name={icon} size={12} />
       {children}
     </span>

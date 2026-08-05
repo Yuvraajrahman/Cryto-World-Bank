@@ -11,13 +11,14 @@ import { useSession } from "@/lib/store";
 import { isPreferredChain, networkLabel } from "../../lib/explorer";
 import "../../global.css";
 
+/* Same section order as Local: Home → Approvals → Liquidity → Capital/roster → Compliance */
 const TAB_ITEMS = [
   { key: "home", label: "Home", icon: "home", path: "/bank/national/dashboard" },
   { key: "approvals", label: "Approvals", icon: "loan", path: "/bank/national/approvals" },
-  { key: "treasury", label: "Treasury", icon: "wallet", path: "/bank/national/treasury" },
   { key: "facilities", label: "Facilities", icon: "node", path: "/bank/national/facilities" },
-  { key: "locals", label: "Locals", icon: "node", path: "/bank/national/local-banks" },
+  { key: "treasury", label: "Treasury", icon: "wallet", path: "/bank/national/treasury" },
   { key: "capital", label: "Capital", icon: "wallet", path: "/bank/national/capital-allocation" },
+  { key: "locals", label: "Locals", icon: "node", path: "/bank/national/local-banks" },
   { key: "sar", label: "SAR", icon: "alert", path: "/bank/national/sar-review" },
 ];
 
@@ -71,7 +72,7 @@ export default function NationalOperatorShell() {
   }
 
   return (
-    <div className="wbr-root">
+    <div className="wbr-root" data-tier="national">
       <ToastProvider>
         <div className="bg-orbs" aria-hidden>
           <div className="orb orb-gold" />

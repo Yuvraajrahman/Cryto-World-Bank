@@ -11,11 +11,12 @@ import { useSession } from "@/lib/store";
 import { isPreferredChain, networkLabel } from "../../lib/explorer";
 import "../../global.css";
 
+/* Same chrome order as National: Home → Approvals → Liquidity → Compliance */
 const ALL_TAB_ITEMS = [
   { key: "home", label: "Home", icon: "home", path: "/bank/local/dashboard" },
   { key: "approvals", label: "Approvals", icon: "loan", path: "/bank/local/approvals" },
-  { key: "treasury", label: "Treasury", icon: "wallet", path: "/bank/local/treasury", adminOnly: true },
   { key: "facilities", label: "Facilities", icon: "node", path: "/bank/local/facilities", adminOnly: true },
+  { key: "treasury", label: "Treasury", icon: "wallet", path: "/bank/local/treasury", adminOnly: true },
   { key: "kyc", label: "KYC", icon: "passport", path: "/bank/local/kyc-review" },
   { key: "aml", label: "AML", icon: "alert", path: "/bank/local/aml-alerts" },
 ];
@@ -76,7 +77,7 @@ export default function BankOperatorShell() {
   }
 
   return (
-    <div className="wbr-root">
+    <div className="wbr-root" data-tier="local">
       <ToastProvider>
         <div className="bg-orbs" aria-hidden>
           <div className="orb orb-gold" />

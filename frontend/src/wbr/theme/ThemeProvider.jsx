@@ -35,7 +35,7 @@ function applyDomTheme(resolved) {
   document.documentElement.setAttribute("data-theme", resolved);
   document.documentElement.style.colorScheme = resolved;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", resolved === "light" ? "#ffffff" : "#05070c");
+  if (meta) meta.setAttribute("content", resolved === "light" ? "#f0f9ff" : "#05070c");
 }
 
 const ThemeContext = createContext(null);

@@ -44,10 +44,7 @@ import { Market } from "@/pages/Market";
 import { RiskConsole } from "@/pages/RiskConsole";
 import { Admin } from "@/pages/Admin";
 import { Banks } from "@/pages/Banks";
-import { Approvals } from "@/pages/Approvals";
 import { Simulation } from "@/pages/Simulation";
-import { Facilities } from "@/pages/Facilities";
-import { Multisig } from "@/pages/Multisig";
 import { NotFound } from "@/pages/NotFound";
 import { RequireBorrower } from "@/pages/RequireBorrower";
 import { RequireLocalStaff } from "@/pages/RequireLocalStaff";
@@ -85,6 +82,12 @@ import { WorldMultisig } from "@/pages/WorldMultisig";
 import { WorldGovernance } from "@/pages/WorldGovernance";
 import { RequireRegulator } from "@/pages/RequireRegulator";
 import { RegulatorShell } from "@/pages/RegulatorShell";
+import { RequireOperator } from "@/pages/RequireOperator";
+import {
+  LegacyFacilitiesRedirect,
+  LegacyMultisigRedirect,
+  LegacyApprovalsRedirect,
+} from "@/wbr/components/ui/LegacyOpsRedirect";
 import { RequireDevAdmin } from "@/pages/RequireDevAdmin";
 import DevAdmin from "@/pages/DevAdmin";
 import { RegulatoryAudit } from "@/pages/RegulatoryAudit";
@@ -152,8 +155,8 @@ export function App() {
           <Route path="/bank/local/kyc-review" element={<LocalKycReview />} />
           <Route path="/bank/local/users" element={<LocalStaffUsers />} />
           <Route path="/bank/local/aml-alerts" element={<LocalAmlAlerts />} />
-          <Route path="/bank/local/lending-settings" element={<LocalLendingSettings />} />
           <Route element={<RequireLocalAdmin />}>
+            <Route path="/bank/local/lending-settings" element={<LocalLendingSettings />} />
             <Route path="/bank/local/treasury" element={<LocalTreasury />} />
             <Route path="/bank/local/facilities" element={<LocalFacilities />} />
           </Route>
@@ -200,15 +203,19 @@ export function App() {
       </Route>
 
       <Route element={<AppLayout />}>
-        <Route path="/app/reserve" element={<Reserve />} />
-        <Route path="/app/banks" element={<Banks />} />
-        <Route path="/app/simulation" element={<Simulation />} />
-        <Route path="/app/facilities" element={<Facilities />} />
-        <Route path="/app/market" element={<Market />} />
-        <Route path="/app/approvals" element={<Approvals />} />
-        <Route path="/app/risk" element={<RiskConsole />} />
-        <Route path="/app/admin" element={<Admin />} />
-        <Route path="/app/multisig" element={<Multisig />} />
+        <Route element={<RequireOperator />}>
+          <Route path="/app/reserve" element={<Reserve />} />
+          <Route path="/app/banks" element={<Banks />} />
+          <Route path="/app/simulation" element={<Simulation />} />
+          <Route path="/app/market" element={<Market />} />
+          <Route path="/app/risk" element={<RiskConsole />} />
+          <Route path="/app/facilities" element={<LegacyFacilitiesRedirect />} />
+          <Route path="/app/approvals" element={<LegacyApprovalsRedirect />} />
+          <Route path="/app/multisig" element={<LegacyMultisigRedirect />} />
+        </Route>
+        <Route element={<RequireDevAdmin />}>
+          <Route path="/app/admin" element={<Admin />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFound />} />

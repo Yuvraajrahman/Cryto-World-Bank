@@ -17,7 +17,8 @@ function pct(n) {
 }
 
 /**
- * Route: `/bank/national/dashboard` — plan J.35
+ * Route: `/bank/national/dashboard`
+ * Shared ops skeleton: header → KPI → queues → liquidity/capital → loan book → roster → links
  */
 export default function NationalDashboardPage() {
   const user = useSession((s) => s.user);
@@ -80,52 +81,54 @@ export default function NationalDashboardPage() {
       label: "Loan approvals",
       count: q.approvalsPending ?? (q.clientLoansPending || 0) + (q.localFromNationalPending || 0),
       icon: "loan",
+      tone: "approvals",
     },
     {
       to: "/bank/national/capital-allocation",
       label: "Capital requests",
       count: q.capitalRequestsOpen ?? 0,
       icon: "wallet",
+      tone: "capital",
     },
     {
       to: "/bank/national/sar-review",
       label: "SAR review",
       count: q.sarOpen ?? 0,
       icon: "alert",
+      tone: "compliance",
     },
     {
       to: "/bank/national/local-banks",
       label: "Local banks",
       count: j.localBankCount ?? 0,
       icon: "node",
+      tone: "liquidity",
     },
   ];
 
   return (
     <div className="client-page">
+      {/* 1. Header */}
       <header className="client-hero">
         <p className="eyebrow">National Bank</p>
         <h1 className="client-title">{data.bank?.name || "Jurisdiction"} operations</h1>
         <p className="client-lede">
-          Approve client and Local Bank loans, allocate capital from World Bank, and manage the
-          jurisdiction roster.
+          Approve client and Local Bank loans, allocate capital, and manage liquidity for this
+          jurisdiction.
         </p>
         <div className="client-hero-badges">
-          <Badge>{user?.role?.replaceAll("_", " ")}</Badge>
-          {data.bank?.jurisdiction ? <Badge icon="node">{data.bank.jurisdiction}</Badge> : null}
+          <Badge tone="tier">{user?.role?.replaceAll("_", " ")}</Badge>
+          {data.bank?.jurisdiction ? <Badge icon="node" tone="info">{data.bank.jurisdiction}</Badge> : null}
         </div>
         <div className="quick-actions" style={{ marginTop: 12 }}>
           <Button as={Link} to="/bank/national/approvals">
             Loan approvals
           </Button>
           <Button as={Link} to="/bank/national/request-loan" variant="ghost" showArrow={false}>
-            Request loan from World
+            Request from World
           </Button>
           <Button as={Link} to="/bank/national/capital-allocation" variant="ghost" showArrow={false}>
-            Capital allocation
-          </Button>
-          <Button as={Link} to="/bank/national/facilities" variant="ghost" showArrow={false}>
-            Interbank & upward
+            Allocate to Locals
           </Button>
         </div>
       </header>
@@ -144,39 +147,75 @@ export default function NationalDashboardPage() {
         </div>
       ) : null}
 
-      <div className="client-snap-row">
+      {/* 2. KPI strip */}
+      <div className="client-snap-row ops-kpi">
         <StatCard label="Allocated down" value={formatUsdc(data.bank?.totalAllocated)} />
         <StatCard label="Reserve" value={formatUsdc(capital.reserveEth)} />
         <StatCard label="Available to allocate" value={formatUsdc(capital.availableToAllocateEth)} />
         <StatCard label="Reserve ratio" value={pct(capital.reserveRatio)} />
       </div>
 
-      <section className="client-section">
-        <div className="client-section-head">
-          <h2 className="client-section-title">Work queues</h2>
-          {allCaughtUp ? <Badge icon="check">All caught up</Badge> : null}
-        </div>
-        {allCaughtUp ? (
-          <StateMessage
-            variant="empty"
-            title="All caught up"
-            description="No open loan approvals, capital requests, or SARs for this jurisdiction."
-          />
-        ) : (
-          <div className="ops-queue-grid">
-            {queues.map((item) => (
-              <Link key={item.to} to={item.to} className="ops-queue-card glass">
-                <Icon name={item.icon} size={22} />
-                <strong>{item.label}</strong>
-                <span className="ops-queue-count">{item.count}</span>
-              </Link>
-            ))}
+      <div className="ops-workspace">
+        {/* 3. Work queues */}
+        <section className="client-section ops-section tone-approvals">
+          <div className="client-section-head">
+            <h2 className="client-section-title">Work queues</h2>
+            {allCaughtUp ? <Badge icon="check" tone="success">All caught up</Badge> : null}
           </div>
-        )}
-      </section>
+          {allCaughtUp ? (
+            <StateMessage
+              variant="empty"
+              title="All caught up"
+              description="No open loan approvals, capital requests, or SARs for this jurisdiction."
+            />
+          ) : (
+            <div className="ops-queue-grid">
+              {queues.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={`ops-queue-card glass tone-${item.tone || "approvals"}`}
+                >
+                  <Icon name={item.icon} size={22} />
+                  <strong>{item.label}</strong>
+                  <span className="ops-queue-count">{item.count}</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
 
+        {/* 4. Capital / liquidity */}
+        <section className="client-section ops-section tone-liquidity">
+          <div className="client-section-head">
+            <h2 className="client-section-title">Liquidity & capital</h2>
+          </div>
+          <Glass className="client-panel" level={2}>
+            <p className="client-lede" style={{ margin: "0 0 10px" }}>
+              Interbank lending pool, upward deposits to World, treasury FX, and capital push to
+              Locals.
+            </p>
+            <div className="quick-actions">
+              <Button as={Link} to="/bank/national/facilities" showArrow={false}>
+                Facilities
+              </Button>
+              <Button as={Link} to="/bank/national/treasury" variant="ghost" showArrow={false}>
+                Treasury FX
+              </Button>
+              <Button as={Link} to="/bank/national/capital-allocation" variant="ghost" showArrow={false}>
+                Capital desk
+              </Button>
+              <Button as={Link} to="/bank/national/request-loan" variant="ghost" showArrow={false}>
+                Request from World
+              </Button>
+            </div>
+          </Glass>
+        </section>
+      </div>
+
+      {/* 5. Loan book */}
       <Glass className="client-panel" level={2}>
-        <h2 className="client-panel-title">Jurisdiction lending</h2>
+        <h2 className="client-panel-title">Jurisdiction loan book</h2>
         <div className="client-grid-2" style={{ marginTop: 8 }}>
           <div>
             <span className="muted" style={{ fontSize: 12 }}>Active loans</span>
@@ -197,6 +236,15 @@ export default function NationalDashboardPage() {
         </div>
       </Glass>
 
+      {data.bank?.id ? (
+        <ActiveLoansPanel
+          bankId={data.bank.id}
+          title="Pending & active loans (this National)"
+          decisionBasePath="/bank/national/approvals"
+        />
+      ) : null}
+
+      {/* Child roster */}
       <section className="client-section">
         <div className="client-section-head">
           <h2 className="client-section-title">Local Bank roster</h2>
@@ -204,7 +252,7 @@ export default function NationalDashboardPage() {
             Manage
           </Link>
         </div>
-        <ul className="ops-stack">
+        <ul className="ops-stack ops-list">
           {(data.localBanks || []).map((lb) => (
             <li key={lb.id} className="ops-row glass">
               <div>
@@ -223,20 +271,13 @@ export default function NationalDashboardPage() {
         </ul>
       </section>
 
-      {data.bank?.id ? (
-        <ActiveLoansPanel
-          bankId={data.bank.id}
-          title="Pending & active loans (this National)"
-          decisionBasePath="/bank/national/approvals"
-        />
-      ) : null}
-
+      {/* 6. Secondary links */}
       <div className="quick-actions">
-        <Button as={Link} to="/bank/national/capital-allocation">
-          Allocate capital
+        <Button as={Link} to="/bank/national/sar-review" variant="ghost" showArrow={false}>
+          SAR review
         </Button>
         <Button as={Link} to="/bank/national/settings" variant="ghost" showArrow={false}>
-          Rate & reserve settings
+          Jurisdiction rates
         </Button>
         <Button as={Link} to="/reserve" variant="ghost" showArrow={false}>
           Reserve detail

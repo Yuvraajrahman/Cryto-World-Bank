@@ -71,7 +71,7 @@ export default function WorldOperatorShell() {
   }
 
   return (
-    <div className="wbr-root">
+    <div className="wbr-root" data-tier="world">
       <ToastProvider>
         <div className="bg-orbs" aria-hidden>
           <div className="orb orb-gold" />

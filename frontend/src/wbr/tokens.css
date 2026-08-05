@@ -1,7 +1,6 @@
 /* =========================================================
    WorldBankReserve — Design Tokens
-   Dark is default. Light is a first-class theme via
-   [data-theme="light"] (see ThemeProvider).
+   Night: black + gold. Day: white + sky blue.
    ========================================================= */
 
 :root,
@@ -19,22 +18,61 @@
   --glass-border-strong:rgba(255,255,255,.20);
   --glass-highlight:rgba(255,255,255,.55);
 
+  /* Brand accent = gold (night) */
   --gold:#c9a86a;
   --gold-bright:#eed6a3;
   --gold-dim:rgba(201,168,106,.35);
-  --signal:#6fa3ff;
-  --signal-bright:#a6c7ff;
-  --signal-dim:rgba(111,163,255,.32);
+  --signal:#d4b87a;
+  --signal-bright:#eed6a3;
+  --signal-dim:rgba(201,168,106,.28);
 
-  --success:#6fd6ab;
-  --success-bright:#a8ecc9;
-  --success-dim:rgba(111,214,171,.30);
-  --pending:#f0ab3e;
-  --pending-bright:#f7c876;
-  --pending-dim:rgba(240,171,62,.30);
-  --danger:#ff8585;
-  --danger-bright:#ffb0b0;
-  --danger-dim:rgba(255,133,133,.30);
+  --success:#66bb6a;
+  --success-bright:#a5d6a7;
+  --success-dim:rgba(102,187,106,.28);
+  --pending:#ffa726;
+  --pending-bright:#ffcc80;
+  --pending-dim:rgba(255,167,38,.28);
+  --danger:#ef5350;
+  --danger-bright:#ef9a9a;
+  --danger-dim:rgba(239,83,80,.28);
+  --info:#42a5f5;
+  --info-bright:#90caf9;
+  --info-dim:rgba(66,165,245,.28);
+
+  /* Tier identity (Material — night) */
+  --tier-world:#9fa8da;
+  --tier-world-dim:rgba(159,168,218,.22);
+  --tier-world-surface:rgba(63,81,181,.14);
+  --tier-national:#4db6ac;
+  --tier-national-dim:rgba(77,182,172,.22);
+  --tier-national-surface:rgba(0,121,107,.16);
+  --tier-local:#64b5f6;
+  --tier-local-dim:rgba(100,181,246,.22);
+  --tier-local-surface:rgba(21,101,192,.16);
+  --tier-client:#81c784;
+  --tier-client-dim:rgba(129,199,132,.22);
+  --tier-client-surface:rgba(46,125,50,.14);
+  --tier-regulator:#90a4ae;
+  --tier-regulator-dim:rgba(144,164,174,.22);
+  --tier-regulator-surface:rgba(84,110,122,.16);
+
+  /* Domain tones (queues, product groups) */
+  --tone-approvals:#9fa8da;
+  --tone-approvals-surface:rgba(63,81,181,.16);
+  --tone-liquidity:#4dd0e1;
+  --tone-liquidity-surface:rgba(0,131,143,.16);
+  --tone-capital:#ffd54f;
+  --tone-capital-surface:rgba(249,168,37,.14);
+  --tone-compliance:#ffab91;
+  --tone-compliance-surface:rgba(230,81,0,.16);
+  --tone-accounts:#81c784;
+  --tone-accounts-surface:rgba(46,125,50,.14);
+  --tone-borrow:#64b5f6;
+  --tone-borrow-surface:rgba(21,101,192,.16);
+  --tone-groups:#80cbc4;
+  --tone-groups-surface:rgba(0,137,123,.14);
+  --tone-fx:#4fc3f7;
+  --tone-fx-surface:rgba(2,119,189,.14);
 
   --text-1:#f4f5f8;
   --text-2:#9aa3b8;
@@ -45,7 +83,14 @@
   --orb-opacity:.55;
   --grain-opacity:.035;
 
-  /* Tailwind ink/gold bridges (channel form for opacity modifiers) */
+  /* Material surface elevation (content — not glass) */
+  --surface-0: #05070c;
+  --surface-1: #0c1018;
+  --surface-2: #121826;
+  --elev-1: 0 1px 2px rgba(0,0,0,.45), 0 1px 3px rgba(0,0,0,.35);
+  --elev-2: 0 2px 6px rgba(0,0,0,.40), 0 4px 12px rgba(0,0,0,.28);
+  --elev-3: 0 6px 16px rgba(0,0,0,.42), 0 12px 28px rgba(0,0,0,.30);
+
   --ink-950: 6 6 6;
   --ink-900: 10 10 11;
   --ink-800: 16 16 19;
@@ -69,88 +114,129 @@
   --gold-900: 77 58 11;
 }
 
-/* Cool white + blue day theme (night tokens above stay unchanged).
-   --gold* is remapped to blue so primary CTAs/eyebrows match day branding. */
+/* Day: white + sky blue */
 [data-theme="light"]{
   color-scheme: light;
 
   --bg-void:#ffffff;
-  --bg-deep:#f5f8fc;
-  --bg-deep-2:#e8eef8;
+  --bg-deep:#f0f9ff;
+  --bg-deep-2:#e0f2fe;
 
-  --glass-fill:rgba(255,255,255,.78);
-  --glass-fill-strong:rgba(255,255,255,.92);
+  --glass-fill:rgba(255,255,255,.72);
+  --glass-fill-strong:rgba(255,255,255,.90);
   --glass-fill-elevated:#ffffff;
-  --glass-border:rgba(37,99,235,.12);
-  --glass-border-strong:rgba(37,99,235,.22);
+  --glass-border:rgba(14,165,233,.14);
+  --glass-border-strong:rgba(2,132,199,.24);
   --glass-highlight:rgba(255,255,255,.98);
 
-  --gold:#3b82f6;
-  --gold-bright:#1d4ed8;
-  --gold-dim:rgba(59,130,246,.28);
-  --signal:#2563eb;
-  --signal-bright:#1d4ed8;
-  --signal-dim:rgba(37,99,235,.25);
+  /* Brand accent remapped to sky blue for day CTAs */
+  --gold:#0ea5e9;
+  --gold-bright:#0284c7;
+  --gold-dim:rgba(14,165,233,.26);
+  --signal:#0284c7;
+  --signal-bright:#0369a1;
+  --signal-dim:rgba(2,132,199,.22);
 
-  --success:#059669;
-  --success-bright:#047857;
-  --success-dim:rgba(5,150,105,.20);
-  --pending:#d97706;
-  --pending-bright:#b45309;
-  --pending-dim:rgba(217,119,6,.20);
-  --danger:#dc2626;
-  --danger-bright:#b91c1c;
-  --danger-dim:rgba(220,38,38,.20);
+  --success:#2e7d32;
+  --success-bright:#1b5e20;
+  --success-dim:rgba(46,125,50,.14);
+  --pending:#ef6c00;
+  --pending-bright:#e65100;
+  --pending-dim:rgba(239,108,0,.14);
+  --danger:#c62828;
+  --danger-bright:#b71c1c;
+  --danger-dim:rgba(198,40,40,.14);
+  --info:#1565c0;
+  --info-bright:#0d47a1;
+  --info-dim:rgba(21,101,192,.12);
 
-  --text-1:#0f172a;
-  --text-2:#475569;
-  --text-3:#94a3b8;
+  /* Tier identity (Material — day) */
+  --tier-world:#3f51b5;
+  --tier-world-dim:rgba(63,81,181,.18);
+  --tier-world-surface:#e8eaf6;
+  --tier-national:#00796b;
+  --tier-national-dim:rgba(0,121,107,.16);
+  --tier-national-surface:#e0f2f1;
+  --tier-local:#1565c0;
+  --tier-local-dim:rgba(21,101,192,.14);
+  --tier-local-surface:#e3f2fd;
+  --tier-client:#2e7d32;
+  --tier-client-dim:rgba(46,125,50,.14);
+  --tier-client-surface:#e8f5e9;
+  --tier-regulator:#546e7a;
+  --tier-regulator-dim:rgba(84,110,122,.14);
+  --tier-regulator-surface:#eceff1;
+
+  /* Domain tones */
+  --tone-approvals:#3949ab;
+  --tone-approvals-surface:#e8eaf6;
+  --tone-liquidity:#00838f;
+  --tone-liquidity-surface:#e0f7fa;
+  --tone-capital:#f9a825;
+  --tone-capital-surface:#fff8e1;
+  --tone-compliance:#e65100;
+  --tone-compliance-surface:#fbe9e7;
+  --tone-accounts:#2e7d32;
+  --tone-accounts-surface:#e8f5e9;
+  --tone-borrow:#1565c0;
+  --tone-borrow-surface:#e3f2fd;
+  --tone-groups:#00796b;
+  --tone-groups-surface:#e0f2f1;
+  --tone-fx:#0277bd;
+  --tone-fx-surface:#e1f5fe;
+
+  --text-1:#0c4a6e;
+  --text-2:#334155;
+  --text-3:#64748b;
   --text-inverse:#ffffff;
 
-  --scrim:rgba(15,23,42,.30);
-  --orb-opacity:.22;
-  --grain-opacity:.018;
+  --scrim:rgba(12,74,110,.22);
+  --orb-opacity:.18;
+  --grain-opacity:.012;
 
-  /* Tailwind ink/gold bridges — inverted ink for light surfaces */
-  --ink-950: 248 250 252;
+  --surface-0: #ffffff;
+  --surface-1: #ffffff;
+  --surface-2: #f8fafc;
+  --elev-1: 0 1px 2px rgba(12,74,110,.06), 0 1px 3px rgba(15,23,42,.04);
+  --elev-2: 0 2px 6px rgba(12,74,110,.08), 0 4px 12px rgba(15,23,42,.06);
+  --elev-3: 0 6px 16px rgba(12,74,110,.10), 0 12px 28px rgba(15,23,42,.08);
+
+  --ink-950: 240 249 255;
   --ink-900: 255 255 255;
-  --ink-800: 241 245 249;
-  --ink-700: 226 232 240;
-  --ink-600: 203 213 225;
+  --ink-800: 224 242 254;
+  --ink-700: 186 230 253;
+  --ink-600: 125 211 252;
   --ink-500: 148 163 184;
   --ink-400: 100 116 139;
   --ink-300: 71 85 105;
   --ink-200: 51 65 85;
-  --ink-100: 30 41 59;
+  --ink-100: 12 74 110;
 
-  --gold-50: 239 246 255;
-  --gold-100: 219 234 254;
-  --gold-200: 191 219 254;
-  --gold-300: 147 197 253;
-  --gold-400: 96 165 250;
-  --gold-500: 59 130 246;
-  --gold-600: 37 99 235;
-  --gold-700: 29 78 216;
-  --gold-800: 30 64 175;
-  --gold-900: 30 58 138;
+  --gold-50: 240 249 255;
+  --gold-100: 224 242 254;
+  --gold-200: 186 230 253;
+  --gold-300: 125 211 252;
+  --gold-400: 56 189 248;
+  --gold-500: 14 165 233;
+  --gold-600: 2 132 199;
+  --gold-700: 3 105 161;
+  --gold-800: 7 89 133;
+  --gold-900: 12 74 110;
 }
 
 :root{
-  /* ---------- radius ---------- */
-  --r-xs:10px;
-  --r-sm:14px;
-  --r-md:20px;
-  --r-lg:28px;
-  --r-xl:36px;
+  --r-xs:6px;
+  --r-sm:8px;
+  --r-md:10px;
+  --r-lg:12px;
+  --r-xl:16px;
   --r-pill:999px;
 
-  /* ---------- blur ---------- */
   --blur-sm:14px;
   --blur-md:20px;
   --blur-lg:26px;
   --blur-xl:40px;
 
-  /* ---------- motion ---------- */
   --ease:cubic-bezier(.22,1,.36,1);
   --ease-spring:cubic-bezier(.34,1.56,.64,1);
   --ease-inout:cubic-bezier(.65,0,.35,1);
@@ -159,7 +245,6 @@
   --dur-base:420ms;
   --dur-slow:650ms;
 
-  /* ---------- spacing ---------- */
   --sp-1:4px;  --sp-2:8px;  --sp-3:12px; --sp-4:16px;
   --sp-5:20px; --sp-6:24px; --sp-7:32px; --sp-8:40px;
   --sp-9:48px; --sp-10:64px; --sp-11:80px; --sp-12:96px;
@@ -167,13 +252,15 @@
   --section-pad-y:88px;
   --section-pad-x:20px;
   --container-max:1120px;
+  --app-container-max:1400px;
+  --app-pad-x:28px;
 
   --safe-top:env(safe-area-inset-top, 0px);
   --safe-bottom:env(safe-area-inset-bottom, 0px);
   --safe-left:env(safe-area-inset-left, 0px);
   --safe-right:env(safe-area-inset-right, 0px);
 
-  --tap-min:44px;
+  --tap-min:40px;
 
   --z-nav:50;
   --z-sticky-cta:45;
@@ -191,5 +278,9 @@
   :root{
     --section-pad-y:150px;
     --section-pad-x:24px;
+    --app-pad-x:32px;
   }
+}
+@media (min-width:1280px){
+  :root{ --app-pad-x:40px; }
 }

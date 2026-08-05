@@ -17,7 +17,7 @@ function OperatorHome({ user }) {
   const isLocal =
     user?.role === "APPROVER" ||
     user?.role === "LOCAL_BANK_ADMIN";
-  const isWorld = user?.role === "OWNER";
+  const isWorld = user?.role === "OWNER" || user?.role === "DEV_ADMIN";
   const isNational = user?.role === "NATIONAL_BANK_ADMIN";
   const isRegulator = user?.role === "REGULATOR";
   const links = isRegulator
@@ -75,12 +75,6 @@ function OperatorHome({ user }) {
                 desc: "USDC ↔ ETH swaps",
                 icon: "wallet",
               },
-              {
-                to: "/bank/world/multisig",
-                label: "World multisig",
-                desc: "Co-sign if you are a Safe signer",
-                icon: "wallet",
-              },
             ]
           : []),
       ]
@@ -121,12 +115,6 @@ function OperatorHome({ user }) {
             label: "Treasury FX",
             desc: "Institutional USDC ↔ ETH",
             icon: "wallet",
-          },
-          {
-            to: "/bank/national/dashboard",
-            label: "National desk",
-            desc: "Oversight of a jurisdiction",
-            icon: "eye",
           },
         ]
       : isNational
@@ -173,18 +161,9 @@ function OperatorHome({ user }) {
             desc: "Rates & reserve ratio",
             icon: "settings",
           },
-          {
-            to: "/bank/world/multisig",
-            label: "World multisig",
-            desc: "Co-sign 2-of-3 Safe txs",
-            icon: "wallet",
-          },
         ]
       : [
-          { to: "/app/approvals", label: "Approvals", desc: "Loan queue & decisions", icon: "loan" },
-          { to: "/app/banks", label: "Banks", desc: "Hierarchy & capital", icon: "node" },
-          { to: "/app/loans", label: "Loans", desc: "Portfolio overview", icon: "eye" },
-          { to: "/app/assistant", label: "MCP agent", desc: "LM Studio tools + confirm gate", icon: "agent" },
+          { to: "/bank/local/dashboard", label: "Local desk", desc: "Open your operator home", icon: "home" },
         ];
   return (
     <div className="client-page">
@@ -204,7 +183,7 @@ function OperatorHome({ user }) {
                 ? "Open National Bank operations for Local Banks, capital, SAR, and policy."
                 : "Use the links below for bank operations."}
         </p>
-        <Badge>{user?.role?.replaceAll("_", " ")}</Badge>
+        <Badge tone="tier">{user?.role?.replaceAll("_", " ")}</Badge>
       </header>
       <div className="quick-grid">
         {links.map((l) => (
@@ -285,15 +264,15 @@ function RetailHome() {
           Balances, credit, and borrowing limits in one place — verifiable against the reserve.
         </p>
         <div className="client-hero-badges">
-          <Badge icon={kycPending ? "clock" : "check"}>
+          <Badge icon={kycPending ? "clock" : "check"} tone={kycPending ? "pending" : "success"}>
             KYC {String(data.kyc?.kyc1Status || "—").toLowerCase()}
           </Badge>
           {credit?.available ? (
-            <Badge icon="passport">
+            <Badge icon="passport" tone="borrow">
               {credit.riskTier} · {credit.creditScore}
             </Badge>
           ) : (
-            <Badge icon="passport">Passport · Bronze</Badge>
+            <Badge icon="passport" tone="borrow">Passport · Bronze</Badge>
           )}
         </div>
       </header>
@@ -352,6 +331,71 @@ function RetailHome() {
           value={formatUsdc(data.loans?.outstandingEth)}
           delay={180}
         />
+      </div>
+
+      <div className="client-product-grid">
+        <Glass className="client-product-group tone-accounts">
+          <h3>Accounts</h3>
+          <div className="quick-actions">
+            <Button as={Link} to="/app/savings" variant="ghost" showArrow={false}>
+              Savings
+            </Button>
+            <Button as={Link} to="/app/deposits/fixed" variant="ghost" showArrow={false}>
+              Fixed deposit
+            </Button>
+            <Button as={Link} to="/app/account/checking" variant="ghost" showArrow={false}>
+              Checking
+            </Button>
+            <Button as={Link} to="/app/account/statement" variant="ghost" showArrow={false}>
+              Statement
+            </Button>
+          </div>
+        </Glass>
+        <Glass className="client-product-group tone-borrow">
+          <h3>Borrow</h3>
+          <div className="quick-actions">
+            <Button as={Link} to="/app/loans/apply" showArrow={false} disabled={kycPending}>
+              Apply
+            </Button>
+            <Button as={Link} to="/app/loans/history" variant="ghost" showArrow={false}>
+              History
+            </Button>
+            <Button as={Link} to="/app/loans/limits" variant="ghost" showArrow={false}>
+              Limits
+            </Button>
+            <Button as={Link} to="/app/passport" variant="ghost" showArrow={false}>
+              Passport
+            </Button>
+          </div>
+        </Glass>
+        <Glass className="client-product-group tone-groups">
+          <h3>Groups</h3>
+          <div className="quick-actions">
+            <Button as={Link} to="/app/groups" variant="ghost" showArrow={false}>
+              Circles
+            </Button>
+            <Button as={Link} to="/app/groups/create" variant="ghost" showArrow={false}>
+              Create
+            </Button>
+            <Button as={Link} to="/app/groups/join" variant="ghost" showArrow={false}>
+              Join
+            </Button>
+          </div>
+        </Glass>
+        <Glass className="client-product-group tone-fx">
+          <h3>FX</h3>
+          <div className="quick-actions">
+            <Button as={Link} to="/app/account/convert" variant="ghost" showArrow={false}>
+              USD → USDC
+            </Button>
+            <Button as={Link} to="/app/account/exchange" variant="ghost" showArrow={false}>
+              Exchange
+            </Button>
+            <Button as={Link} to="/app/assistant" variant="ghost" showArrow={false}>
+              Assistant
+            </Button>
+          </div>
+        </Glass>
       </div>
 
       <div className="client-grid-2">

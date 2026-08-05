@@ -102,7 +102,7 @@ export default function AppShell() {
       : null;
 
   return (
-    <div className="wbr-root">
+    <div className="wbr-root" data-tier="client">
       <ToastProvider>
         <div className="bg-orbs" aria-hidden>
           <div className="orb orb-gold" />

@@ -51,7 +51,7 @@ export default function RegulatorShell() {
   }
 
   return (
-    <div className="wbr-root">
+    <div className="wbr-root" data-tier="regulator">
       <ToastProvider>
         <div className="bg-orbs" aria-hidden>
           <div className="orb orb-gold" />

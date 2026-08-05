@@ -8,6 +8,7 @@ import Sheet from "../../../components/ui/Sheet";
 import StatusStepper from "../../../components/ui/StatusStepper";
 import StateMessage from "../../../components/ui/StateMessage";
 import StatCard from "../../../components/ui/StatCard";
+import Badge from "../../../components/ui/Badge";
 import ExplorerLink from "../../../components/ui/ExplorerLink";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
@@ -17,7 +18,7 @@ import { useSession } from "@/lib/store";
 const ADDR_RE = /^0x[a-fA-F0-9]{40}$/;
 
 /**
- * Route: `/app/account/checking` — plan F.25 Current / Checking Account
+ * Route: `/app/account/checking` — client→client USDC + receive
  */
 export default function CheckingPage() {
   const toast = useToast();
@@ -26,8 +27,12 @@ export default function CheckingPage() {
   const receiveAddr = (user?.wallet || address || "").toLowerCase();
   const [summary, setSummary] = useState(null);
   const [ledger, setLedger] = useState([]);
+  const [mode, setMode] = useState("loginId"); // loginId | address
+  const [toLoginId, setToLoginId] = useState("");
   const [toAddress, setToAddress] = useState("");
-  const [amount, setAmount] = useState("0.1");
+  const [resolved, setResolved] = useState(null);
+  const [amount, setAmount] = useState("1");
+  const [memo, setMemo] = useState("");
   const [busy, setBusy] = useState(false);
   const [txState, setTxState] = useState("idle");
   const [error, setError] = useState(null);
@@ -52,14 +57,33 @@ export default function CheckingPage() {
     void refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    const q = mode === "loginId" ? toLoginId.trim() : toAddress.trim();
+    if (!q || (mode === "address" && !ADDR_RE.test(q)) || (mode === "loginId" && q.length < 3)) {
+      setResolved(null);
+      return;
+    }
+    const t = setTimeout(() => {
+      void api
+        .get(`/api/deposits/checking/resolve?q=${encodeURIComponent(q)}`)
+        .then((r) => {
+          setResolved(r);
+          setFieldError("");
+        })
+        .catch(() => {
+          setResolved(null);
+        });
+    }, 280);
+    return () => clearTimeout(t);
+  }, [mode, toLoginId, toAddress]);
+
   const amt = Number(amount);
 
   function openConfirm(e) {
     e.preventDefault();
     setFieldError("");
-    const to = toAddress.trim();
-    if (!ADDR_RE.test(to)) {
-      setFieldError("Enter a valid 0x recipient address (40 hex chars).");
+    if (!resolved) {
+      setFieldError("Resolve a valid client by login ID or wallet first.");
       return;
     }
     if (!Number.isFinite(amt) || amt <= 0) {
@@ -75,21 +99,27 @@ export default function CheckingPage() {
   }
 
   async function onSendConfirmed() {
-    if (busy) return;
+    if (busy || !resolved) return;
     setBusy(true);
     setTxState("signing");
     try {
-      await new Promise((r) => setTimeout(r, 350));
+      await new Promise((r) => setTimeout(r, 280));
       setTxState("pending");
-      const r = await api.post("/api/deposits/checking/send", {
-        toAddress: toAddress.trim(),
-        amount: amt,
-      });
+      const body =
+        mode === "loginId"
+          ? { toLoginId: toLoginId.trim(), amount: amt, memo: memo.trim() || undefined }
+          : { toAddress: toAddress.trim(), amount: amt, memo: memo.trim() || undefined };
+      const r = await api.post("/api/deposits/checking/send", body);
       setTxState("success");
-      toast.show("Transfer sent", { variant: "success" });
-      setSummary((s) => ({ ...s, checkingEth: r.checkingEth }));
+      toast.show(`Sent ${formatUsdc(amt)} to ${r.recipient?.displayName || "client"}`, {
+        variant: "success",
+      });
+      setSummary((s) => ({ ...s, checkingEth: r.checkingUsdc ?? r.checkingEth }));
       setConfirmOpen(false);
+      setToLoginId("");
       setToAddress("");
+      setResolved(null);
+      setMemo("");
       await refresh();
     } catch (err) {
       setTxState("error");
@@ -115,11 +145,14 @@ export default function CheckingPage() {
     <div className="client-page">
       <header className="client-hero">
         <p className="eyebrow">Account</p>
-        <h1 className="client-title">Checking</h1>
+        <h1 className="client-title">Checking · peer USDC</h1>
         <p className="client-lede">
-          Everyday transactional balance — no lock-up, no yield. Fund the vault and fixed deposits
-          from here.
+          Send USDC to another client by login ID or wallet. Instant ledger credit — no lock-up.
         </p>
+        <div className="client-hero-badges">
+          <Badge>Client → client</Badge>
+          {user?.loginId ? <Badge>Your ID · {user.loginId}</Badge> : null}
+        </div>
         <div className="quick-actions">
           <Button as={Link} to="/app/savings" variant="ghost" showArrow={false}>
             Savings vault
@@ -138,19 +171,55 @@ export default function CheckingPage() {
 
       <div className="client-grid-2">
         <Glass className="client-panel">
-          <p className="eyebrow">Send</p>
+          <p className="eyebrow">Send to client</p>
           <form className="stack-form" onSubmit={openConfirm}>
             <Input
-              label="Recipient address"
-              value={toAddress}
+              label="Lookup by"
+              as="select"
+              value={mode}
               onChange={(e) => {
-                setToAddress(e.target.value);
+                setMode(e.target.value);
                 setFieldError("");
+                setResolved(null);
               }}
-              placeholder="0x…"
-              required
-              error={fieldError || undefined}
-            />
+            >
+              <option value="loginId">Login ID</option>
+              <option value="address">Wallet address</option>
+            </Input>
+            {mode === "loginId" ? (
+              <Input
+                label="Recipient login ID"
+                value={toLoginId}
+                onChange={(e) => {
+                  setToLoginId(e.target.value);
+                  setFieldError("");
+                }}
+                placeholder="e.g. client_bangladesh_dhaka_00001"
+                required
+              />
+            ) : (
+              <Input
+                label="Recipient address"
+                value={toAddress}
+                onChange={(e) => {
+                  setToAddress(e.target.value);
+                  setFieldError("");
+                }}
+                placeholder="0x…"
+                required
+              />
+            )}
+            {resolved ? (
+              <p className="client-lede" style={{ margin: 0 }}>
+                → <strong>{resolved.displayName}</strong>
+                {resolved.loginId ? ` · ${resolved.loginId}` : ""} ·{" "}
+                <code className="mono">{resolved.wallet.slice(0, 10)}…</code>
+              </p>
+            ) : (
+              <p className="client-lede" style={{ margin: 0, fontSize: 13 }}>
+                Recipient must be a registered client.
+              </p>
+            )}
             <Input
               label="Amount (USDC)"
               type="number"
@@ -162,8 +231,15 @@ export default function CheckingPage() {
                 setFieldError("");
               }}
               required
+              error={fieldError || undefined}
             />
-            <Button type="submit" disabled={busy} block>
+            <Input
+              label="Memo (optional)"
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              placeholder="Rent / gift / …"
+            />
+            <Button type="submit" disabled={busy || !resolved} block>
               Review transfer
             </Button>
           </form>
@@ -172,8 +248,29 @@ export default function CheckingPage() {
         <Glass className="client-panel">
           <p className="eyebrow">Receive</p>
           <p className="client-lede" style={{ marginTop: 0 }}>
-            Share your address or QR. Demo ledger credits still settle via bank flows — this is your
-            receive identity.
+            Share your login ID or wallet so peers can send you USDC.
+          </p>
+          {user?.loginId ? (
+            <>
+              <p className="eyebrow">Login ID</p>
+              <code className="mono" style={{ wordBreak: "break-all", display: "block" }}>
+                {user.loginId}
+              </code>
+              <Button
+                type="button"
+                variant="ghost"
+                showArrow={false}
+                onClick={() => {
+                  void navigator.clipboard?.writeText(user.loginId);
+                  toast.show("Login ID copied", { variant: "success" });
+                }}
+              >
+                Copy login ID
+              </Button>
+            </>
+          ) : null}
+          <p className="eyebrow" style={{ marginTop: 12 }}>
+            Wallet
           </p>
           <code className="mono" style={{ wordBreak: "break-all", display: "block" }}>
             {receiveAddr || "—"}
@@ -217,6 +314,7 @@ export default function CheckingPage() {
                   <strong>{e.kind.replaceAll("_", " ")}</strong>
                   <span>
                     {new Date(e.at).toLocaleString()}
+                    {e.note ? ` · ${e.note}` : ""}
                     {e.counterparty ? ` · ${e.counterparty.slice(0, 8)}…` : ""}
                     {e.txHash ? (
                       <>
@@ -236,11 +334,11 @@ export default function CheckingPage() {
       <Sheet
         open={confirmOpen}
         onClose={() => (!busy ? setConfirmOpen(false) : null)}
-        title="Confirm transfer"
+        title="Confirm peer transfer"
       >
         <p className="client-lede">
-          Send {formatUsdc(amt)} to{" "}
-          <code className="mono">{toAddress.trim().slice(0, 10)}…{toAddress.trim().slice(-6)}</code>
+          Send {formatUsdc(amt)} to <strong>{resolved?.displayName}</strong>
+          {resolved?.loginId ? ` (${resolved.loginId})` : ""}.
         </p>
         <StatusStepper state={txState} />
         <div className="quick-actions" style={{ marginTop: 16 }}>

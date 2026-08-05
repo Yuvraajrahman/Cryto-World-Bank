@@ -11,9 +11,11 @@ import { useSession } from "@/lib/store";
 import { isPreferredChain, networkLabel } from "../../lib/explorer";
 import "../../global.css";
 
-const TAB_ITEMS = [
+const ALL_TAB_ITEMS = [
   { key: "home", label: "Home", icon: "home", path: "/bank/local/dashboard" },
   { key: "approvals", label: "Approvals", icon: "loan", path: "/bank/local/approvals" },
+  { key: "treasury", label: "Treasury", icon: "wallet", path: "/bank/local/treasury", adminOnly: true },
+  { key: "facilities", label: "Facilities", icon: "node", path: "/bank/local/facilities", adminOnly: true },
   { key: "kyc", label: "KYC", icon: "passport", path: "/bank/local/kyc-review" },
   { key: "aml", label: "AML", icon: "alert", path: "/bank/local/aml-alerts" },
 ];
@@ -25,6 +27,8 @@ function shortWallet(w) {
 
 function activeKey(pathname) {
   if (pathname.startsWith("/bank/local/approvals")) return "approvals";
+  if (pathname.startsWith("/bank/local/treasury")) return "treasury";
+  if (pathname.startsWith("/bank/local/facilities")) return "facilities";
   if (pathname.startsWith("/bank/local/kyc-review")) return "kyc";
   if (pathname.startsWith("/bank/local/aml-alerts")) return "aml";
   if (pathname.startsWith("/bank/local/users")) return "home";
@@ -60,7 +64,10 @@ export default function BankOperatorShell() {
   const isAdmin =
     user?.role === "LOCAL_BANK_ADMIN" ||
     user?.role === "NATIONAL_BANK_ADMIN" ||
-    user?.role === "OWNER";
+    user?.role === "OWNER" ||
+    user?.role === "DEV_ADMIN";
+  // Treasury + facilities APIs are admin-only (not APPROVER).
+  const TAB_ITEMS = ALL_TAB_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   function onLogout() {
     reset();

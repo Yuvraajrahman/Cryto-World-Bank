@@ -64,6 +64,18 @@ function OperatorHome({ user }) {
                 icon: "group",
               },
               {
+                to: "/bank/local/facilities",
+                label: "Facilities",
+                desc: "Interbank & upward liquidity",
+                icon: "node",
+              },
+              {
+                to: "/bank/local/treasury",
+                label: "Treasury FX",
+                desc: "USDC ↔ ETH swaps",
+                icon: "wallet",
+              },
+              {
                 to: "/bank/world/multisig",
                 label: "World multisig",
                 desc: "Co-sign if you are a Safe signer",
@@ -99,6 +111,18 @@ function OperatorHome({ user }) {
             icon: "settings",
           },
           {
+            to: "/bank/world/facilities",
+            label: "Facilities",
+            desc: "Upward deposits inbox",
+            icon: "node",
+          },
+          {
+            to: "/bank/world/treasury",
+            label: "Treasury FX",
+            desc: "Institutional USDC ↔ ETH",
+            icon: "wallet",
+          },
+          {
             to: "/bank/national/dashboard",
             label: "National desk",
             desc: "Oversight of a jurisdiction",
@@ -123,6 +147,18 @@ function OperatorHome({ user }) {
             to: "/bank/national/capital-allocation",
             label: "Capital allocation",
             desc: "Push funds & fulfill requests",
+            icon: "wallet",
+          },
+          {
+            to: "/bank/national/facilities",
+            label: "Facilities",
+            desc: "Interbank & upward liquidity",
+            icon: "node",
+          },
+          {
+            to: "/bank/national/treasury",
+            label: "Treasury FX",
+            desc: "USDC ↔ ETH swaps",
             icon: "wallet",
           },
           {
@@ -280,6 +316,18 @@ function RetailHome() {
         <Button as={Link} to="/app/savings" variant="ghost" showArrow={false}>
           Deposit to savings
         </Button>
+        <Button as={Link} to="/app/account/checking" variant="ghost" showArrow={false}>
+          Checking
+        </Button>
+        <Button as={Link} to="/app/account/convert" variant="ghost" showArrow={false}>
+          USD → USDC
+        </Button>
+        <Button as={Link} to="/app/account/exchange" variant="ghost" showArrow={false}>
+          Exchange
+        </Button>
+        <Button as={Link} to="/app/deposits/fixed" variant="ghost" showArrow={false}>
+          Fixed deposit
+        </Button>
         <Button as={Link} to="/app/installments" variant="ghost" showArrow={false}>
           Make a payment
         </Button>
@@ -343,13 +391,21 @@ function RetailHome() {
         </Glass>
 
         <Glass className="client-panel">
-          <p className="eyebrow">Savings</p>
+          <p className="eyebrow">Savings & money</p>
           <h2 className="client-panel-title">{formatUsdc(data.savings?.vaultEth ?? 0)}</h2>
           <p className="client-lede" style={{ margin: "0 0 12px" }}>
-            Variable vault, fixed deposits, and checking.
+            Vault, fixed deposits, checking, USD→USDC, and FX.
           </p>
           <Link to="/app/savings" className="text-link">
             Open savings →
+          </Link>
+          <br />
+          <Link to="/app/account/convert" className="text-link">
+            Convert USD →
+          </Link>
+          {" · "}
+          <Link to="/app/account/statement" className="text-link">
+            Statement →
           </Link>
         </Glass>
 

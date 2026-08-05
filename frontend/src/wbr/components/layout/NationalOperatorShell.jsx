@@ -13,6 +13,9 @@ import "../../global.css";
 
 const TAB_ITEMS = [
   { key: "home", label: "Home", icon: "home", path: "/bank/national/dashboard" },
+  { key: "approvals", label: "Approvals", icon: "loan", path: "/bank/national/approvals" },
+  { key: "treasury", label: "Treasury", icon: "wallet", path: "/bank/national/treasury" },
+  { key: "facilities", label: "Facilities", icon: "node", path: "/bank/national/facilities" },
   { key: "locals", label: "Locals", icon: "node", path: "/bank/national/local-banks" },
   { key: "capital", label: "Capital", icon: "wallet", path: "/bank/national/capital-allocation" },
   { key: "sar", label: "SAR", icon: "alert", path: "/bank/national/sar-review" },
@@ -24,6 +27,9 @@ function shortWallet(w) {
 }
 
 function activeKey(pathname) {
+  if (pathname.startsWith("/bank/national/approvals")) return "approvals";
+  if (pathname.startsWith("/bank/national/treasury")) return "treasury";
+  if (pathname.startsWith("/bank/national/facilities")) return "facilities";
   if (pathname.startsWith("/bank/national/local-banks")) return "locals";
   if (pathname.startsWith("/bank/national/capital-allocation")) return "capital";
   if (pathname.startsWith("/bank/national/sar-review")) return "sar";

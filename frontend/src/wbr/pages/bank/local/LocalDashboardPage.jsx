@@ -32,6 +32,11 @@ export default function LocalDashboardPage() {
   const [capAmount, setCapAmount] = useState("10");
   const [capReason, setCapReason] = useState("");
   const [capBusy, setCapBusy] = useState(false);
+  const isAdmin =
+    user?.role === "LOCAL_BANK_ADMIN" ||
+    user?.role === "NATIONAL_BANK_ADMIN" ||
+    user?.role === "OWNER" ||
+    user?.role === "DEV_ADMIN";
 
   async function load() {
     setLoading(true);
@@ -97,10 +102,6 @@ export default function LocalDashboardPage() {
     },
   ];
 
-  const isAdmin =
-    user?.role === "LOCAL_BANK_ADMIN" ||
-    user?.role === "NATIONAL_BANK_ADMIN" ||
-    user?.role === "OWNER";
   const isLbAdmin = user?.role === "LOCAL_BANK_ADMIN";
 
   async function requestCapital() {
@@ -136,12 +137,24 @@ export default function LocalDashboardPage() {
           {data.bank?.id ? <Badge icon="node">{data.bank.id}</Badge> : null}
         </div>
         <div className="quick-actions" style={{ marginTop: 12 }}>
-          <Button as={Link} to="/bank/local/request-loan">
-            Request loan from National
-          </Button>
+          {isAdmin ? (
+            <Button as={Link} to="/bank/local/request-loan">
+              Request loan from National
+            </Button>
+          ) : null}
           <Button as={Link} to="/bank/local/approvals" variant="ghost" showArrow={false}>
             Approvals queue
           </Button>
+          {isAdmin ? (
+            <>
+              <Button as={Link} to="/bank/local/facilities" variant="ghost" showArrow={false}>
+                Interbank & upward
+              </Button>
+              <Button as={Link} to="/bank/local/treasury" variant="ghost" showArrow={false}>
+                Treasury FX
+              </Button>
+            </>
+          ) : null}
         </div>
       </header>
 

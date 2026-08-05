@@ -11,9 +11,12 @@ import { api } from "@/lib/api";
 import { formatUsdc } from "@/lib/formatMoney";
 
 /**
- * Route: `/bank/local/approvals/:loanId` — Authority Brief (plan I.31)
+ * Authority Brief — Local or National (via apiBase / queuePath props).
  */
-export default function LoanDecisionPage() {
+export default function LoanDecisionPage({
+  apiBase = "/api/local-bank/approvals",
+  queuePath = "/bank/local/approvals",
+}) {
   const { loanId } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
@@ -28,7 +31,7 @@ export default function LoanDecisionPage() {
   async function load() {
     setLoading(true);
     try {
-      const d = await api.get(`/api/local-bank/approvals/${loanId}`);
+      const d = await api.get(`${apiBase}/${loanId}`);
       setData(d);
       setError(null);
     } catch (err) {
@@ -40,7 +43,7 @@ export default function LoanDecisionPage() {
 
   useEffect(() => {
     void load();
-  }, [loanId]);
+  }, [loanId, apiBase]);
 
   async function onApprove() {
     setBusy(true);
@@ -48,7 +51,7 @@ export default function LoanDecisionPage() {
       await api.post(`/api/loans/${loanId}/approve`, {});
       toast.show("Loan approved", { variant: "success" });
       setSheet(null);
-      navigate("/bank/local/approvals");
+      navigate(queuePath);
     } catch (err) {
       toast.show(err.message || "Failed", { variant: "error" });
     } finally {
@@ -63,7 +66,7 @@ export default function LoanDecisionPage() {
       await api.post(`/api/loans/${loanId}/reject`, { reason: reason.trim() });
       toast.show("Loan rejected", { variant: "success" });
       setSheet(null);
-      navigate("/bank/local/approvals");
+      navigate(queuePath);
     } catch (err) {
       toast.show(err.message || "Failed", { variant: "error" });
     } finally {
@@ -75,7 +78,7 @@ export default function LoanDecisionPage() {
     if (infoMsg.trim().length < 3) return;
     setBusy(true);
     try {
-      await api.post(`/api/local-bank/approvals/${loanId}/request-info`, {
+      await api.post(`${apiBase}/${loanId}/request-info`, {
         message: infoMsg.trim(),
       });
       toast.show("Info requested", { variant: "success" });
@@ -103,7 +106,7 @@ export default function LoanDecisionPage() {
         <StateMessage
           title="Brief unavailable"
           description={error.message}
-          action={{ label: "Back to queue", onClick: () => navigate("/bank/local/approvals") }}
+          action={{ label: "Back to queue", onClick: () => navigate(queuePath) }}
         />
       </div>
     );
@@ -112,20 +115,33 @@ export default function LoanDecisionPage() {
   const loan = data.loan;
   const brief = data.authorityBrief;
   const borrower = data.borrower;
+  const requesterBank = data.requesterBank;
   const limits = data.limits;
+  const isLocalLiquidity = loan.kind === "LOCAL_FROM_NATIONAL";
+  const titleName =
+    loan.applicantLabel ||
+    borrower?.displayName ||
+    requesterBank?.name ||
+    "Applicant";
 
   return (
     <div className="client-page">
       <header className="client-hero">
         <p className="eyebrow">Authority Brief</p>
-        <h1 className="client-title">{borrower?.displayName || "Applicant"}</h1>
+        <h1 className="client-title">{titleName}</h1>
         <p className="client-lede">
-          {formatUsdc(loan.amount)} · {loan.termMonths} mo · {String(loan.loanType || "loan")} ·{" "}
-          {loan.status}
+          {formatUsdc(loan.amount)} · {loan.termMonths} mo ·{" "}
+          {loan.kindLabel || String(loan.loanType || "loan")} · {loan.status}
         </p>
         <div className="client-hero-badges">
-          <Badge icon="passport">KYC1 {borrower?.kyc1Status || "—"}</Badge>
-          <Badge icon="check">KYC2 {borrower?.kyc2Status || "—"}</Badge>
+          {isLocalLiquidity ? (
+            <Badge icon="node">{requesterBank?.city || requesterBank?.name || "Local bank"}</Badge>
+          ) : (
+            <>
+              <Badge icon="passport">KYC1 {borrower?.kyc1Status || "—"}</Badge>
+              <Badge icon="check">KYC2 {borrower?.kyc2Status || "—"}</Badge>
+            </>
+          )}
         </div>
       </header>
 
@@ -175,9 +191,16 @@ export default function LoanDecisionPage() {
         </Glass>
         <Glass className="client-panel" level={2}>
           <h2 className="client-panel-title" style={{ fontSize: "1.15rem" }}>
-            Limits
+            {isLocalLiquidity ? "Requester bank" : "Limits"}
           </h2>
-          {limits ? (
+          {isLocalLiquidity ? (
+            <>
+              <p style={{ margin: 0, fontSize: 14 }}>
+                <strong>{requesterBank?.name || "—"}</strong>
+              </p>
+              <p style={{ margin: "6px 0 0", fontSize: 14 }}>{requesterBank?.city || "—"}</p>
+            </>
+          ) : limits ? (
             <>
               <p style={{ margin: 0, fontSize: 14 }}>
                 6-month used {formatUsdc(limits.sixMonth?.borrowed)} /{" "}
@@ -213,7 +236,7 @@ export default function LoanDecisionPage() {
         </section>
       ) : null}
 
-      {loan.status === "PENDING" ? (
+      {loan.status === "PENDING" || loan.status === "INFO_REQUESTED" ? (
         <div className="ops-decision-bar glass">
           <Button type="button" onClick={() => setSheet("approve")} disabled={busy}>
             Approve
@@ -242,15 +265,15 @@ export default function LoanDecisionPage() {
       )}
 
       <div className="quick-actions">
-        <Button as={Link} to="/bank/local/approvals" variant="ghost" showArrow={false}>
+        <Button as={Link} to={queuePath} variant="ghost" showArrow={false}>
           Back to queue
         </Button>
       </div>
 
       <Sheet open={sheet === "approve"} onClose={() => !busy && setSheet(null)} title="Confirm approve">
         <p className="client-lede">
-          Approve {formatUsdc(loan.amount)} for {borrower?.displayName || "applicant"}? This records
-          disbursement against branch reserve (demo off-chain write).
+          Approve {formatUsdc(loan.amount)} for {titleName}? This records disbursement against
+          lender reserve.
         </p>
         <div className="quick-actions" style={{ marginTop: 12 }}>
           <Button type="button" onClick={() => void onApprove()} disabled={busy}>

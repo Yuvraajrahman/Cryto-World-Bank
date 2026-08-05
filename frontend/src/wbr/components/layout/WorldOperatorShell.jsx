@@ -14,6 +14,8 @@ import "../../global.css";
 const ALL_TAB_ITEMS = [
   { key: "home", label: "Home", icon: "home", path: "/bank/world/dashboard" },
   { key: "nationals", label: "Nationals", icon: "node", path: "/bank/world/national-banks" },
+  { key: "treasury", label: "Treasury", icon: "wallet", path: "/bank/world/treasury" },
+  { key: "facilities", label: "Facilities", icon: "node", path: "/bank/world/facilities" },
   { key: "multisig", label: "Multisig", icon: "wallet", path: "/bank/world/multisig" },
   { key: "gov", label: "Governance", icon: "settings", path: "/bank/world/governance" },
 ];
@@ -29,6 +31,8 @@ function shortWallet(w) {
 
 function activeKey(pathname) {
   if (pathname.startsWith("/bank/world/national-banks")) return "nationals";
+  if (pathname.startsWith("/bank/world/treasury")) return "treasury";
+  if (pathname.startsWith("/bank/world/facilities")) return "facilities";
   if (pathname.startsWith("/bank/world/multisig")) return "multisig";
   if (pathname.startsWith("/bank/world/governance")) return "gov";
   return "home";

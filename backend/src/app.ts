@@ -28,6 +28,8 @@ import { passportRouter } from "./routes/passport";
 import { localBankRouter } from "./routes/localBank";
 import { nationalBankRouter } from "./routes/nationalBank";
 import { worldBankRouter } from "./routes/worldBank";
+import { treasuryRouter } from "./routes/treasury";
+import { facilitiesRouter } from "./routes/facilities";
 import { auditRouter } from "./routes/audit";
 import { devAdminRouter } from "./routes/devAdmin";
 import { errorHandler } from "./middleware/error";
@@ -121,6 +123,8 @@ export function createApp(): Express {
   app.use("/api/local-bank", localBankRouter);
   app.use("/api/national-bank", nationalBankRouter);
   app.use("/api/world-bank", worldBankRouter);
+  app.use("/api/treasury", treasuryRouter);
+  app.use("/api/facilities", facilitiesRouter);
   app.use("/api/audit", auditRouter);
   app.use("/api/dev-admin", devAdminRouter);
   app.use("/api/banks", banksRouter);

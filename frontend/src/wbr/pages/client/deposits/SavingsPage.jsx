@@ -148,6 +148,15 @@ export default function SavingsPage() {
           <Button as={Link} to="/app/account/checking" variant="ghost" showArrow={false}>
             Checking
           </Button>
+          <Button as={Link} to="/app/account/convert" variant="ghost" showArrow={false}>
+            USD → USDC
+          </Button>
+          <Button as={Link} to="/app/account/exchange" variant="ghost" showArrow={false}>
+            Exchange
+          </Button>
+          <Button as={Link} to="/app/account/statement" variant="ghost" showArrow={false}>
+            Statement
+          </Button>
         </div>
       </header>
 

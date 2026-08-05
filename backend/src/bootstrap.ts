@@ -19,5 +19,11 @@ export async function bootstrapApi(): Promise<void> {
   } catch {
     /* non-fatal until migration applied */
   }
+  try {
+    const { importLegacyJsonStores } = await import("./db/importLegacyJson");
+    await importLegacyJsonStores();
+  } catch {
+    /* non-fatal until migration applied */
+  }
   booted = true;
 }

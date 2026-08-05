@@ -483,6 +483,9 @@ model User {
   messagesReceived   ChatMessage[]        @relation("ReceivedMessages")
   auditEvents        AuditLog[]
   notifications      Notification[]
+  depositAccount     ClientDepositAccount?
+  depositLedger      ClientDepositLedger[]
+  fixedDeposits      ClientFixedDeposit[]
 
   @@index([role])
   @@index([onboardingComplete])
@@ -616,4 +619,86 @@ model SimulationRun {
   completedAt             DateTime?
 
   @@index([startedAt])
+}
+
+// ---- Retail deposits + bank liquidity facilities (Postgres source of truth) ----
+
+/// Per-client deposit balances (checking / vault / retail ETH / fiat on-ramp).
+model ClientDepositAccount {
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vaultUsdc    Float    @default(0)
+  checkingUsdc Float    @default(250)
+  ethBalance   Float    @default(0.05)
+  fiatUsd      Float    @default(500)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ClientDepositLedger {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind         String
+  amount       Float
+  note         String?
+  counterparty String?
+  txHash       String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([kind])
+}
+
+model ClientFixedDeposit {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  principal  Float
+  termDays   Int
+  aprBps     Int
+  openedAt   DateTime @default(now())
+  maturesAt  DateTime
+  status     String   @default("ACTIVE") // ACTIVE | MATURED | WITHDRAWN | EARLY_WITHDRAWN
+  penaltyBps Int      @default(200)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId, status])
+}
+
+/// Same-tier InterBankLendingPool ops (paper #40) — USDC notionals.
+model OpsInterbankLoan {
+  id             String    @id @default(cuid())
+  borrowerBankId String
+  lenderBankId   String
+  amountUsdc     Float
+  tenorDays      Int
+  aprBps         Int
+  status         String    @default("REQUESTED") // REQUESTED | ACTIVE | REPAID | REJECTED | DEFAULTED
+  createdBy      String
+  note           String?
+  fundedAt       DateTime?
+  repaidAt       DateTime?
+  dueAt          DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([borrowerBankId, status])
+  @@index([lenderBankId, status])
+  @@index([createdAt])
+}
+
+/// UpwardDepositFacility ops (paper #41) — surplus parked with parent tier.
+model OpsUpwardDeposit {
+  id         String   @id @default(cuid())
+  fromBankId String
+  toBankId   String
+  amountUsdc Float
+  createdBy  String
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([fromBankId, createdAt])
+  @@index([toBankId, createdAt])
 }

@@ -198,7 +198,7 @@ export default function RequestLoanPage({
           />
         ) : null}
 
-        <div className="fund-bank-list" style={{ maxHeight: 260, marginTop: 10 }} role="listbox">
+        <div className="fund-bank-list" style={{ maxHeight: 320, marginTop: 10 }} role="listbox">
           {banksInTier.slice(0, 80).map((b) => (
             <button
               key={b.id}
@@ -206,12 +206,26 @@ export default function RequestLoanPage({
               className={`fund-bank-row${bankId === b.id ? " selected" : ""}`}
               onClick={() => setBankId(b.id)}
             >
-              <span>
+              <span className="fund-bank-name">
                 <strong>{b.name}</strong>
                 <small>
-                  {b.jurisdiction || b.city || b.tier} · pool {formatUsdc(b.availableToLendUsdc)}{" "}
-                  available · {formatUsdc(b.reserveUsdc)} reserve · {b.activeLoanCount} active
+                  {b.jurisdiction || b.city || b.tier}
+                  {b.activeLoanCount != null ? ` · ${b.activeLoanCount} active loans` : ""}
                 </small>
+              </span>
+              <span className="fund-bank-metrics">
+                <span>
+                  <em>Available</em>
+                  <b>{formatUsdc(b.availableToLendUsdc)}</b>
+                </span>
+                <span>
+                  <em>Reserve</em>
+                  <b>{formatUsdc(b.reserveUsdc)}</b>
+                </span>
+                <span>
+                  <em>Book</em>
+                  <b>{formatUsdc(b.activeLoanValueUsdc)}</b>
+                </span>
               </span>
             </button>
           ))}

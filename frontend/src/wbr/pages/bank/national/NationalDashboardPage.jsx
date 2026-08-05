@@ -66,9 +66,21 @@ export default function NationalDashboardPage() {
   const capital = data.capital || {};
   const j = data.jurisdiction || {};
   const warnings = data.warnings || {};
-  const allCaughtUp = !(q.capitalRequestsOpen || q.sarOpen || q.localFromNationalPending);
+  const allCaughtUp = !(
+    q.capitalRequestsOpen ||
+    q.sarOpen ||
+    q.localFromNationalPending ||
+    q.clientLoansPending ||
+    q.approvalsPending
+  );
 
   const queues = [
+    {
+      to: "/bank/national/approvals",
+      label: "Loan approvals",
+      count: q.approvalsPending ?? (q.clientLoansPending || 0) + (q.localFromNationalPending || 0),
+      icon: "loan",
+    },
     {
       to: "/bank/national/capital-allocation",
       label: "Capital requests",
@@ -95,18 +107,25 @@ export default function NationalDashboardPage() {
         <p className="eyebrow">National Bank</p>
         <h1 className="client-title">{data.bank?.name || "Jurisdiction"} operations</h1>
         <p className="client-lede">
-          Capital from World Bank, Local Bank roster, and pending jurisdiction work.
+          Approve client and Local Bank loans, allocate capital from World Bank, and manage the
+          jurisdiction roster.
         </p>
         <div className="client-hero-badges">
           <Badge>{user?.role?.replaceAll("_", " ")}</Badge>
           {data.bank?.jurisdiction ? <Badge icon="node">{data.bank.jurisdiction}</Badge> : null}
         </div>
         <div className="quick-actions" style={{ marginTop: 12 }}>
-          <Button as={Link} to="/bank/national/request-loan">
+          <Button as={Link} to="/bank/national/approvals">
+            Loan approvals
+          </Button>
+          <Button as={Link} to="/bank/national/request-loan" variant="ghost" showArrow={false}>
             Request loan from World
           </Button>
           <Button as={Link} to="/bank/national/capital-allocation" variant="ghost" showArrow={false}>
             Capital allocation
+          </Button>
+          <Button as={Link} to="/bank/national/facilities" variant="ghost" showArrow={false}>
+            Interbank & upward
           </Button>
         </div>
       </header>
@@ -141,7 +160,7 @@ export default function NationalDashboardPage() {
           <StateMessage
             variant="empty"
             title="All caught up"
-            description="No open capital requests or SARs for this jurisdiction."
+            description="No open loan approvals, capital requests, or SARs for this jurisdiction."
           />
         ) : (
           <div className="ops-queue-grid">
@@ -205,7 +224,11 @@ export default function NationalDashboardPage() {
       </section>
 
       {data.bank?.id ? (
-        <ActiveLoansPanel bankId={data.bank.id} title="Pending & active loans (this National)" />
+        <ActiveLoansPanel
+          bankId={data.bank.id}
+          title="Pending & active loans (this National)"
+          decisionBasePath="/bank/national/approvals"
+        />
       ) : null}
 
       <div className="quick-actions">

@@ -17,7 +17,11 @@ import {
   writeAudit,
 } from "../db/users";
 import { persistBankCapital, syncBanksFromPrisma } from "../db/banksSync";
-import { depositsDb, ensureBalances, pushLedger } from "../store/deposits";
+import {
+  ensureDepositAccount,
+  updateDepositAccount,
+  pushDepositLedger,
+} from "../db/clientDeposits";
 import {
   getSimulationConfig,
   updateSimulationConfig,
@@ -35,11 +39,12 @@ import {
 import { optimizeSimulationConfig } from "../services/optimizeSimulation";
 import { PASSPORT_TIERS } from "../lib/rates";
 
-function creditClientChecking(userId: string, amount: number, note: string) {
-  ensureBalances(userId);
-  depositsDb.state.checkingBalances[userId] =
-    (depositsDb.state.checkingBalances[userId] ?? 0) + amount;
-  pushLedger({
+async function creditClientChecking(userId: string, amount: number, note: string) {
+  const acct = await ensureDepositAccount(userId);
+  await updateDepositAccount(userId, {
+    checkingUsdc: acct.checkingUsdc + amount,
+  });
+  await pushDepositLedger({
     userId,
     kind: "CHECK_RECV",
     amount,
@@ -199,8 +204,7 @@ devAdminRouter.post("/allocate", async (req, res, next) => {
       world.reserve -= body.amount;
       world.totalAllocated += body.amount;
       const note = body.note || `Super Admin allocation to client ${user.loginId || user.id}`;
-      creditClientChecking(user.id, body.amount, note);
-      depositsDb.save();
+      await creditClientChecking(user.id, body.amount, note);
       db.state.transactions.push({
         id: db.uid("tx"),
         type: "DEPOSIT",
@@ -217,13 +221,14 @@ devAdminRouter.post("/allocate", async (req, res, next) => {
         toId: user.id,
         amountUsdc: body.amount,
       });
+      const acct = await ensureDepositAccount(user.id);
       res.json({
         ok: true,
         unit: "USDC",
         from: world,
         client: user,
         amount: body.amount,
-        checkingUsdc: depositsDb.state.checkingBalances[user.id],
+        checkingUsdc: acct.checkingUsdc,
       });
       return;
     }
@@ -346,10 +351,9 @@ devAdminRouter.post("/allocate/bulk", async (req, res, next) => {
 
     if (body.toType === "CLIENT") {
       for (const t of targets) {
-        creditClientChecking(t.id, amountEach, `${noteBase}: ${t.label}`);
+        await creditClientChecking(t.id, amountEach, `${noteBase}: ${t.label}`);
         fundedIds.push(t.id);
       }
-      depositsDb.save();
       db.state.transactions.push({
         id: db.uid("tx"),
         type: "DEPOSIT",

@@ -372,6 +372,27 @@ loansRouter.post("/", requireAuth, async (req, res, next) => {
           : `Your ${loan.amount} USDC request to ${bank.name} is pending review.`,
         href: `/app/loans/${loan.id}`,
       });
+      if (!shouldActivate) {
+        const staff = db.state.users.filter((u) => {
+          if (u.bankId !== bank.id) return false;
+          if (bank.tier === "NATIONAL") return u.role === "NATIONAL_BANK_ADMIN";
+          return u.role === "LOCAL_BANK_ADMIN" || u.role === "APPROVER";
+        });
+        await Promise.all(
+          staff.map((s) =>
+            createNotification({
+              userId: s.id,
+              category: "loan",
+              title: bank.tier === "NATIONAL" ? "Client loan request" : "Loan request",
+              body: `${user.displayName || "Client"} requested ${loan.amount} USDC (${loan.loanType}).`,
+              href:
+                bank.tier === "NATIONAL"
+                  ? `/bank/national/approvals/${loan.id}`
+                  : `/bank/local/approvals/${loan.id}`,
+            }),
+          ),
+        );
+      }
     } catch {
       /* notifications optional if DB down */
     }

@@ -24,6 +24,7 @@ const LTV_BPS = 5000;
 
 /**
  * Route: `/app/loans/apply/collateral` — plan D.13
+ * Clients may request from Local or National banks (not World).
  */
 export default function CollateralApplyPage() {
   const navigate = useNavigate();
@@ -33,7 +34,8 @@ export default function CollateralApplyPage() {
   const ethBal = useBalance({ address });
   const { limits } = useBorrowingLimits();
 
-  const [banks, setBanks] = useState([]);
+  const [lenderTier, setLenderTier] = useState("LOCAL");
+  const [categories, setCategories] = useState({ LOCAL: [], NATIONAL: [] });
   const [bankId, setBankId] = useState("");
   const [collateral, setCollateral] = useState("2");
   const [amount, setAmount] = useState("0.8");
@@ -46,18 +48,35 @@ export default function CollateralApplyPage() {
   const kycPending =
     user?.kyc1Status === "PENDING" || user?.kyc1Status === "NOT_STARTED";
 
+  const banks = categories[lenderTier] || [];
+
   useEffect(() => {
-    void api.get("/api/banks").then((r) => {
-      setBanks(r.localBanks || []);
-      if (r.localBanks?.[0]) setBankId(r.localBanks[0].id);
+    void api.get("/api/loans/lenders").then((r) => {
+      const locals = r.categories?.LOCAL || [];
+      const nationals = r.categories?.NATIONAL || [];
+      setCategories({ LOCAL: locals, NATIONAL: nationals });
+      const start = locals.length ? "LOCAL" : nationals.length ? "NATIONAL" : "LOCAL";
+      setLenderTier(start);
+      const list = start === "NATIONAL" ? nationals : locals;
+      if (list[0]) setBankId(list[0].id);
     });
   }, []);
+
+  useEffect(() => {
+    const list = categories[lenderTier] || [];
+    if (!list.find((b) => b.id === bankId)) {
+      setBankId(list[0]?.id || "");
+    }
+  }, [lenderTier, categories, bankId]);
 
   const selectedBank = banks.find((b) => b.id === bankId);
   const walletEth = ethBal.data ? Number(formatEther(ethBal.data.value)) : 0;
   const coll = Number(collateral) || 0;
   const maxLtv = maxBorrowFromLtv(coll, LTV_BPS);
-  const util = illustrativeUtilization(selectedBank?.totalLent, selectedBank?.reserve);
+  const util = illustrativeUtilization(
+    selectedBank?.totalLentUsdc ?? selectedBank?.totalLent,
+    selectedBank?.reserveUsdc ?? selectedBank?.reserve,
+  );
   const aprBps = rateAtUtilization(util, selectedBank?.aprBps ?? 800);
   const schedule = useMemo(
     () => previewSchedule({ principal: Number(amount) || 0, termMonths, aprBps }),
@@ -66,6 +85,7 @@ export default function CollateralApplyPage() {
 
   const remaining = limits?.sixMonth?.remaining ?? Infinity;
   const errors = [];
+  if (!bankId) errors.push("Select a Local or National bank");
   if (coll > walletEth + 1e-6 && ethBal.data) errors.push("Collateral exceeds wallet balance");
   if ((Number(amount) || 0) > maxLtv + 1e-9) errors.push(`Exceeds LTV max (${formatEth(maxLtv)})`);
   if ((Number(amount) || 0) > remaining) errors.push("Exceeds six-month borrowing limit");
@@ -89,15 +109,17 @@ export default function CollateralApplyPage() {
         amount: Number(amount),
         termMonths: Number(termMonths),
         purpose,
-        localBankId: bankId,
+        lenderBankId: bankId,
         loanType: "collateral",
         collateralEth: coll,
         ltvBps: LTV_BPS,
         category: "Collateral",
-        autoActivate: true,
+        autoActivate: false,
       });
       setTxState("success");
-      toast.show("Collateral loan submitted", { variant: "success" });
+      toast.show(`Collateral request sent to ${selectedBank?.name || "bank"}`, {
+        variant: "success",
+      });
       setConfirmOpen(false);
       navigate(`/app/loans/${r.loan.id}`);
     } catch (err) {
@@ -121,7 +143,8 @@ export default function CollateralApplyPage() {
         <h1 className="client-title">Back your borrow with ETH</h1>
         <p className="client-lede">
           LTV {LTV_BPS / 100}% · pool utilization {(util * 100).toFixed(0)}% (kink at 80%) · wallet{" "}
-          {ethBal.data ? formatEth(walletEth) : "—"}.
+          {ethBal.data ? formatEth(walletEth) : "—"}. Choose Local or National lender — approval
+          required.
         </p>
         <Badge icon="wallet">Max borrow {formatEth(maxLtv)}</Badge>
       </header>
@@ -155,23 +178,33 @@ export default function CollateralApplyPage() {
               onChange={(e) => setTermMonths(Number(e.target.value) || 1)}
             />
             <Input
-              label="Local bank"
+              label="Lender tier"
+              as="select"
+              value={lenderTier}
+              onChange={(e) => setLenderTier(e.target.value)}
+            >
+              <option value="LOCAL">Local banks</option>
+              <option value="NATIONAL">National banks</option>
+            </Input>
+            <Input
+              label={lenderTier === "NATIONAL" ? "National bank" : "Local bank"}
               as="select"
               value={bankId}
               onChange={(e) => setBankId(e.target.value)}
             >
-              {banks.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
+              {banks.length === 0 ? (
+                <option value="">No banks available</option>
+              ) : (
+                banks.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                    {b.city ? ` · ${b.city}` : b.jurisdiction ? ` · ${b.jurisdiction}` : ""}
+                  </option>
+                ))
+              )}
             </Input>
           </div>
-          <Input
-            label="Purpose"
-            value={purpose}
-            onChange={(e) => setPurpose(e.target.value)}
-          />
+          <Input label="Purpose" value={purpose} onChange={(e) => setPurpose(e.target.value)} />
           <div className="ltv-meter" aria-hidden>
             <div
               className="ltv-meter-fill"
@@ -242,9 +275,9 @@ export default function CollateralApplyPage() {
         title="Confirm collateral loan"
       >
         <p className="client-lede">
-          Borrow {formatEth(Number(amount))} against {formatEth(coll)} ETH collateral for{" "}
+          Request {formatEth(Number(amount))} against {formatEth(coll)} ETH collateral for{" "}
           {termMonths} months at ~{(aprBps / 100).toFixed(2)}% APR via{" "}
-          {selectedBank?.name || "local bank"}.
+          {selectedBank?.name || "bank"}. Awaits bank approval.
         </p>
         <StatusStepper state={txState} errorStep="pending" />
         <div className="quick-actions" style={{ marginTop: 16 }}>

@@ -33,6 +33,9 @@ import { GroupConsent } from "@/pages/GroupConsent";
 import { Savings } from "@/pages/Savings";
 import { FixedDeposit } from "@/pages/FixedDeposit";
 import { Checking } from "@/pages/Checking";
+import { Convert } from "@/pages/Convert";
+import { Exchange } from "@/pages/Exchange";
+import { Statement } from "@/pages/Statement";
 import { Passport } from "@/pages/Passport";
 import { Agent } from "@/pages/Agent";
 import { BankChat } from "@/pages/BankChat";
@@ -48,6 +51,7 @@ import { Multisig } from "@/pages/Multisig";
 import { NotFound } from "@/pages/NotFound";
 import { RequireBorrower } from "@/pages/RequireBorrower";
 import { RequireLocalStaff } from "@/pages/RequireLocalStaff";
+import { RequireLocalAdmin } from "@/pages/RequireLocalAdmin";
 import { BankOperatorShell } from "@/pages/BankOperatorShell";
 import { LocalBankDashboard } from "@/pages/LocalBankDashboard";
 import { LocalApprovals } from "@/pages/LocalApprovals";
@@ -63,11 +67,20 @@ import { NationalLocalBanks } from "@/pages/NationalLocalBanks";
 import { NationalCapitalAllocation } from "@/pages/NationalCapitalAllocation";
 import { NationalSettings } from "@/pages/NationalSettings";
 import { NationalSarReview } from "@/pages/NationalSarReview";
+import { NationalApprovals } from "@/pages/NationalApprovals";
+import { NationalLoanDecision } from "@/pages/NationalLoanDecision";
 import { RequireWorldAdmin } from "@/pages/RequireWorldAdmin";
 import { RequireWorldMultisig } from "@/pages/RequireWorldMultisig";
 import { WorldOperatorShell } from "@/pages/WorldOperatorShell";
 import { WorldBankDashboard } from "@/pages/WorldBankDashboard";
 import { WorldNationalBanks } from "@/pages/WorldNationalBanks";
+import { WorldTreasury } from "@/pages/WorldTreasury";
+import { NationalTreasury } from "@/pages/NationalTreasury";
+import { LocalTreasury } from "@/pages/LocalTreasury";
+import { LocalFacilities } from "@/pages/LocalFacilities";
+import { NationalFacilities } from "@/pages/NationalFacilities";
+import { WorldFacilities } from "@/pages/WorldFacilities";
+
 import { WorldMultisig } from "@/pages/WorldMultisig";
 import { WorldGovernance } from "@/pages/WorldGovernance";
 import { RequireRegulator } from "@/pages/RequireRegulator";
@@ -123,6 +136,9 @@ export function App() {
           <Route path="/app/savings" element={<Savings />} />
           <Route path="/app/deposits/fixed" element={<FixedDeposit />} />
           <Route path="/app/account/checking" element={<Checking />} />
+          <Route path="/app/account/convert" element={<Convert />} />
+          <Route path="/app/account/exchange" element={<Exchange />} />
+          <Route path="/app/account/statement" element={<Statement />} />
           <Route path="/app/passport" element={<Passport />} />
         </Route>
       </Route>
@@ -137,6 +153,10 @@ export function App() {
           <Route path="/bank/local/users" element={<LocalStaffUsers />} />
           <Route path="/bank/local/aml-alerts" element={<LocalAmlAlerts />} />
           <Route path="/bank/local/lending-settings" element={<LocalLendingSettings />} />
+          <Route element={<RequireLocalAdmin />}>
+            <Route path="/bank/local/treasury" element={<LocalTreasury />} />
+            <Route path="/bank/local/facilities" element={<LocalFacilities />} />
+          </Route>
         </Route>
       </Route>
 
@@ -144,6 +164,10 @@ export function App() {
         <Route element={<RequireNationalAdmin />}>
           <Route path="/bank/national/dashboard" element={<NationalBankDashboard />} />
           <Route path="/bank/national/request-loan" element={<NationalRequestLoan />} />
+          <Route path="/bank/national/approvals" element={<NationalApprovals />} />
+          <Route path="/bank/national/approvals/:loanId" element={<NationalLoanDecision />} />
+          <Route path="/bank/national/treasury" element={<NationalTreasury />} />
+          <Route path="/bank/national/facilities" element={<NationalFacilities />} />
           <Route path="/bank/national/local-banks" element={<NationalLocalBanks />} />
           <Route path="/bank/national/capital-allocation" element={<NationalCapitalAllocation />} />
           <Route path="/bank/national/settings" element={<NationalSettings />} />
@@ -155,6 +179,8 @@ export function App() {
         <Route element={<RequireWorldAdmin />}>
           <Route path="/bank/world/dashboard" element={<WorldBankDashboard />} />
           <Route path="/bank/world/national-banks" element={<WorldNationalBanks />} />
+          <Route path="/bank/world/treasury" element={<WorldTreasury />} />
+          <Route path="/bank/world/facilities" element={<WorldFacilities />} />
           <Route path="/bank/world/governance" element={<WorldGovernance />} />
         </Route>
         <Route element={<RequireWorldMultisig />}>

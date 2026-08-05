@@ -1,7 +1,13 @@
 import { Router } from "express";
 import { z } from "zod";
 import { AuthedRequest, requireAuth, requireRoles } from "../middleware/auth";
-import { db, findBankById, type Bank } from "../store/db";
+import {
+  computeBorrowingLimits,
+  db,
+  findBankById,
+  findUserById,
+  type Bank,
+} from "../store/db";
 import { localOpsDb } from "../store/localOps";
 import { nationalOpsDb } from "../store/nationalOps";
 import { applyAccountFreeze } from "../chain/freezeClient";
@@ -12,6 +18,8 @@ export const nationalBankRouter = Router();
 
 nationalBankRouter.use(requireAuth, requireRoles("NATIONAL_BANK_ADMIN", "OWNER"));
 
+const APPROVAL_QUEUE_STATUSES = new Set(["PENDING", "INFO_REQUESTED"]);
+
 function nationalIdFor(user: { bankId?: string; role: string }) {
   if (user.role === "OWNER") return user.bankId || "bank_nb_bd";
   return user.bankId || "bank_nb_bd";
@@ -19,6 +27,42 @@ function nationalIdFor(user: { bankId?: string; role: string }) {
 
 function childLocals(nationalId: string): Bank[] {
   return db.state.banks.filter((b) => b.tier === "LOCAL" && b.parentBankId === nationalId);
+}
+
+function enrichNationalLoan(loan: (typeof db.state.loans)[0]) {
+  const borrower = loan.borrowerId ? findUserById(loan.borrowerId) : null;
+  const requesterBank = loan.bankRequesterId ? findBankById(loan.bankRequesterId) : null;
+  const ageMs = Date.now() - new Date(loan.createdAt).getTime();
+  const riskReady = Boolean(loan.riskScore != null);
+  const heuristicScore =
+    loan.riskScore ??
+    (loan.amount < 100 ? 0.22 : loan.amount < 1000 ? 0.38 : loan.amount < 50_000 ? 0.55 : 0.7);
+  const isClient = loan.kind === "BORROWER";
+  return {
+    ...loan,
+    isClient,
+    kindLabel: isClient ? "Client" : "Local bank",
+    applicantLabel: isClient
+      ? borrower?.displayName || borrower?.wallet || "Client"
+      : requesterBank?.name || loan.bankRequesterId || "Local bank",
+    borrower: borrower
+      ? {
+          id: borrower.id,
+          displayName: borrower.displayName,
+          wallet: borrower.wallet,
+          kyc1Status: borrower.kyc1Status,
+          kyc2Status: borrower.kyc2Status,
+        }
+      : null,
+    requesterBank: requesterBank
+      ? { id: requesterBank.id, name: requesterBank.name, city: requesterBank.city, tier: requesterBank.tier }
+      : null,
+    riskReady,
+    compositeRisk: heuristicScore,
+    riskBand: heuristicScore < 0.35 ? "low" : heuristicScore < 0.65 ? "medium" : "high",
+    hoursInQueue: Math.round(ageMs / 3_600_000),
+    loanType: loan.loanType || loan.category || (loan.collateralEth ? "collateral" : "credit"),
+  };
 }
 
 function capitalMetrics(bank: Bank, minReserveRatio: number) {
@@ -74,16 +118,19 @@ nationalBankRouter.get("/dashboard", async (req, res, next) => {
     const locals = childLocals(nationalId).map((lb) => enrichLocal(lb, params.minReserveRatio));
     const childIds = new Set(locals.map((l) => l.id));
 
-    const loans = db.state.loans.filter(
+    // Jurisdiction book = child-local retail + national-as-lender (clients + local liquidity)
+    const childRetail = db.state.loans.filter(
       (l) => l.kind === "BORROWER" && l.lenderBankId && childIds.has(l.lenderBankId),
     );
+    const nationalBook = db.state.loans.filter((l) => l.lenderBankId === nationalId);
+    const loans = [...childRetail, ...nationalBook.filter((l) => l.kind === "BORROWER")];
     const active = loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
     const defaulted = loans.filter((l) => l.status === "DEFAULTED");
-    const pendingUpstream = db.state.loans.filter(
-      (l) =>
-        l.kind === "LOCAL_FROM_NATIONAL" &&
-        l.status === "PENDING" &&
-        l.lenderBankId === nationalId,
+    const pendingUpstream = nationalBook.filter(
+      (l) => l.kind === "LOCAL_FROM_NATIONAL" && APPROVAL_QUEUE_STATUSES.has(l.status),
+    );
+    const pendingClient = nationalBook.filter(
+      (l) => l.kind === "BORROWER" && APPROVAL_QUEUE_STATUSES.has(l.status),
     );
     const capitalOpen = nationalOpsDb.state.capitalRequests.filter(
       (r) => r.toBankId === nationalId && r.status === "OPEN",
@@ -107,11 +154,16 @@ nationalBankRouter.get("/dashboard", async (req, res, next) => {
         defaultRate: loans.length ? defaulted.length / loans.length : 0,
         totalLentEth: locals.reduce((s, l) => s + (l.totalLent || 0), 0),
         totalLentUsdc: locals.reduce((s, l) => s + (l.totalLent || 0), 0),
+        nationalDirectActive: nationalBook.filter(
+          (l) => l.status === "ACTIVE" || l.status === "APPROVED",
+        ).length,
       },
       queues: {
         capitalRequestsOpen: capitalOpen,
         sarOpen,
         localFromNationalPending: pendingUpstream.length,
+        clientLoansPending: pendingClient.length,
+        approvalsPending: pendingUpstream.length + pendingClient.length,
       },
       warnings: {
         nationalNearMinimum: capital.nearMinimum,
@@ -121,6 +173,168 @@ nationalBankRouter.get("/dashboard", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+/**
+ * Approval queue for this National bank as lender:
+ *  - Client (BORROWER) retail requests
+ *  - Local bank liquidity (LOCAL_FROM_NATIONAL)
+ */
+nationalBankRouter.get("/approvals", (req, res) => {
+  const user = (req as AuthedRequest).user!;
+  const nationalId = nationalIdFor(user);
+  const sort = String(req.query.sort || "oldest");
+  const type = String(req.query.type || "all");
+  const kind = String(req.query.kind || "all"); // all | client | local
+
+  let loans = db.state.loans
+    .filter(
+      (l) =>
+        l.lenderBankId === nationalId &&
+        APPROVAL_QUEUE_STATUSES.has(l.status) &&
+        (l.kind === "BORROWER" || l.kind === "LOCAL_FROM_NATIONAL"),
+    )
+    .map(enrichNationalLoan);
+
+  if (kind === "client") loans = loans.filter((l) => l.kind === "BORROWER");
+  if (kind === "local") loans = loans.filter((l) => l.kind === "LOCAL_FROM_NATIONAL");
+
+  if (type === "ready") loans = loans.filter((l) => l.riskReady || l.compositeRisk != null);
+  if (type === "awaiting_ml") loans = loans.filter((l) => !l.riskReady && l.amount >= 1);
+  if (type === "collateral" || type === "credit") {
+    loans = loans.filter((l) => String(l.loanType).toLowerCase().includes(type.toLowerCase()));
+  }
+
+  loans.sort((a, b) => {
+    if (sort === "risk") return b.compositeRisk - a.compositeRisk;
+    if (sort === "amount") return b.amount - a.amount;
+    return a.createdAt.localeCompare(b.createdAt);
+  });
+
+  res.json({
+    loans,
+    buckets: {
+      client: loans.filter((l) => l.kind === "BORROWER").length,
+      local: loans.filter((l) => l.kind === "LOCAL_FROM_NATIONAL").length,
+      ready: loans.filter((l) => l.riskReady || l.amount < 1).length,
+      awaitingMl: loans.filter((l) => !l.riskReady && l.amount >= 1).length,
+    },
+  });
+});
+
+nationalBankRouter.get("/approvals/:loanId", (req, res) => {
+  const user = (req as AuthedRequest).user!;
+  const nationalId = nationalIdFor(user);
+  const loan = db.state.loans.find((l) => l.id === req.params.loanId);
+  if (!loan) {
+    res.status(404).json({ error: "not_found" });
+    return;
+  }
+  if (loan.lenderBankId !== nationalId && user.role !== "OWNER") {
+    res.status(403).json({ error: "forbidden" });
+    return;
+  }
+  if (loan.kind !== "BORROWER" && loan.kind !== "LOCAL_FROM_NATIONAL") {
+    res.status(400).json({ error: "unsupported_loan_kind" });
+    return;
+  }
+
+  const enriched = enrichNationalLoan(loan);
+  const borrower = loan.borrowerId ? findUserById(loan.borrowerId) : null;
+  const requesterBank = loan.bankRequesterId ? findBankById(loan.bankRequesterId) : null;
+  const limits = loan.borrowerId ? computeBorrowingLimits(loan.borrowerId) : null;
+  const history = loan.borrowerId
+    ? db.state.loans.filter((l) => l.borrowerId === loan.borrowerId).slice(0, 8)
+    : loan.bankRequesterId
+      ? db.state.loans.filter((l) => l.bankRequesterId === loan.bankRequesterId).slice(0, 8)
+      : [];
+
+  const riskScore = enriched.compositeRisk;
+  const shap = [
+    {
+      feature: loan.kind === "BORROWER" ? "Client principal" : "Local liquidity ask",
+      direction: riskScore > 0.5 ? "raises" : "lowers",
+      magnitude: 0.18,
+    },
+    {
+      feature: "Term length",
+      direction: loan.termMonths > 12 ? "raises" : "neutral",
+      magnitude: 0.09,
+    },
+    {
+      feature: loan.kind === "BORROWER" ? "Prior repayments" : "Child reserve health",
+      direction: "lowers",
+      magnitude: 0.14,
+    },
+    {
+      feature: loan.kind === "BORROWER" ? "KYC completeness" : "Parent–child link",
+      direction:
+        loan.kind === "BORROWER"
+          ? borrower?.kyc1Status === "APPROVED"
+            ? "lowers"
+            : "raises"
+          : requesterBank?.parentBankId === nationalId
+            ? "lowers"
+            : "raises",
+      magnitude: 0.11,
+    },
+    {
+      feature: "Collateral / coverage",
+      direction: loan.collateralEth ? "lowers" : "raises",
+      magnitude: 0.16,
+    },
+  ];
+
+  res.json({
+    loan: enriched,
+    borrower,
+    requesterBank,
+    limits,
+    history,
+    authorityBrief: {
+      headline:
+        riskScore < 0.35
+          ? "Low risk — approve if reserve & policy OK"
+          : riskScore < 0.65
+            ? "Medium risk — review carefully"
+            : "Elevated risk — strong rationale required",
+      recommendation: riskScore < 0.35 ? "APPROVE" : riskScore < 0.65 ? "REVIEW" : "REJECT",
+      riskScore,
+      interpretation:
+        loan.kind === "BORROWER"
+          ? "Retail client request to this National bank. Confirm KYC, limits, and national reserve before disbursing."
+          : "Local bank liquidity request. Confirm child is under this National and that post-disbursement reserve stays above policy.",
+      shap,
+      randomForestFraudProb: Math.min(0.45, riskScore * 0.5),
+      isolationForestAnomaly: riskScore > 0.7,
+      auditRef: `NB_LOAN_RISK_${loan.id}`,
+      disclaimer: "Demo brief — national approval of clients and local banks.",
+    },
+  });
+});
+
+const nationalRequestInfoSchema = z.object({
+  message: z.string().min(3).max(500),
+});
+
+nationalBankRouter.post("/approvals/:loanId/request-info", (req, res) => {
+  const user = (req as AuthedRequest).user!;
+  const nationalId = nationalIdFor(user);
+  const loan = db.state.loans.find((l) => l.id === req.params.loanId);
+  if (!loan || !APPROVAL_QUEUE_STATUSES.has(loan.status)) {
+    res.status(404).json({ error: "not_found" });
+    return;
+  }
+  if (loan.lenderBankId !== nationalId && user.role !== "OWNER") {
+    res.status(403).json({ error: "forbidden" });
+    return;
+  }
+  const body = nationalRequestInfoSchema.parse(req.body);
+  loan.status = "INFO_REQUESTED";
+  loan.notes =
+    `${loan.notes || ""}\n[INFO REQUESTED ${nationalOpsDb.nowIso()} by ${user.id}] ${body.message}`.trim();
+  db.save();
+  res.json({ ok: true, loan });
 });
 
 /** 36 — Local Bank roster */

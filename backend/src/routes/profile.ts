@@ -16,7 +16,7 @@ import {
 } from "../db/users";
 import { countUnread } from "../db/notifications";
 import { getPrisma } from "../db/prisma";
-import { depositsDb, ensureBalances } from "../store/deposits";
+import { ensureDepositAccount, listFixedDeposits } from "../db/clientDeposits";
 
 export const profileRouter = Router();
 
@@ -159,18 +159,27 @@ profileRouter.get("/home", requireAuth, async (req, res, next) => {
         nextPayment,
         totalLifetime: loans.length,
       },
-      savings: (() => {
-        ensureBalances(user.id);
-        const vault = depositsDb.state.vaultBalances[user.id] ?? 0;
-        const fds = depositsDb.state.fixedDeposits.filter(
-          (f) => f.userId === user.id && (f.status === "ACTIVE" || f.status === "MATURED"),
-        );
-        return {
-          vaultEth: vault,
-          fixedDepositEth: fds.reduce((s, f) => s + f.principal, 0),
-          checkingEth: depositsDb.state.checkingBalances[user.id] ?? 0,
-          stub: false,
-        };
+      savings: await (async () => {
+        try {
+          const acct = await ensureDepositAccount(user.id);
+          const fds = await listFixedDeposits(user.id);
+          const activeFd = fds.filter(
+            (f) => f.status === "ACTIVE" || f.status === "MATURED",
+          );
+          return {
+            vaultEth: acct.vaultUsdc,
+            fixedDepositEth: activeFd.reduce((s, f) => s + f.principal, 0),
+            checkingEth: acct.checkingUsdc,
+            stub: false,
+          };
+        } catch {
+          return {
+            vaultEth: 0,
+            fixedDepositEth: 0,
+            checkingEth: 0,
+            stub: true,
+          };
+        }
       })(),
       credit,
       kyc: {

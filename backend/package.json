@@ -13,6 +13,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:seed:testing": "tsx scripts/seed-testing-world.ts",
+    "db:seed:capital": "tsx scripts/seed-capital-cascade.ts",
     "db:verify:testing": "tsx scripts/verify-testing-seed.ts",
     "db:simulate": "tsx scripts/simulate-economy.ts",
     "db:sync:neon": "bash scripts/sync-local-to-neon.sh",

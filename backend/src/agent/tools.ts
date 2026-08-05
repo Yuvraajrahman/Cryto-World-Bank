@@ -86,20 +86,41 @@ export async function invokeAgentTool(
         return { ok: false, error: "purpose must be at least 3 characters" };
       }
       const u = db.state.users.find((x) => x.id === user.id);
+      const requestedLenderId = args.lenderBankId ? String(args.lenderBankId) : "";
+      const requested =
+        requestedLenderId &&
+        db.state.banks.find(
+          (b) =>
+            b.id === requestedLenderId &&
+            (b.tier === "LOCAL" || b.tier === "NATIONAL") &&
+            (b.status || "ACTIVE") === "ACTIVE",
+        );
       const preferred =
-        (u?.bankId && db.state.banks.find((b) => b.id === u.bankId && b.tier === "LOCAL")) ||
-        db.state.banks.find((b) => b.tier === "LOCAL" && (b.status || "ACTIVE") === "ACTIVE");
+        requested ||
+        (u?.bankId &&
+          db.state.banks.find(
+            (b) =>
+              b.id === u.bankId &&
+              (b.tier === "LOCAL" || b.tier === "NATIONAL") &&
+              (b.status || "ACTIVE") === "ACTIVE",
+          )) ||
+        db.state.banks.find((b) => b.tier === "LOCAL" && (b.status || "ACTIVE") === "ACTIVE") ||
+        db.state.banks.find((b) => b.tier === "NATIONAL" && (b.status || "ACTIVE") === "ACTIVE");
+      if (!preferred) {
+        return { ok: false, error: "No Local or National lender available" };
+      }
       const loan = {
         id: `agent_${Date.now()}`,
         borrowerId: user.id,
-        lenderBankId: preferred?.id || "bank_lb_dhaka",
+        lenderBankId: preferred.id,
         amount: amountEth,
         termMonths,
         purpose,
         status: "PENDING" as const,
         category: "Agent",
         kind: "BORROWER" as const,
-        aprBps: preferred?.aprBps || 800,
+        loanType: "credit" as const,
+        aprBps: preferred.aprBps || 800,
         isInstallment: true,
         createdAt: new Date().toISOString(),
         installments: Array.from({ length: termMonths }, (_, i) => ({
@@ -120,7 +141,9 @@ export async function invokeAgentTool(
           purpose,
           status: loan.status,
           lenderBankId: loan.lenderBankId,
-          message: `Loan request for ${amountEth} USDC submitted — pending bank approval.`,
+          lenderTier: preferred.tier,
+          lenderName: preferred.name,
+          message: `Loan request for ${amountEth} USDC submitted to ${preferred.name} — pending bank approval.`,
         },
       };
     }

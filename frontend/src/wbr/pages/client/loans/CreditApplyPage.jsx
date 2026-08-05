@@ -23,6 +23,7 @@ const ETH_USD = 3200; // illustrative for tier USD caps → ETH
 
 /**
  * Route: `/app/loans/apply/credit` — plan D.14
+ * Clients may request from Local or National banks (not World).
  */
 export default function CreditApplyPage() {
   const navigate = useNavigate();
@@ -31,7 +32,8 @@ export default function CreditApplyPage() {
   const { address } = useAccount();
   const { limits } = useBorrowingLimits();
 
-  const [banks, setBanks] = useState([]);
+  const [lenderTier, setLenderTier] = useState("LOCAL");
+  const [categories, setCategories] = useState({ LOCAL: [], NATIONAL: [] });
   const [bankId, setBankId] = useState("");
   const [amount, setAmount] = useState("0.5");
   const [termMonths, setTermMonths] = useState(6);
@@ -44,12 +46,26 @@ export default function CreditApplyPage() {
   const kycPending =
     user?.kyc1Status === "PENDING" || user?.kyc1Status === "NOT_STARTED";
 
+  const banks = categories[lenderTier] || [];
+
   useEffect(() => {
-    void api.get("/api/banks").then((r) => {
-      setBanks(r.localBanks || []);
-      if (r.localBanks?.[0]) setBankId(r.localBanks[0].id);
+    void api.get("/api/loans/lenders").then((r) => {
+      const locals = r.categories?.LOCAL || [];
+      const nationals = r.categories?.NATIONAL || [];
+      setCategories({ LOCAL: locals, NATIONAL: nationals });
+      const start = locals.length ? "LOCAL" : nationals.length ? "NATIONAL" : "LOCAL";
+      setLenderTier(start);
+      const list = start === "NATIONAL" ? nationals : locals;
+      if (list[0]) setBankId(list[0].id);
     });
   }, []);
+
+  useEffect(() => {
+    const list = categories[lenderTier] || [];
+    if (!list.find((b) => b.id === bankId)) {
+      setBankId(list[0]?.id || "");
+    }
+  }, [lenderTier, categories, bankId]);
 
   useEffect(() => {
     if (!address) {
@@ -61,11 +77,11 @@ export default function CreditApplyPage() {
       .catch(() => setPassport({ riskTier: "BRONZE", creditScore: 320 }));
   }, [address]);
 
-  const tier = (passport?.riskTierName || passport?.riskTier || "BRONZE")
+  const riskTier = (passport?.riskTierName || passport?.riskTier || "BRONZE")
     .toString()
     .toUpperCase();
-  const tierKey = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"].includes(tier)
-    ? tier
+  const tierKey = ["BRONZE", "SILVER", "GOLD", "PLATINUM", "DIAMOND"].includes(riskTier)
+    ? riskTier
     : "BRONZE";
   const tierCapUsd = TIER_CAPS_USD[tierKey] ?? TIER_CAPS_USD.BRONZE;
   const tierCapEth = tierCapUsd / ETH_USD;
@@ -83,6 +99,7 @@ export default function CreditApplyPage() {
 
   const errors = [];
   if (!eligible) errors.push("Credit Passport tier too low for uncollateralized loans");
+  if (!bankId) errors.push("Select a Local or National bank");
   if ((Number(amount) || 0) > maxAmount + 1e-9) {
     errors.push(`Exceeds tier/limit cap (${formatEth(maxAmount)})`);
   }
@@ -106,13 +123,13 @@ export default function CreditApplyPage() {
         amount: Number(amount),
         termMonths: Number(termMonths),
         purpose,
-        localBankId: bankId,
+        lenderBankId: bankId,
         loanType: "credit",
         category: "Credit",
-        autoActivate: true,
+        autoActivate: false,
       });
       setTxState("success");
-      toast.show("Credit loan submitted", { variant: "success" });
+      toast.show(`Credit request sent to ${selectedBank?.name || "bank"}`, { variant: "success" });
       setConfirmOpen(false);
       navigate(`/app/loans/${r.loan.id}`);
     } catch (err) {
@@ -129,10 +146,6 @@ export default function CreditApplyPage() {
     }
   }
 
-  if (passport && tierKey === "BRONZE" && tierCapUsd <= 50 && (Number(amount) || 0) > tierCapEth) {
-    /* validation via errors */
-  }
-
   return (
     <div className="client-page">
       <header className="client-hero">
@@ -142,7 +155,7 @@ export default function CreditApplyPage() {
           Tier <strong>{tierKey}</strong>
           {passport?.creditScore != null ? ` · score ${passport.creditScore}` : ""} · max
           uncollateralized ~{formatEth(tierCapEth)} (illustrative ${tierCapUsd.toLocaleString()}{" "}
-          cap).
+          cap). Request from a Local or National bank — pending their approval.
         </p>
         <div className="client-hero-badges">
           <Badge icon="passport">{tierKey}</Badge>
@@ -191,16 +204,30 @@ export default function CreditApplyPage() {
                 onChange={(e) => setTermMonths(Number(e.target.value) || 1)}
               />
               <Input
-                label="Local bank"
+                label="Lender tier"
+                as="select"
+                value={lenderTier}
+                onChange={(e) => setLenderTier(e.target.value)}
+              >
+                <option value="LOCAL">Local banks</option>
+                <option value="NATIONAL">National banks</option>
+              </Input>
+              <Input
+                label={lenderTier === "NATIONAL" ? "National bank" : "Local bank"}
                 as="select"
                 value={bankId}
                 onChange={(e) => setBankId(e.target.value)}
               >
-                {banks.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
+                {banks.length === 0 ? (
+                  <option value="">No banks available</option>
+                ) : (
+                  banks.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                      {b.city ? ` · ${b.city}` : b.jurisdiction ? ` · ${b.jurisdiction}` : ""}
+                    </option>
+                  ))
+                )}
               </Input>
             </div>
             <Input label="Purpose" value={purpose} onChange={(e) => setPurpose(e.target.value)} />
@@ -264,8 +291,8 @@ export default function CreditApplyPage() {
         title="Confirm credit loan"
       >
         <p className="client-lede">
-          Borrow {formatEth(Number(amount))} uncollateralized ({tierKey}) for {termMonths} months at
-          ~{(aprBps / 100).toFixed(2)}% APR.
+          Request {formatEth(Number(amount))} uncollateralized ({tierKey}) for {termMonths} months at
+          ~{(aprBps / 100).toFixed(2)}% APR from {selectedBank?.name || "bank"}. Awaits bank approval.
         </p>
         <StatusStepper state={txState} errorStep="pending" />
         <div className="quick-actions" style={{ marginTop: 16 }}>

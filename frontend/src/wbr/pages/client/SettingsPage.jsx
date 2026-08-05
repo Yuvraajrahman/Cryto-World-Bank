@@ -287,6 +287,34 @@ export default function SettingsPage() {
         </Glass>
 
         <Glass className="client-panel">
+          <p className="eyebrow">Banking products</p>
+          <h2 className="client-panel-title">Accounts & FX</h2>
+          <div className="pref-toggles" style={{ display: "grid", gap: 8 }}>
+            <Link to="/app/savings" className="text-link">
+              Savings vault →
+            </Link>
+            <Link to="/app/deposits/fixed" className="text-link">
+              Fixed deposits →
+            </Link>
+            <Link to="/app/account/checking" className="text-link">
+              Checking (P2P USDC) →
+            </Link>
+            <Link to="/app/account/convert" className="text-link">
+              USD → USDC convert →
+            </Link>
+            <Link to="/app/account/exchange" className="text-link">
+              Exchange USDC ↔ ETH →
+            </Link>
+            <Link to="/app/account/statement" className="text-link">
+              Account statement →
+            </Link>
+            <Link to="/app/groups" className="text-link">
+              Group lending →
+            </Link>
+          </div>
+        </Glass>
+
+        <Glass className="client-panel">
           <p className="eyebrow">KYC</p>
           <div className="kyc-status-grid">
             <div>

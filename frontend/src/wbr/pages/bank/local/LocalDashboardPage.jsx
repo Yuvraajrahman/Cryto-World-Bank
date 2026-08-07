@@ -20,7 +20,7 @@ function pct(n) {
 }
 
 /**
- * Route: `/bank/local/dashboard`
+ * Route: `/bank/local`
  * Shared ops skeleton (aligned with National): header → KPI → queues → liquidity/capital → loan book → links
  */
 export default function LocalDashboardPage() {
@@ -84,21 +84,21 @@ export default function LocalDashboardPage() {
 
   const queues = [
     {
-      to: "/bank/local/approvals",
+      to: "/bank/local?tab=approvals",
       label: "Loan approvals",
       count: q.approvalsPending ?? 0,
       icon: "loan",
       tone: "approvals",
     },
     {
-      to: "/bank/local/kyc-review",
+      to: "/bank/local?tab=kyc",
       label: "KYC / income",
       count: (q.kycPending ?? 0) + (q.incomePending ?? 0),
       icon: "passport",
       tone: "compliance",
     },
     {
-      to: "/bank/local/aml-alerts",
+      to: "/bank/local?tab=aml",
       label: "AML alerts",
       count: q.amlOpen ?? 0,
       icon: "alert",
@@ -138,11 +138,11 @@ export default function LocalDashboardPage() {
           {data.bank?.id ? <Badge icon="node" tone="info">{data.bank.id}</Badge> : null}
         </div>
         <div className="quick-actions" style={{ marginTop: 12 }}>
-          <Button as={Link} to="/bank/local/approvals">
+          <Button as={Link} to="/bank/local?tab=approvals">
             Approvals queue
           </Button>
           {isAdmin ? (
-            <Button as={Link} to="/bank/local/request-loan" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/bank/local?tab=request" variant="ghost" showArrow={false}>
               Request from National
             </Button>
           ) : null}
@@ -215,13 +215,13 @@ export default function LocalDashboardPage() {
                   requests.
                 </p>
                 <div className="quick-actions">
-                  <Button as={Link} to="/bank/local/facilities" showArrow={false}>
+                  <Button as={Link} to="/bank/local?tab=facilities" showArrow={false}>
                     Facilities
                   </Button>
-                  <Button as={Link} to="/bank/local/treasury" variant="ghost" showArrow={false}>
+                  <Button as={Link} to="/bank/local?tab=treasury" variant="ghost" showArrow={false}>
                     Treasury FX
                   </Button>
-                  <Button as={Link} to="/bank/local/request-loan" variant="ghost" showArrow={false}>
+                  <Button as={Link} to="/bank/local?tab=request" variant="ghost" showArrow={false}>
                     Request from National
                   </Button>
                   {isLbAdmin ? (
@@ -281,25 +281,25 @@ export default function LocalDashboardPage() {
         <ActiveLoansPanel
           bankId={data.bank.id}
           title="Pending & active loans"
-          decisionBasePath="/bank/local/approvals"
+          decisionBasePath="/bank/local?tab=approvals"
         />
       ) : null}
 
       {/* 6. Secondary links */}
       <div className="quick-actions">
-        <Button as={Link} to="/bank/local/kyc-review" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/local?tab=kyc" variant="ghost" showArrow={false}>
           KYC review
         </Button>
-        <Button as={Link} to="/bank/local/aml-alerts" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/local?tab=aml" variant="ghost" showArrow={false}>
           AML alerts
         </Button>
         {isAdmin ? (
-          <Button as={Link} to="/bank/local/users" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/local?tab=staff" variant="ghost" showArrow={false}>
             Manage staff
           </Button>
         ) : null}
         {isAdmin ? (
-          <Button as={Link} to="/bank/local/lending-settings" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/local?tab=settings" variant="ghost" showArrow={false}>
             Lending settings
           </Button>
         ) : null}

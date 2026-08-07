@@ -1,6 +1,6 @@
 /**
  * Shared treasury FX swap UI for World / National / Local operators.
- * Route examples: /bank/world/treasury, /bank/national/treasury, /bank/local/treasury
+ * Route examples: /bank/world?tab=treasury, /bank/national?tab=treasury, /bank/local?tab=treasury
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Glass from "../../components/ui/Glass";

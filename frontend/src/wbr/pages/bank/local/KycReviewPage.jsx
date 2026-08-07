@@ -10,7 +10,7 @@ import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 
 /**
- * Route: `/bank/local/kyc-review` — plan I.32
+ * Route: `/bank/local?tab=kyc` — plan I.32
  */
 export default function KycReviewPage() {
   const toast = useToast();
@@ -159,7 +159,7 @@ export default function KycReviewPage() {
                 </Button>
                 <Button
                   as={Link}
-                  to="/bank/local/aml-alerts"
+                  to="/bank/local?tab=aml"
                   variant="ghost"
                   showArrow={false}
                 >

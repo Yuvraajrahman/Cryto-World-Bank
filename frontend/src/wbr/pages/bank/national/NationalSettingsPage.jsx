@@ -9,7 +9,7 @@ import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 
 /**
- * Route: `/bank/national/settings` — plan J.38 settings
+ * Route: `/bank/national?tab=settings` — plan J.38 settings
  */
 export default function NationalSettingsPage() {
   const toast = useToast();

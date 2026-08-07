@@ -15,9 +15,11 @@ import { formatUsdc } from "@/lib/formatMoney";
  */
 export default function LoanDecisionPage({
   apiBase = "/api/local-bank/approvals",
-  queuePath = "/bank/local/approvals",
+  queuePath = "/bank/local?tab=approvals",
+  loanId: loanIdProp,
 }) {
-  const { loanId } = useParams();
+  const params = useParams();
+  const loanId = loanIdProp || params.loanId;
   const navigate = useNavigate();
   const toast = useToast();
   const [data, setData] = useState(null);

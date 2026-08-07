@@ -16,7 +16,7 @@ function pct(n) {
 }
 
 /**
- * Route: `/bank/national/capital-allocation` — plan J.37
+ * Route: `/bank/national?tab=capital` — plan J.37
  */
 export default function CapitalAllocationPage() {
   const toast = useToast();
@@ -179,7 +179,7 @@ export default function CapitalAllocationPage() {
           <Button type="button" onClick={() => void allocate()} disabled={busy || !validAmount}>
             {busy ? "Submitting…" : "Submit allocation"}
           </Button>
-          <Button as={Link} to="/bank/national/local-banks" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/national?tab=locals" variant="ghost" showArrow={false}>
             Manage Local Banks
           </Button>
         </div>

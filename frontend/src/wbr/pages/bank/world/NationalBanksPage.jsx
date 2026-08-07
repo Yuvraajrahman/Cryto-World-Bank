@@ -14,7 +14,7 @@ function pct(n) {
   return `${(Number(n) * 100).toFixed(1)}%`;
 }
 
-/** `/bank/world/national-banks` — plan K.40 */
+/** `/bank/world?tab=nationals` — plan K.40 */
 export default function NationalBanksPage() {
   const toast = useToast();
   const [banks, setBanks] = useState([]);
@@ -124,10 +124,10 @@ export default function NationalBanksPage() {
         <Button type="button" onClick={() => setSheet("register")}>
           Register National Bank
         </Button>
-        <Button as={Link} to="/bank/world/multisig" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/world?tab=multisig" variant="ghost" showArrow={false}>
           Multisig console
         </Button>
-        <Button as={Link} to="/bank/world/dashboard" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/world" variant="ghost" showArrow={false}>
           Dashboard
         </Button>
       </div>

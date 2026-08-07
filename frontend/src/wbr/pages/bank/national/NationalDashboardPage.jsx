@@ -17,7 +17,7 @@ function pct(n) {
 }
 
 /**
- * Route: `/bank/national/dashboard`
+ * Route: `/bank/national`
  * Shared ops skeleton: header → KPI → queues → liquidity/capital → loan book → roster → links
  */
 export default function NationalDashboardPage() {
@@ -77,28 +77,28 @@ export default function NationalDashboardPage() {
 
   const queues = [
     {
-      to: "/bank/national/approvals",
+      to: "/bank/national?tab=approvals",
       label: "Loan approvals",
       count: q.approvalsPending ?? (q.clientLoansPending || 0) + (q.localFromNationalPending || 0),
       icon: "loan",
       tone: "approvals",
     },
     {
-      to: "/bank/national/capital-allocation",
+      to: "/bank/national?tab=capital",
       label: "Capital requests",
       count: q.capitalRequestsOpen ?? 0,
       icon: "wallet",
       tone: "capital",
     },
     {
-      to: "/bank/national/sar-review",
+      to: "/bank/national?tab=sar",
       label: "SAR review",
       count: q.sarOpen ?? 0,
       icon: "alert",
       tone: "compliance",
     },
     {
-      to: "/bank/national/local-banks",
+      to: "/bank/national?tab=locals",
       label: "Local banks",
       count: j.localBankCount ?? 0,
       icon: "node",
@@ -121,13 +121,13 @@ export default function NationalDashboardPage() {
           {data.bank?.jurisdiction ? <Badge icon="node" tone="info">{data.bank.jurisdiction}</Badge> : null}
         </div>
         <div className="quick-actions" style={{ marginTop: 12 }}>
-          <Button as={Link} to="/bank/national/approvals">
+          <Button as={Link} to="/bank/national?tab=approvals">
             Loan approvals
           </Button>
-          <Button as={Link} to="/bank/national/request-loan" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/national?tab=request" variant="ghost" showArrow={false}>
             Request from World
           </Button>
-          <Button as={Link} to="/bank/national/capital-allocation" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/national?tab=capital" variant="ghost" showArrow={false}>
             Allocate to Locals
           </Button>
         </div>
@@ -196,16 +196,16 @@ export default function NationalDashboardPage() {
               Locals.
             </p>
             <div className="quick-actions">
-              <Button as={Link} to="/bank/national/facilities" showArrow={false}>
+              <Button as={Link} to="/bank/national?tab=facilities" showArrow={false}>
                 Facilities
               </Button>
-              <Button as={Link} to="/bank/national/treasury" variant="ghost" showArrow={false}>
+              <Button as={Link} to="/bank/national?tab=treasury" variant="ghost" showArrow={false}>
                 Treasury FX
               </Button>
-              <Button as={Link} to="/bank/national/capital-allocation" variant="ghost" showArrow={false}>
+              <Button as={Link} to="/bank/national?tab=capital" variant="ghost" showArrow={false}>
                 Capital desk
               </Button>
-              <Button as={Link} to="/bank/national/request-loan" variant="ghost" showArrow={false}>
+              <Button as={Link} to="/bank/national?tab=request" variant="ghost" showArrow={false}>
                 Request from World
               </Button>
             </div>
@@ -240,7 +240,7 @@ export default function NationalDashboardPage() {
         <ActiveLoansPanel
           bankId={data.bank.id}
           title="Pending & active loans (this National)"
-          decisionBasePath="/bank/national/approvals"
+          decisionBasePath="/bank/national?tab=approvals"
         />
       ) : null}
 
@@ -248,7 +248,7 @@ export default function NationalDashboardPage() {
       <section className="client-section">
         <div className="client-section-head">
           <h2 className="client-section-title">Local Bank roster</h2>
-          <Link to="/bank/national/local-banks" className="text-link">
+          <Link to="/bank/national?tab=locals" className="text-link">
             Manage
           </Link>
         </div>
@@ -273,10 +273,10 @@ export default function NationalDashboardPage() {
 
       {/* 6. Secondary links */}
       <div className="quick-actions">
-        <Button as={Link} to="/bank/national/sar-review" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/national?tab=sar" variant="ghost" showArrow={false}>
           SAR review
         </Button>
-        <Button as={Link} to="/bank/national/settings" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/national?tab=settings" variant="ghost" showArrow={false}>
           Jurisdiction rates
         </Button>
         <Button as={Link} to="/reserve" variant="ghost" showArrow={false}>

@@ -57,6 +57,18 @@ function resolvePostLoginPath(user, returnTo, nextStepPath) {
   if (role === "REGULATOR") {
     return returnTo?.startsWith("/audit") ? returnTo : "/audit";
   }
+  if (role === "OWNER") {
+    if (returnTo?.startsWith("/bank/world")) return returnTo;
+    return "/bank/world";
+  }
+  if (role === "NATIONAL_BANK_ADMIN") {
+    if (returnTo?.startsWith("/bank/national")) return returnTo;
+    return "/bank/national";
+  }
+  if (role === "LOCAL_BANK_ADMIN" || role === "APPROVER") {
+    if (returnTo?.startsWith("/bank/local")) return returnTo;
+    return "/bank/local";
+  }
   if (role && role !== "BORROWER" && role !== "GUEST") {
     if (
       returnTo?.startsWith("/app") ||
@@ -66,12 +78,12 @@ function resolvePostLoginPath(user, returnTo, nextStepPath) {
     ) {
       return returnTo;
     }
-    return "/app/dashboard";
+    return "/app";
   }
   const onboardingPath = nextStepPath();
-  if (onboardingPath !== "/app/dashboard") return onboardingPath;
+  if (onboardingPath !== "/app/dashboard" && onboardingPath !== "/app") return onboardingPath;
   if (user?.isFirstTime) return "/onboarding/register";
-  return returnTo || "/app/dashboard";
+  return returnTo?.startsWith("/app") ? returnTo : "/app";
 }
 
 function LoginContent() {

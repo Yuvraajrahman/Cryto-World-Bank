@@ -15,7 +15,7 @@ function short(w) {
   return `${w.slice(0, 6)}…${w.slice(-4)}`;
 }
 
-/** `/bank/world/multisig` — plan K.41 (2-of-3) */
+/** `/bank/world?tab=multisig` — plan K.41 (2-of-3) */
 export default function MultisigConsolePage() {
   const toast = useToast();
   const user = useSession((s) => s.user);

@@ -10,7 +10,7 @@ import { api } from "@/lib/api";
 import { useSession } from "@/lib/store";
 
 /**
- * Route: `/bank/local/users` — plan I.33 (LOCAL_BANK_ADMIN+)
+ * Route: `/bank/local?tab=staff` — plan I.33 (LOCAL_BANK_ADMIN+)
  */
 export default function StaffUsersPage() {
   const role = useSession((s) => s.role ?? s.user?.role);
@@ -52,7 +52,7 @@ export default function StaffUsersPage() {
       <AccessDenied
         title="Admin only"
         description="Staff management requires Local Bank Admin (or higher)."
-        homeTo="/bank/local/dashboard"
+        homeTo="/bank/local"
       />
     );
   }

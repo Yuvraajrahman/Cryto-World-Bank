@@ -10,7 +10,7 @@ import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 
 /**
- * Route: `/bank/national/sar-review` — plan J.38 SAR queue
+ * Route: `/bank/national?tab=sar` — plan J.38 SAR queue
  */
 export default function SarReviewPage() {
   const toast = useToast();
@@ -223,7 +223,7 @@ export default function SarReviewPage() {
                   </Button>
                   <Button
                     as={Link}
-                    to="/bank/local/aml-alerts"
+                    to="/bank/local?tab=aml"
                     variant="ghost"
                     showArrow={false}
                   >

@@ -9,7 +9,7 @@ import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 
 /**
- * Route: `/bank/local/lending-settings` — Local Bank kinked rate + LTV authority
+ * Route: `/bank/local?tab=settings` — Local Bank kinked rate + LTV authority
  */
 export default function LocalLendingSettingsPage() {
   const toast = useToast();
@@ -105,7 +105,7 @@ export default function LocalLendingSettingsPage() {
           Adjust kinked utilization APR and collateral LTV for this branch&apos;s loan pool.
         </p>
         <div className="quick-actions" style={{ marginTop: 12 }}>
-          <Button as={Link} to="/bank/local/dashboard" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/local" variant="ghost" showArrow={false}>
             Back to dashboard
           </Button>
           <Button type="button" onClick={() => setSheet(true)}>

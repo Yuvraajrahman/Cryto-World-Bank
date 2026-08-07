@@ -26,7 +26,7 @@ export default function RequireLocalAdmin() {
             ? `Your role (${String(role).replaceAll("_", " ")}) cannot open treasury or liquidity facilities. Sign in as Local Bank Admin.`
             : "Sign in as Local Bank Admin to continue."
         }
-        homeTo="/bank/local/dashboard"
+        homeTo="/bank/local"
       />
     );
   }

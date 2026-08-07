@@ -32,25 +32,25 @@ function OperatorHome({ user }) {
     : isLocal
     ? [
         {
-          to: "/bank/local/dashboard",
+          to: "/bank/local",
           label: "Local dashboard",
           desc: "Capital, loan book, queues",
           icon: "home",
         },
         {
-          to: "/bank/local/approvals",
+          to: "/bank/local?tab=approvals",
           label: "Approvals",
           desc: "Loan queue & Authority Brief",
           icon: "loan",
         },
         {
-          to: "/bank/local/kyc-review",
+          to: "/bank/local?tab=kyc",
           label: "KYC review",
           desc: "Income & identity docs",
           icon: "passport",
         },
         {
-          to: "/bank/local/aml-alerts",
+          to: "/bank/local?tab=aml",
           label: "AML alerts",
           desc: "Anomaly flags & SAR",
           icon: "alert",
@@ -58,19 +58,19 @@ function OperatorHome({ user }) {
         ...(user?.role === "LOCAL_BANK_ADMIN"
           ? [
               {
-                to: "/bank/local/users",
+                to: "/bank/local?tab=staff",
                 label: "Staff",
                 desc: "Approvers & operators",
                 icon: "group",
               },
               {
-                to: "/bank/local/facilities",
+                to: "/bank/local?tab=facilities",
                 label: "Facilities",
                 desc: "Interbank & upward liquidity",
                 icon: "node",
               },
               {
-                to: "/bank/local/treasury",
+                to: "/bank/local?tab=treasury",
                 label: "Treasury FX",
                 desc: "USDC ↔ ETH swaps",
                 icon: "wallet",
@@ -81,37 +81,37 @@ function OperatorHome({ user }) {
     : isWorld
       ? [
           {
-            to: "/bank/world/dashboard",
+            to: "/bank/world",
             label: "World dashboard",
             desc: "Global reserve & health",
             icon: "home",
           },
           {
-            to: "/bank/world/national-banks",
+            to: "/bank/world?tab=nationals",
             label: "National Banks",
             desc: "Register & pause jurisdictions",
             icon: "node",
           },
           {
-            to: "/bank/world/multisig",
+            to: "/bank/world?tab=multisig",
             label: "Multisig",
             desc: "2-of-3 Safe console",
             icon: "wallet",
           },
           {
-            to: "/bank/world/governance",
+            to: "/bank/world?tab=governance",
             label: "Governance",
             desc: "Proposals & timelock",
             icon: "settings",
           },
           {
-            to: "/bank/world/facilities",
+            to: "/bank/world?tab=facilities",
             label: "Facilities",
             desc: "Upward deposits inbox",
             icon: "node",
           },
           {
-            to: "/bank/world/treasury",
+            to: "/bank/world?tab=treasury",
             label: "Treasury FX",
             desc: "Institutional USDC ↔ ETH",
             icon: "wallet",
@@ -120,50 +120,50 @@ function OperatorHome({ user }) {
       : isNational
       ? [
           {
-            to: "/bank/national/dashboard",
+            to: "/bank/national",
             label: "National dashboard",
             desc: "Jurisdiction capital & queues",
             icon: "home",
           },
           {
-            to: "/bank/national/local-banks",
+            to: "/bank/national?tab=locals",
             label: "Local Banks",
             desc: "Register, pause, parameters",
             icon: "node",
           },
           {
-            to: "/bank/national/capital-allocation",
+            to: "/bank/national?tab=capital",
             label: "Capital allocation",
             desc: "Push funds & fulfill requests",
             icon: "wallet",
           },
           {
-            to: "/bank/national/facilities",
+            to: "/bank/national?tab=facilities",
             label: "Facilities",
             desc: "Interbank & upward liquidity",
             icon: "node",
           },
           {
-            to: "/bank/national/treasury",
+            to: "/bank/national?tab=treasury",
             label: "Treasury FX",
             desc: "USDC ↔ ETH swaps",
             icon: "wallet",
           },
           {
-            to: "/bank/national/sar-review",
+            to: "/bank/national?tab=sar",
             label: "SAR review",
             desc: "Escalations from Local AML",
             icon: "alert",
           },
           {
-            to: "/bank/national/settings",
+            to: "/bank/national?tab=settings",
             label: "Settings",
             desc: "Rates & reserve ratio",
             icon: "settings",
           },
         ]
       : [
-          { to: "/bank/local/dashboard", label: "Local desk", desc: "Open your operator home", icon: "home" },
+          { to: "/bank/local", label: "Local desk", desc: "Open your operator home", icon: "home" },
         ];
   return (
     <div className="client-page">
@@ -286,34 +286,34 @@ function RetailHome() {
       ) : null}
 
       <div className="quick-actions">
-        <Button as={Link} to="/app/loans/apply" disabled={kycPending}>
+        <Button as={Link} to="/app?tab=borrow&view=apply" disabled={kycPending}>
           Apply for loan
         </Button>
-        <Button as={Link} to="/app/groups" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=groups" variant="ghost" showArrow={false}>
           Group lending
         </Button>
-        <Button as={Link} to="/app/savings" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=accounts&account=savings" variant="ghost" showArrow={false}>
           Deposit to savings
         </Button>
-        <Button as={Link} to="/app/account/checking" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=accounts&account=checking" variant="ghost" showArrow={false}>
           Checking
         </Button>
-        <Button as={Link} to="/app/account/convert" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=fx&fx=convert" variant="ghost" showArrow={false}>
           USD → USDC
         </Button>
-        <Button as={Link} to="/app/account/exchange" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=fx&fx=exchange" variant="ghost" showArrow={false}>
           Exchange
         </Button>
-        <Button as={Link} to="/app/deposits/fixed" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=accounts&account=fixed" variant="ghost" showArrow={false}>
           Fixed deposit
         </Button>
-        <Button as={Link} to="/app/installments" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=borrow&view=history" variant="ghost" showArrow={false}>
           Make a payment
         </Button>
-        <Button as={Link} to="/app/loans/limits" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=borrow&view=limits" variant="ghost" showArrow={false}>
           Borrowing limits
         </Button>
-        <Button as={Link} to="/app/assistant" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/app?tab=assistant" variant="ghost" showArrow={false}>
           MCP agent
         </Button>
       </div>
@@ -337,16 +337,16 @@ function RetailHome() {
         <Glass className="client-product-group tone-accounts">
           <h3>Accounts</h3>
           <div className="quick-actions">
-            <Button as={Link} to="/app/savings" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=accounts&account=savings" variant="ghost" showArrow={false}>
               Savings
             </Button>
-            <Button as={Link} to="/app/deposits/fixed" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=accounts&account=fixed" variant="ghost" showArrow={false}>
               Fixed deposit
             </Button>
-            <Button as={Link} to="/app/account/checking" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=accounts&account=checking" variant="ghost" showArrow={false}>
               Checking
             </Button>
-            <Button as={Link} to="/app/account/statement" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=accounts&account=statement" variant="ghost" showArrow={false}>
               Statement
             </Button>
           </div>
@@ -354,16 +354,16 @@ function RetailHome() {
         <Glass className="client-product-group tone-borrow">
           <h3>Borrow</h3>
           <div className="quick-actions">
-            <Button as={Link} to="/app/loans/apply" showArrow={false} disabled={kycPending}>
+            <Button as={Link} to="/app?tab=borrow&view=apply" showArrow={false} disabled={kycPending}>
               Apply
             </Button>
-            <Button as={Link} to="/app/loans/history" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=borrow&view=history" variant="ghost" showArrow={false}>
               History
             </Button>
-            <Button as={Link} to="/app/loans/limits" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=borrow&view=limits" variant="ghost" showArrow={false}>
               Limits
             </Button>
-            <Button as={Link} to="/app/passport" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=passport" variant="ghost" showArrow={false}>
               Passport
             </Button>
           </div>
@@ -371,27 +371,21 @@ function RetailHome() {
         <Glass className="client-product-group tone-groups">
           <h3>Groups</h3>
           <div className="quick-actions">
-            <Button as={Link} to="/app/groups" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=groups" variant="ghost" showArrow={false}>
               Circles
-            </Button>
-            <Button as={Link} to="/app/groups/create" variant="ghost" showArrow={false}>
-              Create
-            </Button>
-            <Button as={Link} to="/app/groups/join" variant="ghost" showArrow={false}>
-              Join
             </Button>
           </div>
         </Glass>
         <Glass className="client-product-group tone-fx">
           <h3>FX</h3>
           <div className="quick-actions">
-            <Button as={Link} to="/app/account/convert" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=fx&fx=convert" variant="ghost" showArrow={false}>
               USD → USDC
             </Button>
-            <Button as={Link} to="/app/account/exchange" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=fx&fx=exchange" variant="ghost" showArrow={false}>
               Exchange
             </Button>
-            <Button as={Link} to="/app/assistant" variant="ghost" showArrow={false}>
+            <Button as={Link} to="/app?tab=assistant" variant="ghost" showArrow={false}>
               Assistant
             </Button>
           </div>

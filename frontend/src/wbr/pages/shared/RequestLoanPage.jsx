@@ -19,6 +19,7 @@ const TIER_LABEL = { LOCAL: "Local banks", NATIONAL: "National banks", WORLD: "W
 export default function RequestLoanPage({
   title = "Request a loan",
   backTo,
+  onDone,
 }) {
   const toast = useToast();
   const navigate = useNavigate();
@@ -98,7 +99,8 @@ export default function RequestLoanPage({
           autoActivate: false,
         });
         toast.show(`Request sent to ${selected.name}`, { variant: "success" });
-        navigate(`/app/loans/${r.loan.id}`);
+        if (onDone) onDone(r);
+        else navigate(`/app?tab=borrow&loan=${encodeURIComponent(r.loan.id)}`);
         return;
       }
       if (role === "LOCAL_BANK_ADMIN" || role === "APPROVER") {
@@ -110,7 +112,8 @@ export default function RequestLoanPage({
           lenderBankId: selected.id,
         });
         toast.show("Liquidity request sent to National bank", { variant: "success" });
-        navigate("/bank/local/dashboard");
+        if (onDone) onDone(r);
+        else navigate("/bank/local?tab=overview");
         return;
       }
       if (role === "NATIONAL_BANK_ADMIN") {
@@ -122,7 +125,8 @@ export default function RequestLoanPage({
           lenderBankId: selected.id,
         });
         toast.show("Liquidity request sent to World Bank", { variant: "success" });
-        navigate("/bank/national/dashboard");
+        if (onDone) onDone();
+        else navigate("/bank/national?tab=overview");
         return;
       }
       toast.show("Your role cannot request loans this way", { variant: "error" });

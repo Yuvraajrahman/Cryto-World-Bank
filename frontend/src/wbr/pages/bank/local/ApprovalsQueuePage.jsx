@@ -12,16 +12,21 @@ function riskTone(band) {
 }
 
 /**
- * Shared approval queue — Local (`/bank/local/approvals`) or National (`/bank/national/approvals`).
+ * Shared approval queue — Local (`/bank/local?tab=approvals`) or National (`/bank/national?tab=approvals`).
  */
 export default function ApprovalsQueuePage({
   apiBase = "/api/local-bank/approvals",
-  decisionBasePath = "/bank/local/approvals",
+  decisionBasePath = "/bank/local",
+  getDecisionHref,
   title = "Loan approval queue",
   lede = "Prioritized applications awaiting a human decision. Items still waiting on ML scoring stay visually separate.",
   emptyDescription = "No pending loan applications for this branch.",
   showKindFilter = false,
 }) {
+  const decisionHref = (id) =>
+    typeof getDecisionHref === "function"
+      ? getDecisionHref(id)
+      : `${decisionBasePath}?tab=approvals&loan=${encodeURIComponent(id)}`;
   const [sort, setSort] = useState("oldest");
   const [type, setType] = useState("all");
   const [kind, setKind] = useState("all");
@@ -132,7 +137,7 @@ export default function ApprovalsQueuePage({
           <ul className="ops-stack">
             {ready.map((loan) => (
               <li key={loan.id}>
-                <Link to={`${decisionBasePath}/${loan.id}`} className="ops-row glass">
+                <Link to={decisionHref(loan.id)} className="ops-row glass">
                   <div>
                     <strong>{rowTitle(loan)}</strong>
                     <span>{rowMeta(loan)}</span>
@@ -159,7 +164,7 @@ export default function ApprovalsQueuePage({
           <ul className="ops-stack">
             {awaiting.map((loan) => (
               <li key={loan.id}>
-                <Link to={`${decisionBasePath}/${loan.id}`} className="ops-row glass ops-row-muted">
+                <Link to={decisionHref(loan.id)} className="ops-row glass ops-row-muted">
                   <div>
                     <strong>{rowTitle(loan)}</strong>
                     <span>Commit–reveal / scoring in progress</span>

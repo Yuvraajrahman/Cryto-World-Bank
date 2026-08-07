@@ -109,7 +109,16 @@ export default function ActiveLoansPanel({
               </div>
               <div className="quick-actions">
                 {decisionBasePath ? (
-                  <Button as={Link} to={`${decisionBasePath}/${l.id}`} variant="ghost" showArrow={false}>
+                  <Button
+                    as={Link}
+                    to={
+                      decisionBasePath.includes("?")
+                        ? `${decisionBasePath}&loan=${encodeURIComponent(l.id)}`
+                        : `${decisionBasePath}?tab=approvals&loan=${encodeURIComponent(l.id)}`
+                    }
+                    variant="ghost"
+                    showArrow={false}
+                  >
                     Review
                   </Button>
                 ) : null}

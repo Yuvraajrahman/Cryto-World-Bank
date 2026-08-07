@@ -14,7 +14,7 @@ function pct(n) {
 }
 
 /**
- * Route: `/bank/national/local-banks` — plan J.36
+ * Route: `/bank/national?tab=locals` — plan J.36
  */
 export default function LocalBanksPage() {
   const toast = useToast();

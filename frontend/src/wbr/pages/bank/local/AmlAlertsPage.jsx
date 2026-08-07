@@ -9,7 +9,7 @@ import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 
 /**
- * Route: `/bank/local/aml-alerts` — plan I.34
+ * Route: `/bank/local?tab=aml` — plan I.34
  */
 export default function AmlAlertsPage() {
   const toast = useToast();

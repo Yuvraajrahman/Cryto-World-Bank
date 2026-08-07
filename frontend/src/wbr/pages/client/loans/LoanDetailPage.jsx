@@ -14,8 +14,9 @@ import {
 /**
  * Route: `/app/loans/:loanId` — plan D.15
  */
-export default function LoanDetailPage() {
-  const { loanId } = useParams();
+export default function LoanDetailPage({ loanId: loanIdProp } = {}) {
+  const params = useParams();
+  const loanId = loanIdProp || params.loanId;
   const { data, loan, loading, error, refresh } = useLoan(loanId);
 
   if (loading && !loan) {

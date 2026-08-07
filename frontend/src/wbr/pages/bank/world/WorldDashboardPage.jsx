@@ -18,7 +18,7 @@ function pct(n) {
   return `${(Number(n) * 100).toFixed(1)}%`;
 }
 
-/** `/bank/world/dashboard` — plan K.39 */
+/** `/bank/world` — plan K.39 */
 export default function WorldDashboardPage() {
   const toast = useToast();
   const [data, setData] = useState(null);
@@ -119,10 +119,10 @@ export default function WorldDashboardPage() {
           <Button type="button" onClick={() => setAllocSheet(true)}>
             Allocate to National
           </Button>
-          <Button as={Link} to="/bank/world/national-banks" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/world?tab=nationals" variant="ghost" showArrow={false}>
             Nationals registry
           </Button>
-          <Button as={Link} to="/bank/world/facilities" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/world?tab=facilities" variant="ghost" showArrow={false}>
             Upward inbox
           </Button>
         </div>
@@ -148,22 +148,22 @@ export default function WorldDashboardPage() {
       <section className="client-section">
         <h2 className="client-section-title">Pending work</h2>
         <div className="ops-queue-grid">
-          <Link to="/bank/world/multisig" className="ops-queue-card glass tone-capital">
+          <Link to="/bank/world?tab=multisig" className="ops-queue-card glass tone-capital">
             <Icon name="wallet" size={22} />
             <strong>Multisig</strong>
             <span className="ops-queue-count">{q.multisigPending ?? 0}</span>
           </Link>
-          <Link to="/bank/world/governance" className="ops-queue-card glass tone-approvals">
+          <Link to="/bank/world?tab=governance" className="ops-queue-card glass tone-approvals">
             <Icon name="settings" size={22} />
             <strong>Governance</strong>
             <span className="ops-queue-count">{q.governancePending ?? 0}</span>
           </Link>
-          <Link to="/bank/world/national-banks" className="ops-queue-card glass tone-liquidity">
+          <Link to="/bank/world?tab=nationals" className="ops-queue-card glass tone-liquidity">
             <Icon name="node" size={22} />
             <strong>National Banks</strong>
             <span className="ops-queue-count">{s.nationalCount ?? 0}</span>
           </Link>
-          <Link to="/bank/world/facilities" className="ops-queue-card glass tone-liquidity">
+          <Link to="/bank/world?tab=facilities" className="ops-queue-card glass tone-liquidity">
             <Icon name="node" size={22} />
             <strong>Upward inbox</strong>
             <span className="ops-queue-count">{q.upwardPending ?? "—"}</span>
@@ -185,10 +185,10 @@ export default function WorldDashboardPage() {
           <Button type="button" onClick={() => setAllocSheet(true)} showArrow={false}>
             Allocate capital
           </Button>
-          <Button as={Link} to="/bank/world/facilities" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/world?tab=facilities" variant="ghost" showArrow={false}>
             Facilities
           </Button>
-          <Button as={Link} to="/bank/world/treasury" variant="ghost" showArrow={false}>
+          <Button as={Link} to="/bank/world?tab=treasury" variant="ghost" showArrow={false}>
             Treasury FX
           </Button>
         </div>
@@ -230,7 +230,7 @@ export default function WorldDashboardPage() {
         <ul className="ops-stack">
           {nationals.map((nb) => (
             <li key={nb.id}>
-              <Link to="/bank/world/national-banks" className="ops-row glass">
+              <Link to="/bank/world?tab=nationals" className="ops-row glass">
                 <div>
                   <strong>{nb.name}</strong>
                   <span>
@@ -283,13 +283,13 @@ export default function WorldDashboardPage() {
         <Button type="button" onClick={() => setAllocSheet(true)}>
           Allocate capital
         </Button>
-        <Button as={Link} to="/bank/world/national-banks">
+        <Button as={Link} to="/bank/world?tab=nationals">
           Manage nationals
         </Button>
-        <Button as={Link} to="/bank/world/multisig" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/world?tab=multisig" variant="ghost" showArrow={false}>
           Multisig console
         </Button>
-        <Button as={Link} to="/bank/world/governance" variant="ghost" showArrow={false}>
+        <Button as={Link} to="/bank/world?tab=governance" variant="ghost" showArrow={false}>
           Governance
         </Button>
       </div>

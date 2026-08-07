@@ -8,7 +8,7 @@ import StateMessage from "../../../components/ui/StateMessage";
 import { useToast } from "../../../components/ui/Toast";
 import { api } from "@/lib/api";
 
-/** `/bank/world/governance` — plan K.42 */
+/** `/bank/world?tab=governance` — plan K.42 */
 export default function GovernancePage() {
   const toast = useToast();
   const [data, setData] = useState(null);

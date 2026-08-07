@@ -5,10 +5,15 @@ import { db, findBankById, type Bank } from "../store/db";
 import { localOpsDb } from "../store/localOps";
 import { nationalOpsDb } from "../store/nationalOps";
 import { worldOpsDb, MULTISIG_THRESHOLD } from "../store/worldOps";
+import { canonicalizeBanks } from "../db/banksSync";
 
 export const worldBankRouter = Router();
 
 worldBankRouter.use(requireAuth);
+
+function nationalBanksCanonical() {
+  return canonicalizeBanks(db.state.banks).filter((b) => b.tier === "NATIONAL");
+}
 
 function isSigner(wallet: string) {
   const w = wallet.toLowerCase();
@@ -59,7 +64,10 @@ function capitalMetrics(bank: Bank, minReserveRatio: number) {
 }
 
 function enrichNational(nb: Bank, minRatio: number) {
-  const locals = db.state.banks.filter((b) => b.tier === "LOCAL" && b.parentBankId === nb.id);
+  const locals = db.state.banks.filter(
+    (b) => b.tier === "LOCAL" && b.parentBankId === nb.id,
+  );
+  // Prefer child count from canonical tree (ignore legacy orphans)
   const metrics = capitalMetrics(nb, minRatio);
   return {
     ...nb,
@@ -79,9 +87,8 @@ worldBankRouter.get("/dashboard", requireOwner, (_req, res) => {
   }
   const minRatio = worldOpsDb.state.globalParams.minReserveRatio;
   const capital = capitalMetrics(world, minRatio);
-  const nationals = db.state.banks
-    .filter((b) => b.tier === "NATIONAL")
-    .map((nb) => enrichNational(nb, minRatio));
+  const nationals = nationalBanksCanonical().map((nb) => enrichNational(nb, minRatio));
+  const canonBanks = canonicalizeBanks(db.state.banks);
   const allLoans = db.state.loans.filter((l) => l.kind === "BORROWER");
   const active = allLoans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
   const defaulted = allLoans.filter((l) => l.status === "DEFAULTED");
@@ -100,7 +107,7 @@ worldBankRouter.get("/dashboard", requireOwner, (_req, res) => {
     nationalBanks: nationals,
     system: {
       nationalCount: nationals.length,
-      localCount: db.state.banks.filter((b) => b.tier === "LOCAL").length,
+      localCount: canonBanks.filter((b) => b.tier === "LOCAL").length,
       activeLoanCount: active.length,
       activeLoanValueEth: active.reduce((s, l) => s + l.amount, 0),
       defaultRate: allLoans.length ? defaulted.length / allLoans.length : 0,
@@ -118,9 +125,7 @@ worldBankRouter.get("/dashboard", requireOwner, (_req, res) => {
 /** 40 — National Bank registration & management */
 worldBankRouter.get("/national-banks", requireOwner, (_req, res) => {
   const minRatio = worldOpsDb.state.globalParams.minReserveRatio;
-  const banks = db.state.banks
-    .filter((b) => b.tier === "NATIONAL")
-    .map((nb) => enrichNational(nb, minRatio));
+  const banks = nationalBanksCanonical().map((nb) => enrichNational(nb, minRatio));
   res.json({ banks });
 });
 

@@ -45,7 +45,7 @@ loansRouter.get("/queue", requireAuth, (req, res) => {
         l.lenderBankId === user.bankId &&
         (l.kind === "LOCAL_FROM_NATIONAL" || l.kind === "BORROWER"),
     );
-  } else if (user.role === "OWNER") {
+  } else if (user.role === "OWNER" || user.role === "DEV_ADMIN") {
     loans = db.state.loans.filter(
       (l) =>
         l.status === "PENDING" &&
@@ -696,6 +696,57 @@ loansRouter.post("/:id/repay", requireAuth, (req, res) => {
     at: db.nowIso(),
     txHash: `0x${crypto.randomBytes(16).toString("hex")}`,
   });
+  res.json({ ok: true, loan });
+});
+
+/** Settle remaining balance (Lab / testing) — marks installment or bullet loans REPAID. */
+loansRouter.post("/:id/settle", requireAuth, (req, res) => {
+  const user = (req as AuthedRequest).user!;
+  const loan = db.state.loans.find((l) => l.id === req.params.id);
+  if (!loan) {
+    res.status(404).json({ error: "not_found" });
+    return;
+  }
+  if (loan.borrowerId !== user.id && user.role !== "DEV_ADMIN" && user.role !== "OWNER") {
+    res.status(403).json({ error: "not_your_loan" });
+    return;
+  }
+  if (loan.status !== "ACTIVE" && loan.status !== "APPROVED" && loan.status !== "PENDING") {
+    res.status(400).json({ error: "not_active", status: loan.status });
+    return;
+  }
+  const wasActive = loan.status === "ACTIVE" || loan.status === "APPROVED";
+  if (loan.installments?.length) {
+    for (const inst of loan.installments) {
+      if (!inst.paid) {
+        inst.paid = true;
+        inst.paidAt = db.nowIso();
+      }
+    }
+  }
+  const refund = wasActive ? loan.amount : 0;
+  loan.status = "REPAID";
+  loan.repaidAt = db.nowIso();
+  if (wasActive) {
+    user.consecutivePaidLoans += 1;
+    const bank = findBankById(loan.lenderBankId);
+    if (bank && refund > 0) {
+      bank.reserve += refund;
+      bank.totalRepaid += refund;
+    }
+  }
+  db.state.transactions.push({
+    id: db.uid("tx"),
+    type: "LOAN_REPAID",
+    userId: loan.borrowerId,
+    bankId: loan.lenderBankId,
+    loanId: loan.id,
+    amount: loan.amount,
+    note: "Settled in Lab",
+    at: db.nowIso(),
+    txHash: `0x${crypto.randomBytes(16).toString("hex")}`,
+  });
+  db.save();
   res.json({ ok: true, loan });
 });
 

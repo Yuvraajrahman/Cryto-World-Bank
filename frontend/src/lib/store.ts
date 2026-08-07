@@ -15,6 +15,7 @@ export interface SessionUser {
   id: string;
   wallet: string;
   displayName: string;
+  loginId?: string;
   email?: string;
   phone?: string;
   country?: string;

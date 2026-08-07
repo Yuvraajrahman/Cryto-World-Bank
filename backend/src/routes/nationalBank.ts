@@ -21,8 +21,8 @@ nationalBankRouter.use(requireAuth, requireRoles("NATIONAL_BANK_ADMIN", "OWNER")
 const APPROVAL_QUEUE_STATUSES = new Set(["PENDING", "INFO_REQUESTED"]);
 
 function nationalIdFor(user: { bankId?: string; role: string }) {
-  if (user.role === "OWNER") return user.bankId || "bank_nb_bd";
-  return user.bankId || "bank_nb_bd";
+  if (user.role === "OWNER") return user.bankId || "bank_nb_bangladesh";
+  return user.bankId || "bank_nb_bangladesh";
 }
 
 function childLocals(nationalId: string): Bank[] {

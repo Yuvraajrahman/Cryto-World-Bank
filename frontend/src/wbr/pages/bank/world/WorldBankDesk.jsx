@@ -17,6 +17,8 @@ const TABS = [
 
 /**
  * Single World Bank admin desk — all World-only features as tabs.
+ * Super Admin default home is Demo Lab (`/lab`); this desk remains for deep links
+ * (facilities, treasury, governance) opened from the Lab.
  * Route: `/bank/world`
  */
 export default function WorldBankDesk() {

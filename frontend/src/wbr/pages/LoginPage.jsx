@@ -49,10 +49,27 @@ Nonce: ${nonce}
 Issued At: ${issuedAt}`;
 }
 
+const DEMO_LAB_LOGIN_IDS = new Set([
+  "admin",
+  "admin@gmail.com",
+  "bangladesh",
+  "local_bangladesh_dhaka",
+  "client_bangladesh_dhaka_00001",
+]);
+
 function resolvePostLoginPath(user, returnTo, nextStepPath) {
   const role = user?.role;
-  if (role === "DEV_ADMIN") {
-    return returnTo?.startsWith("/dev-admin") ? returnTo : "/dev-admin";
+  const email = (user?.email || "").toLowerCase();
+  const loginId = (user?.loginId || "").toLowerCase();
+  const isDemoLabUser =
+    role === "DEV_ADMIN" ||
+    DEMO_LAB_LOGIN_IDS.has(email) ||
+    DEMO_LAB_LOGIN_IDS.has(loginId);
+
+  // Bangladesh Demo Lab (admin + BD national / Dhaka local / sample client)
+  if (isDemoLabUser) {
+    if (returnTo?.startsWith("/lab") || returnTo?.startsWith("/dev-admin")) return returnTo;
+    return "/lab";
   }
   if (role === "REGULATOR") {
     return returnTo?.startsWith("/audit") ? returnTo : "/audit";
@@ -74,7 +91,8 @@ function resolvePostLoginPath(user, returnTo, nextStepPath) {
       returnTo?.startsWith("/app") ||
       returnTo?.startsWith("/bank") ||
       returnTo?.startsWith("/audit") ||
-      returnTo?.startsWith("/dev-admin")
+      returnTo?.startsWith("/dev-admin") ||
+      returnTo?.startsWith("/lab")
     ) {
       return returnTo;
     }
@@ -275,9 +293,10 @@ function LoginContent() {
         <Glass className="login-card">
           <h2>Account sign-in</h2>
           <p style={{ fontSize: 13.5, color: "var(--text-2)", lineHeight: 1.55, marginBottom: 14 }}>
-            Use your User ID (e.g. <code>bangladesh</code>, <code>local_bangladesh_dhaka</code>,{" "}
-            <code>client_brazil_rio_00001</code>) or a confirmed personal email. Super Admin:{" "}
-            <code>admin@gmail.com</code>.
+            Use your User ID (e.g. <code>kenya</code>, <code>local_kenya_nairobi</code>) or a confirmed
+            personal email. Bangladesh Demo Lab accounts (<code>admin@gmail.com</code>,{" "}
+            <code>bangladesh</code>, <code>local_bangladesh_dhaka</code>,{" "}
+            <code>client_bangladesh_dhaka_00001</code>) open the testing Lab UI.
           </p>
           <form onSubmit={(ev) => void passwordLogin(ev)} className="admin-login-form">
             <label className="field">

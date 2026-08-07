@@ -23,6 +23,7 @@ import WorldBankDesk from "@/wbr/pages/bank/world/WorldBankDesk";
 import NationalBankDesk from "@/wbr/pages/bank/national/NationalBankDesk";
 import LocalBankDesk from "@/wbr/pages/bank/local/LocalBankDesk";
 import ClientDesk from "@/wbr/pages/client/ClientDesk";
+import DemoLabDashboard from "@/wbr/pages/demo/DemoLabDashboard";
 import MultisigConsolePage from "@/wbr/pages/bank/world/MultisigConsolePage";
 import DeskShell from "@/wbr/components/layout/DeskShell";
 
@@ -146,6 +147,9 @@ export function App() {
       <Route path="/onboarding/kyc-2" element={<OnboardingKyc2 />} />
       <Route path="/onboarding/consent" element={<OnboardingConsent />} />
       <Route path="/onboarding/complete" element={<OnboardingComplete />} />
+
+      {/* Super Admin Bangladesh testing Lab (replaces World Bank desk for admin@gmail.com) */}
+      <Route path="/lab" element={<DemoLabDashboard />} />
 
       {/* 4 desktop desks */}
       <Route path="/app" element={<ClientDesk />} />

@@ -32,7 +32,7 @@ const CLIENT_TABS = [
 
 const OPERATOR_HOME = {
   OWNER: "/bank/world",
-  DEV_ADMIN: "/dev-admin",
+  DEV_ADMIN: "/lab",
   NATIONAL_BANK_ADMIN: "/bank/national",
   LOCAL_BANK_ADMIN: "/bank/local",
   APPROVER: "/bank/local",

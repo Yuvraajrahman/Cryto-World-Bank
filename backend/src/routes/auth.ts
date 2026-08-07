@@ -255,6 +255,96 @@ authRouter.get("/me", async (req, res) => {
   }
 });
 
+/** Bangladesh demo lab personas — password testing accounts for the Lab UI. */
+export const DEMO_LAB_PERSONAS = {
+  world: {
+    key: "world" as const,
+    label: "World Bank",
+    scope: "Global",
+    identifier: "admin@gmail.com",
+  },
+  national: {
+    key: "national" as const,
+    label: "National Bank",
+    scope: "Bangladesh",
+    identifier: "bangladesh",
+  },
+  local: {
+    key: "local" as const,
+    label: "Local Bank",
+    scope: "Dhaka",
+    identifier: "local_bangladesh_dhaka",
+  },
+  client: {
+    key: "client" as const,
+    label: "Client",
+    scope: "Dhaka client #1",
+    identifier: "client_bangladesh_dhaka_00001",
+  },
+};
+
+const DEMO_LAB_IDS = new Set(
+  Object.values(DEMO_LAB_PERSONAS).map((p) => p.identifier.toLowerCase()),
+);
+
+function isLabOperator(user: { role?: string; email?: string | null; loginId?: string | null }) {
+  if (user.role === "DEV_ADMIN") return true;
+  const email = (user.email || "").toLowerCase();
+  const loginId = (user.loginId || "").toLowerCase();
+  return email === "admin@gmail.com" || loginId === "admin";
+}
+
+function isLabPersonaUser(user: { email?: string | null; loginId?: string | null }) {
+  const email = (user.email || "").toLowerCase();
+  const loginId = (user.loginId || "").toLowerCase();
+  return DEMO_LAB_IDS.has(email) || DEMO_LAB_IDS.has(loginId);
+}
+
+/** List demo lab personas (metadata only). */
+authRouter.get("/demo-lab/personas", (_req, res) => {
+  res.json({
+    personas: Object.values(DEMO_LAB_PERSONAS).map((p) => ({
+      key: p.key,
+      label: p.label,
+      scope: p.scope,
+      identifier: p.identifier,
+    })),
+  });
+});
+
+/**
+ * Switch among Bangladesh demo personas for the testing Lab UI.
+ * Allowed for Super Admin (admin@gmail.com) or any already-switched lab persona.
+ */
+authRouter.post("/demo-lab/switch", requireAuth, async (req, res, next) => {
+  try {
+    const schema = z.object({
+      persona: z.enum(["world", "national", "local", "client"]),
+    });
+    const { persona } = schema.parse(req.body);
+    const actor = (req as AuthedRequest).user!;
+    if (!isLabOperator(actor) && !isLabPersonaUser(actor)) {
+      res.status(403).json({ error: "demo_lab_forbidden" });
+      return;
+    }
+    const target = DEMO_LAB_PERSONAS[persona];
+    const found = await findUserByLoginIdentifierPg(target.identifier);
+    if (!found?.user) {
+      res.status(404).json({ error: "persona_not_found", identifier: target.identifier });
+      return;
+    }
+    const token = issueToken(found.user.id, found.user.wallet, found.user.role);
+    res.json({
+      token,
+      user: found.user,
+      persona: target.key,
+      lab: true,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /** Deterministic synthetic wallet from a loginId (for password-only accounts). */
 export function syntheticWalletFromLoginId(loginId: string): `0x${string}` {
   const h = createHash("sha256").update(`cwb:login:${loginId}`).digest("hex");

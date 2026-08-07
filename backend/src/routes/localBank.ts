@@ -26,7 +26,7 @@ const adminOnly = ["LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"] as const;
 
 localBankRouter.use(
   requireAuth,
-  requireRoles("APPROVER", "LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER"),
+  requireRoles("APPROVER", "LOCAL_BANK_ADMIN", "NATIONAL_BANK_ADMIN", "OWNER", "DEV_ADMIN"),
 );
 
 function bankIdFor(user: { bankId?: string; role: string }) {
@@ -78,18 +78,57 @@ localBankRouter.get("/dashboard", async (req, res, next) => {
     ).length;
 
     let kycPending = 0;
+    let clientRows: Array<{
+      id: string;
+      loginId?: string | null;
+      displayName?: string | null;
+      wallet?: string | null;
+      kyc1Status?: string | null;
+      kyc2Status?: string | null;
+      country?: string | null;
+    }> = [];
     try {
       const prisma = getPrisma();
       if (prisma) {
         kycPending = await prisma.user.count({
           where: {
             role: "BORROWER",
+            bankId,
             OR: [{ kyc1Status: "PENDING" }, { kyc2Status: "PENDING" }],
+          },
+        });
+        clientRows = await prisma.user.findMany({
+          where: { role: "BORROWER", bankId },
+          orderBy: [{ loginId: "asc" }, { displayName: "asc" }],
+          take: 200,
+          select: {
+            id: true,
+            loginId: true,
+            displayName: true,
+            wallet: true,
+            kyc1Status: true,
+            kyc2Status: true,
+            country: true,
           },
         });
       }
     } catch {
       /* optional */
+    }
+
+    // Fallback: in-memory users tied to this local bank
+    if (clientRows.length === 0) {
+      clientRows = db.state.users
+        .filter((u) => u.role === "BORROWER" && u.bankId === bankId)
+        .map((u) => ({
+          id: u.id,
+          loginId: u.loginId,
+          displayName: u.displayName,
+          wallet: u.wallet,
+          kyc1Status: u.kyc1Status,
+          kyc2Status: u.kyc2Status,
+          country: u.country,
+        }));
     }
 
     const reserve = bank?.reserve ?? 0;
@@ -99,6 +138,33 @@ localBankRouter.get("/dashboard", async (req, res, next) => {
       1,
     );
     const reserveRatio = allocated > 0 ? reserve / allocated : 1;
+
+    const clients = clientRows.map((u) => {
+      const loans = book.filter((l) => l.borrowerId === u.id);
+      const activeLoans = loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
+      const pendingLoans = loans.filter((l) => APPROVAL_QUEUE_STATUSES.has(l.status));
+      const outstanding = activeLoans.reduce((s, l) => s + (l.amount || 0), 0);
+      const kyc =
+        u.kyc2Status === "APPROVED" || u.kyc1Status === "APPROVED"
+          ? "APPROVED"
+          : u.kyc1Status === "PENDING" || u.kyc2Status === "PENDING"
+            ? "PENDING"
+            : u.kyc1Status || "NOT_STARTED";
+      return {
+        id: u.id,
+        loginId: u.loginId || undefined,
+        name: u.displayName || u.loginId || u.id,
+        wallet: u.wallet || undefined,
+        country: u.country || undefined,
+        kyc1Status: u.kyc1Status,
+        kyc2Status: u.kyc2Status,
+        kycStatus: kyc,
+        activeLoanCount: activeLoans.length,
+        pendingLoanCount: pendingLoans.length,
+        outstandingUsdc: outstanding,
+        status: activeLoans.length ? "ACTIVE" : pendingLoans.length ? "PENDING" : "INACTIVE",
+      };
+    });
 
     res.json({
       bank,
@@ -133,8 +199,137 @@ localBankRouter.get("/dashboard", async (req, res, next) => {
         kycPending,
       },
       clients: {
-        activeCount: new Set(book.map((l) => l.borrowerId).filter(Boolean)).size,
+        activeCount: clients.filter((c) => c.status === "ACTIVE").length,
+        totalCount: clients.length,
+        list: clients,
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** Branch / national client roster for Local Bank operators / Lab.
+ *  ?scope=branch (default) — this local bank only
+ *  ?scope=national — all local banks under the same National parent
+ *  ?q= — server-side search on loginId / name / wallet
+ */
+localBankRouter.get("/clients", async (req, res, next) => {
+  try {
+    const user = (req as AuthedRequest).user!;
+    const bankId = bankIdFor(user);
+    const scope = String(req.query.scope || "branch").toLowerCase();
+    const q = String(req.query.q || "").trim().toLowerCase();
+
+    const mine = findBankById(bankId);
+    let bankIds = [bankId];
+    if (scope === "national" || scope === "country" || scope === "all") {
+      const parentId = mine?.parentBankId;
+      if (parentId) {
+        bankIds = db.state.banks
+          .filter((b) => b.tier === "LOCAL" && b.parentBankId === parentId)
+          .map((b) => b.id);
+        if (!bankIds.includes(bankId)) bankIds.push(bankId);
+      }
+    }
+    const bankNameById = new Map(
+      db.state.banks.filter((b) => bankIds.includes(b.id)).map((b) => [b.id, b.name || b.id]),
+    );
+
+    const book = db.state.loans.filter(
+      (l) => l.kind === "BORROWER" && l.lenderBankId && bankIds.includes(l.lenderBankId),
+    );
+
+    type Row = {
+      id: string;
+      loginId?: string | null;
+      displayName?: string | null;
+      wallet?: string | null;
+      bankId?: string | null;
+      kyc1Status?: string | null;
+      kyc2Status?: string | null;
+      country?: string | null;
+    };
+    let rows: Row[] = [];
+    try {
+      const prisma = getPrisma();
+      if (prisma) {
+        rows = await prisma.user.findMany({
+          where: { role: "BORROWER", bankId: { in: bankIds } },
+          orderBy: [{ loginId: "asc" }, { displayName: "asc" }],
+          take: 5000,
+          select: {
+            id: true,
+            loginId: true,
+            displayName: true,
+            wallet: true,
+            bankId: true,
+            kyc1Status: true,
+            kyc2Status: true,
+            country: true,
+          },
+        });
+      }
+    } catch {
+      /* optional */
+    }
+    if (rows.length === 0) {
+      rows = db.state.users
+        .filter((u) => u.role === "BORROWER" && u.bankId && bankIds.includes(u.bankId))
+        .map((u) => ({
+          id: u.id,
+          loginId: u.loginId,
+          displayName: u.displayName,
+          wallet: u.wallet,
+          bankId: u.bankId,
+          kyc1Status: u.kyc1Status,
+          kyc2Status: u.kyc2Status,
+          country: u.country,
+        }));
+    }
+
+    if (q) {
+      rows = rows.filter((u) => {
+        const hay = `${u.loginId || ""} ${u.displayName || ""} ${u.wallet || ""} ${u.id} ${u.bankId || ""}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    const clients = rows.map((u) => {
+      const loans = book.filter((l) => l.borrowerId === u.id);
+      const activeLoans = loans.filter((l) => l.status === "ACTIVE" || l.status === "APPROVED");
+      const pendingLoans = loans.filter((l) => APPROVAL_QUEUE_STATUSES.has(l.status));
+      const outstanding = activeLoans.reduce((s, l) => s + (l.amount || 0), 0);
+      const kyc =
+        u.kyc2Status === "APPROVED" || u.kyc1Status === "APPROVED"
+          ? "APPROVED"
+          : u.kyc1Status === "PENDING" || u.kyc2Status === "PENDING"
+            ? "PENDING"
+            : u.kyc1Status || "NOT_STARTED";
+      const clientBankId = u.bankId || bankId;
+      return {
+        id: u.id,
+        loginId: u.loginId || undefined,
+        name: u.displayName || u.loginId || u.id,
+        wallet: u.wallet || undefined,
+        country: u.country || undefined,
+        bankId: clientBankId,
+        bankName: bankNameById.get(clientBankId) || clientBankId,
+        kycStatus: kyc,
+        activeLoanCount: activeLoans.length,
+        pendingLoanCount: pendingLoans.length,
+        outstandingUsdc: outstanding,
+        status: activeLoans.length ? "ACTIVE" : pendingLoans.length ? "PENDING" : "INACTIVE",
+      };
+    });
+
+    res.json({
+      bankId,
+      scope: scope === "national" || scope === "country" || scope === "all" ? "national" : "branch",
+      bankIds,
+      totalCount: clients.length,
+      clients,
+      unit: "USDC",
     });
   } catch (err) {
     next(err);

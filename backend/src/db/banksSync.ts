@@ -12,6 +12,61 @@ function walletFor(id: string, onChain: string | null | undefined): string {
   return `0x${hex}`;
 }
 
+/**
+ * Prefer testing-world seed institutions over legacy demo duplicates.
+ * Example: bank_nb_bangladesh (+ 8 locals) wins over bank_nb_bd (+ 2 legacy locals).
+ */
+export function canonicalizeBanks(banks: Bank[]): Bank[] {
+  const ids = new Set(banks.map((b) => b.id));
+  let list = banks;
+
+  // Explicit legacy → canonical pairs from older prisma/seed.ts vs seed-testing-world.ts
+  if (ids.has("bank_nb_bangladesh") && ids.has("bank_nb_bd")) {
+    list = list.filter((b) => b.id !== "bank_nb_bd" && b.parentBankId !== "bank_nb_bd");
+  }
+
+  // Deduplicate remaining nationals that share the same jurisdiction name
+  const nationals = list.filter((b) => b.tier === "NATIONAL");
+  const nonNationals = list.filter((b) => b.tier !== "NATIONAL");
+  const groups = new Map<string, Bank[]>();
+  for (const n of nationals) {
+    const key = String(n.jurisdiction || n.name || n.id)
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(n);
+  }
+
+  const keptNationals: Bank[] = [];
+  const droppedNationalIds = new Set<string>();
+  for (const group of groups.values()) {
+    if (group.length === 1) {
+      keptNationals.push(group[0]);
+      continue;
+    }
+    const ranked = group
+      .map((n) => {
+        const childCount = list.filter((b) => b.parentBankId === n.id).length;
+        const preferCanonicalName = /_[a-z]{3,}$/i.test(n.id) && !/_bd$/i.test(n.id) ? 1 : 0;
+        const preferLongId = n.id.length;
+        return {
+          n,
+          score: preferCanonicalName * 1_000_000 + childCount * 10_000 + (n.reserve || 0) + preferLongId,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
+    keptNationals.push(ranked[0].n);
+    for (const loser of ranked.slice(1)) droppedNationalIds.add(loser.n.id);
+  }
+
+  const keptOthers = nonNationals.filter(
+    (b) => !(b.tier === "LOCAL" && b.parentBankId && droppedNationalIds.has(b.parentBankId)),
+  );
+
+  return [...keptOthers.filter((b) => b.tier === "WORLD"), ...keptNationals, ...keptOthers.filter((b) => b.tier === "LOCAL")];
+}
+
 export async function syncBanksFromPrisma(): Promise<{ count: number }> {
   const prisma = requirePrisma();
   const rows = await prisma.institution.findMany({
@@ -67,10 +122,10 @@ export async function syncBanksFromPrisma(): Promise<{ count: number }> {
 
   if (banks.length === 0) return { count: 0 };
 
-  // Preserve non-bank memory state; replace bank list from Postgres.
-  db.state.banks = banks;
+  // Preserve non-bank memory state; replace bank list from Postgres (canonicalized).
+  db.state.banks = canonicalizeBanks(banks);
   db.save();
-  return { count: banks.length };
+  return { count: db.state.banks.length };
 }
 
 /** Persist a single bank's capital back to Prisma (after allocate). */

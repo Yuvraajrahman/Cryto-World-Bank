@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1400 630" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgF" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#f7fbfe"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="630" fill="url(#bgF)"/>
+
+  <!-- Title -->
+  <text x="700" y="36" text-anchor="middle" font-size="22" font-weight="700" fill="#1f3864">Agile / Scrum SDLC — 4 Incremental Phases (16 weeks)</text>
+  <text x="700" y="58" text-anchor="middle" font-size="13" fill="#5a738c">Lightweight Scrum · MoSCoW priorities · weekly supervisor sync · gates G1–G4 · MVC separation</text>
+
+  <!-- Top process strip with icons -->
+  <rect x="40" y="75" width="1320" height="70" rx="12" fill="#e8f2fa" stroke="#2b6cb0"/>
+  <!-- Sprint icon -->
+  <circle cx="100" cy="110" r="20" fill="#0e6ebd"/>
+  <path d="M92 110 a8 8 0 1 1 8 8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M108 104 l2 6 6 1 -5 4 1 6 -6-3 -6 3 1-6 -5-4 6-1 z" fill="#fff" transform="translate(-2,-2) scale(0.55) translate(170,185)"/>
+  <text x="130" y="105" font-size="13" font-weight="700" fill="#1f3864">Sprint cycle</text>
+  <text x="130" y="123" font-size="11" fill="#5a738c">3–5 weeks / phase</text>
+
+  <text x="280" y="115" font-size="18" fill="#2b6cb0">→</text>
+
+  <!-- Team icon -->
+  <circle cx="340" cy="110" r="20" fill="#1565a0"/>
+  <circle cx="334" cy="104" r="5" fill="#fff"/>
+  <circle cx="346" cy="104" r="5" fill="#fff"/>
+  <path d="M325 120 c0-6 6-9 15-9 s15 3 15 9" fill="none" stroke="#fff" stroke-width="2"/>
+  <text x="370" y="105" font-size="13" font-weight="700" fill="#1f3864">Team of 2</text>
+  <text x="370" y="123" font-size="11" fill="#5a738c">Tue sync + retro</text>
+
+  <text x="520" y="115" font-size="18" fill="#2b6cb0">→</text>
+
+  <!-- MVC icon -->
+  <circle cx="580" cy="110" r="20" fill="#1f5f9a"/>
+  <rect x="568" y="100" width="10" height="8" rx="1.5" fill="#fff"/>
+  <rect x="580" y="100" width="10" height="8" rx="1.5" fill="#cfe5f7"/>
+  <rect x="574" y="112" width="12" height="8" rx="1.5" fill="#fff"/>
+  <text x="610" y="105" font-size="13" font-weight="700" fill="#1f3864">MVC stack</text>
+  <text x="610" y="123" font-size="11" fill="#5a738c">contracts · React · API</text>
+
+  <text x="800" y="115" font-size="18" fill="#2b6cb0">→</text>
+
+  <!-- Testnet icon -->
+  <circle cx="860" cy="110" r="20" fill="#0e6ebd"/>
+  <path d="M850 110 h20 M860 100 v20" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="860" cy="110" r="7" fill="none" stroke="#fff" stroke-width="2"/>
+  <text x="890" y="105" font-size="13" font-weight="700" fill="#1f3864">Testnets</text>
+  <text x="890" y="123" font-size="11" fill="#5a738c">Sepolia · zkEVM</text>
+
+  <text x="1060" y="115" font-size="18" fill="#2b6cb0">→</text>
+
+  <!-- Gate icon -->
+  <circle cx="1120" cy="110" r="20" fill="#1f3864"/>
+  <path d="M1110 110 l8 8 14-16" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1150" y="105" font-size="13" font-weight="700" fill="#1f3864">Phase gates</text>
+  <text x="1150" y="123" font-size="11" fill="#5a738c">G1 → G2 → G3 → G4</text>
+
+  <!-- ===== Phase cards ===== -->
+  <!-- I Foundation -->
+  <rect x="25" y="165" width="310" height="330" rx="14" fill="#cfe5f7" stroke="#1f3864" stroke-width="1.6"/>
+  <!-- icon: building / contracts -->
+  <rect x="45" y="185" width="52" height="52" rx="12" fill="#0e6ebd"/>
+  <path d="M58 222 v-24 h6 v-6 h10 v6 h6 v24" fill="none" stroke="#fff" stroke-width="2.2"/>
+  <path d="M64 210 h4 M72 210 h4 M64 216 h4 M72 216 h4" stroke="#fff" stroke-width="1.6"/>
+  <text x="115" y="208" font-size="18" font-weight="700" fill="#1f3864">Phase I</text>
+  <text x="115" y="228" font-size="13" fill="#334e68">Weeks 1–4</text>
+  <text x="45" y="260" font-size="14" font-weight="700" fill="#0e6ebd">Foundation &amp; infrastructure</text>
+  <g fill="#1f3864" font-size="13">
+    <circle cx="52" cy="285" r="3" fill="#0e6ebd"/><text x="62" y="290">WB / NB / LB contracts</text>
+    <circle cx="52" cy="312" r="3" fill="#0e6ebd"/><text x="62" y="317">RBAC + MockUSDC</text>
+    <circle cx="52" cy="339" r="3" fill="#0e6ebd"/><text x="62" y="344">Schema (M1) + indexes</text>
+    <circle cx="52" cy="366" r="3" fill="#0e6ebd"/><text x="62" y="371">React shell + wallet</text>
+    <circle cx="52" cy="393" r="3" fill="#5a738c"/><text x="62" y="398" fill="#5a738c">Sepolia · Safe multisig</text>
+  </g>
+  <rect x="45" y="420" width="90" height="28" rx="6" fill="#0e6ebd"/>
+  <text x="90" y="439" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">Gate G1</text>
+  <!-- small icons row -->
+  <g transform="translate(155,422)">
+    <rect width="24" height="24" rx="5" fill="#fff" stroke="#0e6ebd"/>
+    <path d="M7 17 V8 h3 v2 h4 V8 h3 v9" fill="none" stroke="#0e6ebd" stroke-width="1.5"/>
+    <rect x="32" width="24" height="24" rx="5" fill="#fff" stroke="#0e6ebd"/>
+    <rect x="38" y="8" width="12" height="9" rx="1" fill="none" stroke="#0e6ebd" stroke-width="1.5"/>
+    <path d="M40 17 h8" stroke="#0e6ebd" stroke-width="1.5"/>
+    <rect x="64" width="24" height="24" rx="5" fill="#fff" stroke="#0e6ebd"/>
+    <circle cx="76" cy="12" r="3" fill="none" stroke="#0e6ebd" stroke-width="1.5"/>
+    <path d="M70 19 c0-3 3-5 6-5 s6 2 6 5" fill="none" stroke="#0e6ebd" stroke-width="1.5"/>
+  </g>
+
+  <polygon points="345,320 365,330 345,340" fill="#1f3864"/>
+
+  <!-- II Banking -->
+  <rect x="375" y="165" width="310" height="330" rx="14" fill="#d9eaf7" stroke="#2b6cb0" stroke-width="1.5"/>
+  <rect x="395" y="185" width="52" height="52" rx="12" fill="#1565a0"/>
+  <!-- bank/loan icon -->
+  <path d="M408 222 v-8 h26 v8 M411 214 h20 M421 200 v14 M414 207 h14" fill="none" stroke="#fff" stroke-width="2"/>
+  <path d="M416 200 l5-5 5 5" fill="none" stroke="#fff" stroke-width="2"/>
+  <text x="465" y="208" font-size="18" font-weight="700" fill="#1f3864">Phase II</text>
+  <text x="465" y="228" font-size="13" fill="#334e68">Weeks 5–9</text>
+  <text x="395" y="260" font-size="14" font-weight="700" fill="#1565a0">Core banking lifecycle</text>
+  <g fill="#1f3864" font-size="13">
+    <circle cx="402" cy="285" r="3" fill="#1565a0"/><text x="412" y="290">Loan request / approve</text>
+    <circle cx="402" cy="312" r="3" fill="#1565a0"/><text x="412" y="317">Installments + limits</text>
+    <circle cx="402" cy="339" r="3" fill="#1565a0"/><text x="412" y="344">Bank registration path</text>
+    <circle cx="402" cy="366" r="3" fill="#1565a0"/><text x="412" y="371">Authority Brief UI</text>
+    <circle cx="402" cy="393" r="3" fill="#5a738c"/><text x="412" y="398" fill="#5a738c">Agent audit schema prep</text>
+  </g>
+  <rect x="395" y="420" width="90" height="28" rx="6" fill="#1565a0"/>
+  <text x="440" y="439" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">Gate G2</text>
+  <g transform="translate(505,422)">
+    <rect width="24" height="24" rx="5" fill="#fff" stroke="#1565a0"/>
+    <path d="M6 16 h12 M8 12 h8 M10 8 h4" stroke="#1565a0" stroke-width="1.6" stroke-linecap="round"/>
+    <rect x="32" width="24" height="24" rx="5" fill="#fff" stroke="#1565a0"/>
+    <circle cx="44" cy="11" r="3" fill="none" stroke="#1565a0" stroke-width="1.5"/>
+    <path d="M38 19 c2-3 10-3 12 0" fill="none" stroke="#1565a0" stroke-width="1.5"/>
+    <rect x="64" width="24" height="24" rx="5" fill="#fff" stroke="#1565a0"/>
+    <path d="M70 8 h12 v12 H70 z" fill="none" stroke="#1565a0" stroke-width="1.5"/>
+    <path d="M73 12 h6 M73 16 h6" stroke="#1565a0" stroke-width="1.3"/>
+  </g>
+
+  <polygon points="695,320 715,330 695,340" fill="#1f3864"/>
+
+  <!-- III ML + Agent -->
+  <rect x="725" y="165" width="310" height="330" rx="14" fill="#e3eef8" stroke="#1f5f9a" stroke-width="1.5"/>
+  <rect x="745" y="185" width="52" height="52" rx="12" fill="#1f5f9a"/>
+  <!-- brain/bot icon -->
+  <circle cx="771" cy="208" r="11" fill="none" stroke="#fff" stroke-width="2"/>
+  <path d="M763 208 h16 M771 200 v16" stroke="#fff" stroke-width="1.8"/>
+  <circle cx="766" cy="205" r="1.5" fill="#fff"/>
+  <circle cx="776" cy="205" r="1.5" fill="#fff"/>
+  <text x="815" y="208" font-size="18" font-weight="700" fill="#1f3864">Phase III</text>
+  <text x="815" y="228" font-size="13" fill="#334e68">Weeks 10–13</text>
+  <text x="745" y="260" font-size="14" font-weight="700" fill="#1f5f9a">ML oracle + MCP agent</text>
+  <g fill="#1f3864" font-size="13">
+    <circle cx="752" cy="285" r="3" fill="#1f5f9a"/><text x="762" y="290">RF + IF + SHAP pipeline</text>
+    <circle cx="752" cy="312" r="3" fill="#1f5f9a"/><text x="762" y="317">Commit–reveal oracle</text>
+    <circle cx="752" cy="339" r="3" fill="#1f5f9a"/><text x="762" y="344">MCP 3–5 tools + chat</text>
+    <circle cx="752" cy="366" r="3" fill="#1f5f9a"/><text x="762" y="371">Human confirmation gate</text>
+    <circle cx="752" cy="393" r="3" fill="#5a738c"/><text x="762" y="398" fill="#5a738c">Prompt-injection scan</text>
+  </g>
+  <rect x="745" y="420" width="90" height="28" rx="6" fill="#1f5f9a"/>
+  <text x="790" y="439" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">Gate G3</text>
+  <g transform="translate(855,422)">
+    <rect width="24" height="24" rx="5" fill="#fff" stroke="#1f5f9a"/>
+    <path d="M7 17 V9 h10 v8 M9 12 h6" stroke="#1f5f9a" stroke-width="1.5" fill="none"/>
+    <rect x="32" width="24" height="24" rx="5" fill="#fff" stroke="#1f5f9a"/>
+    <circle cx="44" cy="12" r="4" fill="none" stroke="#1f5f9a" stroke-width="1.5"/>
+    <path d="M44 16 v3 M42 20 h4" stroke="#1f5f9a" stroke-width="1.4"/>
+    <rect x="64" width="24" height="24" rx="5" fill="#fff" stroke="#1f5f9a"/>
+    <path d="M70 10 h12 v4 h-8 v3 h8 v4 h-12" fill="none" stroke="#1f5f9a" stroke-width="1.4"/>
+  </g>
+
+  <polygon points="1045,320 1065,330 1045,340" fill="#1f3864"/>
+
+  <!-- IV Evaluation -->
+  <rect x="1075" y="165" width="300" height="330" rx="14" fill="#eef5fb" stroke="#2b6cb0" stroke-width="1.5"/>
+  <rect x="1095" y="185" width="52" height="52" rx="12" fill="#0e6ebd"/>
+  <!-- checklist icon -->
+  <rect x="1108" y="198" width="26" height="28" rx="3" fill="none" stroke="#fff" stroke-width="2"/>
+  <path d="M1114 208 l4 4 8-9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <path d="M1114 218 h14" stroke="#fff" stroke-width="1.6"/>
+  <text x="1165" y="208" font-size="18" font-weight="700" fill="#1f3864">Phase IV</text>
+  <text x="1165" y="228" font-size="13" fill="#334e68">Weeks 14–16</text>
+  <text x="1095" y="260" font-size="14" font-weight="700" fill="#0e6ebd">Verification &amp; evaluation</text>
+  <g fill="#1f3864" font-size="13">
+    <circle cx="1102" cy="285" r="3" fill="#0e6ebd"/><text x="1112" y="290">Foundry fuzz / invariants</text>
+    <circle cx="1102" cy="312" r="3" fill="#0e6ebd"/><text x="1112" y="317">300-client capital sim</text>
+    <circle cx="1102" cy="339" r="3" fill="#0e6ebd"/><text x="1112" y="344">Testnet evaluation</text>
+    <circle cx="1102" cy="366" r="3" fill="#0e6ebd"/><text x="1112" y="371">LLM agent eval (Should)</text>
+    <circle cx="1102" cy="393" r="3" fill="#5a738c"/><text x="1112" y="398" fill="#5a738c">Paper finalization</text>
+  </g>
+  <rect x="1095" y="420" width="90" height="28" rx="6" fill="#0e6ebd"/>
+  <text x="1140" y="439" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">Gate G4</text>
+  <g transform="translate(1205,422)">
+    <rect width="24" height="24" rx="5" fill="#fff" stroke="#0e6ebd"/>
+    <path d="M8 12 l3 3 6-7" fill="none" stroke="#0e6ebd" stroke-width="1.7"/>
+    <rect x="32" width="24" height="24" rx="5" fill="#fff" stroke="#0e6ebd"/>
+    <path d="M38 17 V9 h12 v8 M41 13 h6" stroke="#0e6ebd" stroke-width="1.4" fill="none"/>
+    <rect x="64" width="24" height="24" rx="5" fill="#fff" stroke="#0e6ebd"/>
+    <path d="M70 9 h12 v14 H70 z M73 13 h6 M73 17 h6" fill="none" stroke="#0e6ebd" stroke-width="1.4"/>
+  </g>
+
+  <!-- MoSCoW footer with icons -->
+  <rect x="25" y="515" width="1350" height="95" rx="12" fill="#f0f6fc" stroke="#2b6cb0"/>
+  <text x="50" y="545" font-size="15" font-weight="700" fill="#1f3864">Priority model (MoSCoW)</text>
+
+  <rect x="50" y="560" width="36" height="36" rx="8" fill="#0e6ebd"/>
+  <path d="M59 578 l5 5 10-12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+  <text x="96" y="575" font-size="14" font-weight="700" fill="#0e6ebd">Must</text>
+  <text x="96" y="592" font-size="12" fill="#334e68">complete by end of build / demo</text>
+
+  <rect x="420" y="560" width="36" height="36" rx="8" fill="#1565a0"/>
+  <path d="M432 572 l8 0 0 8 -8 0 z" fill="none" stroke="#fff" stroke-width="2"/>
+  <path d="M436 568 v16 M428 576 h16" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+  <text x="466" y="575" font-size="14" font-weight="700" fill="#1565a0">Should</text>
+  <text x="466" y="592" font-size="12" fill="#334e68">in-phase stretch goals</text>
+
+  <rect x="760" y="560" width="36" height="36" rx="8" fill="#5a738c"/>
+  <path d="M772 570 c6-6 16 0 12 8 -2 4-6 5-6 9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="778" cy="590" r="1.6" fill="#fff"/>
+  <text x="806" y="575" font-size="14" font-weight="700" fill="#5a738c">Future</text>
+  <text x="806" y="592" font-size="12" fill="#334e68">specified only — zkKYC · full 17-tool MCP · GNN · federated learning</text>
+</svg>

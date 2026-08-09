@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1400 560" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgE" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="barAccent" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#0e6ebd"/><stop offset="100%" stop-color="#4fc3f7"/>
+    </linearGradient>
+    <linearGradient id="barBlue" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#c5d6e8"/><stop offset="100%" stop-color="#1565a0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="560" fill="url(#bgE)"/>
+  <text x="700" y="30" text-anchor="middle" font-size="22" font-weight="700" fill="#1f3864">ML Fraud Detection - Results and Decision Mechanism</text>
+  <text x="700" y="52" text-anchor="middle" font-size="12" fill="#5a738c">BCCC-DeFiFraudTrans-2025 / RF+IF stacking / n = 5,140 held-out (Ch. 5)</text>
+
+  <!-- Bar chart panel (compact) -->
+  <rect x="50" y="70" width="640" height="270" rx="12" fill="#f0f6fc" stroke="#4a90c2"/>
+  <text x="370" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Held-out metrics (bar chart)</text>
+  <text x="370" y="114" text-anchor="middle" font-size="11" fill="#5a738c">Scale 0.0 - 1.0</text>
+
+  <!-- Y axis: top=135 bottom=300, maxH=165 -->
+  <line x1="110" y1="135" x2="110" y2="300" stroke="#2b6cb0" stroke-width="1.5"/>
+  <line x1="110" y1="300" x2="620" y2="300" stroke="#2b6cb0" stroke-width="1.5"/>
+  <line x1="110" y1="135" x2="620" y2="135" stroke="#c5d6e8" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="100" y="140" text-anchor="end" font-size="10" fill="#5a738c">1.0</text>
+  <line x1="110" y1="176" x2="620" y2="176" stroke="#c5d6e8" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="100" y="181" text-anchor="end" font-size="10" fill="#5a738c">0.75</text>
+  <line x1="110" y1="218" x2="620" y2="218" stroke="#c5d6e8" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="100" y="223" text-anchor="end" font-size="10" fill="#5a738c">0.50</text>
+  <line x1="110" y1="259" x2="620" y2="259" stroke="#c5d6e8" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="100" y="264" text-anchor="end" font-size="10" fill="#5a738c">0.25</text>
+  <text x="100" y="305" text-anchor="end" font-size="10" fill="#5a738c">0.0</text>
+
+  <!-- Bars: bottom=300, maxH=165 -->
+  <rect x="145" y="136" width="70" height="164" rx="5" fill="url(#barAccent)"/>
+  <text x="180" y="128" text-anchor="middle" font-size="12" font-weight="700" fill="#0e6ebd">0.991</text>
+  <text x="180" y="322" text-anchor="middle" font-size="11" fill="#4a657a">ROC-AUC</text>
+
+  <rect x="255" y="153" width="70" height="147" rx="5" fill="url(#barBlue)"/>
+  <text x="290" y="145" text-anchor="middle" font-size="12" font-weight="700" fill="#1565a0">0.891</text>
+  <text x="290" y="322" text-anchor="middle" font-size="11" fill="#4a657a">F1</text>
+
+  <rect x="365" y="150" width="70" height="150" rx="5" fill="url(#barBlue)"/>
+  <text x="400" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#1565a0">0.908</text>
+  <text x="400" y="322" text-anchor="middle" font-size="11" fill="#4a657a">Recall</text>
+
+  <rect x="475" y="156" width="70" height="144" rx="5" fill="url(#barBlue)"/>
+  <text x="510" y="148" text-anchor="middle" font-size="12" font-weight="700" fill="#1565a0">0.874</text>
+  <text x="510" y="322" text-anchor="middle" font-size="11" fill="#4a657a">Precision</text>
+
+  <!-- Confusion (compact cells) -->
+  <rect x="720" y="70" width="640" height="270" rx="12" fill="#f0f6fc" stroke="#4a90c2"/>
+  <text x="1040" y="96" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Confusion matrix</text>
+  <text x="960" y="122" text-anchor="middle" font-size="11" fill="#5a738c">Predicted Fraud</text>
+  <text x="1160" y="122" text-anchor="middle" font-size="11" fill="#5a738c">Predicted Legit</text>
+  <text x="768" y="195" text-anchor="middle" font-size="11" fill="#5a738c" transform="rotate(-90 768 195)">Actual Fraud</text>
+  <text x="768" y="285" text-anchor="middle" font-size="11" fill="#5a738c" transform="rotate(-90 768 285)">Actual Legit</text>
+
+  <rect x="860" y="140" width="200" height="80" rx="8" fill="#cfe5f7" stroke="#1f3864" stroke-width="1.5"/>
+  <text x="960" y="170" text-anchor="middle" font-size="12" fill="#1f3864">TP</text>
+  <text x="960" y="200" text-anchor="middle" font-size="24" font-weight="700" fill="#1f3864">417</text>
+  <rect x="1080" y="140" width="200" height="80" rx="8" fill="#ffebee" stroke="#c62828" stroke-width="1.3"/>
+  <text x="1180" y="170" text-anchor="middle" font-size="12" fill="#b71c1c">FN</text>
+  <text x="1180" y="200" text-anchor="middle" font-size="24" font-weight="700" fill="#b71c1c">42</text>
+  <rect x="860" y="235" width="200" height="80" rx="8" fill="#ffebee" stroke="#c62828" stroke-width="1.3"/>
+  <text x="960" y="265" text-anchor="middle" font-size="12" fill="#b71c1c">FP</text>
+  <text x="960" y="295" text-anchor="middle" font-size="24" font-weight="700" fill="#b71c1c">60</text>
+  <rect x="1080" y="235" width="200" height="80" rx="8" fill="#e8f1fa" stroke="#1f5f9a" stroke-width="1.3"/>
+  <text x="1180" y="265" text-anchor="middle" font-size="12" fill="#1565a0">TN</text>
+  <text x="1180" y="295" text-anchor="middle" font-size="24" font-weight="700" fill="#1565a0">4,621</text>
+
+  <!-- Decision bands (compact) -->
+  <rect x="50" y="360" width="1310" height="175" rx="12" fill="#f0f6fc" stroke="#1f3864" stroke-width="1.5"/>
+  <text x="705" y="388" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3864">How score s becomes a banking decision (Ch. 4 oracle + L3 security)</text>
+
+  <rect x="100" y="405" width="360" height="78" rx="10" fill="#e8f5e9" stroke="#388e3c" stroke-width="1.5"/>
+  <text x="280" y="432" text-anchor="middle" font-size="13" font-weight="700" fill="#2e7d32">APPROVE</text>
+  <text x="280" y="454" text-anchor="middle" font-size="16" font-weight="700" fill="#1f3864">s &lt; 0.4</text>
+  <text x="280" y="474" text-anchor="middle" font-size="11" fill="#4a657a">auto-recommend / still human sign-off</text>
+
+  <rect x="500" y="405" width="360" height="78" rx="10" fill="#e3f2fd" stroke="#1f3864" stroke-width="1.8"/>
+  <text x="680" y="432" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3864">MANUAL REVIEW</text>
+  <text x="680" y="454" text-anchor="middle" font-size="16" font-weight="700" fill="#1f3864">0.4 &lt;= s &lt; 0.7</text>
+  <text x="680" y="474" text-anchor="middle" font-size="11" fill="#4a657a">SHAP explanation -&gt; approver desk</text>
+
+  <rect x="900" y="405" width="360" height="78" rx="10" fill="#ffebee" stroke="#c62828" stroke-width="1.5"/>
+  <text x="1080" y="432" text-anchor="middle" font-size="13" font-weight="700" fill="#b71c1c">REJECT</text>
+  <text x="1080" y="454" text-anchor="middle" font-size="16" font-weight="700" fill="#1f3864">s &gt;= 0.7</text>
+  <text x="1080" y="474" text-anchor="middle" font-size="11" fill="#4a657a">flag / optional freeze path</text>
+
+  <text x="705" y="515" text-anchor="middle" font-size="11" fill="#5a738c">Pipeline: features -&gt; RF+IF stack -&gt; score s -&gt; commit-reveal on-chain -&gt; human gate (never silent auto-disburse)</text>
+</svg>

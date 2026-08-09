@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1400 920" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <marker id="tipDn" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="7" refY="12" orient="0">
+      <path d="M1,2 L7,12 L13,2 Z" fill="#1f3864"/>
+    </marker>
+    <marker id="tipUp" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" refX="7" refY="2" orient="0">
+      <path d="M1,12 L7,2 L13,12 Z" fill="#1565a0"/>
+    </marker>
+    <!-- Simple bank building icon (stroke inherits via currentColor) -->
+    <g id="icoBank">
+      <path d="M4 28 V12 L18 4 L32 12 V28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M4 28 H32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M10 28 V18 H14 V28 M16 28 V18 H20 V28 M22 28 V18 H26 V28" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M8 12 H28" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </g>
+    <g id="icoBankSm">
+      <path d="M3 22 V10 L12 4 L21 10 V22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M3 22 H21" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M7 22 V15 H10 V22 M11 22 V15 H14 V22 M15 22 V15 H18 V22" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    </g>
+    <g id="icoClient">
+      <circle cx="18" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2.2"/>
+      <path d="M6 30 C6 22 12 18 18 18 S30 22 30 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </g>
+    <g id="icoDown">
+      <path d="M12 4 V20" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M6 14 L12 22 L18 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="icoUp">
+      <path d="M12 22 V6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M6 12 L12 4 L18 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="icoPeer">
+      <circle cx="8" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="18" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M8 14 C8 18 18 18 18 14" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </g>
+    <g id="icoSwap">
+      <path d="M4 8 H18 L14 4 M18 8 L14 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M20 16 H6 L10 12 M6 16 L10 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="icoStack">
+      <rect x="4" y="14" width="16" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="6" y="9" width="16" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="8" y="4" width="16" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </g>
+    <g id="icoPool">
+      <ellipse cx="12" cy="16" rx="9" ry="4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M3 16 V10 C3 6 21 6 21 10 V16" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    </g>
+  </defs>
+
+  <rect width="1400" height="920" fill="url(#bgB)"/>
+  <text x="700" y="34" text-anchor="middle" font-size="24" font-weight="700" fill="#1f3864">Four-Tier Hierarchy and Cross-Tier Financial Flows</text>
+  <text x="700" y="56" text-anchor="middle" font-size="13" fill="#5a738c">Capital allocation down / repayment and yield up / peer lending / surplus repatriation (Ch. 4)</text>
+
+  <!-- ========== LEFT: CAPITAL DOWN ========== -->
+  <rect x="24" y="78" width="200" height="500" rx="12" fill="#f0f6fc" stroke="#1f3864" stroke-width="1.4"/>
+  <circle cx="70" cy="100" r="16" fill="#1f3864"/>
+  <g transform="translate(58,88) scale(0.65)" color="#ffffff"><use xlink:href="#icoDown"/></g>
+  <text x="124" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3864">CAPITAL DOWN</text>
+
+  <!-- vertical shaft on left side of panel -->
+  <line x1="55" y1="125" x2="55" y2="540" stroke="#1f3864" stroke-width="4" stroke-linecap="round" marker-end="url(#tipDn)"/>
+
+  <!-- step labels to the RIGHT of the shaft -->
+  <text x="75" y="170" font-size="13" font-weight="700" fill="#1f3864">1. WB reserve</text>
+  <text x="75" y="190" font-size="12" fill="#5a738c">allocates to NB</text>
+
+  <text x="75" y="270" font-size="13" font-weight="700" fill="#1f3864">2. NB allocates</text>
+  <text x="75" y="290" font-size="12" fill="#5a738c">country quota</text>
+
+  <text x="75" y="370" font-size="13" font-weight="700" fill="#1f3864">3. LB receives</text>
+  <text x="75" y="390" font-size="12" fill="#5a738c">lending capital</text>
+
+  <text x="75" y="470" font-size="13" font-weight="700" fill="#1f3864">4. Client loan</text>
+  <text x="75" y="490" font-size="12" fill="#5a738c">disbursement</text>
+
+  <!-- ========== RIGHT: RETURNS UP ========== -->
+  <rect x="1176" y="78" width="200" height="500" rx="12" fill="#f0f6fc" stroke="#1565a0" stroke-width="1.4"/>
+  <circle cx="1222" cy="100" r="16" fill="#1565a0"/>
+  <g transform="translate(1210,88) scale(0.65)" color="#ffffff"><use xlink:href="#icoUp"/></g>
+  <text x="1276" y="108" text-anchor="middle" font-size="13" font-weight="700" fill="#1565a0">RETURNS UP</text>
+
+  <!-- vertical shaft on right side of panel -->
+  <line x1="1345" y1="540" x2="1345" y2="125" stroke="#1565a0" stroke-width="4" stroke-linecap="round" marker-end="url(#tipUp)"/>
+
+  <!-- step labels to the LEFT of the shaft -->
+  <text x="1330" y="170" text-anchor="end" font-size="13" font-weight="700" fill="#1565a0">1. Reserve yield</text>
+  <text x="1330" y="190" text-anchor="end" font-size="12" fill="#5a738c">PoR / reporting</text>
+
+  <text x="1330" y="270" text-anchor="end" font-size="13" font-weight="700" fill="#1565a0">2. NB receives</text>
+  <text x="1330" y="290" text-anchor="end" font-size="12" fill="#5a738c">UDF + interest</text>
+
+  <text x="1330" y="370" text-anchor="end" font-size="13" font-weight="700" fill="#1565a0">3. LB collects</text>
+  <text x="1330" y="390" text-anchor="end" font-size="12" fill="#5a738c">installments</text>
+
+  <text x="1330" y="470" text-anchor="end" font-size="13" font-weight="700" fill="#1565a0">4. Client pays</text>
+  <text x="1330" y="490" text-anchor="end" font-size="12" fill="#5a738c">principal + interest</text>
+
+  <!-- ========== CENTER TIER STACK ========== -->
+  <!-- Tier 1 World Bank -->
+  <rect x="260" y="90" width="880" height="88" rx="14" fill="#1f5f9a" stroke="#1f3864" stroke-width="2"/>
+  <circle cx="310" cy="134" r="26" fill="#ffffff"/>
+  <g transform="translate(292,116)" color="#1f5f9a"><use xlink:href="#icoBank"/></g>
+  <text x="720" y="125" text-anchor="middle" font-size="20" font-weight="700" fill="#ffffff">World Bank Reserve  |  Tier 1</text>
+  <text x="720" y="155" text-anchor="middle" font-size="13" fill="#d6e8f7">Global reserve pool  ·  reserve-ratio governance  ·  Safe multisig admin</text>
+
+  <line x1="700" y1="178" x2="700" y2="208" stroke="#1f3864" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="690,208 710,208 700,224" fill="#1f3864"/>
+
+  <!-- Tier 2 National Bank -->
+  <rect x="300" y="228" width="800" height="88" rx="14" fill="#2b5f8f" stroke="#2b6cb0" stroke-width="1.6"/>
+  <circle cx="350" cy="272" r="26" fill="#ffffff"/>
+  <g transform="translate(332,254)" color="#2b5f8f"><use xlink:href="#icoBank"/></g>
+  <text x="720" y="263" text-anchor="middle" font-size="19" font-weight="700" fill="#ffffff">National Bank  |  Tier 2</text>
+  <text x="720" y="293" text-anchor="middle" font-size="13" fill="#d6e8f7">Country capital allocation  ·  SAR review  ·  freeze authority</text>
+
+  <line x1="700" y1="316" x2="700" y2="346" stroke="#1f3864" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="690,346 710,346 700,362" fill="#1f3864"/>
+
+  <!-- Tier 3 Local Bank -->
+  <rect x="340" y="366" width="720" height="88" rx="14" fill="#3d7aad" stroke="#1f5f9a" stroke-width="1.5"/>
+  <circle cx="390" cy="410" r="26" fill="#ffffff"/>
+  <g transform="translate(372,392)" color="#3d7aad"><use xlink:href="#icoBank"/></g>
+  <text x="720" y="401" text-anchor="middle" font-size="19" font-weight="700" fill="#ffffff">Local Bank  |  Tier 3</text>
+  <text x="720" y="431" text-anchor="middle" font-size="13" fill="#d6e8f7">Retail lending  ·  loan approval desk  ·  InsuranceFund</text>
+
+  <line x1="700" y1="454" x2="700" y2="484" stroke="#1f3864" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="690,484 710,484 700,500" fill="#1f3864"/>
+
+  <!-- Tier 4 Client -->
+  <rect x="400" y="504" width="600" height="88" rx="14" fill="#5a9bc8" stroke="#4a90c2" stroke-width="1.5"/>
+  <circle cx="450" cy="548" r="26" fill="#ffffff"/>
+  <g transform="translate(432,530)" color="#5a9bc8"><use xlink:href="#icoClient"/></g>
+  <text x="720" y="539" text-anchor="middle" font-size="19" font-weight="700" fill="#ffffff">Client  |  Tier 4</text>
+  <text x="720" y="569" text-anchor="middle" font-size="13" fill="#d6e8f7">Individual / SME  ·  KYC tiers  ·  wallet UX + MCP agent</text>
+
+  <!-- ========== SIDE FLOW BADGES in gaps (no overlap with tiers) ========== -->
+  <!-- Left of stack between T2/T3 -->
+  <rect x="240" y="250" width="48" height="44" rx="8" fill="#e8f5e9" stroke="#1f3864" stroke-width="1.3"/>
+  <text x="264" y="268" text-anchor="middle" font-size="10" font-weight="700" fill="#1f3864">IBLP</text>
+  <text x="264" y="284" text-anchor="middle" font-size="9" fill="#5a738c">peer</text>
+
+  <rect x="280" y="388" width="48" height="44" rx="8" fill="#e8f5e9" stroke="#1f3864" stroke-width="1.3"/>
+  <text x="304" y="406" text-anchor="middle" font-size="10" font-weight="700" fill="#1f3864">loan</text>
+  <text x="304" y="422" text-anchor="middle" font-size="9" fill="#5a738c">retail</text>
+
+  <!-- Right of stack -->
+  <rect x="1112" y="250" width="52" height="44" rx="8" fill="#eef5fb" stroke="#1565a0" stroke-width="1.3"/>
+  <text x="1138" y="268" text-anchor="middle" font-size="10" font-weight="700" fill="#1565a0">UDF</text>
+  <text x="1138" y="284" text-anchor="middle" font-size="9" fill="#5a738c">up</text>
+
+  <rect x="1072" y="388" width="52" height="44" rx="8" fill="#eef5fb" stroke="#1565a0" stroke-width="1.3"/>
+  <text x="1098" y="406" text-anchor="middle" font-size="10" font-weight="700" fill="#1565a0">yield</text>
+  <text x="1098" y="422" text-anchor="middle" font-size="9" fill="#5a738c">up</text>
+
+  <!-- MCP callout near client, right gap -->
+  <rect x="1020" y="520" width="140" height="56" rx="10" fill="#e8f5e9" stroke="#1f3864" stroke-width="1.4"/>
+  <text x="1090" y="543" text-anchor="middle" font-size="11" font-weight="700" fill="#1f3864">MCP Agent</text>
+  <text x="1090" y="561" text-anchor="middle" font-size="10" fill="#4a657a">confirm -&gt; apply</text>
+
+  <!-- Financial summary -->
+  <rect x="260" y="610" width="880" height="58" rx="10" fill="#eef5fb" stroke="#4a90c2"/>
+  <text x="700" y="632" text-anchor="middle" font-size="12" font-weight="700" fill="#1f3864">Financial flow summary</text>
+  <text x="700" y="652" text-anchor="middle" font-size="11" fill="#4a657a">Down: WB -&gt; NB -&gt; LB -&gt; Client (USDC)   |   Up: Client installment -&gt; LB -&gt; optional UDF -&gt; PoR</text>
+
+  <!-- ========== COMPRESSED mechanisms ========== -->
+  <text x="700" y="695" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Five on-chain mechanisms</text>
+
+  <rect x="24" y="710" width="260" height="185" rx="10" fill="#eef5fb" stroke="#1f3864" stroke-width="1.3"/>
+  <circle cx="154" cy="738" r="18" fill="#1f3864"/>
+  <g transform="translate(142,726)" color="#ffffff"><use xlink:href="#icoPeer"/></g>
+  <text x="154" y="770" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3864">IBLP (peer)</text>
+  <text x="154" y="792" text-anchor="middle" font-size="12" fill="#4a657a">Same-tier bank loans</text>
+  <text x="154" y="812" text-anchor="middle" font-size="12" fill="#4a657a">NB-NB or LB-LB</text>
+  <text x="154" y="834" text-anchor="middle" font-size="11" fill="#1565a0">r_IB &lt;= r_down - d</text>
+  <text x="154" y="854" text-anchor="middle" font-size="11" fill="#1f3864">Uses idle peer reserve</text>
+  <text x="154" y="874" text-anchor="middle" font-size="11" fill="#5a738c">Flow: horizontal peer</text>
+
+  <rect x="298" y="710" width="260" height="185" rx="10" fill="#eef5fb" stroke="#2b6cb0" stroke-width="1.2"/>
+  <circle cx="428" cy="738" r="18" fill="#1565a0"/>
+  <g transform="translate(416,726)" color="#ffffff"><use xlink:href="#icoUp"/></g>
+  <text x="428" y="770" text-anchor="middle" font-size="13" font-weight="700" fill="#1565a0">UDF (upward)</text>
+  <text x="428" y="792" text-anchor="middle" font-size="12" fill="#4a657a">Park surplus upward</text>
+  <text x="428" y="812" text-anchor="middle" font-size="12" fill="#4a657a">LB -&gt; NB -&gt; WB</text>
+  <text x="428" y="834" text-anchor="middle" font-size="11" fill="#1565a0">r_up &lt; r_down - d</text>
+  <text x="428" y="854" text-anchor="middle" font-size="11" fill="#1f3864">Earns vs idle cash</text>
+  <text x="428" y="874" text-anchor="middle" font-size="11" fill="#5a738c">Flow: vertical surplus</text>
+
+  <rect x="572" y="710" width="260" height="185" rx="10" fill="#e8f1fa" stroke="#1f3864" stroke-width="1.5"/>
+  <circle cx="702" cy="738" r="18" fill="#1f3864"/>
+  <g transform="translate(690,726)" color="#ffffff"><use xlink:href="#icoPool"/></g>
+  <text x="702" y="770" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3864">SyndicatedLoan</text>
+  <text x="702" y="792" text-anchor="middle" font-size="12" fill="#4a657a">Multi-bank co-fund</text>
+  <text x="702" y="812" text-anchor="middle" font-size="12" fill="#4a657a">one large facility</text>
+  <text x="702" y="834" text-anchor="middle" font-size="11" fill="#1565a0">Share = C_i / sum C</text>
+  <text x="702" y="854" text-anchor="middle" font-size="11" fill="#1f3864">Risk shared by capital</text>
+  <text x="702" y="874" text-anchor="middle" font-size="11" fill="#5a738c">Flow: pooled capital</text>
+
+  <rect x="846" y="710" width="260" height="185" rx="10" fill="#eef5fb" stroke="#2b6cb0" stroke-width="1.2"/>
+  <circle cx="976" cy="738" r="18" fill="#1565a0"/>
+  <g transform="translate(964,726)" color="#ffffff"><use xlink:href="#icoStack"/></g>
+  <text x="976" y="770" text-anchor="middle" font-size="13" font-weight="700" fill="#1565a0">TranchedPool</text>
+  <text x="976" y="792" text-anchor="middle" font-size="12" fill="#4a657a">Senior / junior risk</text>
+  <text x="976" y="812" text-anchor="middle" font-size="12" fill="#4a657a">institutional LPs</text>
+  <text x="976" y="834" text-anchor="middle" font-size="11" fill="#1565a0">J/(J+S) in 10-30%</text>
+  <text x="976" y="854" text-anchor="middle" font-size="11" fill="#1f3864">Junior absorbs first</text>
+  <text x="976" y="874" text-anchor="middle" font-size="11" fill="#5a738c">Flow: tranche stack</text>
+
+  <rect x="1120" y="710" width="256" height="185" rx="10" fill="#eef5fb" stroke="#2b6cb0" stroke-width="1.2"/>
+  <circle cx="1248" cy="738" r="18" fill="#1565a0"/>
+  <g transform="translate(1236,726)" color="#ffffff"><use xlink:href="#icoSwap"/></g>
+  <text x="1248" y="770" text-anchor="middle" font-size="13" font-weight="700" fill="#1565a0">TreasurySwap</text>
+  <text x="1248" y="792" text-anchor="middle" font-size="12" fill="#4a657a">Cross-bank FX</text>
+  <text x="1248" y="812" text-anchor="middle" font-size="12" fill="#4a657a">Chainlink priced</text>
+  <text x="1248" y="834" text-anchor="middle" font-size="11" fill="#1565a0">(1 - spread) rate</text>
+  <text x="1248" y="854" text-anchor="middle" font-size="11" fill="#1f3864">Oracle-guarded FX</text>
+  <text x="1248" y="874" text-anchor="middle" font-size="11" fill="#5a738c">Flow: FX swap</text>
+</svg>

@@ -200,7 +200,10 @@
   \begin{landscape}%
   \begin{figure}[H]%
   \centering%
-  \ThesisIncludeGraphics[width=\linewidth,height=0.88\textheight,keepaspectratio]{#2}%
+  % Cap height so image + caption fit one landscape page (avoids blank pages from tiny overfull \vbox).
+  \makebox[\linewidth][c]{%
+    \ThesisIncludeGraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{#2}%
+  }%
 }
 \newcommand{\LandscapeDiagramEnd}{%
   \end{figure}%
@@ -210,7 +213,11 @@
   \begin{landscape}%
   \begin{figure}[H]%
   \centering%
-  \ThesisIncludeGraphics[width=\linewidth,keepaspectratio]{#1}%
+  % Same height cap: consecutive landscape sequence figures were leaving an empty page
+  % when width=\linewidth made the graphic a fraction of a point taller than \textheight+caption.
+  \makebox[\linewidth][c]{%
+    \ThesisIncludeGraphics[width=\linewidth,height=0.82\textheight,keepaspectratio]{#1}%
+  }%
 }
 \newcommand{\SequenceDiagramEnd}{%
   \end{figure}%
@@ -284,17 +291,17 @@
 \chapter{Requirements, Impacts and Constraints}
 \input{chapters/chapter_3.tex}
 
-% Ch4 — Proposed Methodology (v39 Ch4: Design Alternatives) → chapter_5.tex per template naming
+% Ch4 — Proposed Methodology (v39 Ch4: Design Alternatives)
 \chapter{Proposed Methodology}
-\input{chapters/chapter_5.tex}
+\input{chapters/chapter_4.tex}
 
-% Ch5 — Result Analysis (v39 Ch5: Evaluation, Analysis, and Final Design) → chapter_6.tex
+% Ch5 — Result Analysis (v39 Ch5: Evaluation, Analysis, and Final Design)
 \chapter{Result Analysis}
-\input{chapters/chapter_6.tex}
+\input{chapters/chapter_5.tex}
 
 % Ch6 — Conclusion (v39 Ch6)
 \chapter{Conclusion}
-\input{chapters/chapter_9.tex}
+\input{chapters/chapter_6.tex}
 
 \phantomsection
 \addcontentsline{toc}{chapter}{References}

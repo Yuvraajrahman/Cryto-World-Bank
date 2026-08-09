@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1400 880" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <marker id="arrC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f3864"/>
+    </marker>
+    <marker id="arrCd" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L5,10 L10,0 z" fill="#1f3864"/>
+    </marker>
+    <marker id="arrCb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1565a0"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="880" fill="url(#bgC)"/>
+  <text x="700" y="36" text-anchor="middle" font-size="24" font-weight="700" fill="#1f3864">MCP Conversational Agent - End-to-End Flow</text>
+  <text x="700" y="58" text-anchor="middle" font-size="13" fill="#5a738c">Qwen3-8B / typed MCP tools / human confirmation gate / on-chain write (Ch. 4)</text>
+
+  <!-- ROW 1: Steps 1-4 linear -->
+  <rect x="40" y="90" width="200" height="100" rx="12" fill="#cfe5f7" stroke="#1f3864" stroke-width="1.5"/>
+  <text x="140" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="#1f3864">1. CLIENT</text>
+  <text x="140" y="148" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Chat intent</text>
+  <text x="140" y="172" text-anchor="middle" font-size="11" fill="#4a657a">authenticated wallet</text>
+
+  <line x1="240" y1="140" x2="275" y2="140" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrC)"/>
+
+  <rect x="280" y="90" width="200" height="100" rx="12" fill="#d9eaf7" stroke="#2b6cb0" stroke-width="1.3"/>
+  <text x="380" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="#1565a0">2. REACT UI</text>
+  <text x="380" y="148" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">SSE chat</text>
+  <text x="380" y="172" text-anchor="middle" font-size="11" fill="#4a657a">thin streaming client</text>
+
+  <line x1="480" y1="140" x2="515" y2="140" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrC)"/>
+
+  <rect x="520" y="90" width="220" height="100" rx="12" fill="#d9eaf7" stroke="#1f3864" stroke-width="1.5"/>
+  <text x="630" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="#1f3864">3. EXPRESS</text>
+  <text x="630" y="145" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Context inject</text>
+  <text x="630" y="168" text-anchor="middle" font-size="11" fill="#1f3864">+ prompt-injection scan</text>
+
+  <line x1="740" y1="140" x2="775" y2="140" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrC)"/>
+
+  <rect x="780" y="90" width="220" height="100" rx="12" fill="#cfe5f7" stroke="#1f3864" stroke-width="1.6"/>
+  <text x="890" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="#1f3864">4. QWEN3-8B</text>
+  <text x="890" y="145" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Select MCP tool</text>
+  <text x="890" y="168" text-anchor="middle" font-size="11" fill="#4a657a">llama.cpp / Q4_K_M</text>
+
+  <line x1="1000" y1="140" x2="1050" y2="140" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrC)"/>
+
+  <!-- Decision -->
+  <polygon points="1150,90 1250,140 1150,190 1050,140" fill="#e8f5e9" stroke="#1f3864" stroke-width="2"/>
+  <text x="1150" y="135" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3864">READ or</text>
+  <text x="1150" y="155" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3864">WRITE?</text>
+
+  <!-- Branch connectors from diamond -->
+  <!-- READ goes right then down? Better: READ left branch down-left, WRITE down-center -->
+  <!-- Actually place READ path on left bottom and WRITE on right bottom for clarity -->
+
+  <!-- Vertical from diamond down to split -->
+  <line x1="1150" y1="190" x2="1150" y2="230" stroke="#1f3864" stroke-width="2.5"/>
+  <!-- Horizontal split -->
+  <line x1="280" y1="230" x2="1150" y2="230" stroke="#1f3864" stroke-width="2"/>
+  <line x1="280" y1="230" x2="280" y2="260" stroke="#1565a0" stroke-width="2.5" marker-end="url(#arrCd)"/>
+  <line x1="700" y1="230" x2="700" y2="260" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrCd)"/>
+  <text x="280" y="225" text-anchor="middle" font-size="12" font-weight="700" fill="#1565a0">READ path</text>
+  <text x="700" y="225" text-anchor="middle" font-size="12" font-weight="700" fill="#1f3864">WRITE path</text>
+
+  <!-- READ branch -->
+  <rect x="120" y="270" width="320" height="120" rx="12" fill="#eef5fb" stroke="#1565a0" stroke-width="1.5"/>
+  <text x="280" y="305" text-anchor="middle" font-size="14" font-weight="700" fill="#1565a0">READ tools</text>
+  <text x="280" y="330" text-anchor="middle" font-size="12" fill="#1f3864">get_account_state</text>
+  <text x="280" y="350" text-anchor="middle" font-size="12" fill="#1f3864">get_loan_status / get_requirements</text>
+  <text x="280" y="375" text-anchor="middle" font-size="12" fill="#1565a0">-&gt; grounded answer to client</text>
+
+  <!-- WRITE branch horizontal steps -->
+  <rect x="480" y="270" width="170" height="120" rx="12" fill="#e8f5e9" stroke="#1f3864" stroke-width="2"/>
+  <text x="565" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#1f3864">5. GATE</text>
+  <text x="565" y="335" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Human</text>
+  <text x="565" y="355" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">Confirm</text>
+  <text x="565" y="378" text-anchor="middle" font-size="11" fill="#1f3864">explicit yes</text>
+
+  <line x1="650" y1="330" x2="685" y2="330" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrC)"/>
+
+  <rect x="690" y="270" width="170" height="120" rx="12" fill="#d9eaf7" stroke="#2b6cb0" stroke-width="1.3"/>
+  <text x="775" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#1565a0">6. SESSION</text>
+  <text x="775" y="335" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">EIP-7702</text>
+  <text x="775" y="355" text-anchor="middle" font-size="12" fill="#4a657a">scoped key</text>
+  <text x="775" y="378" text-anchor="middle" font-size="11" fill="#5a738c">capped / 24h TTL</text>
+
+  <line x1="860" y1="330" x2="895" y2="330" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrC)"/>
+
+  <rect x="900" y="270" width="170" height="120" rx="12" fill="#d9eaf7" stroke="#2b6cb0" stroke-width="1.3"/>
+  <text x="985" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#1565a0">7. CHAIN</text>
+  <text x="985" y="335" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">On-chain Tx</text>
+  <text x="985" y="355" text-anchor="middle" font-size="12" fill="#4a657a">LoanController</text>
+  <text x="985" y="378" text-anchor="middle" font-size="11" fill="#5a738c">or LocalBank</text>
+
+  <line x1="1070" y1="330" x2="1105" y2="330" stroke="#1f3864" stroke-width="2.5" marker-end="url(#arrC)"/>
+
+  <rect x="1110" y="270" width="250" height="120" rx="12" fill="#cfe5f7" stroke="#1f3864" stroke-width="1.5"/>
+  <text x="1235" y="305" text-anchor="middle" font-size="12" font-weight="700" fill="#1f3864">8. AUDIT</text>
+  <text x="1235" y="335" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3864">AGENT_ACTION_LOG</text>
+  <text x="1235" y="360" text-anchor="middle" font-size="12" fill="#4a657a">append-only</text>
+  <text x="1235" y="378" text-anchor="middle" font-size="11" fill="#5a738c">linked to tx hash</text>
+
+  <!-- Bottom panels -->
+  <rect x="40" y="430" width="820" height="400" rx="14" fill="#f0f6fc" stroke="#4a90c2"/>
+  <text x="450" y="465" text-anchor="middle" font-size="15" font-weight="700" fill="#1f3864">MCP Tool Surface (typed schema = safety boundary)</text>
+
+  <text x="80" y="500" font-size="13" font-weight="700" fill="#1565a0">READ (ungated)</text>
+  <rect x="80" y="515" width="230" height="70" rx="8" fill="#eef5fb" stroke="#1565a0"/>
+  <text x="195" y="545" text-anchor="middle" font-size="13" fill="#1f3864">get_account_state</text>
+  <text x="195" y="565" text-anchor="middle" font-size="11" fill="#5a738c">tier / loans / savings</text>
+  <rect x="325" y="515" width="230" height="70" rx="8" fill="#eef5fb" stroke="#1565a0"/>
+  <text x="440" y="545" text-anchor="middle" font-size="13" fill="#1f3864">get_loan_status</text>
+  <text x="440" y="565" text-anchor="middle" font-size="11" fill="#5a738c">active / next due</text>
+  <rect x="570" y="515" width="250" height="70" rx="8" fill="#eef5fb" stroke="#1565a0"/>
+  <text x="695" y="545" text-anchor="middle" font-size="13" fill="#1f3864">get_requirements</text>
+  <text x="695" y="565" text-anchor="middle" font-size="11" fill="#5a738c">KYC / docs for amount</text>
+
+  <text x="80" y="620" font-size="13" font-weight="700" fill="#1f3864">WRITE (requires Step 5 confirm)</text>
+  <rect x="80" y="635" width="360" height="70" rx="8" fill="#e8f5e9" stroke="#1f3864" stroke-width="1.5"/>
+  <text x="260" y="665" text-anchor="middle" font-size="13" fill="#1f3864">submit_loan_application</text>
+  <text x="260" y="685" text-anchor="middle" font-size="11" fill="#4a657a">POST /api/loan/apply</text>
+  <rect x="460" y="635" width="360" height="70" rx="8" fill="#e8f5e9" stroke="#1f3864" stroke-width="1.5"/>
+  <text x="640" y="665" text-anchor="middle" font-size="13" fill="#1f3864">pay_installment</text>
+  <text x="640" y="685" text-anchor="middle" font-size="11" fill="#4a657a">POST /api/installment/pay</text>
+
+  <text x="450" y="750" text-anchor="middle" font-size="12" fill="#5a738c">Vague yes x3 -&gt; 10-min lockout + security log</text>
+  <text x="450" y="775" text-anchor="middle" font-size="12" fill="#1f3864">Agent never writes without human confirmation</text>
+  <text x="450" y="800" text-anchor="middle" font-size="12" fill="#ffffff">MVP: 3-5 tools</text>
+
+  <rect x="890" y="430" width="470" height="400" rx="14" fill="#eef5fb" stroke="#1f3864" stroke-width="1.4"/>
+  <text x="1125" y="465" text-anchor="middle" font-size="15" font-weight="700" fill="#1f3864">Live Context Injection</text>
+  <text x="1125" y="490" text-anchor="middle" font-size="12" fill="#5a738c">Express injects before each prompt</text>
+  <rect x="920" y="510" width="410" height="280" rx="8" fill="#ffffff" stroke="#4a90c2"/>
+  <text x="940" y="545" font-family="Menlo, monospace" font-size="13" fill="#1565a0">{</text>
+  <text x="955" y="575" font-family="Menlo, monospace" font-size="12" fill="#4a657a">  "credit_tier": "Silver",</text>
+  <text x="955" y="605" font-family="Menlo, monospace" font-size="12" fill="#4a657a">  "credit_score": 512,</text>
+  <text x="955" y="635" font-family="Menlo, monospace" font-size="12" fill="#4a657a">  "active_loans": [...],</text>
+  <text x="955" y="665" font-family="Menlo, monospace" font-size="12" fill="#4a657a">  "savings_balance": 250,</text>
+  <text x="955" y="695" font-family="Menlo, monospace" font-size="12" fill="#4a657a">  "kyc_tier": 1,</text>
+  <text x="955" y="725" font-family="Menlo, monospace" font-size="12" fill="#4a657a">  "pool_utilisation": 0.67,</text>
+  <text x="955" y="755" font-family="Menlo, monospace" font-size="12" fill="#1f3864">  "session_id": "sess_..."</text>
+  <text x="940" y="780" font-family="Menlo, monospace" font-size="13" fill="#1565a0">}</text>
+</svg>
